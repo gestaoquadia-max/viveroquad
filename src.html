@@ -677,9 +677,6 @@
   .xp-row { display: flex; align-items: center; gap: 10px; }
   .score-lbl { font: 700 12px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--p-gold); flex: none; }
   .xp-num { font: 700 12.5px var(--ui); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums; }
-  .level-badge { position: absolute; right: -7px; bottom: -3px; width: 25px; height: 25px; border-radius: 50%;
-    display: grid; place-items: center; background: linear-gradient(160deg, #18B7F4, #0878F8); color: #fff;
-    font: 700 12px var(--ui); border: 2px solid #fff; box-shadow: 0 3px 8px rgba(8,120,248,0.4); }
   .xp-track { flex: 1; min-width: 0; height: 11px; border-radius: 99px; background: rgba(18,60,143,0.14);
     overflow: hidden; box-shadow: inset 0 1px 3px rgba(11,46,115,0.2); }
   .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3B8BFF, #1976FF);
@@ -905,7 +902,6 @@
           <div class="id-row">
             <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno">
               <span class="insignia" id="homeAvatar" aria-hidden="true">▲</span>
-              <span class="level-badge" id="levelBadge" title="Patente 1 de 14">1</span>
             </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
@@ -977,7 +973,7 @@
                 <span class="hm-expira"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg><span id="missExpira">EXPIRA EM 2H12</span></span>
               </div>
               <h2 class="mil hero-title">Bloco da noite</h2>
-              <p class="hero-sub">Não fuja! Não tire ponto — não os Quad Coins do bloco somem com ele. Arraste-os e avancemos!</p>
+              <p class="hero-sub">Complete as 20 questões de hoje antes das 23h59. Não fazer não tira pontos — mas os Quad Coins do bloco expiram com ele. Avante!</p>
               <div class="hero-prog">
                 <div class="bar-track"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
                 <span class="hero-count" id="missCount">10/20</span>
@@ -1707,18 +1703,9 @@
         <div class="plus-pop" id="plusPop">
           <div class="plus-sheet">
             <div class="k-label">Mais do Viver o Quad</div>
-            <button class="plus-row" data-goto="v-aluno">
-              <span class="p-ico">✦</span>
-              <span class="grow"><span class="t">Perfil do aluno</span><span class="d">nome de guerra, avatar e senha</span></span>
-            </button>
             <button class="plus-row" data-goto="v-perfil">
               <span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
               <span class="grow"><span class="t">Quadrômetro</span><span class="d">sua jornada em números</span></span>
-            </button>
-            <button class="plus-row" data-goto="v-pretaf">
-              <span class="p-ico">⚑</span>
-              <span class="grow"><span class="t">Pré-TAF</span><span class="d">preparo físico para as provas do concurso</span></span>
-              <span class="tag gold">NOVO</span>
             </button>
             <button class="plus-row" data-goto="v-calendario">
               <span class="p-ico">▦</span>
@@ -1733,11 +1720,6 @@
               <span class="grow"><span class="t">Loja · Intendência</span><span class="d">gaste seus Quad Coins em turmas, eventos e itens</span></span>
               <span class="tag gold">NOVO</span>
             </button>
-            <button class="plus-row locked" data-lock="Presença por geofencing chega na V1">
-              <span class="p-ico">◉</span>
-              <span class="grow"><span class="t">Presença automática</span><span class="d">geofencing do prédio, atraso e falta com cuidado</span></span>
-              <span class="tag v1">V1</span>
-            </button>
             <button class="plus-row locked" data-lock="Camada viva — chat e grupos chegam na V2">
               <span class="p-ico">✉</span>
               <span class="grow"><span class="t">Chat e grupos de questões</span><span class="d">quiz anônimo estilo Telegram, sem expor ninguém</span></span>
@@ -1747,6 +1729,11 @@
               <span class="p-ico">⚔</span>
               <span class="grow"><span class="t">Guarnições · GvG/PvP</span><span class="d">competição por velocidade, em equipe</span></span>
               <span class="tag v2">V2</span>
+            </button>
+            <button class="plus-row locked" data-lock="Pré-TAF em planejamento — ainda não disponível nesta versão">
+              <span class="p-ico">⚑</span>
+              <span class="grow"><span class="t">Pré-TAF</span><span class="d">preparo físico para as provas do concurso</span></span>
+              <span class="tag v1">EM BREVE</span>
             </button>
           </div>
         </div>
@@ -2692,10 +2679,10 @@
   /* ---------- tour obrigatório do Danilo (primeiro acesso) ---------- */
   var TOUR = [
     { sel: null, txt: 'Missão dada é missão cumprida! Eu sou o <strong>Danilo</strong>, seu guia. Antes de liberar a plataforma, vou te mostrar cada canto do app. Vamos juntos?' },
-    { sel: '.app-top[data-scope="aluno"]', txt: 'Este é você: <strong>avatar, nome de guerra, patente</strong> e os seus <strong>Quad Coins</strong> com a posição na turma. Tudo se ajusta no Perfil do aluno, dentro do botão +.' },
+    { sel: '.app-top[data-scope="aluno"]', txt: 'Este é você: <strong>avatar, nome de guerra, patente</strong> e os seus <strong>Quad Coins</strong> com a posição na turma. Tudo se ajusta no Perfil do aluno — basta tocar na sua foto.' },
     { sel: '#salaCard', txt: 'A <strong>Sala de aula</strong>: quando o professor abrir o quiz ao vivo, é por aqui que você entra — respondendo sem ver acerto ou erro até o fim.' },
     { sel: '[data-view="v-missoes"]', txt: '<strong>Missões</strong>: 20 questões novas por dia, em dois blocos de 10. O bloco expira 23h59 — e as atrasadas recuperam até sábado.' },
-    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: Perfil do aluno, <strong>Quadrômetro</strong>, Pré-TAF, Calendário e Materiais das aulas.' },
+    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: <strong>Quadrômetro</strong>, Loja·Intendência, Calendário e Materiais das aulas.' },
     { sel: '[data-view="v-dominio"]', txt: '<strong>Domínio</strong>: o quanto você demonstra saber, por matéria e assunto do edital. Quad Coin é fazer; Domínio é acertar.' },
     { sel: '[data-view="v-loja"]', txt: 'A <strong>Loja</strong>: troque seus Quad Coins por turmas, simulados, eventos e itens do personagem. Aqui <strong>só entra Quad Coin</strong> — dinheiro não compra.' },
     { sel: '#daniloFab', txt: 'E eu fico sempre por aqui! Toque em mim em qualquer tela para receber as orientações daquela etapa.' },
@@ -2862,8 +2849,6 @@
     // card de perfil (Início)
     $('homeNome').textContent = nomeCurto();
     $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
-    $('levelBadge').textContent = carreira.patenteIdx + 1;
-    $('levelBadge').title = 'Patente ' + (carreira.patenteIdx + 1) + ' de ' + GAMI.patentes.length + ' · ' + p.nome;
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
     $('xpFill').style.width = pct + '%';
     $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
