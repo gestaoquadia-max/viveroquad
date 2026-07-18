@@ -638,10 +638,15 @@
   .k-label, .tag, .ev-date { font-family: var(--font); }
   .k-label { letter-spacing: .12em; }
   .id-row { display: flex; align-items: center; gap: 12px; }
+  /* a foto é um botão: abre o Perfil do aluno */
   .avatar-ring { width: 56px; height: 56px; flex: none; border-radius: 50%; padding: 3px;
     background: conic-gradient(from 200deg, #3B8BFF, #0B2E73, #6FB4FF, #3B8BFF);
-    box-shadow: 0 6px 16px rgba(25,118,255,0.35); }
-  .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; }
+    box-shadow: 0 6px 16px rgba(25,118,255,0.35);
+    border: none; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+  .avatar-ring:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(25,118,255,0.5); }
+  .avatar-ring:active { transform: scale(0.97); }
+  .avatar-ring:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; }
+  .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; display: grid; place-items: center; }
   .idbar .who { flex: 1; min-width: 0; }
   .idbar .who .name { font-size: 19px; line-height: 1; white-space: nowrap; font-weight: 800; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
@@ -819,7 +824,7 @@
         <!-- topo identidade (aluno) -->
         <div class="app-top idbar" data-scope="aluno">
           <div class="id-row">
-            <div class="avatar-ring"><div class="insignia" id="homeAvatar" aria-hidden="true">▲</div></div>
+            <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno"><span class="insignia" id="homeAvatar" aria-hidden="true">▲</span></button>
             <div class="who">
               <div class="name mil" id="homeNome">Falcão-03</div>
               <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
@@ -2587,6 +2592,10 @@
   /* ---------- card de Quad Coins abre o Quadrômetro ---------- */
   var coinsCardEl = $('coinsCard');
   if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-perfil', 'navAluno'); });
+
+  /* ---------- foto do personagem abre o Perfil do aluno ---------- */
+  var btnAvatarEl = $('btnAvatarPerfil');
+  if (btnAvatarEl) btnAvatarEl.addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
 
   /* ---------- init do estado de acesso/conectividade ---------- */
   applyConnUI();
