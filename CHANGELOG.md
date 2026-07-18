@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — símbolo oficial na animação de carregamento
+- A releitura do símbolo em SVG foi **descartada**: as telas de acesso e a vinheta
+  passam a usar o **símbolo oficial da marca** (arquivo original, fundo transparente),
+  conforme o Manual de Marca 2024 (cores #0098DA, #2D5782, #6BCDF3)
+- Vinheta: animação de carregamento agora é uma **revelação circular do próprio
+  símbolo oficial** (ele se "desenha" em círculo enquanto carrega), sem recriar a forma
+- Novo asset `simbolo-quad-transparente.png` embutido no build via token
+  `__QUAD_SIMBOLO__` (build.ps1 atualizado); removido `simbolo-quad-3d.png`
+
 ## 18/07/2026 (fim de tarde) — identidade visual do acesso
 - **Símbolo do Quad em SVG** (fitas de ferro azul, transparente, com brilho e
   sombra 3D) substitui a logo em caixa branca nas telas de acesso
