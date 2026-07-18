@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — redesign gamificado (modelo do gestor)
+- Novo sistema visual "RPG militar": cartões de **vidro** (glass), botões **3D
+  brilhantes**, ícones **hexagonais**, pílulas e brilhos — aplicado a todo o app
+  via componentes compartilhados (`.p-card`, `.btn`, `.tag`, nav)
+- **Tela Início** refeita conforme o modelo enviado:
+  - Cabeçalho de identidade: avatar com anel, nome, patente com insígnia
+    hexagonal, **nível + barra de XP** e card **Quad Coins** com moeda dourada
+  - **Missão principal** como cartão-herói azul-escuro com brilho, título estêncil
+    "BLOCO DA NOITE", barra 10/20 e botão 3D "Continuar missão"
+  - Aula de hoje, Avisos (megafone) e **Eventos da semana** em tiles coloridos
+  - Nav inferior com **botão + central brilhante** e ícones com glow
+  - Balão do Danilo "Precisa de ajuda? Clique aqui"
+- 1º passo: Início como vitrine + tema aplicado ao app inteiro; refino fino das
+  demais telas (Professor, Admin, Quadrômetro) e das telas de acesso vem a seguir
+
 ## 18/07/2026 (noite) — símbolo oficial na animação de carregamento
 - A releitura do símbolo em SVG foi **descartada**: as telas de acesso e a vinheta
   passam a usar o **símbolo oficial da marca** (arquivo original, fundo transparente),

@@ -580,6 +580,149 @@
   .fase .f-nm { font-size: 12px; font-weight: 600; margin-top: 3px; }
   .fase .f-ds { font-size: 11px; color: var(--ink-dim); margin-top: 2px; line-height: 1.4; }
 
+  /* ==================================================================
+     REDESIGN GAMIFICADO (modelo do gestor) — vidro, brilho, RPG militar
+     ================================================================== */
+  .mil { font-family: "Arial Narrow", "Roboto Condensed", "Oswald", var(--font);
+         font-weight: 800; text-transform: uppercase; letter-spacing: .012em; }
+
+  .screen { background: linear-gradient(180deg, #EEF6FD 0%, #DEEBF9 55%, #D3E4F6 100%); }
+
+  /* cartões de vidro */
+  .p-card {
+    background: rgba(255,255,255,0.72);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(20,50,79,0.10), inset 0 1px 0 rgba(255,255,255,0.65);
+  }
+  .view .p-card.spot { box-shadow: 0 16px 34px rgba(27,127,196,0.22), inset 0 1px 0 rgba(255,255,255,0.7); border-color: #BFE3F7; }
+
+  /* botões glossy 3D */
+  .btn {
+    background: linear-gradient(180deg, #45A7EC 0%, #1E82C6 52%, #176CAC 100%);
+    box-shadow: 0 7px 16px rgba(27,127,196,0.38), inset 0 1px 0 rgba(255,255,255,0.55);
+    text-transform: uppercase; letter-spacing: .03em; font-weight: 800; border-radius: 12px;
+  }
+  .btn.ghost { background: rgba(255,255,255,0.6); border: 1px solid var(--p-line); color: var(--p-text); box-shadow: none; }
+  .btn:active { transform: translateY(1px); }
+
+  /* pílulas (tags) */
+  .tag { border-radius: 999px; padding: 4px 10px; font-weight: 700; backdrop-filter: blur(4px); }
+  .tag.blue-fill { background: #1B7FC4; color: #fff; border-color: #1B7FC4; }
+  .chev { color: var(--p-dim); font: 700 18px var(--font); flex: none; opacity: .7; }
+
+  .bar-track { background: rgba(20,50,79,0.12); height: 8px; }
+  .bar-fill { background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.55); }
+
+  /* ---------- cabeçalho de identidade (aluno) ---------- */
+  .app-top.idbar { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px 14px; border-bottom: none; }
+  .id-row { display: flex; align-items: center; gap: 12px; }
+  .avatar-ring { width: 52px; height: 52px; flex: none; border-radius: 50%; padding: 2.5px;
+    background: conic-gradient(from 200deg, #45A7EC, #2D5782, #6BCDF3, #45A7EC);
+    box-shadow: 0 4px 12px rgba(27,127,196,0.35); }
+  .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; }
+  .idbar .who { flex: 1; min-width: 0; }
+  .idbar .who .name { font-size: 19px; line-height: 1; white-space: nowrap; }
+  .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .rank-hex { width: 18px; height: 18px; flex: none; display: grid; place-items: center; color: #fff; font-size: 9px;
+    background: linear-gradient(160deg, #45A7EC, #1B6FB0); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
+  .rank-name { font: 800 12px var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--p-gold); }
+  .rank-sub { font-size: 11px; color: var(--p-dim); margin-top: 2px; }
+
+  .coins-card { display: flex; align-items: center; gap: 7px; flex: none; cursor: pointer;
+    background: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.9); border-radius: 13px;
+    padding: 7px 9px; box-shadow: 0 6px 14px rgba(20,50,79,0.10); position: relative; font: inherit; color: var(--p-text); }
+  .coin { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #8a5a10; font-size: 12px;
+    background: radial-gradient(circle at 35% 30%, #FFE694, #F5BC3C 55%, #D98A1F);
+    box-shadow: 0 2px 5px rgba(180,110,10,0.4), inset 0 1px 1px rgba(255,255,255,0.7); }
+  .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
+  .coins-lbl { font: 700 8.5px Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--p-dim); }
+  .coins-val { font: 800 16px var(--font); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
+  .coins-card .chev { font-size: 16px; margin-left: 2px; }
+  .coins-card .score-pop { top: -12px; right: 8px; }
+
+  .xp-row { display: flex; align-items: center; gap: 10px; }
+  .level-badge { width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(160deg, #45A7EC, #1B6FB0); color: #fff; font: 800 14px var(--font);
+    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(27,127,196,0.4); }
+  .xp-wrap { flex: 1; min-width: 0; }
+  .xp-top { display: flex; justify-content: space-between; font: 700 10px Consolas, monospace; color: var(--p-dim); margin-bottom: 4px; letter-spacing: .06em; }
+  .xp-track { height: 9px; border-radius: 99px; background: rgba(20,50,79,0.12); overflow: hidden; }
+  .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.6); }
+
+  /* ---------- cabeçalho de cartão com ícone hexagonal ---------- */
+  .card-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+  .card-head .k-label, .card-head h3 { margin: 0; }
+  .card-head .grow { flex: 1; min-width: 0; }
+  .card-eyebrow { font: 800 10px var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--p-gold);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 2px; white-space: nowrap; }
+  .aula-title { font-size: 15.5px; font-weight: 800; line-height: 1.15; margin: 4px 0 6px; }
+  .hexi { width: 46px; height: 46px; flex: none; display: grid; place-items: center; color: #fff;
+    background: linear-gradient(160deg, #45A7EC, #1B6FB0);
+    clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+    box-shadow: 0 5px 12px rgba(27,127,196,0.35); }
+  .hexi svg { width: 24px; height: 24px; }
+  .hexi.soft { background: linear-gradient(160deg, #EAF3FB, #CFE7F8); color: var(--p-gold); box-shadow: 0 3px 8px rgba(27,127,196,0.18); }
+  .hexi.soft svg { stroke: var(--p-gold); }
+
+  /* ---------- cartão herói: missão principal ---------- */
+  .hero-mission { background: linear-gradient(155deg, #1F5C93 0%, #14355A 60%, #0E2743 100%);
+    border: 1px solid rgba(120,180,230,0.35); color: #EAF4FD; position: relative; overflow: hidden;
+    box-shadow: 0 16px 34px rgba(11,40,71,0.4), inset 0 1px 0 rgba(255,255,255,0.12); }
+  .hero-mission::after { content: "⬡"; position: absolute; right: -18px; top: 34px; font-size: 190px; line-height: 1;
+    color: rgba(120,180,230,0.10); pointer-events: none; }
+  .hero-mission .hexi { background: linear-gradient(160deg, #56B4EE, #1E7FC2); box-shadow: 0 0 16px rgba(86,180,238,0.5); }
+  .hero-mission .k-label { color: #9CC6EC; }
+  .hero-title { font-size: 34px; line-height: .96; margin: 4px 0 8px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.25); }
+  .hero-sub { font-size: 12.5px; line-height: 1.5; color: #C7DEF2; margin: 0 0 14px; position: relative; }
+  .hero-prog { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; }
+  .hero-prog .bar-track { flex: 1; height: 12px; background: rgba(255,255,255,0.14); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+  .hero-prog .bar-fill { background: linear-gradient(90deg, #6BCDF3, #2E9BE0); box-shadow: 0 0 12px rgba(107,205,243,0.8); }
+  .hero-count { font: 800 20px var(--font); color: #fff; }
+  .hero-count b { font-weight: 800; }
+  .hero-btn { width: 100%; padding: 15px; font-size: 15px; border-radius: 14px;
+    background: linear-gradient(180deg, #57B4EE 0%, #2189CE 52%, #176CAC 100%);
+    box-shadow: 0 10px 22px rgba(30,120,200,0.5), inset 0 1px 0 rgba(255,255,255,0.6); position: relative; }
+
+  /* ---------- avisos ---------- */
+  .mission-row .m-dot { border-radius: 10px; background: linear-gradient(160deg, #EAF3FB, #CFE7F8); border: none; color: var(--p-gold); }
+  .mission-row .chev { margin-left: auto; }
+
+  /* ---------- eventos da semana (tiles) ---------- */
+  .ev-strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+  .ev-strip::-webkit-scrollbar { display: none; }
+  .ev-tile { flex: none; width: 116px; min-height: 96px; border-radius: 14px; padding: 11px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 3px; text-align: left; border: none; color: #EAF4FD; font: inherit;
+    background: linear-gradient(160deg, #23507E, #14314F); box-shadow: 0 8px 18px rgba(11,40,71,0.28); position: relative; }
+  .ev-tile.purple { background: linear-gradient(160deg, #6D3B9E, #3E2170); }
+  .ev-tile.teal { background: linear-gradient(160deg, #1C8F9C, #124E63); }
+  .ev-tile.add { background: rgba(255,255,255,0.55); border: 1px dashed var(--p-line); color: var(--p-dim);
+    align-items: center; justify-content: center; box-shadow: none; }
+  .ev-date { font: 800 9.5px Consolas, monospace; letter-spacing: .06em; opacity: .85; }
+  .ev-name { font-weight: 800; font-size: 12.5px; line-height: 1.12; text-transform: uppercase; }
+  .ev-meta { font-size: 10px; opacity: .8; margin-top: auto; }
+  .ev-tile .tag { position: absolute; top: 9px; right: 9px; font-size: 8px; padding: 2px 6px; }
+  .ev-plus { font-size: 24px; font-weight: 300; line-height: 1; }
+  .ev-tile.add .ev-name { color: var(--p-dim); }
+
+  /* ---------- nav inferior gamificada ---------- */
+  .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
+  .nav-btn { text-transform: uppercase; letter-spacing: .04em; font-size: 9.5px; }
+  .nav-btn .ico { font-size: 18px; transition: transform .15s ease; }
+  .nav-btn.active { color: var(--p-gold); }
+  .nav-btn.active .ico { filter: drop-shadow(0 0 6px rgba(27,127,196,0.7)); transform: translateY(-1px); }
+  .nav-plus { width: 56px; height: 56px; margin-top: -26px; font-size: 30px;
+    background: radial-gradient(circle at 50% 35%, #57B4EE, #1B7FC4 70%);
+    box-shadow: 0 8px 20px rgba(27,127,196,0.55), 0 0 0 6px rgba(69,167,236,0.18), inset 0 1px 0 rgba(255,255,255,0.6); }
+
+  /* ---------- balão do Danilo ---------- */
+  .danilo-hint { right: 84px; bottom: 96px; padding: 9px 13px; border-radius: 14px 14px 3px 14px;
+    background: #1B7FC4; box-shadow: 0 8px 18px rgba(27,127,196,0.4); line-height: 1.25; text-align: left; max-width: 150px; white-space: normal; }
+  .danilo-hint b { display: block; font-size: 12px; }
+  .danilo-hint small { font-size: 10px; opacity: .9; }
+
   @media (max-width: 860px) {
     .stage { flex-direction: column; align-items: center; }
     .aside { max-width: 480px; }
@@ -621,16 +764,29 @@
         <!-- app claro, padrão slate+azul do ecossistema Quad -->
 
         <!-- topo identidade (aluno) -->
-        <div class="app-top" data-scope="aluno">
-          <div class="insignia" id="homeAvatar" aria-hidden="true">▲</div>
-          <div class="who">
-            <div class="name" id="homeNome">Falcão-03</div>
-            <div class="rank">Soldado · patente fixa na V0</div>
+        <div class="app-top idbar" data-scope="aluno">
+          <div class="id-row">
+            <div class="avatar-ring"><div class="insignia" id="homeAvatar" aria-hidden="true">▲</div></div>
+            <div class="who">
+              <div class="name mil" id="homeNome">Falcão-03</div>
+              <div class="rank-line"><span class="rank-hex" aria-hidden="true">▲</span><span class="rank-name">Soldado</span></div>
+              <div class="rank-sub">Patente fixa na V0</div>
+            </div>
+            <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
+              <span class="coin" aria-hidden="true">★</span>
+              <span class="coins-txt">
+                <span class="coins-lbl">Quad Coins</span>
+                <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
+              </span>
+              <span class="chev">›</span>
+            </button>
           </div>
-          <div class="score-chip">
-            <div class="score-pop" id="scorePop">+30</div>
-            <div class="val" id="scoreVal">1.240</div>
-            <div class="lbl">Quad Coins · #12 turma</div>
+          <div class="xp-row">
+            <span class="level-badge" id="levelBadge">12</span>
+            <div class="xp-wrap">
+              <div class="xp-top"><span>XP</span><span id="xpNum">6.850 / 10.000</span></div>
+              <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.5%"></div></div>
+            </div>
           </div>
         </div>
 
@@ -662,51 +818,74 @@
 
         <!-- ============ ALUNO · INÍCIO ============ -->
         <div class="view on" id="v-inicio">
+          <!-- aula de hoje -->
           <div class="p-card" id="salaCard">
-            <div class="k-label">Sala de aula</div>
-            <h3 id="salaTitle">Aula de hoje · 19h–22h <span class="tag" id="salaTag">SEM QUIZ ABERTO</span></h3>
-            <p class="sub" id="salaSub">Direito Administrativo — Poderes. Quando o professor abrir o quiz, ele aparece aqui.</p>
-            <div style="margin-top:10px">
-              <button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button>
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg></div>
+              <div class="card-eyebrow grow">Aula de hoje <span class="tag blue-fill">19h–22h</span></div>
+              <span class="tag live" id="salaTag">SEM QUIZ ABERTO</span>
             </div>
+            <h3 class="aula-title" id="salaTitle">Direito Administrativo — Poderes</h3>
+            <p class="sub" id="salaSub">Sua próxima aula ao vivo. Prepare-se e avance na missão!</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button></div>
           </div>
 
+          <!-- missão principal (herói) -->
+          <div class="p-card hero-mission">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke-linecap="round"/></svg></div>
+              <div class="k-label grow">Missão principal</div>
+              <span class="tag warn" id="missExpira">⏱ EXPIRA EM 2H12</span>
+            </div>
+            <h2 class="mil hero-title">Bloco da noite</h2>
+            <p class="hero-sub">Não fuja! Não tire ponto — não os Quad Coins do bloco somem com ele. Arraste-os e avancemos!</p>
+            <div class="hero-prog">
+              <div class="bar-track"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
+              <span class="hero-count" id="missCount">10/20</span>
+            </div>
+            <button class="btn hero-btn" id="btnMissaoHome">Continuar missão ›</button>
+          </div>
+
+          <!-- avisos do professor -->
           <div class="p-card">
-            <div class="k-label">Missões de hoje · expiram 23h59</div>
-            <h3>Bloco da noite <span class="tag warn" id="missExpira">EXPIRA EM 2H12</span></h3>
-            <p class="sub">Não fazer não tira ponto — mas os Quad Coins do bloco somem com ele. Atrasadas recuperam até sábado.</p>
-            <div style="display:flex; align-items:center; gap:10px; margin-top:12px">
-              <div class="bar-track" style="flex:1"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
-              <span style="font:600 12px Consolas,monospace" id="missCount">10/20</span>
+            <div class="card-head slim">
+              <div class="hexi soft" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
+              <div class="k-label">Avisos do professor</div>
             </div>
-            <div style="margin-top:12px">
-              <button class="btn small" id="btnMissaoHome">Continuar missão</button>
+            <div class="mission-row">
+              <div class="m-dot" aria-hidden="true">▤</div>
+              <div class="grow"><div class="t">Simulado presencial — sábado 8h</div><div class="d">Inscrição pelo link. Presença pontua em Quad Coins.</div></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot" aria-hidden="true">✎</div>
+              <div class="grow"><div class="t">Material de Poderes liberado</div><div class="d">Leia antes do quiz de quinta.</div></div>
+              <span class="chev">›</span>
             </div>
           </div>
 
-          <div class="p-card">
-            <div class="k-label">Avisos do professor</div>
-            <div class="mission-row">
-              <div class="m-dot">!</div>
-              <div class="grow">
-                <div class="t">Simulado presencial — sábado 8h</div>
-                <div class="d">Inscrição pelo link. Presença pontua em Quad Coins.</div>
-              </div>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot">!</div>
-              <div class="grow">
-                <div class="t">Material de Poderes liberado</div>
-                <div class="d">Leia antes do quiz de quinta.</div>
-              </div>
-            </div>
-          </div>
-
+          <!-- eventos da semana -->
           <div class="p-card" id="mineCard">
             <div class="k-label">Eventos da semana</div>
-            <h3>Aulão de véspera — RONDESP <span class="tag gold" id="mineTag">COINS OCULTOS</span></h3>
-            <p class="sub">Tem Quad Coin para garimpar aqui dentro. Quem explora, encontra.</p>
-            <div style="margin-top:10px"><button class="btn ghost small" id="btnMinerar">Explorar evento</button></div>
+            <div class="ev-strip">
+              <button class="ev-tile" id="btnMinerar">
+                <span class="ev-date">QUI · 23/05</span>
+                <span class="ev-name">Aulão de véspera RONDESP</span>
+                <span class="ev-meta">Explore para garimpar</span>
+                <span class="tag gold" id="mineTag">COINS</span>
+              </button>
+              <div class="ev-tile purple">
+                <span class="ev-date">SÁB · 25/05</span>
+                <span class="ev-name">Simuladão Quad</span>
+                <span class="ev-meta">140 questões</span>
+              </div>
+              <div class="ev-tile teal">
+                <span class="ev-date">DOM · 26/05</span>
+                <span class="ev-name">Revisão turbinada</span>
+                <span class="ev-meta">Ao vivo</span>
+              </div>
+              <button class="ev-tile add"><span class="ev-plus">+</span><span class="ev-name">Mais eventos</span></button>
+            </div>
           </div>
         </div>
 
@@ -1147,7 +1326,7 @@
           </defs>
         </svg>
 
-        <span class="danilo-hint" id="daniloHint">Fale comigo!</span>
+        <span class="danilo-hint" id="daniloHint"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
         <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
           <video id="fabVideo" autoplay muted loop playsinline aria-hidden="true"></video>
         </button>
@@ -2310,6 +2489,10 @@
     sairConta();
     toast('Demonstração reiniciada — dispositivo não autorizado');
   });
+
+  /* ---------- card de Quad Coins abre o Quadrômetro ---------- */
+  var coinsCardEl = $('coinsCard');
+  if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-perfil', 'navAluno'); });
 
   /* ---------- init do estado de acesso/conectividade ---------- */
   applyConnUI();
