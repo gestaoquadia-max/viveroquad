@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — artes da Home refeitas em vetor (referências do gestor)
+- **Insígnia de patente** (brasão-casa azul com hexágono, estrela e divisas) refeita
+  em SVG ao lado de "SOLDADO", com glow
+- **Quad Coin** refeita em SVG: moeda dourada com estrela no aro, centro azul,
+  hexágono dourado, estrela facetada e divisas — usada no card de coins
+- **Bloco da Noite** reconstruído como placa técnica chanfrada: fundo azul-marinho
+  em gradiente com borda clara e emblema em marca d'água; por cima, os elementos
+  **funcionais** refeitos conforme a arte — placa octogonal com alvo, selo dourado
+  "EXPIRA EM 2H12" com relógio, título grande, barra de progresso com brilho e
+  botão hexagonal "CONTINUAR MISSÃO" com seta (proporções, cores e fontes da arte)
+
 ## 18/07/2026 (noite) — fidelidade visual premium (referência = fonte da verdade)
 - **Tipografia de identidade Exo 2** (500–800) em títulos, nome, missão, botões,
   Quad Coins, indicadores, nav e eventos; **Inter** só para textos de leitura

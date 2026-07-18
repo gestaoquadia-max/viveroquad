@@ -643,27 +643,22 @@
     box-shadow: 0 6px 16px rgba(25,118,255,0.35); }
   .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; }
   .idbar .who { flex: 1; min-width: 0; }
-  .idbar .who .name { font-size: 20px; line-height: 1; white-space: nowrap; font-weight: 800; }
+  .idbar .who .name { font-size: 19px; line-height: 1; white-space: nowrap; font-weight: 800; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
   .rank-name { font: 800 13px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--p-gold); }
-  .rank-sub { font-size: 11px; color: var(--p-dim); margin-top: 3px; }
+  .rank-sub { font-size: 10.5px; color: var(--p-dim); margin-top: 3px; white-space: nowrap; }
 
   .coins-card { display: flex; align-items: center; gap: 7px; flex: none; cursor: pointer;
     background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 14px;
     padding: 7px 9px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
-  .coin { position: relative; width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center;
-    background: radial-gradient(circle at 38% 30%, #FFE7A0, #F4B63A 58%, #D48E12);
-    box-shadow: 0 3px 8px rgba(190,130,20,0.5), 0 0 10px rgba(244,182,58,0.45), inset 0 0 0 2px rgba(255,255,255,0.35), inset 0 -2px 3px rgba(150,90,10,0.45); }
-  .coin i { width: 60%; height: 60%; border-radius: 50%; display: grid; place-items: center;
-    background: radial-gradient(circle at 38% 30%, #3B8BFF, #123C8F);
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.5), 0 1px 1px rgba(10,40,120,0.3); }
-  .coin i::before { content: "★"; color: #EAF3FF; font-size: 10px; line-height: 1; }
-  .coin::after { content: "★"; position: absolute; top: -3px; right: -3px; font-size: 10px; color: #FFD24A; text-shadow: 0 0 4px rgba(244,182,58,0.95); }
+  .coin-art { width: 31px; height: 31px; flex: none;
+    filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 9px rgba(244,182,58,0.5)); }
+  .rank-badge { width: 22px; height: 24px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
   .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
   .coins-lbl { font: 700 8.5px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--p-dim); }
-  .coins-val { font: 800 18px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
+  .coins-val { font: 800 17px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
   .coins-card .chev { font-size: 16px; margin-left: 2px; }
   .coins-card .score-pop { top: -12px; right: 8px; }
 
@@ -694,25 +689,49 @@
   .hexi.soft svg { stroke: var(--p-gold); }
 
   /* ---------- cartão herói: missão principal ---------- */
-  .hero-mission { padding: 20px; border-radius: 26px;
-    background: linear-gradient(150deg, #0B2E73 0%, #123C8F 55%, #164FA8 100%);
-    border: 1px solid rgba(90,160,255,0.35); color: #EAF3FF; position: relative; overflow: hidden;
-    box-shadow: 0 22px 46px rgba(9,34,90,0.35), inset 0 1px 0 rgba(255,255,255,0.12); }
-  .hero-mission::after { content: ""; position: absolute; right: -50px; top: 20px; width: 220px; height: 220px;
-    background: radial-gradient(closest-side, rgba(59,139,255,0.22), transparent 70%); pointer-events: none; }
-  .hero-mission .hexi { background: linear-gradient(160deg, #3B8BFF, #1976FF); box-shadow: 0 0 18px rgba(59,139,255,0.6); }
-  .hero-mission .k-label { color: #9CC1F5; }
-  .hero-title { font-size: 35px; line-height: .96; margin: 8px 0 10px; color: #fff; letter-spacing: .01em; }
-  .hero-sub { font-size: 13px; line-height: 1.5; color: #C3D6F5; margin: 0 0 16px; position: relative; }
-  .hero-prog { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; position: relative; }
-  .hero-prog .bar-track { flex: 1; height: 14px; border-radius: 99px; background: rgba(255,255,255,0.15); box-shadow: inset 0 1px 4px rgba(0,0,0,0.35); }
-  .hero-prog .bar-fill { border-radius: 99px; background: linear-gradient(90deg, #6FB4FF, #1976FF); box-shadow: 0 0 14px rgba(59,139,255,0.9), inset 0 1px 0 rgba(255,255,255,0.4); }
-  .hero-count { font: 800 24px var(--num); color: #fff; }
-  .hero-btn { width: 100%; height: 58px; padding: 0 18px; font-size: 16px; border-radius: 18px; letter-spacing: .05em; font-weight: 800;
-    background: linear-gradient(180deg, #4A94FF 0%, #1976FF 55%, #135FE0 100%);
-    border: 1px solid rgba(150,195,255,0.7);
-    box-shadow: 0 14px 26px rgba(25,118,255,0.5), inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -3px 8px rgba(10,40,120,0.35); position: relative; overflow: hidden; }
-  .hero-btn::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(180deg, rgba(255,255,255,0.32), transparent); pointer-events: none; }
+  /* placa técnica chanfrada — fundo da arte de referência */
+  .hero-mission { padding: 2px; border: none; border-radius: 0; color: #EAF3FF;
+    background: linear-gradient(140deg, #A9D6FF 0%, #4E8FE0 30%, #1B4C9E 70%, #0E2E6B 100%);
+    clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 22px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 22px 100%, 0 calc(100% - 22px), 0 22px);
+    box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    filter: drop-shadow(0 18px 30px rgba(9,34,90,0.38)); }
+  .hm-inner { position: relative; padding: 18px;
+    clip-path: polygon(21px 0, calc(100% - 21px) 0, 100% 21px, 100% calc(100% - 21px), calc(100% - 21px) 100%, 21px 100%, 0 calc(100% - 21px), 0 21px);
+    background:
+      radial-gradient(130% 90% at 88% 12%, rgba(46,110,220,0.35), transparent 55%),
+      linear-gradient(155deg, #0A2050 0%, #0C2A63 45%, #123E8C 100%); }
+  .hm-inner > :not(.hm-mark) { position: relative; z-index: 1; }
+  .hm-mark { position: absolute; right: 2px; top: 46%; transform: translateY(-50%); width: 165px; height: 165px;
+    color: #1D55B0; opacity: .55; pointer-events: none; }
+  .hm-plaque { width: 52px; height: 52px; flex: none; display: grid; place-items: center; color: #EAF4FF;
+    background: linear-gradient(160deg, #1E4FA8, #0C2557);
+    clip-path: polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);
+    box-shadow: inset 0 0 0 2.5px rgba(126,190,255,0.75), inset 0 0 14px rgba(24,110,240,0.5); }
+  .hm-plaque svg { width: 27px; height: 27px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+  .hero-mission .k-label { color: #57A8FF; font: 700 12.5px var(--ui); letter-spacing: .2em; }
+  .hm-expira { display: inline-flex; align-items: center; gap: 6px; flex: none;
+    background: rgba(8,20,52,0.8); border: 2px solid #C99B2F; color: #F2C94C;
+    border-radius: 999px; padding: 7px 13px; font: 700 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; }
+  .hm-expira svg { width: 14px; height: 14px; stroke: #F2C94C; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+  .hero-title { font-size: 36px; line-height: .96; margin: 10px 0 10px; color: #fff; letter-spacing: .015em; }
+  .hero-sub { font-size: 13px; line-height: 1.5; color: #C3D6F5; margin: 0 0 16px; max-width: 34ch; }
+  .hero-prog { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .hero-prog .bar-track { flex: 1; height: 17px; border-radius: 99px; background: #071838;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 0 2px rgba(10,30,70,0.9), 0 1px 0 rgba(90,150,240,0.25); }
+  .hero-prog .bar-fill { border-radius: 99px; background: linear-gradient(180deg, #6FD0FF 0%, #2496FF 60%, #1976FF 100%);
+    box-shadow: 0 0 16px rgba(47,166,255,0.95), inset 0 1px 0 rgba(255,255,255,0.55); }
+  .hero-count { font: 800 26px var(--num); color: #fff; }
+  .hero-btn-wrap { padding: 2px;
+    background: linear-gradient(180deg, #BBDCFF, #5D9EEC 45%, #2F6CC8);
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 30%, 100% 70%, calc(100% - 18px) 100%, 18px 100%, 0 70%, 0 30%);
+    filter: drop-shadow(0 10px 18px rgba(20,90,220,0.45)); }
+  .hero-btn { width: 100%; height: 56px; padding: 0 18px; border: none; border-radius: 0;
+    clip-path: polygon(17px 0, calc(100% - 17px) 0, 100% 31%, 100% 69%, calc(100% - 17px) 100%, 17px 100%, 0 69%, 0 31%);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font: 800 16.5px var(--ui); letter-spacing: .06em; text-transform: uppercase;
+    background: linear-gradient(180deg, #54A4FF 0%, #1E7DFF 55%, #135FE0 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -4px 8px rgba(9,40,120,0.4); }
+  .hb-chev { width: 18px; height: 18px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
   /* ---------- avisos ---------- */
   .mission-row .m-dot { width: 34px; height: 34px; border-radius: 12px; background: linear-gradient(160deg, #E7F1FF, #CFE2FF); border: none; color: var(--p-gold); }
@@ -803,11 +822,11 @@
             <div class="avatar-ring"><div class="insignia" id="homeAvatar" aria-hidden="true">▲</div></div>
             <div class="who">
               <div class="name mil" id="homeNome">Falcão-03</div>
-              <div class="rank-line"><span class="rank-hex" aria-hidden="true">▲</span><span class="rank-name">Soldado</span></div>
+              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
               <div class="rank-sub">Patente fixa na V0</div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
-              <span class="coin" aria-hidden="true"><i></i></span>
+              <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
               <span class="coins-txt">
                 <span class="coins-lbl">Quad Coins</span>
                 <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
@@ -864,20 +883,25 @@
             <div style="margin-top:10px"><button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button></div>
           </div>
 
-          <!-- missão principal (herói) -->
+          <!-- missão principal (herói) — placa técnica chanfrada, arte de referência -->
           <div class="p-card hero-mission">
-            <div class="card-head">
-              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke-linecap="round"/></svg></div>
-              <div class="k-label grow">Missão principal</div>
-              <span class="tag warn" id="missExpira">⏱ EXPIRA EM 2H12</span>
+            <div class="hm-inner">
+              <svg class="hm-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#emblemaQuad"/></svg>
+              <div class="card-head">
+                <div class="hm-plaque" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.2v3.4M12 18.4v3.4M2.2 12h3.4M18.4 12h3.4"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+                <div class="k-label grow">Missão principal</div>
+                <span class="hm-expira"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg><span id="missExpira">EXPIRA EM 2H12</span></span>
+              </div>
+              <h2 class="mil hero-title">Bloco da noite</h2>
+              <p class="hero-sub">Não fuja! Não tire ponto — não os Quad Coins do bloco somem com ele. Arraste-os e avancemos!</p>
+              <div class="hero-prog">
+                <div class="bar-track"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
+                <span class="hero-count" id="missCount">10/20</span>
+              </div>
+              <div class="hero-btn-wrap">
+                <button class="btn hero-btn" id="btnMissaoHome">Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+              </div>
             </div>
-            <h2 class="mil hero-title">Bloco da noite</h2>
-            <p class="hero-sub">Não fuja! Não tire ponto — não os Quad Coins do bloco somem com ele. Arraste-os e avancemos!</p>
-            <div class="hero-prog">
-              <div class="bar-track"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
-              <span class="hero-count" id="missCount">10/20</span>
-            </div>
-            <button class="btn hero-btn" id="btnMissaoHome">Continuar missão ›</button>
           </div>
 
           <!-- avisos do professor -->
@@ -1356,6 +1380,42 @@
               <path d="M92.6 57.2 A8.5 8.5 0 0 0 104.2 60.4" fill="none" stroke="#7ECBF1" stroke-width="3" stroke-linecap="round"/>
               <path d="M105.2 43.9 A10.5 10.5 0 0 1 102.7 63.1" fill="none" stroke="#1B9CD9" stroke-width="4.2" stroke-linecap="round"/>
               <path d="M100 61 L110 69 L107.5 57.5 Z" fill="#1B9CD9"/>
+            </symbol>
+          </defs>
+        </svg>
+
+        <!-- ============ ARTES DA HOME · insígnia, Quad Coin e emblema (vetor) ============ -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <linearGradient id="insOut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4FAFF"/><stop offset="1" stop-color="#8FC1F2"/></linearGradient>
+            <linearGradient id="insIn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E55B2"/><stop offset="1" stop-color="#0A2A66"/></linearGradient>
+            <radialGradient id="cgOuter" cx="0.38" cy="0.3" r="0.9"><stop offset="0" stop-color="#FFEBA8"/><stop offset="0.55" stop-color="#F6BE45"/><stop offset="1" stop-color="#C8860D"/></radialGradient>
+            <radialGradient id="cgBlue" cx="0.38" cy="0.32" r="0.85"><stop offset="0" stop-color="#3B79F2"/><stop offset="0.7" stop-color="#16368F"/><stop offset="1" stop-color="#0B2455"/></radialGradient>
+            <linearGradient id="cgStar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE596"/><stop offset="1" stop-color="#E09415"/></linearGradient>
+
+            <symbol id="emblemaQuad" viewBox="0 0 100 100">
+              <path d="M50 4 89 27 89 73 50 96 11 73 11 27Z" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round"/>
+              <path d="M50 20 55.9 35.8 72.8 36.6 59.6 47.1 64.1 63.4 50 54.1 35.9 63.4 40.4 47.1 27.2 36.6 44.1 35.8Z" fill="currentColor"/>
+              <path d="M24 72 50 84 76 72 76 80 50 92 24 80Z" fill="currentColor"/>
+            </symbol>
+
+            <symbol id="insigniaQuad" viewBox="0 0 100 112">
+              <rect x="20" y="8" width="13" height="22" rx="2" fill="#A9D2F8" stroke="#E8F5FF" stroke-width="1"/>
+              <path d="M50 2 98 36 86 36 86 74 50 108 14 74 14 36 2 36Z" fill="url(#insOut)"/>
+              <path d="M50 13 87 39 78 39 78 69 50 95 22 69 22 39 13 39Z" fill="url(#insIn)"/>
+              <g color="#EAF4FF"><use href="#emblemaQuad" x="0" y="0" width="100" height="100" transform="translate(28,30) scale(0.45)"/></g>
+            </symbol>
+
+            <symbol id="quadCoinSvg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="48" fill="url(#cgOuter)" stroke="#9A6606" stroke-width="1"/>
+              <circle cx="50" cy="50" r="40.5" fill="none" stroke="#FFE9A0" stroke-opacity="0.55" stroke-width="1"/>
+              <circle cx="50" cy="50" r="39" fill="none" stroke="#8A5E08" stroke-opacity="0.3" stroke-width="1.5"/>
+              <path d="M50 4.5 51.7 8.6 56 8.9 52.7 11.6 53.9 15.8 50 13.4 46.1 15.8 47.3 11.6 44 8.9 48.3 8.6Z" fill="#8A5C06"/>
+              <path d="M5 36 13 36M5 64 13 64M87 36 95 36M87 64 95 64" stroke="#B87A0E" stroke-width="2"/>
+              <circle cx="50" cy="50" r="31" fill="url(#cgBlue)" stroke="#E8B23A" stroke-width="3"/>
+              <path d="M50 26 70.8 38 70.8 62 50 74 29.2 62 29.2 38Z" fill="none" stroke="#F2B93E" stroke-width="4.5" stroke-linejoin="round"/>
+              <path d="M50 31 53.9 41.6 65.2 42.1 56.4 49.1 59.4 59.9 50 53.7 40.6 59.9 43.6 49.1 34.8 42.1 46.1 41.6Z" fill="url(#cgStar)" stroke="#B0730A" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M27 62 50 72.5 73 62 73 70 50 80.5 27 70Z" fill="url(#cgStar)" stroke="#B0730A" stroke-width="1" stroke-linejoin="round"/>
             </symbol>
           </defs>
         </svg>
