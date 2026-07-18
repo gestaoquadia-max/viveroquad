@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (fim de tarde) — identidade visual do acesso
+- **Símbolo do Quad em SVG** (fitas de ferro azul, transparente, com brilho e
+  sombra 3D) substitui a logo em caixa branca nas telas de acesso
+- **Vinheta**: a barra de carregamento saiu; agora o **próprio símbolo se desenha**
+  (as fitas de ferro se constroem e se ajustam) como animação de carregamento
+- Tela inicial: subtítulo passa a **"Da matrícula ao primeiro dia do curso de
+  formação"** e o aviso sobre uso offline foi removido
+- Tela "Dispositivo autorizado": recado longo removido; layout refeito com selo de
+  sucesso verde e hierarquia mais limpa
+- Telas de acesso reorganizadas (selos de status, espaçamento e centralização
+  consistentes)
+- Assets: `simbolo-quad-transparente.png` (símbolo oficial sem fundo) e
+  `simbolo-quad-3d.png` (releitura 3D em fitas de ferro)
+
 ## 18/07/2026 (tarde) — novo fluxo inicial de acesso (offline-first)
 - **Tela inicial** repaginada: pede apenas o e-mail + botão **Acessar o portal** e o
   aviso sobre uso sem internet após o primeiro acesso online

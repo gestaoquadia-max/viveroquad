@@ -362,11 +362,35 @@
     width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
     background: #E6F3FC; border: 1px solid #BFE3F7; color: var(--p-gold); font-size: 26px; margin-bottom: 10px; flex: none;
   }
+  .gate-badge {
+    width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 30px; font-weight: 700; margin-bottom: 14px; flex: none;
+    box-shadow: 0 6px 16px rgba(20,50,79,0.14);
+  }
+  .gate-badge.ok { background: #F0FDF4; border: 1px solid #BBF7D0; color: #16A34A; }
+  .gate-badge.warn { background: #FFFBEB; border: 1px solid #FDE68A; color: #B45309; }
+  .gate-centered { align-items: center; text-align: center; }
   .gate-email-chip {
     font: 600 12px Consolas, monospace; color: var(--p-text); background: var(--gold-soft);
     border: 1px solid #BFE3F7; border-radius: 8px; padding: 6px 10px; margin-bottom: 12px;
     word-break: break-all; text-align: center; max-width: 100%;
   }
+
+  /* ============ MARCA QUAD · símbolo em fitas de ferro azul (SVG 3D) ============ */
+  .brand-q { display: block; overflow: visible; }
+  .login-q { width: 118px; height: auto; margin: 0 auto 16px; }
+  .gate-q { width: 56px; height: auto; margin: 0 auto 12px; }
+  .splash-q { width: 138px; height: auto; }
+  /* animação de carregamento: o próprio símbolo se constrói (o ferro se desenha e torce) */
+  .q-load { animation: qsettle 2.5s cubic-bezier(.34,1.16,.4,1) both; }
+  .q-load .rb { stroke-dasharray: 1; stroke-dashoffset: 1; animation: qdraw 1.7s cubic-bezier(.55,0,.25,1) forwards; }
+  .q-load .d1 { animation-delay: .05s; }
+  .q-load .d2 { animation-delay: .30s; }
+  .q-load .d3 { animation-delay: .55s; }
+  .q-load .tail { opacity: 0; transform-box: fill-box; transform-origin: center; animation: qtail .55s ease 1.15s forwards; }
+  @keyframes qdraw { to { stroke-dashoffset: 0; } }
+  @keyframes qtail { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
+  @keyframes qsettle { 0% { transform: rotate(-9deg) scale(.85); } 55% { transform: none; } 100% { transform: none; } }
 
   /* ============ BOTÃO + (MAIS) ============ */
   .nav-plus {
@@ -566,8 +590,9 @@
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
     .login-logo, .splash-logo { opacity: 1 !important; transform: none !important; }
-    .splash-phrase, .splash-phrase .dot, .splash-brand, .splash-load { opacity: 1 !important; transform: none !important; }
-    .splash-load .fill { width: 100% !important; }
+    .splash-phrase, .splash-phrase .dot, .splash-brand { opacity: 1 !important; transform: none !important; }
+    .q-load .rb { stroke-dashoffset: 0 !important; }
+    .q-load .tail { opacity: 1 !important; transform: none !important; }
   }
 </style>
 
@@ -1126,6 +1151,24 @@
           </defs>
         </svg>
 
+        <!-- ============ MARCA QUAD · símbolo em fitas de ferro azul (definições) ============ -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <linearGradient id="qgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6ea0"/><stop offset="1" stop-color="#204d78"/></linearGradient>
+            <linearGradient id="qgb" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#33b4e8"/><stop offset="1" stop-color="#1288c4"/></linearGradient>
+            <linearGradient id="qgl" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#8fd3f4"/><stop offset="1" stop-color="#5cb8e6"/></linearGradient>
+            <filter id="qsh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0d325a" flood-opacity="0.32"/></filter>
+            <symbol id="quadQ" viewBox="0 0 200 210">
+              <g filter="url(#qsh)" fill="none" stroke-linecap="round">
+                <path d="M48.9 131.5 A59 59 0 0 0 137.9 147.2" stroke="url(#qgl)" stroke-width="17"/>
+                <path d="M95.7 40.2 A62 62 0 0 0 85.0 162.2" stroke="url(#qgd)" stroke-width="21"/>
+                <path d="M104.3 40.2 A62 62 0 0 1 138.2 150.9" stroke="url(#qgb)" stroke-width="21"/>
+                <path d="M149.0 143.1 Q141.3 168.1 137.4 186.0 Q112.5 172.9 97.9 163.0 Z" fill="url(#qgb)"/>
+              </g>
+            </symbol>
+          </defs>
+        </svg>
+
         <span class="danilo-hint" id="daniloHint">Fale comigo!</span>
         <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
           <video id="fabVideo" autoplay muted loop playsinline aria-hidden="true"></video>
@@ -1193,15 +1236,21 @@
 
         <!-- ============ VINHETA (toca logo após o login) ============ -->
         <div class="splash-layer done" id="splashLayer" role="button" aria-label="Vinheta — toque para pular">
-          <img class="splash-logo" src="__QUAD_LOGO__" alt="Logo Quad Concursos">
+          <svg class="brand-q splash-q q-load" viewBox="0 0 200 210" aria-hidden="true">
+            <g filter="url(#qsh)" fill="none" stroke-linecap="round">
+              <path class="rb d3" pathLength="1" d="M48.9 131.5 A59 59 0 0 0 137.9 147.2" stroke="url(#qgl)" stroke-width="17"/>
+              <path class="rb d1" pathLength="1" d="M95.7 40.2 A62 62 0 0 0 85.0 162.2" stroke="url(#qgd)" stroke-width="21"/>
+              <path class="rb d2" pathLength="1" d="M104.3 40.2 A62 62 0 0 1 138.2 150.9" stroke="url(#qgb)" stroke-width="21"/>
+              <path class="tail" d="M149.0 143.1 Q141.3 168.1 137.4 186.0 Q112.5 172.9 97.9 163.0 Z" fill="url(#qgb)"/>
+            </g>
+          </svg>
           <div class="splash-phrase">Comece seu sonho por aqui<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
-          <div class="splash-load"><div class="fill"></div></div>
           <div class="splash-brand">Quad Concursos</div>
         </div>
 
         <!-- ============ PORTÃO: JÁ É ALUNO / PRIMEIRA VEZ ============ -->
         <div class="gate-layer" id="gateLayer">
-          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
+          <svg class="brand-q gate-q" viewBox="0 0 200 210" aria-hidden="true"><use href="#quadQ"/></svg>
 
           <!-- verificação do e-mail (loading) -->
           <div class="gate-step" id="gateVerify" style="display:none">
@@ -1288,20 +1337,18 @@
 
         <!-- ============ PRIMEIRO ACESSO CONCLUÍDO: DISPOSITIVO AUTORIZADO ============ -->
         <div class="gate-layer" id="authLayer">
-          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
-          <div class="gate-step">
-            <div class="gate-icon" aria-hidden="true">✓</div>
+          <div class="gate-step gate-centered">
+            <div class="gate-badge ok" aria-hidden="true">✓</div>
             <h2>Dispositivo autorizado</h2>
-            <p class="login-sub" style="max-width:290px">Este dispositivo foi autorizado. Nos próximos acessos, você poderá usar o reconhecimento facial ou o código de desbloqueio do aparelho, inclusive quando estiver sem internet.</p>
-            <button class="btn" id="btnAuthContinuar" style="width:100%; margin-top:6px">Continuar</button>
+            <p class="login-sub" style="max-width:260px">Seu acesso está pronto.</p>
+            <button class="btn" id="btnAuthContinuar" style="width:100%; margin-top:8px">Continuar</button>
           </div>
         </div>
 
         <!-- ============ ABERTURA SEM INTERNET (dispositivo já autorizado) ============ -->
         <div class="gate-layer" id="offlineLayer">
-          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
-          <div class="gate-step">
-            <div class="gate-icon" aria-hidden="true">▽</div>
+          <div class="gate-step gate-centered">
+            <div class="gate-badge warn" aria-hidden="true">▽</div>
             <h2>Você está offline</h2>
             <p class="login-sub" style="max-width:300px">Somente os conteúdos já carregados neste dispositivo estarão disponíveis. Novas missões e o quiz ao vivo voltam quando a conexão retornar.</p>
             <div class="gate-info" id="offlineLastSync">Última sincronização: —</div>
@@ -1333,16 +1380,15 @@
         <!-- ============ LOGIN ============ -->
         <div class="login-layer" id="loginLayer">
           <div class="login-logo-wrap" id="logoWrap">
-            <img class="login-logo" src="__QUAD_LOGO__" alt="Logo Quad Concursos">
+            <svg class="brand-q login-q" viewBox="0 0 200 210" aria-hidden="true"><use href="#quadQ"/></svg>
           </div>
           <h2 class="login-title">VIVER O QUAD</h2>
-          <p class="login-sub">Do primeiro contato ao dia da farda.</p>
+          <p class="login-sub">Da matrícula ao primeiro dia do curso de formação.</p>
           <div class="login-field">
             <label for="loginEmail">E-mail</label>
             <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
           </div>
           <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Acessar o portal</button>
-          <p class="login-note">Após o primeiro acesso online, você poderá entrar no aplicativo sem internet e realizar as missões que já estiverem carregadas no dispositivo.</p>
         </div>
 
         <div class="toast" id="toast"></div>
