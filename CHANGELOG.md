@@ -1,14 +1,5 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
-## 18/07/2026 (noite) — Card de Perfil rediagramado
-- **Foto do aluno centralizada** no topo do card, com o **nível (12) sobre a foto**
-- Removido o texto "Patente fixa na V0"; patente segue como insígnia + SOLDADO
-- **"XP" renomeado para "Score"** (rótulo · barra · números na mesma linha)
-- Tipografia do card em **Rajdhani Bold** (nome, patente, Score, números e Quad Coins)
-- **Quad Coins como faixa dourada** de largura total, com a nova **moeda-medalha**
-  refeita em vetor (Q oficial ao centro, "QUAD"/"CONCURSOS" em arco, louros e
-  triângulos, dourado com relevo)
-
 ## 18/07/2026 (noite) — artes da Home refeitas em vetor (referências do gestor)
 - **Insígnia de patente** (brasão-casa azul com hexágono, estrela e divisas) refeita
   em SVG ao lado de "SOLDADO", com glow
