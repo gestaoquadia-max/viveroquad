@@ -650,23 +650,23 @@
   .avatar-ring:active { transform: scale(0.97); }
   .avatar-ring:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; }
   .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; display: grid; place-items: center; }
-  .idbar .who { flex: 1; min-width: 0; }
-  .idbar .who .name { font-size: 19px; line-height: 1; white-space: nowrap; font-weight: 800; }
+  .idbar .who { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+  .idbar .who .name { font-size: 14.5px; line-height: 1; white-space: nowrap; font-weight: 800; letter-spacing: 0; }
+  .idbar .rank-line { margin-top: 0; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
   .rank-name { font: 800 13px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--p-gold); }
-  .rank-sub { font-size: 10.5px; color: var(--p-dim); margin-top: 3px; white-space: nowrap; }
 
-  .coins-card { display: flex; align-items: center; gap: 7px; flex: none; cursor: pointer;
-    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 14px;
-    padding: 7px 9px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
-  .coin-art { width: 31px; height: 31px; flex: none;
+  .coins-card { display: flex; align-items: center; gap: 6px; flex: none; cursor: pointer;
+    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 13px;
+    padding: 6px 8px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
+  .coin-art { width: 27px; height: 27px; flex: none;
     filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 9px rgba(244,182,58,0.5)); }
   .rank-badge { width: 22px; height: 24px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
   .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
-  .coins-lbl { font: 700 8.5px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--p-dim); }
-  .coins-val { font: 800 17px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
+  .coins-lbl { font: 700 8px var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--p-dim); }
+  .coins-val { font: 800 16px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
   .coins-card .chev { font-size: 16px; margin-left: 2px; }
   .coins-card .score-pop { top: -12px; right: 8px; }
 
@@ -831,9 +831,8 @@
           <div class="id-row">
             <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno"><span class="insignia" id="homeAvatar" aria-hidden="true">▲</span></button>
             <div class="who">
-              <div class="name mil" id="homeNome">Falcão-03</div>
+              <div class="name mil" id="homeNome">Al Quad Moura</div>
               <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
-              <div class="rank-sub">Patente fixa na V0</div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
@@ -847,7 +846,7 @@
           <div class="xp-row">
             <span class="level-badge" id="levelBadge">12</span>
             <div class="xp-wrap">
-              <div class="xp-top"><span>XP</span><span id="xpNum">6.850 / 10.000</span></div>
+              <div class="xp-top"><span>Score</span><span id="xpNum">6.850 / 10.000</span></div>
               <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.5%"></div></div>
             </div>
           </div>
@@ -1059,7 +1058,7 @@
         <div class="view" id="v-perfil">
           <div class="p-card">
             <div class="k-label">Quadrômetro · sua jornada em números</div>
-            <h3 id="quadNome">Falcão-03 · Soldado</h3>
+            <h3 id="quadNome">Al Quad Moura · Soldado</h3>
             <p class="sub">Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10 encontros. Patente evolutiva entra na V1.</p>
           </div>
           <div class="p-card">
@@ -1092,14 +1091,14 @@
             <div class="k-label">Avatar · coleção da Polícia Militar</div>
             <div class="avatar-preview">
               <img id="avPreview" alt="Avatar selecionado">
-              <span class="nametag" id="avNametag">Falcão-03</span>
+              <span class="nametag" id="avNametag">Al Quad Moura</span>
             </div>
             <div class="avatar-grid" id="avGrid"></div>
             <p class="sub" style="margin-top:10px">O nome de guerra vai estampado na farda. Novas variações chegam com a patente evolutiva (V1).</p>
           </div>
           <div class="p-card">
             <div class="k-label">Nome de guerra</div>
-            <input id="nomeGuerra" class="fld" value="Falcão-03" maxlength="16" aria-label="Nome de guerra">
+            <input id="nomeGuerra" class="fld" value="Al Quad Moura" maxlength="16" aria-label="Nome de guerra">
           </div>
           <div class="p-card">
             <div class="k-label">Conta e senha</div>
@@ -2525,11 +2524,11 @@
   }
   if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
   function syncNametag() {
-    $('avNametag').textContent = $('nomeGuerra').value.trim() || 'Falcão-03';
+    $('avNametag').textContent = $('nomeGuerra').value.trim() || 'Al Quad Moura';
   }
   $('nomeGuerra').addEventListener('input', syncNametag);
   $('btnSalvarPerfil').addEventListener('click', function () {
-    var nome = $('nomeGuerra').value.trim() || 'Falcão-03';
+    var nome = $('nomeGuerra').value.trim() || 'Al Quad Moura';
     $('homeNome').textContent = nome;
     $('quadNome').textContent = nome + ' · Soldado';
     syncNametag();
@@ -2608,12 +2607,12 @@
   function daniloWave() {
     if (!fabSpriteEl) return;
     waveTimers.forEach(clearTimeout); waveTimers = [];
-    // parado → levanta o braço → acena (vai-e-vem) → abaixa → parado
-    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0];
+    // parado → levanta o braço → acena (vai-e-vem, 3x) → abaixa → parado
+    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0];
     seq.forEach(function (fr, i) {
       waveTimers.push(setTimeout(function () {
         fabSpriteEl.style.backgroundPosition = (-fr * 118) + 'px 0';
-      }, i * 110));
+      }, i * 230));
     });
   }
   setTimeout(daniloWave, 1200); // acena ao chegar; depois fica quieto
