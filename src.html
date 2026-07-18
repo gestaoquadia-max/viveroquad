@@ -2777,14 +2777,13 @@
   });
 
   /* ---------- perfil do aluno: avatares da coleção PM ---------- */
-  var AVATAR_SPRITE = '__AVATARS__'; // coleção oficial, embutida no build
-  var AV_CX = [0.1535, 0.3745, 0.6135, 0.8425], AV_CY = [0.1975, 0.50, 0.80], AV_R = 0.104;
+  var AVATAR_SPRITE = '__AVATARS__'; // coleção 3D · 6 homens + 6 mulheres (grade 6×2, embutida no build)
+  var AV_CX = [1/12, 3/12, 5/12, 7/12, 9/12, 11/12], AV_CY = [0.25, 0.75], AV_R = 1/12;
   var AV_LABELS = [
-    'Quepe clássico, bigode', 'Quepe, sorrindo', 'Boina preta, sério', 'Feminina, quepe, sorrindo',
-    'Tático preto, boina, bigode', 'Tático preto, boné', 'Feminina, farda azul, boina', 'Feminina, tático, boina',
-    'Feminina, tático, sorrindo', 'Boina preta, farda azul', 'Boina preta, farda azul II', 'Feminina, tático preto'
+    'Homem · cabelo loiro', 'Homem · pele parda, corte raspado', 'Homem · ruivo', 'Homem · careca', 'Homem · negro, corte fade', 'Homem · corte militar',
+    'Mulher · cabelo preto liso', 'Mulher · loira', 'Mulher · ruiva', 'Mulher · castanho curto', 'Mulher · negra, cabelo curto', 'Mulher · negra, tranças'
   ];
-  var avatarThumbs = [], avatarIdx = 2; // boina preta é o padrão
+  var avatarThumbs = [], avatarIdx = 0;
   function aplicarAvatar() {
     if (!avatarThumbs.length) return;
     var src = avatarThumbs[avatarIdx];
