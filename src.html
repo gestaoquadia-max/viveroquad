@@ -307,6 +307,67 @@
   .login-field input:focus { border-color: var(--p-gold); box-shadow: 0 0 0 3px #CFE9FA; }
   .login-note { font-size: 11px; color: var(--p-dim); margin-top: 14px; text-align: center; line-height: 1.5; }
 
+  /* ============ NOVO ACESSO · CONECTIVIDADE / OFFLINE ============ */
+  /* alternador de rede (simulação) — flutua acima de todas as camadas para ficar sempre acessível */
+  .conn-toggle {
+    position: absolute; top: 8px; right: 15px; z-index: 60;
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    background: rgba(255,255,255,0.92); border: 1px solid var(--p-line); border-radius: 999px;
+    padding: 4px 9px; font: 600 10px Consolas, monospace; color: var(--p-dim); letter-spacing: 0.06em;
+    box-shadow: 0 2px 6px rgba(20,50,79,0.12);
+  }
+  .conn-toggle .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--p-ok); flex: none; }
+  .conn-toggle.off .dot { background: #F59E0B; }
+  .conn-toggle:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 2px; border-radius: 6px; }
+
+  .offline-banner {
+    flex: none; display: none; align-items: center; gap: 8px;
+    background: #FFFBEB; border-bottom: 1px solid #FDE68A; color: #92400E;
+    padding: 8px 14px; font-size: 11.5px; line-height: 1.4;
+  }
+  .offline-banner.on { display: flex; }
+  .offline-banner .oi { font-size: 13px; flex: none; }
+  .offline-banner .sync-chip {
+    margin-left: auto; flex: none; font: 600 9px Consolas, monospace;
+    background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;
+    padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .offline-banner.syncing { background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF; }
+  .offline-banner.syncing .sync-chip { background: #DBEAFE; border-color: #BFDBFE; color: #1E40AF; }
+
+  .gate-alts { width: 100%; margin-top: 12px; display: flex; flex-direction: column; gap: 2px; }
+  .gate-link {
+    background: none; border: none; cursor: pointer; color: var(--p-gold);
+    font: 600 12.5px var(--font); padding: 9px 6px; border-radius: 8px; text-align: center;
+  }
+  .gate-link.dim { color: var(--p-dim); font-weight: 500; }
+  .gate-link:hover { background: var(--gold-soft); }
+  .gate-link:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 2px; }
+
+  .access-spin {
+    width: 34px; height: 34px; border-radius: 50%; margin: 4px 0 14px;
+    border: 3px solid #D8E7F5; border-top-color: var(--p-gold);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gate-warn {
+    width: 100%; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E;
+    border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5; margin-bottom: 12px;
+  }
+  .gate-info {
+    width: 100%; background: #E6F3FC; border: 1px solid #BFE3F7; color: #14324F;
+    border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5; margin-bottom: 12px; text-align: center;
+  }
+  .gate-icon {
+    width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
+    background: #E6F3FC; border: 1px solid #BFE3F7; color: var(--p-gold); font-size: 26px; margin-bottom: 10px; flex: none;
+  }
+  .gate-email-chip {
+    font: 600 12px Consolas, monospace; color: var(--p-text); background: var(--gold-soft);
+    border: 1px solid #BFE3F7; border-radius: 8px; padding: 6px 10px; margin-bottom: 12px;
+    word-break: break-all; text-align: center; max-width: 100%;
+  }
+
   /* ============ BOTÃO + (MAIS) ============ */
   .nav-plus {
     flex: none; width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
@@ -530,7 +591,12 @@
     <!-- ==================== PHONE ==================== -->
     <div class="phone">
       <div class="screen" id="screen">
-        <div class="statusbar"><span>21:47</span><span>TER · QUAD</span></div>
+        <div class="statusbar">
+          <span>21:47</span>
+          <button class="conn-toggle" id="connToggle" aria-label="Alternar conexão (simulação de rede)" title="Simulação de rede — toque para alternar online/offline">
+            <span class="dot"></span><span id="connLabel">ONLINE</span>
+          </button>
+        </div>
         <!-- app claro, padrão slate+azul do ecossistema Quad -->
 
         <!-- topo identidade (aluno) -->
@@ -564,6 +630,13 @@
             <div class="name">Administrador</div>
             <div class="rank">N.P.P. · camada estrutural</div>
           </div>
+        </div>
+
+        <!-- ============ BANNER MODO OFFLINE (nível do app) ============ -->
+        <div class="offline-banner" id="offlineBanner">
+          <span class="oi" aria-hidden="true">▽</span>
+          <span id="offlineBannerText">Modo offline. Novas missões e informações serão carregadas quando a conexão retornar.</span>
+          <span class="sync-chip" id="syncChip" style="display:none">0 respostas aguardando envio</span>
         </div>
 
         <!-- ============ ALUNO · INÍCIO ============ -->
@@ -618,6 +691,12 @@
 
         <!-- ============ ALUNO · MISSÕES ============ -->
         <div class="view" id="v-missoes">
+          <div class="p-card" id="novaMissaoCard" style="display:none">
+            <div class="k-label">Nova missão</div>
+            <h3 id="novaMissaoTitle">Nova missão disponível</h3>
+            <p class="sub" id="novaMissaoSub">Missão carregada e pronta. Toque para começar.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnNovaMissao">Iniciar missão</button></div>
+          </div>
           <div class="p-card">
             <div class="k-label">Hoje · 20 questões novas (10 + 10)</div>
             <div class="mission-row">
@@ -1124,37 +1203,62 @@
         <div class="gate-layer" id="gateLayer">
           <img class="gate-logo" src="__QUAD_LOGO__" alt="">
 
-          <div class="gate-step" id="gateChoice">
-            <h2>Bem-vindo ao Viver o Quad</h2>
-            <p class="login-sub">Como você chega até aqui?</p>
-            <button class="gate-opt" id="btnJaAluno">
-              <span class="t">Já sou aluno</span>
-              <span class="d">valide seu acesso com o e-mail cadastrado no curso</span>
-            </button>
-            <button class="gate-opt" id="btnPrimeiraVez">
-              <span class="t">Minha primeira vez</span>
-              <span class="d">crie seu cadastro — buscamos seus dados na plataforma</span>
-            </button>
-            <p class="login-note">V0 · público interno: todo aluno já existe na plataforma-base.</p>
+          <!-- verificação do e-mail (loading) -->
+          <div class="gate-step" id="gateVerify" style="display:none">
+            <div class="access-spin" aria-hidden="true"></div>
+            <h2>Verificando e-mail</h2>
+            <p class="login-sub">Consultando a plataforma-base…</p>
+            <div class="gate-email-chip" id="verifyEmail">voce@exemplo.com</div>
           </div>
 
-          <div class="gate-step" id="gateValida" style="display:none">
-            <h2>Validação por e-mail</h2>
-            <p class="login-sub">Digite o e-mail cadastrado. Enviaremos um código de acesso.</p>
-            <div class="login-field">
-              <label for="valEmail">E-mail cadastrado</label>
-              <input id="valEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off">
+          <!-- cenário 1: aluno com cadastro ativo → código por e-mail -->
+          <div class="gate-step" id="gateCode" style="display:none">
+            <h2>Verificação por e-mail</h2>
+            <p class="login-sub">Enviamos um código de acesso para</p>
+            <div class="gate-email-chip" id="codeEmail">voce@exemplo.com</div>
+            <div class="gate-warn" id="codeTrouble" style="display:none">
+              Com dificuldade para receber o código? Você pode reenviá-lo ou entrar com a sua senha.
             </div>
-            <button class="btn" id="btnEnviarCodigo" style="width:100%">Enviar código</button>
-            <div id="codigoBox" style="display:none; width:100%; margin-top:12px">
-              <div class="login-field">
-                <label for="valCodigo">Código de 6 dígitos</label>
-                <input id="valCodigo" inputmode="numeric" maxlength="6" placeholder="______">
-              </div>
-              <button class="btn" id="btnValidar" style="width:100%">Validar acesso</button>
-              <button class="btn ghost small" id="btnReenviar" style="width:100%; margin-top:8px">Reenviar código</button>
+            <div class="login-field" style="width:100%">
+              <label for="codeInput">Código de acesso</label>
+              <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="______">
             </div>
-            <button class="btn ghost small" data-gate-back style="width:100%; margin-top:14px">Voltar</button>
+            <button class="btn" id="btnEntrarCode" style="width:100%">Entrar</button>
+            <div class="gate-alts">
+              <button class="gate-link" id="btnReenviarCode">Reenviar código</button>
+              <button class="gate-link" id="btnUsarSenha">Entrar com senha</button>
+              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
+            </div>
+          </div>
+
+          <!-- entrada alternativa por senha (apenas online) -->
+          <div class="gate-step" id="gatePassword" style="display:none">
+            <h2>Entrar com senha</h2>
+            <p class="login-sub">Use a senha da sua conta Quad.</p>
+            <div class="gate-email-chip" id="pwEmail">voce@exemplo.com</div>
+            <div class="login-field" style="width:100%">
+              <label for="pwInput">Senha</label>
+              <input id="pwInput" type="password" placeholder="••••••••">
+            </div>
+            <button class="btn" id="btnEntrarSenha" style="width:100%">Acessar o portal</button>
+            <div class="gate-alts">
+              <button class="gate-link" id="btnEsqueciSenha">Esqueci minha senha</button>
+              <button class="gate-link" id="btnUsarCodigo">Usar código por e-mail</button>
+              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
+            </div>
+            <p class="login-note">A senha é usada apenas no acesso online.</p>
+          </div>
+
+          <!-- cenário 3: cadastrado, mas conta ainda não ativada -->
+          <div class="gate-step" id="gateActivate" style="display:none">
+            <div class="gate-icon" aria-hidden="true">✦</div>
+            <h2>Cadastro localizado</h2>
+            <p class="login-sub">Encontramos seu cadastro na plataforma, mas sua conta do Viver o Quad ainda não foi ativada.</p>
+            <div class="gate-email-chip" id="activateEmail">voce@exemplo.com</div>
+            <button class="btn" id="btnAtivarConta" style="width:100%">Ativar minha conta</button>
+            <div class="gate-alts">
+              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
+            </div>
           </div>
 
           <div class="gate-step" id="gateCadastro" style="display:none">
@@ -1179,6 +1283,30 @@
             <div class="login-field"><label for="cadMatricula">Matrícula</label><input id="cadMatricula"></div>
             <button class="btn" id="btnConcluir" style="width:100%" disabled>Concluir cadastro</button>
             <button class="btn ghost small" id="btnCadVoltar" style="width:100%; margin-top:10px">Voltar</button>
+          </div>
+        </div>
+
+        <!-- ============ PRIMEIRO ACESSO CONCLUÍDO: DISPOSITIVO AUTORIZADO ============ -->
+        <div class="gate-layer" id="authLayer">
+          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
+          <div class="gate-step">
+            <div class="gate-icon" aria-hidden="true">✓</div>
+            <h2>Dispositivo autorizado</h2>
+            <p class="login-sub" style="max-width:290px">Este dispositivo foi autorizado. Nos próximos acessos, você poderá usar o reconhecimento facial ou o código de desbloqueio do aparelho, inclusive quando estiver sem internet.</p>
+            <button class="btn" id="btnAuthContinuar" style="width:100%; margin-top:6px">Continuar</button>
+          </div>
+        </div>
+
+        <!-- ============ ABERTURA SEM INTERNET (dispositivo já autorizado) ============ -->
+        <div class="gate-layer" id="offlineLayer">
+          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
+          <div class="gate-step">
+            <div class="gate-icon" aria-hidden="true">▽</div>
+            <h2>Você está offline</h2>
+            <p class="login-sub" style="max-width:300px">Somente os conteúdos já carregados neste dispositivo estarão disponíveis. Novas missões e o quiz ao vivo voltam quando a conexão retornar.</p>
+            <div class="gate-info" id="offlineLastSync">Última sincronização: —</div>
+            <button class="btn" id="btnEntrarOffline" style="width:100%">Entrar no modo offline</button>
+            <button class="btn ghost small" id="btnTentarNovamente" style="width:100%; margin-top:10px">Tentar novamente</button>
           </div>
         </div>
 
@@ -1210,15 +1338,11 @@
           <h2 class="login-title">VIVER O QUAD</h2>
           <p class="login-sub">Do primeiro contato ao dia da farda.</p>
           <div class="login-field">
-            <label for="loginEmail">E-mail do curso</label>
+            <label for="loginEmail">E-mail</label>
             <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
           </div>
-          <div class="login-field">
-            <label for="loginSenha">Senha</label>
-            <input id="loginSenha" type="password" placeholder="••••••••" />
-          </div>
-          <button class="btn" id="btnEntrar" style="width:100%; margin-top:6px">Entrar</button>
-          <p class="login-note">Mesma conta da plataforma do curso.<br>Protótipo: qualquer e-mail e senha entram.</p>
+          <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Acessar o portal</button>
+          <p class="login-note">Após o primeiro acesso online, você poderá entrar no aplicativo sem internet e realizar as missões que já estiverem carregadas no dispositivo.</p>
         </div>
 
         <div class="toast" id="toast"></div>
@@ -1272,11 +1396,23 @@
           <li><strong>Admin por edital</strong> — árvore Concurso→Edital→Matéria→Assunto separada de Turma = Edital × Modalidade, banco de questões por tag e simulação de reconciliação. <span class="ref">§5</span></li>
           <li><strong>Fronteira V0/V1 explícita</strong> — Domínio como prévia bloqueada, Quadcoin/Intendência trancados, telemetria (origem da sessão + linha de base) registrada desde o dia 1. <span class="ref">§6 · §8 · Anexo A</span></li>
           <li><strong>Danilo, o guia</strong> — mascote vetorizado a partir da folha de personagem (Unidade 01). Toque nele em qualquer tela: o popup traz as orientações daquela etapa da jornada, para aluno, professor e admin. <span class="ref">novo · rev. desta proposta</span></li>
-          <li><strong>Login + vinheta com carregamento</strong> — e-mail do curso + senha com a logo oficial (arquivo da marca); ao entrar, vinheta animada "Comece seu sonho por aqui..." com barra de carregamento. Sair da conta (no Quadrômetro) volta ao login. <span class="ref">§14 · conta e acesso</span></li>
-          <li><strong>Portão de acesso</strong> — após a vinheta: "Já sou aluno" (validação por código enviado ao e-mail) ou "Minha primeira vez" (cadastro com preenchimento automático a partir da plataforma-base — V0 é público interno, o aluno já existe no banco). <span class="ref">§14 · conta e acesso</span></li>
+          <li><strong>Acesso por e-mail (código ou senha)</strong> — tela inicial pede só o e-mail e "Acessar o portal"; a verificação roteia três cenários (ativo · dificuldade com o código · conta não ativada). Aluno ativo valida por código, com "Entrar com senha" como alternativa online; conta não ativada cai no cadastro existente. <span class="ref">§14 · conta e acesso</span></li>
+          <li><strong>Autorização do dispositivo + modo offline</strong> — o 1º acesso online autoriza o aparelho ("reconhecimento facial/desbloqueio nos próximos acessos"). Depois disso, abrir sem internet mostra "Você está offline" com a última sincronização; no app, missões já carregadas funcionam e as respostas ficam "aguardando envio", o quiz ao vivo e novas missões pedem conexão, e o retorno da rede sincroniza tudo. <span class="ref">novo · offline-first</span></li>
           <li><strong>Botão "+" — hub de módulos</strong> — Perfil do aluno (nome de guerra, avatar com fardamentos da PM, senha), Pré-TAF (metas do edital e treino da semana), Calendário e Materiais das aulas; prévias de V1 (Quadcoin, geofencing) e V2 (chat, guarnições) aparecem bloqueadas. <span class="ref">novo</span></li>
           <li><strong>Quadrômetro</strong> — a antiga aba Perfil, rebatizada: Quad Coins, posição, presença e constância do aluno em números. <span class="ref">novo nome</span></li>
         </ul>
+      </div>
+
+      <div class="note-card">
+        <h2>Testar o novo acesso (V0)</h2>
+        <p>Fluxo de acesso com dados simulados. A conexão é alternada pelo indicador <strong>ONLINE/OFFLINE</strong> na barra de status do celular (canto superior direito).</p>
+        <ul style="font-size:13px">
+          <li><strong>aluno@quad.com</strong> — cadastro ativo (código por e-mail)</li>
+          <li><strong>codigo@quad.com</strong> — cadastrado, com dificuldade para receber o código</li>
+          <li><strong>novo@quad.com</strong> — conta ainda não ativada (leva ao cadastro)</li>
+        </ul>
+        <p style="margin-top:4px">Código de demonstração: <strong>123456</strong> · senha: qualquer valor. O 1º acesso online autoriza o dispositivo e habilita o modo offline.</p>
+        <button id="btnResetDemo" style="margin-top:8px; cursor:pointer; font:600 12px var(--font); padding:9px 14px; border-radius:8px; border:1px solid var(--line); background:var(--gold-soft); color:var(--gold)">Resetar demonstração (dispositivo)</button>
       </div>
 
       <div class="note-card">
@@ -1296,6 +1432,22 @@
 (function () {
   var score = 1240;
   var missDone = 10;
+
+  // ---- estado de acesso e conectividade (SIMULADO no front-end) ----
+  // [INTEGRAÇÃO REAL] trocar por: verificação no servidor, envio de e-mail,
+  // biometria nativa e fila de sincronização. Aqui tudo é mock no navegador.
+  var online = true;          // rede simulada (alternável pelo toggle da statusbar)
+  var currentEmail = '';      // e-mail do fluxo de acesso em andamento
+  var scenario = 'ativo';     // ativo | dificuldade | nao_ativado
+  var pendingRunTour = false; // se o próximo entrarApp deve rodar o tour
+  var CODE_OK = '123456';     // código de demonstração aceito
+  // persistência simulada só no navegador
+  var LS = { auth: 'vq_device_authorized', sync: 'vq_last_sync', pend: 'vq_pending' };
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+  var deviceAuthorized = lsGet(LS.auth) === '1';
+  var pendingAnswers = parseInt(lsGet(LS.pend) || '0', 10) || 0;
 
   function $(id) { return document.getElementById(id); }
   function fmt(n) { return n.toLocaleString('pt-BR'); }
@@ -1563,6 +1715,13 @@
         $('btnMissao2').disabled = true; $('btnMissao2').textContent = 'Feito';
         $('btnMissaoHome').disabled = true; $('btnMissaoHome').textContent = 'Missão do dia concluída';
         addScore(30, '+30 Quad Coins · missão do dia completa');
+        if (!online) {
+          // offline: o progresso fica salvo no dispositivo, aguardando sincronização
+          pendingAnswers += QUESTIONS.length;
+          lsSet(LS.pend, String(pendingAnswers));
+          updatePending();
+          toast(QUESTIONS.length + ' respostas salvas · aguardando envio');
+        }
       } else {
         addScore(20, '+20 Quad Coins · quiz da aula');
       }
@@ -1584,6 +1743,10 @@
   });
 
   $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 2 · Dir. Administrativo'); });
+  $('btnNovaMissao').addEventListener('click', function () {
+    if (!online) { toast('Existe uma nova missão disponível. Conecte-se à internet para carregá-la.'); return; }
+    openQuiz('missao', 'Nova missão · questões do dia');
+  });
   $('btnMissaoHome').addEventListener('click', function () {
     showView('v-missoes', 'navAluno');
   });
@@ -1603,6 +1766,7 @@
     $('salaTag').classList.add('live');
     $('salaSub').textContent = 'O professor abriu o quiz de Poderes. Entre agora — pontua em Quad Coins.';
     $('btnEntrarQuiz').style.display = 'inline-block';
+    refreshSalaLock(); // se o aluno estiver offline, o botão entra travado
     pollN = 0;
     pollTimer = setInterval(function () {
       pollN = Math.min(42, pollN + Math.ceil(Math.random() * 5));
@@ -1627,60 +1791,246 @@
     $('btnEntrarQuiz').style.display = 'none';
     toast('Relatório da sala gerado');
   });
-  $('btnEntrarQuiz').addEventListener('click', function () { openQuiz('aula', 'Quiz ao vivo · registrado como OPEN_CLASS'); });
+  $('btnEntrarQuiz').addEventListener('click', function () {
+    if (!online) { toast('O quiz ao vivo precisa de conexão com a internet.'); return; }
+    openQuiz('aula', 'Quiz ao vivo · registrado como OPEN_CLASS');
+  });
 
-  /* ---------- vinheta (logo após o login) ---------- */
-  var splashTimer = null;
-  function playSplash() {
+  /* ---------- vinheta (após conceder o acesso, antes de abrir o app) ---------- */
+  var splashTimer = null, splashDone = null;
+  function playSplash(done) {
+    splashDone = done || null;
     var s = $('splashLayer');
     s.innerHTML = s.innerHTML; // recria os nós para reiniciar as animações
     s.classList.remove('done');
     clearTimeout(splashTimer);
-    splashTimer = setTimeout(function () { s.classList.add('done'); abrirGate(); }, 3400);
+    splashTimer = setTimeout(function () {
+      s.classList.add('done');
+      var d = splashDone; splashDone = null; if (d) d();
+    }, 3400);
   }
   $('splashLayer').addEventListener('click', function () {
     clearTimeout(splashTimer);
     $('splashLayer').classList.add('done');
-    abrirGate();
+    var d = splashDone; splashDone = null; if (d) d();
   });
 
-  /* ---------- portão: já é aluno / minha primeira vez ---------- */
-  var CODIGO = '';
+  /* ============================================================
+     CONECTIVIDADE + ACESSO (simulado no front-end)
+     Organizado para plugar a integração real depois:
+       detectarCenario(email) → [INTEGRAÇÃO REAL: consulta à plataforma-base]
+       código/senha           → [INTEGRAÇÃO REAL: verificação no servidor]
+       deviceAuthorized/sync  → [INTEGRAÇÃO REAL: biometria + fila de sync]
+     ============================================================ */
+
+  function isInApp() {
+    return !$('gateLayer').classList.contains('on') &&
+           !$('offlineLayer').classList.contains('on') &&
+           !$('authLayer').classList.contains('on') &&
+           $('loginLayer').classList.contains('off');
+  }
+  function fmtSync(ts) {
+    if (!ts) return '—';
+    var d = new Date(parseInt(ts, 10));
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' às ' + p(d.getHours()) + 'h' + p(d.getMinutes());
+  }
+  function updatePending() {
+    var chip = $('syncChip');
+    if (pendingAnswers > 0) {
+      chip.style.display = 'inline-block';
+      chip.textContent = pendingAnswers + (pendingAnswers === 1 ? ' resposta aguardando envio' : ' respostas aguardando envio');
+    } else { chip.style.display = 'none'; }
+  }
+  function refreshSalaLock() {
+    var btn = $('btnEntrarQuiz');
+    if (!btn) return;
+    if (!online) {
+      if (btn.style.display !== 'none') { btn.disabled = true; btn.textContent = 'Quiz ao vivo indisponível offline'; }
+    } else if (btn.style.display !== 'none') {
+      btn.disabled = false; btn.textContent = 'Entrar no quiz ao vivo';
+    }
+  }
+  function refreshNovaMissao() {
+    var card = $('novaMissaoCard');
+    if (!card) return;
+    card.style.display = 'block';
+    if (!online) {
+      $('novaMissaoSub').textContent = 'Existe uma nova missão disponível. Conecte-se à internet para carregá-la.';
+      $('btnNovaMissao').disabled = true;
+      $('btnNovaMissao').textContent = 'Aguardando conexão';
+    } else {
+      $('novaMissaoSub').textContent = 'Missão carregada e pronta. Toque para começar.';
+      $('btnNovaMissao').disabled = false;
+      $('btnNovaMissao').textContent = 'Iniciar missão';
+    }
+  }
+  function applyConnUI() {
+    var t = $('connToggle');
+    t.classList.toggle('off', !online);
+    $('connLabel').textContent = online ? 'ONLINE' : 'OFFLINE';
+    $('offlineBanner').classList.toggle('on', !online && isInApp());
+    refreshSalaLock();
+    refreshNovaMissao();
+    queueSync();
+  }
+  function sincronizar() {
+    var b = $('offlineBanner');
+    var had = pendingAnswers;
+    b.classList.add('on', 'syncing');
+    $('offlineBannerText').textContent = 'Sincronizando…';
+    $('syncChip').style.display = 'none';
+    setTimeout(function () {
+      pendingAnswers = 0; lsSet(LS.pend, '0'); lsSet(LS.sync, String(Date.now()));
+      b.classList.remove('syncing');
+      $('offlineBannerText').textContent = 'Modo offline. Novas missões e informações serão carregadas quando a conexão retornar.';
+      updatePending();
+      applyConnUI(); // esconde o banner (agora online) e destrava o app
+      toast(had > 0 ? 'Sincronização concluída · ' + had + (had === 1 ? ' resposta enviada' : ' respostas enviadas') : 'Sincronização concluída.');
+    }, 1300);
+  }
+  function setOnline(v) {
+    var was = online;
+    online = v;
+    applyConnUI();
+    if (v && !was && isInApp()) sincronizar();
+  }
+  $('connToggle').addEventListener('click', function () { setOnline(!online); });
+
+  /* ---------- passos do portão ---------- */
   function gateStep(id) {
-    ['gateChoice', 'gateValida', 'gateCadastro', 'gateCadastroDados'].forEach(function (s) {
+    ['gateVerify', 'gateCode', 'gatePassword', 'gateActivate', 'gateCadastro', 'gateCadastroDados'].forEach(function (s) {
       $(s).style.display = (s === id) ? 'flex' : 'none';
     });
   }
-  function abrirGate() { gateStep('gateChoice'); $('gateLayer').classList.add('on'); }
+  function abrirGate(id) { gateStep(id || 'gateVerify'); $('gateLayer').classList.add('on'); }
   function fecharGate() { $('gateLayer').classList.remove('on'); }
-  $('btnJaAluno').addEventListener('click', function () { gateStep('gateValida'); });
-  $('btnPrimeiraVez').addEventListener('click', function () { gateStep('gateCadastro'); });
-  document.querySelectorAll('[data-gate-back]').forEach(function (b) {
-    b.addEventListener('click', function () { gateStep('gateChoice'); });
-  });
-  function enviarCodigo() {
-    var em = $('valEmail').value.trim();
-    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
-    CODIGO = String(Math.floor(100000 + Math.random() * 900000));
-    $('codigoBox').style.display = 'block';
-    $('btnEnviarCodigo').disabled = true;
-    $('btnEnviarCodigo').textContent = 'Código enviado para ' + em;
-    // na versão real o código chega por e-mail; no protótipo, mostramos no toast
-    toast('Simulação do e-mail — seu código: ' + CODIGO);
+
+  /* ---------- tela inicial: acessar o portal ---------- */
+  function detectarCenario(email) {
+    // [INTEGRAÇÃO REAL] substituir por consulta ao cadastro do aluno
+    var e = (email || '').toLowerCase();
+    if (e.indexOf('novo') >= 0 || e.indexOf('ativar') >= 0) return 'nao_ativado';
+    if (e.indexOf('codigo') >= 0 || e.indexOf('suporte') >= 0 || e.indexOf('ajuda') >= 0) return 'dificuldade';
+    return 'ativo';
   }
-  $('btnEnviarCodigo').addEventListener('click', enviarCodigo);
-  $('btnReenviar').addEventListener('click', function () {
-    $('btnEnviarCodigo').disabled = false;
-    enviarCodigo();
-  });
-  $('btnValidar').addEventListener('click', function () {
-    if ($('valCodigo').value === CODIGO && CODIGO) {
-      $('contaEmail').textContent = $('valEmail').value.trim();
-      fecharGate();
-      toast('Acesso validado — bem-vindo de volta!');
-    } else {
-      toast('Código incorreto — confira seu e-mail');
+  function acessarPortal() {
+    var em = $('loginEmail').value.trim();
+    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
+    currentEmail = em;
+    if (!online) {
+      if (deviceAuthorized) { showOfflineEntry(); }
+      else { toast('O primeiro acesso precisa de internet.'); }
+      return;
     }
+    // online: verifica o e-mail (loading) e roteia pelo cenário
+    $('loginLayer').classList.add('off');
+    $('verifyEmail').textContent = em;
+    abrirGate('gateVerify');
+    setTimeout(function () {
+      scenario = detectarCenario(em);
+      if (scenario === 'nao_ativado') {
+        $('activateEmail').textContent = em;
+        gateStep('gateActivate');
+      } else {
+        $('codeEmail').textContent = em;
+        $('codeTrouble').style.display = (scenario === 'dificuldade') ? 'block' : 'none';
+        $('codeInput').value = '';
+        gateStep('gateCode');
+        toast('Simulação do e-mail — código: ' + CODE_OK);
+      }
+    }, 1500);
+  }
+  $('btnAcessar').addEventListener('click', acessarPortal);
+  $('loginEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') acessarPortal(); });
+
+  function voltarInicio() {
+    fecharGate();
+    $('offlineLayer').classList.remove('on');
+    $('authLayer').classList.remove('on');
+    $('loginLayer').classList.remove('off');
+    applyConnUI();
+  }
+  document.querySelectorAll('[data-trocar-email]').forEach(function (b) {
+    b.addEventListener('click', voltarInicio);
+  });
+
+  /* ---------- cenário 1: código por e-mail ---------- */
+  $('btnEntrarCode').addEventListener('click', function () {
+    if ($('codeInput').value.trim() === CODE_OK) { concederAcesso(false); }
+    else { toast('Código incorreto — confira seu e-mail (demo: ' + CODE_OK + ')'); }
+  });
+  $('btnReenviarCode').addEventListener('click', function () { toast('Novo código enviado — demo: ' + CODE_OK); });
+  $('btnUsarSenha').addEventListener('click', function () {
+    $('pwEmail').textContent = currentEmail; $('pwInput').value = '';
+    gateStep('gatePassword');
+  });
+
+  /* ---------- entrada alternativa por senha ---------- */
+  $('btnEntrarSenha').addEventListener('click', function () {
+    if ($('pwInput').value) { concederAcesso(false); } else { toast('Digite sua senha'); }
+  });
+  $('btnEsqueciSenha').addEventListener('click', function () { toast('Enviamos as instruções de recuperação (simulação).'); });
+  $('btnUsarCodigo').addEventListener('click', function () {
+    $('codeEmail').textContent = currentEmail;
+    $('codeTrouble').style.display = (scenario === 'dificuldade') ? 'block' : 'none';
+    $('codeInput').value = '';
+    gateStep('gateCode');
+    toast('Simulação do e-mail — código: ' + CODE_OK);
+  });
+
+  /* ---------- cenário 3: ativar conta → fluxo de cadastro existente ---------- */
+  $('btnAtivarConta').addEventListener('click', function () {
+    $('cadEmail').value = currentEmail;
+    gateStep('gateCadastro'); // reaproveita o fluxo de criação de conta já existente
+  });
+
+  /* ---------- conceder acesso / dispositivo autorizado ---------- */
+  function concederAcesso(runTour) {
+    pendingRunTour = !!runTour;
+    $('contaEmail').textContent = currentEmail;
+    $('telemetry').textContent = 'login: ' + currentEmail + ' · origem: OPEN_ORGANIC · linha de base: ativa';
+    if (!deviceAuthorized) {
+      fecharGate();
+      $('authLayer').classList.add('on'); // 1º acesso: autoriza o dispositivo
+    } else {
+      entrarApp(runTour);
+    }
+  }
+  $('btnAuthContinuar').addEventListener('click', function () {
+    deviceAuthorized = true; lsSet(LS.auth, '1'); lsSet(LS.sync, String(Date.now()));
+    $('authLayer').classList.remove('on');
+    entrarApp(pendingRunTour);
+  });
+  function entrarApp(runTour) {
+    fecharGate();
+    $('authLayer').classList.remove('on');
+    $('offlineLayer').classList.remove('on');
+    $('loginLayer').classList.add('off');
+    lsSet(LS.sync, String(Date.now()));
+    playSplash(function () {
+      applyConnUI();
+      if (runTour) iniciarTour();
+      else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
+    });
+  }
+
+  /* ---------- abertura sem internet (dispositivo já autorizado) ---------- */
+  function showOfflineEntry() {
+    $('loginLayer').classList.add('off');
+    $('offlineLastSync').textContent = 'Última sincronização: ' + fmtSync(lsGet(LS.sync));
+    $('offlineLayer').classList.add('on');
+  }
+  $('btnEntrarOffline').addEventListener('click', function () {
+    $('offlineLayer').classList.remove('on');
+    $('loginLayer').classList.add('off');
+    applyConnUI();   // mostra o banner de modo offline dentro do app
+    updatePending();
+    toast('Modo offline — conteúdos já carregados disponíveis.');
+  });
+  $('btnTentarNovamente').addEventListener('click', function () {
+    if (online) { $('offlineLayer').classList.remove('on'); acessarPortal(); }
+    else { toast('Ainda sem conexão — tente novamente.'); }
   });
   // preenchimento automático: a tela seguinte abre já carregando; os dados
   // chegam da plataforma-base campo a campo (V0 é público interno — o aluno existe no banco)
@@ -1720,10 +2070,13 @@
     cadTimers.forEach(clearTimeout);
     gateStep('gateCadastro');
   });
+  document.querySelectorAll('[data-gate-back]').forEach(function (b) {
+    b.addEventListener('click', function () { gateStep('gateActivate'); });
+  });
   $('btnConcluir').addEventListener('click', function () {
-    $('contaEmail').textContent = $('cadEmail').value.trim();
-    fecharGate();
-    iniciarTour(); // primeiro acesso: plataforma só libera após o tour completo
+    currentEmail = $('cadEmail').value.trim() || currentEmail;
+    // primeiro acesso: autoriza o dispositivo e, ao continuar, roda o tour obrigatório
+    concederAcesso(true);
   });
 
   /* ---------- tour obrigatório do Danilo (primeiro acesso) ---------- */
@@ -1781,33 +2134,21 @@
     }
   });
 
-  /* ---------- login ---------- */
-  function doLogin() {
-    var em = $('loginEmail').value.trim(), pw = $('loginSenha').value;
-    if (!em || !pw) { toast('Informe e-mail e senha'); return; }
-    $('loginLayer').classList.add('off');
-    playSplash(); // vinheta logo após o login
-    toast('Bem-vindo, ' + $('homeNome').textContent + '!');
-    $('contaEmail').textContent = em;
-    $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
-  }
-  $('btnEntrar').addEventListener('click', doLogin);
-  $('loginSenha').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
-  $('btnSair').addEventListener('click', function () {
-    $('loginEmail').value = ''; $('loginSenha').value = '';
+  /* ---------- sair da conta ---------- */
+  function sairConta() {
+    $('loginEmail').value = '';
     var w = $('logoWrap');
     w.innerHTML = w.innerHTML; // recria os nós para reiniciar a animação da logo
     $('loginLayer').classList.remove('off');
-    // zera o portão para o próximo acesso
     fecharGate();
-    ['valEmail', 'valCodigo', 'cadEmail', 'cadNome', 'cadCpf', 'cadFone', 'cadTurma', 'cadMatricula'].forEach(function (id) { $(id).value = ''; });
-    $('codigoBox').style.display = 'none';
-    $('btnEnviarCodigo').disabled = false;
-    $('btnEnviarCodigo').textContent = 'Enviar código';
+    $('offlineLayer').classList.remove('on');
+    $('authLayer').classList.remove('on');
+    ['codeInput', 'pwInput', 'cadEmail', 'cadNome', 'cadCpf', 'cadFone', 'cadTurma', 'cadMatricula'].forEach(function (id) { if ($(id)) $(id).value = ''; });
     $('btnConcluir').disabled = true;
-    CODIGO = '';
+    applyConnUI();
     document.querySelector('[data-persona="aluno"]').click();
-  });
+  }
+  $('btnSair').addEventListener('click', sairConta);
 
   /* ---------- botão + (mais) ---------- */
   $('btnPlus').addEventListener('click', function () { $('plusPop').classList.add('on'); });
@@ -1942,5 +2283,19 @@
     c.style.display = c.style.display === 'none' ? 'block' : 'none';
   });
   $('btnNovaQuestao').addEventListener('click', function () { toast('Cadastro: enunciado, alternativas, tag e campo de uso'); });
+
+  /* ---------- reset da demonstração (limpa a autorização do dispositivo) ---------- */
+  var btnReset = $('btnResetDemo');
+  if (btnReset) btnReset.addEventListener('click', function () {
+    lsDel(LS.auth); lsDel(LS.sync); lsDel(LS.pend);
+    deviceAuthorized = false; pendingAnswers = 0; online = true;
+    updatePending();
+    sairConta();
+    toast('Demonstração reiniciada — dispositivo não autorizado');
+  });
+
+  /* ---------- init do estado de acesso/conectividade ---------- */
+  applyConnUI();
+  updatePending();
 })();
 </script>

@@ -1,5 +1,24 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (tarde) — novo fluxo inicial de acesso (offline-first)
+- **Tela inicial** repaginada: pede apenas o e-mail + botão **Acessar o portal** e o
+  aviso sobre uso sem internet após o primeiro acesso online
+- **Verificação de e-mail** com estado de carregamento e três cenários simulados:
+  aluno **ativo** (código por e-mail), **dificuldade** para receber o código e
+  **conta não ativada** (leva ao cadastro/primeiro acesso já existente)
+- **Entrada alternativa por senha** (só no fluxo online), com "Esqueci minha senha",
+  "Usar código por e-mail" e "Trocar e-mail"
+- **Dispositivo autorizado** no 1º acesso online (simulado; habilita o modo offline)
+- **Abertura sem internet**: tela "Você está offline" com última sincronização,
+  "Entrar no modo offline" e "Tentar novamente"
+- **Modo offline no app**: banner fixo, missões já carregadas jogáveis com respostas
+  "aguardando envio" (salvas no navegador), nova missão e quiz ao vivo bloqueados
+- **Retorno da conexão**: estado de sincronização → respostas marcadas como enviadas
+  → "Sincronização concluída"
+- **Simulador de rede** (indicador ONLINE/OFFLINE na barra de status) e botão
+  "Resetar demonstração" no painel lateral. Tudo com dados simulados; sem backend,
+  e-mail, biometria ou sincronização reais. Fluxo de cadastro existente preservado.
+
 ## 18/07/2026
 - Projeto estruturado como repositório Git para armazenamento no GitHub
 - Documentação criada: visão e escopo, registro de decisões, guia de build
