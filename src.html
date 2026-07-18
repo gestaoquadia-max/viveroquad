@@ -1,4 +1,5 @@
 <title>Viver o Quad — Protótipo V0</title>
+<style>__FONTS__</style>
 <style>
   :root {
     --bg: #F3F9FE;
@@ -10,6 +11,8 @@
     --gold-soft: #E6F3FC;
     --blue: #3E6288;
     --font: "Inter", "Roboto", "SF Pro Text", -apple-system, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    --title: "Rajdhani", "Exo 2", "Inter", system-ui, sans-serif;
+    --num: "Exo 2", "Rajdhani", "Inter", system-ui, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -64,9 +67,10 @@
     margin: 0 auto;
   }
   .screen {
-    --p-bg: #EAF3FB; --p-surface: #FFFFFF; --p-card: #FFFFFF; --p-line: #D8E7F5;
-    --p-text: #14324F; --p-dim: #5E7FA0; --p-gold: #1B7FC4; --p-blue: #1B9CD9;
-    --p-ok: #16A34A; --p-bad: #DC2626;
+    --p-bg: #EAF5FF; --p-surface: #FFFFFF; --p-card: #FFFFFF; --p-line: #D4E7F8;
+    --p-text: #12366D; --p-dim: #61799F; --p-gold: #0878F8; --p-blue: #18B7F4;
+    --p-ok: #28A96B; --p-bad: #DC2626;
+    --p-navy: #062B64; --p-coin: #E6A91A; --p-purple: #6237D8;
     position: relative;
     background: var(--p-bg); color: var(--p-text); border-radius: 26px;
     height: 780px; overflow: hidden; display: flex; flex-direction: column;
@@ -583,10 +587,10 @@
   /* ==================================================================
      REDESIGN GAMIFICADO (modelo do gestor) — vidro, brilho, RPG militar
      ================================================================== */
-  .mil { font-family: "Arial Narrow", "Roboto Condensed", "Oswald", var(--font);
-         font-weight: 800; text-transform: uppercase; letter-spacing: .012em; }
+  .mil { font-family: var(--title); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; }
+  .num { font-family: var(--num); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-  .screen { background: linear-gradient(180deg, #EEF6FD 0%, #DEEBF9 55%, #D3E4F6 100%); }
+  .screen { background: linear-gradient(180deg, #F2F8FF 0%, #E6F1FF 58%, #DCEBFC 100%); }
   /* sem barra de rolagem visível — recupera a largura do enquadramento */
   .view { scrollbar-width: none; -ms-overflow-style: none; }
   .view::-webkit-scrollbar { width: 0; height: 0; display: none; }
@@ -611,15 +615,23 @@
   .btn:active { transform: translateY(1px); }
 
   /* pílulas (tags) */
-  .tag { border-radius: 999px; padding: 4px 10px; font-weight: 700; backdrop-filter: blur(4px); }
-  .tag.blue-fill { background: #1B7FC4; color: #fff; border-color: #1B7FC4; }
+  .tag { border-radius: 999px; padding: 4px 10px; font-weight: 700; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .tag.blue-fill { background: #0878F8; color: #fff; border-color: #0878F8; }
+  .tag.gold { color: #9A6B00; border-color: #F1D488; background: #FFF6DF; }
+  .tag.live { color: #1E874F; border-color: #A7E3C4; background: #E9FAF1; }
+  .tag.warn { color: #9A6B00; border-color: #F1D488; background: #FFF7E2; }
   .chev { color: var(--p-dim); font: 700 18px var(--font); flex: none; opacity: .7; }
 
   .bar-track { background: rgba(20,50,79,0.12); height: 8px; }
   .bar-fill { background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.55); }
 
   /* ---------- cabeçalho de identidade (aluno) ---------- */
-  .app-top.idbar { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px 14px; border-bottom: none; }
+  .app-top.idbar { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; border-bottom: none;
+    margin: 12px 14px 2px; background: #fff; border: 1px solid var(--p-line); border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(7,61,123,0.10); }
+  /* rótulos e tags em Inter (spec proíbe fonte decorativa) */
+  .k-label, .tag, .ev-date { font-family: var(--font); }
+  .k-label { letter-spacing: .12em; }
   .id-row { display: flex; align-items: center; gap: 12px; }
   .avatar-ring { width: 52px; height: 52px; flex: none; border-radius: 50%; padding: 2.5px;
     background: conic-gradient(from 200deg, #45A7EC, #2D5782, #6BCDF3, #45A7EC);
@@ -645,17 +657,17 @@
   .coin i::before { content: "★"; color: #EAF6FF; font-size: 8px; line-height: 1; }
   .coin::after { content: "★"; position: absolute; top: -3px; right: -3px; font-size: 9px; color: #FFD24A; text-shadow: 0 0 3px rgba(255,180,20,0.95); }
   .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
-  .coins-lbl { font: 700 8.5px Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--p-dim); }
-  .coins-val { font: 800 16px var(--font); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
+  .coins-lbl { font: 700 8.5px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--p-dim); }
+  .coins-val { font: 700 17px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
   .coins-card .chev { font-size: 16px; margin-left: 2px; }
   .coins-card .score-pop { top: -12px; right: 8px; }
 
   .xp-row { display: flex; align-items: center; gap: 10px; }
   .level-badge { width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center;
-    background: linear-gradient(160deg, #45A7EC, #1B6FB0); color: #fff; font: 800 14px var(--font);
-    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(27,127,196,0.4); }
+    background: linear-gradient(160deg, #18B7F4, #0878F8); color: #fff; font: 700 15px var(--num);
+    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(8,120,248,0.4); }
   .xp-wrap { flex: 1; min-width: 0; }
-  .xp-top { display: flex; justify-content: space-between; font: 700 10px Consolas, monospace; color: var(--p-dim); margin-bottom: 4px; letter-spacing: .06em; }
+  .xp-top { display: flex; justify-content: space-between; font: 700 11px var(--num); color: var(--p-dim); margin-bottom: 4px; letter-spacing: .04em; }
   .xp-track { height: 9px; border-radius: 99px; background: rgba(20,50,79,0.12); overflow: hidden; }
   .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.6); }
 
@@ -677,26 +689,27 @@
   .hexi.soft svg { stroke: var(--p-gold); }
 
   /* ---------- cartão herói: missão principal ---------- */
-  .hero-mission { background: linear-gradient(155deg, #1F5C93 0%, #14355A 60%, #0E2743 100%);
-    border: 1px solid rgba(120,180,230,0.35); color: #EAF4FD; position: relative; overflow: hidden;
-    box-shadow: 0 16px 34px rgba(11,40,71,0.4), inset 0 1px 0 rgba(255,255,255,0.12); }
-  .hero-mission::after { content: "⬡"; position: absolute; right: -18px; top: 34px; font-size: 190px; line-height: 1;
-    color: rgba(120,180,230,0.10); pointer-events: none; }
-  .hero-mission .hexi { background: linear-gradient(160deg, #56B4EE, #1E7FC2); box-shadow: 0 0 16px rgba(86,180,238,0.5); }
-  .hero-mission .k-label { color: #9CC6EC; }
-  .hero-title { font-size: 34px; line-height: .96; margin: 4px 0 8px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.25); }
-  .hero-sub { font-size: 12.5px; line-height: 1.5; color: #C7DEF2; margin: 0 0 14px; position: relative; }
-  .hero-prog { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; }
-  .hero-prog .bar-track { flex: 1; height: 12px; background: rgba(255,255,255,0.14); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
-  .hero-prog .bar-fill { background: linear-gradient(90deg, #6BCDF3, #2E9BE0); box-shadow: 0 0 12px rgba(107,205,243,0.8); }
-  .hero-count { font: 800 20px var(--font); color: #fff; }
-  .hero-count b { font-weight: 800; }
-  .hero-btn { width: 100%; padding: 15px; font-size: 15px; border-radius: 14px;
-    background: linear-gradient(180deg, #57B4EE 0%, #2189CE 52%, #176CAC 100%);
-    box-shadow: 0 10px 22px rgba(30,120,200,0.5), inset 0 1px 0 rgba(255,255,255,0.6); position: relative; }
+  .hero-mission { background: linear-gradient(150deg, #062B64 0%, #073C82 55%, #084C9A 100%);
+    border: 1px solid rgba(31,180,255,0.35); color: #EAF4FD; position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,31,83,0.22), inset 0 1px 0 rgba(255,255,255,0.10); }
+  .hero-mission::after { content: ""; position: absolute; right: -40px; top: 26px; width: 200px; height: 200px;
+    background: radial-gradient(closest-side, rgba(24,183,244,0.16), transparent 70%); pointer-events: none; }
+  .hero-mission .hexi { background: linear-gradient(160deg, #18B7F4, #0878F8); box-shadow: 0 0 16px rgba(24,183,244,0.55); }
+  .hero-mission .k-label { color: #8FC4F2; }
+  .hero-title { font-size: 33px; line-height: .98; margin: 6px 0 8px; color: #fff; letter-spacing: .01em; }
+  .hero-sub { font-size: 12.5px; line-height: 1.5; color: #BFD8F2; margin: 0 0 14px; position: relative; }
+  .hero-prog { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; position: relative; }
+  .hero-prog .bar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.16); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+  .hero-prog .bar-fill { background: linear-gradient(90deg, #18B7F4, #0878F8); box-shadow: 0 0 12px rgba(24,183,244,0.85); }
+  .hero-count { font: 700 22px var(--num); color: #fff; }
+  .hero-btn { width: 100%; height: 54px; padding: 0 16px; font-size: 15px; border-radius: 14px; letter-spacing: .04em;
+    background: linear-gradient(180deg, #18B7F4 0%, #0878F8 100%);
+    border: 2px solid rgba(120,210,255,0.6);
+    box-shadow: 0 7px 16px rgba(0,99,238,0.35), inset 0 1px 0 rgba(255,255,255,0.45); position: relative; }
 
   /* ---------- avisos ---------- */
   .mission-row .m-dot { border-radius: 10px; background: linear-gradient(160deg, #EAF3FB, #CFE7F8); border: none; color: var(--p-gold); }
+  .m-dot svg { width: 18px; height: 18px; stroke: var(--p-gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .mission-row .chev { margin-left: auto; }
 
   /* ---------- eventos da semana (tiles) ---------- */
@@ -704,9 +717,9 @@
   .ev-strip::-webkit-scrollbar { display: none; }
   .ev-tile { flex: none; width: 116px; min-height: 96px; border-radius: 14px; padding: 11px; cursor: pointer;
     display: flex; flex-direction: column; gap: 3px; text-align: left; border: none; color: #EAF4FD; font: inherit;
-    background: linear-gradient(160deg, #23507E, #14314F); box-shadow: 0 8px 18px rgba(11,40,71,0.28); position: relative; }
-  .ev-tile.purple { background: linear-gradient(160deg, #6D3B9E, #3E2170); }
-  .ev-tile.teal { background: linear-gradient(160deg, #1C8F9C, #124E63); }
+    background: linear-gradient(155deg, #0A4A9E, #062B64); box-shadow: 0 8px 18px rgba(6,43,100,0.28); position: relative; }
+  .ev-tile.purple { background: linear-gradient(155deg, #7B4DE8, #6237D8); }
+  .ev-tile.teal { background: linear-gradient(155deg, #18B7F4, #0878F8); }
   .ev-tile.add { background: rgba(255,255,255,0.55); border: 1px dashed var(--p-line); color: var(--p-dim);
     align-items: center; justify-content: center; box-shadow: none; }
   .ev-date { font: 800 9.5px Consolas, monospace; letter-spacing: .06em; opacity: .85; }
@@ -719,17 +732,19 @@
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
-  .nav-btn { text-transform: uppercase; letter-spacing: .04em; font-size: 9.5px; }
-  .nav-btn .ico { font-size: 18px; transition: transform .15s ease; }
+  .nav-btn { text-transform: uppercase; letter-spacing: .03em; font-size: 9.5px; color: var(--p-dim); }
+  .nav-btn .ico { transition: transform .15s ease; }
+  .nav-btn .ico svg { width: 25px; height: 25px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; display: block; }
   .nav-btn.active { color: var(--p-gold); }
-  .nav-btn.active .ico { filter: drop-shadow(0 0 6px rgba(27,127,196,0.7)); transform: translateY(-1px); }
-  .nav-plus { width: 56px; height: 56px; margin-top: -26px; font-size: 30px;
-    background: radial-gradient(circle at 50% 35%, #57B4EE, #1B7FC4 70%);
-    box-shadow: 0 8px 20px rgba(27,127,196,0.55), 0 0 0 6px rgba(69,167,236,0.18), inset 0 1px 0 rgba(255,255,255,0.6); }
+  .nav-btn.active .ico { filter: drop-shadow(0 0 6px rgba(8,120,248,0.5)); transform: translateY(-1px); }
+  .nav-plus { width: 62px; height: 62px; margin-top: -30px; padding: 0;
+    background: radial-gradient(circle at 50% 34%, #3AA0FB, #0878F8 72%);
+    box-shadow: 0 8px 18px rgba(0,75,190,0.35), 0 0 0 6px rgba(24,183,244,0.20), inset 0 1px 0 rgba(255,255,255,0.55); }
+  .nav-plus svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2.8; stroke-linecap: round; margin: 0 auto; display: block; }
 
-  /* ---------- balão do Danilo ---------- */
-  .danilo-hint { right: 84px; bottom: 96px; padding: 9px 13px; border-radius: 14px 14px 3px 14px;
-    background: #1B7FC4; box-shadow: 0 8px 18px rgba(27,127,196,0.4); line-height: 1.25; text-align: left; max-width: 150px; white-space: normal; }
+  /* ---------- balão do Danilo (acima do robô, não cobre texto) ---------- */
+  .danilo-hint { right: 12px; left: auto; bottom: 156px; padding: 9px 13px; border-radius: 14px 14px 14px 3px;
+    background: #0878F8; box-shadow: 0 8px 18px rgba(8,120,248,0.4); line-height: 1.25; text-align: left; max-width: 158px; white-space: normal; }
   .danilo-hint b { display: block; font-size: 12px; }
   .danilo-hint small { font-size: 10px; opacity: .9; }
 
@@ -863,12 +878,12 @@
               <div class="k-label">Avisos do professor</div>
             </div>
             <div class="mission-row">
-              <div class="m-dot" aria-hidden="true">▤</div>
+              <div class="m-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="2.2"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg></div>
               <div class="grow"><div class="t">Simulado presencial — sábado 8h</div><div class="d">Inscrição pelo link. Presença pontua em Quad Coins.</div></div>
               <span class="chev">›</span>
             </div>
             <div class="mission-row">
-              <div class="m-dot" aria-hidden="true">✎</div>
+              <div class="m-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h5"/></svg></div>
               <div class="grow"><div class="t">Material de Poderes liberado</div><div class="d">Leia antes do quiz de quinta.</div></div>
               <span class="chev">›</span>
             </div>
@@ -1555,11 +1570,11 @@
 
         <!-- ============ NAV ============ -->
         <nav class="navbar" id="navAluno">
-          <button class="nav-btn active" data-view="v-inicio"><span class="ico">⌂</span>Início</button>
-          <button class="nav-btn" data-view="v-missoes"><span class="ico">◎</span>Missões</button>
-          <button class="nav-plus" id="btnPlus" aria-label="Mais: Pré-TAF, calendário, materiais e prévias">+</button>
-          <button class="nav-btn" data-view="v-dominio"><span class="ico">▤</span>Domínio</button>
-          <button class="nav-btn" data-view="v-perfil"><span class="ico">◔</span>Quadrômetro</button>
+          <button class="nav-btn active" data-view="v-inicio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 10.3 12 3l9 7.3"/><path d="M5.2 9.4V20a1 1 0 0 0 1 1h11.6a1 1 0 0 0 1-1V9.4"/><path d="M9.5 21v-6h5v6"/></svg></span>Início</button>
+          <button class="nav-btn" data-view="v-missoes"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.3"/><path d="M12 1.6v4M12 18.4v4M1.6 12h4M18.4 12h4"/></svg></span>Missões</button>
+          <button class="nav-plus" id="btnPlus" aria-label="Mais: Pré-TAF, calendário, materiais e prévias"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="nav-btn" data-view="v-dominio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 5 5v6.2c0 4.4 3 7.3 7 8.8 4-1.5 7-4.4 7-8.8V5l-7-2.5Z"/><path d="m12 8.2 1.15 2.35 2.6.38-1.88 1.83.44 2.59L12 14.13l-2.31 1.22.44-2.59-1.88-1.83 2.6-.38Z" fill="currentColor" stroke="none"/></svg></span>Domínio</button>
+          <button class="nav-btn" data-view="v-perfil"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>Quadrômetro</button>
         </nav>
         <nav class="navbar" id="navProfessor" style="display:none">
           <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
@@ -2503,6 +2518,9 @@
   /* ---------- card de Quad Coins abre o Quadrômetro ---------- */
   var coinsCardEl = $('coinsCard');
   if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-perfil', 'navAluno'); });
+
+  /* ---------- balão do Danilo some sozinho para não cobrir conteúdo ---------- */
+  setTimeout(function () { var h = $('daniloHint'); if (h) h.style.display = 'none'; }, 5000);
 
   /* ---------- init do estado de acesso/conectividade ---------- */
   applyConnUI();

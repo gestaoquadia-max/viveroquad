@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — conformidade com a Especificação Visual da Home
+- **Tipografia oficial embutida** (token `__FONTS__` / `fonts.css`): Inter (texto),
+  **Rajdhani** (títulos/missão) e **Exo 2** (números) — remove a fonte "Arial Narrow"
+  que a spec proíbe; título da missão agora é claramente diferente do texto corrido
+- **Paleta exata** da spec: `#062B64` navy · `#0878F8` azul · `#18B7F4` ciano ·
+  `#EAF5FF` fundo · `#12366D` texto · `#61799F` secundário · `#E6A91A` dourado ·
+  `#28A96B` verde · `#6237D8` roxo (eventos)
+- **Ícones SVG lineares (família Lucide)** substituem os emojis: nav (casa, alvo,
+  escudo+estrela, grade 2×2, + central branco), avisos (calendário, arquivo), com
+  traço consistente ~2,1
+- **Perfil como card único** (avatar, nome, patente, nível, XP e Quad Coins juntos)
+- **Missão** com gradiente `#062B64→#084C9A`, borda técnica ciano e CTA de 2 camadas
+- **Moeda** dourada própria (rim + centro azul + estrela), não emoji
+- **Robô assistente** menor e reposicionado; balão some sozinho para não cobrir cards
+
 ## 18/07/2026 (noite) — ajustes de diagramação do redesign
 - **Barra de rolagem** oculta nas telas (recupera a largura do enquadramento
   que estava comendo ~15px à direita e desalinhando os itens)

@@ -8,7 +8,8 @@ $vid = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir 
 $logo = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "logo.jpg")))
 $sim = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "simbolo-quad-transparente.png")))
 $avs = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "avatars.jpg")))
-$out = $src.Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs)
+$fonts = [System.IO.File]::ReadAllText((Join-Path $dir "fonts.css"), [System.Text.Encoding]::UTF8)
+$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs)
 $enc = New-Object System.Text.UTF8Encoding $false
 # artifact.html: conteúdo sem esqueleto (o Artifact adiciona doctype/head/body ao publicar)
 [System.IO.File]::WriteAllText((Join-Path $dir "artifact.html"), $out, $enc)
