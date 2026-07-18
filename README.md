@@ -11,6 +11,7 @@ e o material de marca usado na construção.
 
 | O quê | Onde |
 |---|---|
+| **Comece aqui (guia do Danilo)** | [`docs/00-comece-aqui-danilo.md`](docs/00-comece-aqui-danilo.md) |
 | Protótipo online (sempre atualizado) | https://claude.ai/code/artifact/4d06ad26-be6f-41c3-a5df-e08ea41230fa |
 | Protótipo local | `index.html` (gerado pelo build — rode `build.ps1` após clonar) |
 | Fonte editável | `src.html` |
