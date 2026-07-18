@@ -1289,6 +1289,7 @@
               <span class="nametag" id="avNametag">AL SD QUAD MOURA</span>
             </div>
             <div class="avatar-grid" id="avGrid"></div>
+            <button class="btn ghost small" id="btnTrocarAvatar" style="width:100%; margin-top:10px; display:none">Trocar personagem</button>
             <div class="k-label" style="margin-top:14px">Itens do personagem</div>
             <div class="equip-row">
               <button class="equip-chip locked" id="chipBoina"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>Boina</button>
@@ -2813,6 +2814,10 @@
           b.classList.add('sel');
           avatarIdx = i;
           aplicarAvatar();
+          // escolheu: a área de escolha desaparece e o personagem vira o ícone do card
+          grid.style.display = 'none';
+          $('btnTrocarAvatar').style.display = 'block';
+          toast('Personagem definido — já é o seu ícone no perfil!');
         });
         grid.appendChild(b);
       });
@@ -2821,6 +2826,10 @@
     img.src = AVATAR_SPRITE;
   }
   if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
+  $('btnTrocarAvatar').addEventListener('click', function () {
+    $('avGrid').style.display = 'grid';
+    $('btnTrocarAvatar').style.display = 'none';
+  });
   /* ==================================================================
      GAMIFICAÇÃO · progressão, estados, prova de promoção e histórico
      (dados simulados; no sistema real o servidor valida tudo)
