@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — fidelidade visual premium (referência = fonte da verdade)
+- **Tipografia de identidade Exo 2** (500–800) em títulos, nome, missão, botões,
+  Quad Coins, indicadores, nav e eventos; **Inter** só para textos de leitura
+- **Paleta de maior contraste**: `#1976FF` (principal) · `#123C8F` (escuro) ·
+  `#0B2E73` (hero) · `#EDF6FF` (fundo) · `#F4B63A` (dourado) · `#667085` (cinza)
+- **Cards premium**: raio maior (24px), sombra suave, borda discreta, glass leve
+  e profundidade — nada de cards planos
+- **Missão como protagonista**: título 35px, barra de progresso espessa com brilho,
+  CTA "de jogo" (gradiente + brilho superior + borda interna + sombra)
+- **Ícones HUD** mais grossos (traço 2,3–3,2) e maiores
+- **Quad Coins** como recompensa: moeda com brilho/sombra e número em destaque
+- **Robô** integrado no rodapé (posição fixa, ao lado do balão de ajuda)
+- Hierarquia e espaçamento revisados para o ritmo visual da referência
+
 ## 18/07/2026 (noite) — conformidade com a Especificação Visual da Home
 - **Tipografia oficial embutida** (token `__FONTS__` / `fonts.css`): Inter (texto),
   **Rajdhani** (títulos/missão) e **Exo 2** (números) — remove a fonte "Arial Narrow"
