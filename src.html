@@ -1,0 +1,1946 @@
+<title>Viver o Quad — Protótipo V0</title>
+<style>
+  :root {
+    --bg: #F3F9FE;
+    --panel: #FFFFFF;
+    --ink: #14324F;
+    --ink-dim: #5E7FA0;
+    --line: #D8E7F5;
+    --gold: #1B7FC4;
+    --gold-soft: #E6F3FC;
+    --blue: #3E6288;
+    --font: "Inter", "Roboto", "SF Pro Text", -apple-system, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1E30; --panel: #12293F; --ink: #DCEBF8; --ink-dim: #8FB0CC;
+      --line: #1F3D59; --gold: #54B2E8; --gold-soft: #14395A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1E30; --panel: #12293F; --ink: #DCEBF8; --ink-dim: #8FB0CC;
+    --line: #1F3D59; --gold: #54B2E8; --gold-soft: #14395A;
+  }
+  :root[data-theme="light"] {
+    --bg: #F3F9FE; --panel: #FFFFFF; --ink: #14324F; --ink-dim: #5E7FA0;
+    --line: #D8E7F5; --gold: #1B7FC4; --gold-soft: #E6F3FC;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font);
+    margin: 0; padding: 32px 20px 64px;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+
+  .masthead { margin-bottom: 28px; }
+  .eyebrow {
+    font-family: Consolas, monospace; font-size: 11px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+  h1 {
+    font-size: clamp(26px, 4vw, 38px); font-weight: 800; margin: 0 0 6px;
+    letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .masthead p { color: var(--ink-dim); max-width: 62ch; margin: 4px 0 0; line-height: 1.55; }
+
+  .persona-bar { display: flex; gap: 8px; margin: 22px 0 18px; flex-wrap: wrap; }
+  .persona-btn {
+    font: 600 13px/1 var(--font); letter-spacing: 0.04em;
+    padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--ink-dim); cursor: pointer;
+  }
+  .persona-btn small { display: block; font-weight: 400; font-size: 10px; margin-top: 3px; letter-spacing: 0.02em; }
+  .persona-btn.active { border-color: var(--gold); color: var(--ink); background: var(--gold-soft); }
+  .persona-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .stage { display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap; }
+
+  /* ============ PHONE — padrão da casa: limpo, claro, slate + azul ============ */
+  .phone {
+    width: 384px; flex: none; background: #14304D; border-radius: 34px;
+    padding: 10px; box-shadow: 0 24px 60px rgba(11,42,71,0.28), 0 0 0 1px rgba(255,255,255,0.08);
+    margin: 0 auto;
+  }
+  .screen {
+    --p-bg: #EAF3FB; --p-surface: #FFFFFF; --p-card: #FFFFFF; --p-line: #D8E7F5;
+    --p-text: #14324F; --p-dim: #5E7FA0; --p-gold: #1B7FC4; --p-blue: #1B9CD9;
+    --p-ok: #16A34A; --p-bad: #DC2626;
+    position: relative;
+    background: var(--p-bg); color: var(--p-text); border-radius: 26px;
+    height: 780px; overflow: hidden; display: flex; flex-direction: column;
+    font-size: 14px;
+  }
+  .statusbar {
+    display: flex; justify-content: space-between; padding: 10px 18px 6px;
+    font: 600 11px Consolas, monospace; color: var(--p-dim); flex: none;
+  }
+  .app-top {
+    display: flex; align-items: center; gap: 10px; padding: 8px 16px 12px;
+    border-bottom: 1px solid var(--p-line); flex: none;
+  }
+  .insignia {
+    width: 40px; height: 40px; border-radius: 10px; flex: none;
+    background: linear-gradient(145deg, #E6F3FC, #CFE9FA);
+    border: 1px solid #BFE3F7; display: grid; place-items: center;
+    color: var(--p-gold); font-size: 18px;
+  }
+  .who { flex: 1; min-width: 0; }
+  .who .name { font-weight: 700; font-size: 14px; }
+  .who .rank {
+    font: 600 10px Consolas, monospace; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--p-gold); margin-top: 2px;
+  }
+  .score-chip {
+    background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 12px;
+    padding: 6px 12px; text-align: right; position: relative;
+  }
+  .score-chip .val { font: 700 16px Consolas, monospace; color: var(--p-gold); font-variant-numeric: tabular-nums; }
+  .score-chip .lbl { font-size: 9px; letter-spacing: 0.14em; color: var(--p-dim); text-transform: uppercase; }
+  .score-pop {
+    position: absolute; top: -14px; right: 6px; font: 700 13px Consolas, monospace;
+    color: var(--p-ok); opacity: 0; pointer-events: none;
+  }
+  .score-pop.go { animation: rise 1.1s ease-out; }
+  @keyframes rise { 0% { opacity: 0; transform: translateY(6px);} 20% {opacity: 1;} 100% { opacity: 0; transform: translateY(-14px);} }
+
+  .view {
+    flex: 1; overflow-y: auto; padding: 14px 14px 120px; display: none;
+    scroll-snap-type: y proximity;
+  }
+  .view.on { display: block; }
+
+  .p-card {
+    background: var(--p-card); border: 1px solid var(--p-line); border-radius: 14px;
+    padding: 14px; margin-bottom: 12px;
+    scroll-snap-align: center; will-change: transform, opacity;
+    transition: transform 0.15s linear, opacity 0.15s linear, box-shadow 0.3s ease;
+  }
+  /* engrenagem: os blocos giram como dentes de uma roda; o central fica em destaque */
+  .view .p-card.spot {
+    box-shadow: 0 10px 26px rgba(27, 127, 196, 0.18);
+    border-color: #BFE3F7;
+  }
+  .p-card h3 {
+    margin: 0 0 4px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+  }
+  .p-card .sub { color: var(--p-dim); font-size: 12px; line-height: 1.5; margin: 0; }
+  .k-label {
+    font: 600 9.5px Consolas, monospace; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--p-dim); margin-bottom: 8px;
+  }
+  .tag {
+    font: 600 9.5px Consolas, monospace; letter-spacing: 0.08em; padding: 3px 8px;
+    border-radius: 999px; border: 1px solid var(--p-line); color: var(--p-dim); white-space: nowrap;
+  }
+  .tag.gold { color: var(--p-gold); border-color: #BFE3F7; background: #E6F3FC; }
+  .tag.live { color: var(--p-ok); border-color: #BBF7D0; background: #F0FDF4; }
+  .tag.v1 { color: var(--p-blue); border-color: #BAE6FD; background: #F0F9FF; }
+  .tag.warn { color: #B45309; border-color: #FDE68A; background: #FFFBEB; }
+
+  .btn {
+    display: inline-block; border: none; cursor: pointer; border-radius: 10px;
+    font: 700 13px var(--font); padding: 10px 16px;
+    background: var(--p-gold); color: #FFFFFF;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--p-line); color: var(--p-text); font-weight: 600; }
+  .btn.small { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+  .btn:focus-visible { outline: 2px solid var(--p-text); outline-offset: 2px; }
+
+  .bar-track { height: 7px; background: #D8E7F5; border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--p-gold); border-radius: 99px; transition: width 0.5s ease; }
+  .bar-fill.blue { background: var(--p-blue); }
+
+  .mission-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--p-line);
+  }
+  .mission-row:last-child { border-bottom: none; }
+  .m-dot { width: 26px; height: 26px; border-radius: 8px; flex: none; display: grid; place-items: center;
+    border: 1px solid var(--p-line); font-size: 12px; color: var(--p-dim); }
+  .m-dot.done { background: #F0FDF4; border-color: #BBF7D0; color: var(--p-ok); }
+  .mission-row .grow { flex: 1; min-width: 0; }
+  .mission-row .t { font-weight: 600; font-size: 13px; }
+  .mission-row .d { font-size: 11px; color: var(--p-dim); margin-top: 1px; }
+
+  .navbar {
+    flex: none; display: flex; border-top: 1px solid var(--p-line); background: #FFFFFF;
+    padding: 6px 6px calc(6px + 6px);
+  }
+  .nav-btn {
+    flex: 1; background: none; border: none; cursor: pointer; color: var(--p-dim);
+    font: 600 10px var(--font); padding: 8px 2px 6px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .nav-btn .ico { font-size: 17px; line-height: 1; }
+  .nav-btn.active { color: var(--p-gold); }
+  .nav-btn:focus-visible { outline: 2px solid var(--p-gold); outline-offset: -2px; }
+
+  /* domínio tree */
+  .dom-item { border-bottom: 1px solid var(--p-line); padding: 11px 0; }
+  .dom-item:last-child { border-bottom: none; }
+  .dom-head { display: flex; align-items: center; gap: 10px; cursor: pointer; background:none; border:none; width:100%; color: inherit; font: inherit; padding: 0; text-align: left; }
+  .dom-head .nm { flex: 1; font-weight: 600; font-size: 13px; }
+  .dom-head .pc { font: 700 13px Consolas, monospace; color: var(--p-gold); width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+  .dom-head .chev { color: var(--p-dim); font-size: 11px; width: 12px; }
+  .dom-sub { margin-top: 10px; padding-left: 22px; display: none; }
+  .dom-item.open .dom-sub { display: block; }
+  .dom-sub .row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .dom-sub .row .nm { flex: 1; font-size: 12px; color: var(--p-dim); }
+  .dom-sub .row .pc { font: 600 12px Consolas, monospace; width: 38px; text-align: right; color: var(--p-text); font-variant-numeric: tabular-nums; }
+  .dom-sub .bar-track { width: 74px; flex: none; }
+
+  /* quiz overlay */
+  .quiz-layer {
+    position: absolute; inset: 0; background: var(--p-bg); z-index: 30;
+    display: none; flex-direction: column; border-radius: 26px;
+  }
+  .quiz-layer.on { display: flex; }
+  .quiz-head { padding: 18px 18px 10px; border-bottom: 1px solid var(--p-line); flex: none; }
+  .quiz-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+  .q-alt {
+    display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left;
+    background: var(--p-card); border: 1px solid var(--p-line); color: var(--p-text);
+    border-radius: 12px; padding: 12px; margin-bottom: 9px; cursor: pointer; font: 400 13px/1.45 var(--font);
+  }
+  .q-alt .letter { font: 700 12px Consolas, monospace; color: var(--p-gold); flex: none; margin-top: 1px; }
+  .q-alt.sel { border-color: var(--p-gold); background: #E6F3FC; }
+  .q-alt.hit { border-color: #BBF7D0; background: #F0FDF4; }
+  .q-alt.miss { border-color: #FECACA; background: #FEF2F2; }
+  .quiz-foot { flex: none; padding: 12px 18px 18px; display: flex; gap: 10px; justify-content: space-between; align-items: center; border-top: 1px solid var(--p-line); }
+
+  .toast {
+    position: absolute; left: 50%; bottom: 86px; transform: translateX(-50%);
+    background: #14324F; color: #F5FAFF; border: 1px solid #2C5170;
+    padding: 9px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    opacity: 0; pointer-events: none; z-index: 40; white-space: nowrap; max-width: 90%;
+  }
+  .toast.go { animation: toast 2.4s ease; }
+  @keyframes toast { 0% {opacity:0; transform: translate(-50%, 8px);} 12% {opacity:1; transform: translate(-50%,0);} 82% {opacity:1;} 100% {opacity:0;} }
+
+  /* tree (admin) */
+  .tree { font-size: 13px; }
+  .tree .node { padding: 6px 0 6px 0; }
+  .tree .lvl1 { padding-left: 14px; border-left: 1px solid var(--p-line); margin-left: 7px; }
+  .tree .nname { font-weight: 600; }
+  .tree .nmeta { font: 600 9.5px Consolas, monospace; color: var(--p-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-left: 6px; }
+
+  table.mini { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.mini th { font: 600 9.5px Consolas, monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-dim); text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--p-line); }
+  table.mini td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--p-line); vertical-align: top; }
+  table.mini tr:last-child td { border-bottom: none; }
+
+  .result-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .result-bar .q { font: 600 11px Consolas, monospace; color: var(--p-dim); width: 26px; }
+  .result-bar .bar-track { flex: 1; }
+  .result-bar .n { font: 600 11px Consolas, monospace; width: 34px; text-align: right; color: var(--p-dim); }
+
+  /* ============ VINHETA DE ABERTURA ============ */
+  .splash-layer {
+    position: absolute; inset: 0; z-index: 50; border-radius: 26px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #E6F3FC 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; transition: opacity 0.55s ease; cursor: pointer;
+  }
+  .splash-layer.done { opacity: 0; pointer-events: none; }
+  .splash-logo {
+    width: 138px; height: auto; display: block;
+    animation: splashLogo 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes splashLogo {
+    0% { opacity: 0; transform: scale(0.45) rotate(-10deg); }
+    60% { opacity: 1; transform: scale(1.07) rotate(2deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  .splash-phrase {
+    font-size: 16.5px; font-weight: 600; color: var(--p-text); letter-spacing: 0.02em;
+    opacity: 0; transform: translateY(10px); animation: phraseUp 0.6s ease 1.1s forwards;
+  }
+  .splash-phrase .dot { opacity: 0; animation: dotIn 0.28s ease forwards; }
+  .splash-phrase .dot:nth-child(1) { animation-delay: 1.8s; }
+  .splash-phrase .dot:nth-child(2) { animation-delay: 2.1s; }
+  .splash-phrase .dot:nth-child(3) { animation-delay: 2.4s; }
+  @keyframes phraseUp { to { opacity: 1; transform: none; } }
+  @keyframes dotIn { to { opacity: 1; } }
+  .splash-load {
+    width: 156px; height: 5px; border-radius: 99px; background: #D8E7F5; overflow: hidden;
+    opacity: 0; animation: phraseUp 0.4s ease 1.4s forwards;
+  }
+  .splash-load .fill {
+    height: 100%; width: 0; border-radius: 99px; background: var(--p-gold);
+    animation: loadFill 2.1s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+  }
+  @keyframes loadFill { to { width: 100%; } }
+  .splash-brand {
+    font: 600 10px Consolas, monospace; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--p-dim); opacity: 0; animation: phraseUp 0.6s ease 2s forwards;
+  }
+
+  /* ============ LOGIN ============ */
+  .login-layer {
+    position: absolute; inset: 0; z-index: 38; border-radius: 26px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px 26px; transition: opacity 0.35s ease;
+  }
+  .login-layer.off { opacity: 0; pointer-events: none; }
+  .login-logo-wrap { animation: qfloat 4s ease-in-out 1.2s infinite; }
+  .login-logo {
+    width: 112px; height: auto; margin-bottom: 16px; display: block;
+    animation: logoIn 0.7s ease both;
+  }
+  @keyframes logoIn { from { opacity: 0; transform: scale(0.72); } to { opacity: 1; transform: none; } }
+  @keyframes qfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .login-title { font-weight: 800; font-size: 19px; letter-spacing: 0.22em; color: var(--p-text); margin: 0 0 4px; }
+  .login-sub { font-size: 12px; color: var(--p-dim); margin: 0 0 24px; text-align: center; }
+  .login-field { width: 100%; margin-bottom: 12px; }
+  .login-field label {
+    display: block; font: 600 9.5px Consolas, monospace; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--p-dim); margin-bottom: 6px;
+  }
+  .login-field input {
+    width: 100%; border: 1px solid var(--p-line); border-radius: 10px; padding: 11px 12px;
+    font: 400 14px var(--font); color: var(--p-text); background: #FFFFFF; outline: none;
+  }
+  .login-field input:focus { border-color: var(--p-gold); box-shadow: 0 0 0 3px #CFE9FA; }
+  .login-note { font-size: 11px; color: var(--p-dim); margin-top: 14px; text-align: center; line-height: 1.5; }
+
+  /* ============ BOTÃO + (MAIS) ============ */
+  .nav-plus {
+    flex: none; width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
+    background: var(--p-gold); color: #FFFFFF; font: 300 26px/1 var(--font);
+    margin: -20px 6px 0; align-self: flex-start;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  }
+  .nav-plus:focus-visible { outline: 2px solid var(--p-text); outline-offset: 2px; }
+  .plus-pop {
+    position: absolute; inset: 0; z-index: 35; display: none;
+    background: rgba(15, 23, 42, 0.45); border-radius: 26px; align-items: flex-end;
+  }
+  .plus-pop.on { display: flex; }
+  .plus-sheet {
+    background: var(--p-surface); width: 100%; border-radius: 20px 20px 26px 26px;
+    padding: 16px 18px 20px; max-height: 78%; overflow-y: auto; animation: sheetUp 0.25s ease;
+  }
+  .plus-row {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    background: none; border: none; border-bottom: 1px solid var(--p-line);
+    padding: 12px 2px; cursor: pointer; color: var(--p-text); font: inherit;
+  }
+  .plus-row:last-child { border-bottom: none; }
+  .plus-row .p-ico {
+    width: 36px; height: 36px; border-radius: 10px; flex: none; display: grid; place-items: center;
+    background: #E6F3FC; border: 1px solid #BFE3F7; color: var(--p-gold); font-size: 16px;
+  }
+  .plus-row.locked .p-ico { background: #F8FAFC; border-color: var(--p-line); color: var(--p-dim); }
+  .plus-row .grow { flex: 1; min-width: 0; }
+  .plus-row .t { display: block; font-weight: 600; font-size: 13.5px; }
+  .plus-row .d { display: block; font-size: 11.5px; color: var(--p-dim); margin-top: 1px; }
+  .tag.v2 { color: #7C3AED; border-color: #DDD6FE; background: #F5F3FF; }
+
+  .cal-date {
+    width: 46px; flex: none; text-align: center; border: 1px solid var(--p-line); border-radius: 10px;
+    padding: 5px 0; font: 700 11px Consolas, monospace; color: var(--p-text); background: var(--p-surface);
+  }
+  .cal-date small { display: block; font-size: 9px; color: var(--p-dim); font-weight: 600; letter-spacing: 0.08em; }
+
+  /* ============ PERFIL DO ALUNO ============ */
+  .fld {
+    width: 100%; border: 1px solid var(--p-line); border-radius: 10px; padding: 11px 12px;
+    font: 400 14px var(--font); color: var(--p-text); background: #FFFFFF; outline: none;
+  }
+  .fld:focus { border-color: var(--p-gold); box-shadow: 0 0 0 3px #CFE9FA; }
+  .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .avatar-opt {
+    padding: 0; cursor: pointer; background: none; border: 3px solid transparent;
+    border-radius: 50%; display: block;
+  }
+  .avatar-opt img { width: 100%; aspect-ratio: 1; border-radius: 50%; display: block; }
+  .avatar-opt.sel { border-color: var(--p-gold); box-shadow: 0 0 0 2px #BFE3F7; }
+  .avatar-opt:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 2px; }
+  .avatar-preview { position: relative; width: 128px; height: 128px; margin: 4px auto 14px; }
+  .avatar-preview img {
+    width: 100%; height: 100%; border-radius: 50%; border: 3px solid #FFFFFF;
+    box-shadow: 0 6px 18px rgba(20, 50, 79, 0.18); display: block;
+  }
+  .avatar-preview .nametag {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    background: #14324F; color: #FFFFFF; font: 700 8.5px Consolas, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px;
+    border-radius: 3px; border: 1px solid #3E6288; white-space: nowrap; max-width: 96%;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .insignia { overflow: hidden; }
+  .insignia img { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; display: block; }
+
+  /* ============ PORTÃO: JÁ É ALUNO / PRIMEIRA VEZ ============ */
+  .gate-layer {
+    position: absolute; inset: 0; z-index: 39; border-radius: 26px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EAF3FB 100%);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 26px; overflow-y: auto;
+  }
+  .gate-layer.on { display: flex; }
+  .gate-logo { width: 62px; height: auto; margin-bottom: 14px; flex: none; }
+  .gate-step { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .gate-step h2 { font-weight: 800; font-size: 17px; margin: 0 0 4px; color: var(--p-text); }
+  .gate-opt {
+    width: 100%; text-align: left; background: #FFFFFF; border: 1px solid var(--p-line);
+    border-radius: 14px; padding: 14px 16px; cursor: pointer; margin-bottom: 10px;
+    font: inherit; color: var(--p-text); transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .gate-opt:hover, .gate-opt:focus-visible { border-color: var(--p-gold); box-shadow: 0 4px 14px rgba(27, 127, 196, 0.12); outline: none; }
+  .gate-opt .t { display: block; font-weight: 700; font-size: 15px; }
+  .gate-opt .d { display: block; font-size: 12px; color: var(--p-dim); margin-top: 2px; }
+
+  .cad-progress {
+    width: 100%; height: 4px; border-radius: 99px; background: #D8E7F5;
+    overflow: hidden; margin-bottom: 12px; flex: none;
+  }
+  .cad-progress .fill {
+    height: 100%; width: 0; border-radius: 99px; background: var(--p-gold);
+    transition: width 0.4s ease;
+  }
+
+  /* ============ TOUR OBRIGATÓRIO DO DANILO ============ */
+  .tour-layer {
+    position: absolute; inset: 0; z-index: 45; display: none;
+    border-radius: 26px; overflow: hidden;
+  }
+  .tour-layer.on { display: block; }
+  .tour-halo {
+    position: absolute; border-radius: 14px; pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(10, 35, 58, 0.62);
+    border: 2px solid #54B2E8;
+    transition: left 0.35s ease, top 0.35s ease, width 0.35s ease, height 0.35s ease;
+  }
+  .tour-box {
+    position: absolute; left: 12px; right: 12px; bottom: 14px;
+    background: #FFFFFF; border-radius: 16px; padding: 14px;
+    box-shadow: 0 12px 30px rgba(10, 35, 58, 0.35);
+  }
+  .tour-head { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .tour-head video {
+    width: 44px; height: 54px; object-fit: cover; border-radius: 10px;
+    flex: none; background: #E9E3DA;
+  }
+  .tour-count { margin-left: auto; font: 600 10px Consolas, monospace; color: var(--p-dim); }
+  .tour-text { font-size: 13px; line-height: 1.55; color: var(--p-text); }
+  .tour-text strong { color: var(--p-gold); }
+  .tour-nav { display: flex; justify-content: space-between; margin-top: 12px; }
+
+  /* ============ DANILO, O GUIA ============ */
+  .danilo-fab {
+    position: absolute; right: 12px; bottom: 86px; z-index: 25;
+    width: 62px; height: 62px; background: none; border: none; cursor: pointer; padding: 0;
+  }
+  .danilo-fab video {
+    width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%;
+    border: 2px solid #FFFFFF; box-shadow: 0 6px 16px rgba(15,23,42,0.3); background: #E9E3DA;
+  }
+  .danilo-fab:hover { transform: translateY(-2px); transition: transform 0.15s ease; }
+  .danilo-fab:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; border-radius: 14px; }
+  .danilo-hint {
+    position: absolute; right: 78px; bottom: 108px; z-index: 25;
+    background: var(--p-gold); color: #FFFFFF; font: 700 11px var(--font);
+    padding: 7px 12px; border-radius: 12px 12px 3px 12px; white-space: nowrap;
+    animation: hintFloat 2.2s ease-in-out infinite;
+  }
+  @keyframes hintFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-4px);} }
+  .danilo-pop {
+    position: absolute; inset: 0; z-index: 35; display: none;
+    background: rgba(15,23,42,0.45); border-radius: 26px;
+    align-items: flex-end;
+  }
+  .danilo-pop.on { display: flex; }
+  .danilo-sheet {
+    background: var(--p-surface); border-top: 1px solid var(--p-line); width: 100%;
+    border-radius: 20px 20px 26px 26px; padding: 16px 18px 20px;
+    max-height: 72%; overflow-y: auto; animation: sheetUp 0.25s ease;
+  }
+  @keyframes sheetUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .danilo-sheet .d-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .danilo-sheet .d-head video {
+    width: 84px; height: 102px; flex: none; object-fit: cover; border-radius: 14px;
+    border: 1px solid var(--p-line); background: #E9E3DA;
+  }
+  .danilo-sheet .d-name { font-weight: 800; font-size: 16px; }
+  .danilo-sheet .d-role { font: 600 9.5px Consolas, monospace; letter-spacing: 0.16em; text-transform: uppercase; color: var(--p-gold); margin-top: 2px; }
+  .danilo-sheet .d-bubble {
+    background: var(--p-card); border: 1px solid var(--p-line); border-radius: 4px 14px 14px 14px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.6; color: var(--p-text);
+  }
+  .danilo-sheet .d-bubble strong { color: var(--p-gold); }
+
+  /* ============ ASIDE ============ */
+  .aside { flex: 1; min-width: 300px; max-width: 560px; }
+  .note-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 22px; margin-bottom: 16px;
+  }
+  .note-card h2 {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 12px; font-family: Consolas, monospace;
+  }
+  .note-card ul { margin: 0; padding-left: 18px; line-height: 1.65; font-size: 13.5px; }
+  .note-card li { margin-bottom: 7px; }
+  .note-card li::marker { color: var(--gold); }
+  .note-card .ref { font: 600 10.5px Consolas, monospace; color: var(--ink-dim); letter-spacing: 0.04em; }
+  .note-card p { font-size: 13.5px; line-height: 1.6; margin: 0 0 8px; }
+  .fase-strip { display: flex; gap: 8px; margin-top: 4px; }
+  .fase {
+    flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  .fase.now { border-color: var(--gold); background: var(--gold-soft); }
+  .fase .f-id { font: 700 11px Consolas, monospace; letter-spacing: 0.1em; color: var(--gold); }
+  .fase .f-nm { font-size: 12px; font-weight: 600; margin-top: 3px; }
+  .fase .f-ds { font-size: 11px; color: var(--ink-dim); margin-top: 2px; line-height: 1.4; }
+
+  @media (max-width: 860px) {
+    .stage { flex-direction: column; align-items: center; }
+    .aside { max-width: 480px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .login-logo, .splash-logo { opacity: 1 !important; transform: none !important; }
+    .splash-phrase, .splash-phrase .dot, .splash-brand, .splash-load { opacity: 1 !important; transform: none !important; }
+    .splash-load .fill { width: 100% !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Quad Concursos · Documento-base rev. 2.3 · Protótipo navegável</div>
+    <div style="display:flex; align-items:center; gap:14px">
+      <img src="__QUAD_LOGO__" width="50" height="50" alt="" style="flex:none; border-radius:12px">
+      <h1>Viver o Quad — V0 · Prova de Vida</h1>
+    </div>
+    <p>Protótipo do escopo V0 conforme o relatório: o mínimo capaz de responder se o aluno abre o app sozinho, numa terça, sem ninguém mandar. Elementos de V1 aparecem marcados como prévia bloqueada. Alterne os três perfis do sistema abaixo.</p>
+  </header>
+
+  <div class="persona-bar" role="tablist" aria-label="Perfil do sistema">
+    <button class="persona-btn active" data-persona="aluno" role="tab" aria-selected="true">Aluno<small>usa e gera o dado</small></button>
+    <button class="persona-btn" data-persona="professor" role="tab" aria-selected="false">Professor<small>abre e fecha o quiz</small></button>
+    <button class="persona-btn" data-persona="admin" role="tab" aria-selected="false">Administrador — N.P.P.<small>turma · edital · questões</small></button>
+  </div>
+
+  <div class="stage">
+    <!-- ==================== PHONE ==================== -->
+    <div class="phone">
+      <div class="screen" id="screen">
+        <div class="statusbar"><span>21:47</span><span>TER · QUAD</span></div>
+        <!-- app claro, padrão slate+azul do ecossistema Quad -->
+
+        <!-- topo identidade (aluno) -->
+        <div class="app-top" data-scope="aluno">
+          <div class="insignia" id="homeAvatar" aria-hidden="true">▲</div>
+          <div class="who">
+            <div class="name" id="homeNome">Falcão-03</div>
+            <div class="rank">Soldado · patente fixa na V0</div>
+          </div>
+          <div class="score-chip">
+            <div class="score-pop" id="scorePop">+30</div>
+            <div class="val" id="scoreVal">1.240</div>
+            <div class="lbl">Quad Coins · #12 turma</div>
+          </div>
+        </div>
+
+        <!-- topo professor -->
+        <div class="app-top" data-scope="professor" style="display:none">
+          <div class="insignia" aria-hidden="true">★</div>
+          <div class="who">
+            <div class="name">Prof. Andrade</div>
+            <div class="rank">Turma PC-BA · PATAMO · 19h–22h</div>
+          </div>
+          <span class="tag live" id="liveTag" style="display:none">AO VIVO</span>
+        </div>
+
+        <!-- topo admin -->
+        <div class="app-top" data-scope="admin" style="display:none">
+          <div class="insignia" aria-hidden="true">⬢</div>
+          <div class="who">
+            <div class="name">Administrador</div>
+            <div class="rank">N.P.P. · camada estrutural</div>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · INÍCIO ============ -->
+        <div class="view on" id="v-inicio">
+          <div class="p-card" id="salaCard">
+            <div class="k-label">Sala de aula</div>
+            <h3 id="salaTitle">Aula de hoje · 19h–22h <span class="tag" id="salaTag">SEM QUIZ ABERTO</span></h3>
+            <p class="sub" id="salaSub">Direito Administrativo — Poderes. Quando o professor abrir o quiz, ele aparece aqui.</p>
+            <div style="margin-top:10px">
+              <button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Missões de hoje · expiram 23h59</div>
+            <h3>Bloco da noite <span class="tag warn" id="missExpira">EXPIRA EM 2H12</span></h3>
+            <p class="sub">Não fazer não tira ponto — mas os Quad Coins do bloco somem com ele. Atrasadas recuperam até sábado.</p>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:12px">
+              <div class="bar-track" style="flex:1"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
+              <span style="font:600 12px Consolas,monospace" id="missCount">10/20</span>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn small" id="btnMissaoHome">Continuar missão</button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Avisos do professor</div>
+            <div class="mission-row">
+              <div class="m-dot">!</div>
+              <div class="grow">
+                <div class="t">Simulado presencial — sábado 8h</div>
+                <div class="d">Inscrição pelo link. Presença pontua em Quad Coins.</div>
+              </div>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">!</div>
+              <div class="grow">
+                <div class="t">Material de Poderes liberado</div>
+                <div class="d">Leia antes do quiz de quinta.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-card" id="mineCard">
+            <div class="k-label">Eventos da semana</div>
+            <h3>Aulão de véspera — RONDESP <span class="tag gold" id="mineTag">COINS OCULTOS</span></h3>
+            <p class="sub">Tem Quad Coin para garimpar aqui dentro. Quem explora, encontra.</p>
+            <div style="margin-top:10px"><button class="btn ghost small" id="btnMinerar">Explorar evento</button></div>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · MISSÕES ============ -->
+        <div class="view" id="v-missoes">
+          <div class="p-card">
+            <div class="k-label">Hoje · 20 questões novas (10 + 10)</div>
+            <div class="mission-row">
+              <div class="m-dot done">✓</div>
+              <div class="grow">
+                <div class="t">Bloco 1 · Português</div>
+                <div class="d">10/10 · concluído no almoço · +25 Quad Coins</div>
+              </div>
+              <span class="tag">FEITO</span>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot" id="b2dot">2</div>
+              <div class="grow">
+                <div class="t">Bloco 2 · Dir. Administrativo — Poderes</div>
+                <div class="d" id="b2desc">10 questões · ~15 min · expira 23h59</div>
+              </div>
+              <button class="btn small" id="btnMissao2">Iniciar</button>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Atrasadas · recupere até sábado</div>
+            <div class="mission-row">
+              <div class="m-dot">↺</div>
+              <div class="grow">
+                <div class="t">Bloco de terça · Legislação</div>
+                <div class="d">Corte no sábado 23h59 — depois disso, sai da semana.</div>
+              </div>
+              <button class="btn ghost small">Recuperar</button>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Simulados</div>
+            <div class="mission-row">
+              <div class="m-dot">◈</div>
+              <div class="grow">
+                <div class="t">Simulado interno · domingo</div>
+                <div class="d">Formato quiz, dentro do app. Pontua em Quad Coins.</div>
+              </div>
+              <span class="tag">EM BREVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · DOMÍNIO (prévia V1) ============ -->
+        <div class="view" id="v-dominio">
+          <div class="p-card" style="border-color:#BAE6FD">
+            <h3>Painel de Domínio <span class="tag v1">PRÉVIA · V1</span></h3>
+            <p class="sub">Na V0 o sistema só <strong>loga o cru</strong> (resposta, acerto, tempo, assunto). A barra visual e a metodologia calibrada entram na V1 — domínio não é acerto bruto.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Árvore do edital · PC-BA (último concurso)</div>
+            <div class="dom-item open">
+              <button class="dom-head" data-dom>
+                <span class="chev">▾</span><span class="nm">Direito Administrativo</span><span class="pc">60%</span>
+              </button>
+              <div style="margin-top:8px"><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div></div>
+              <div class="dom-sub">
+                <div class="row"><span class="nm">Administração pública</span><div class="bar-track"><div class="bar-fill blue" style="width:75%"></div></div><span class="pc">75%</span></div>
+                <div class="row"><span class="nm">Princípios</span><div class="bar-track"><div class="bar-fill blue" style="width:80%"></div></div><span class="pc">80%</span></div>
+                <div class="row"><span class="nm">Poderes</span><div class="bar-track"><div class="bar-fill blue" style="width:0%"></div></div><span class="pc">0%</span></div>
+                <div class="row"><span class="nm">Cargo, emprego e função</span><div class="bar-track"><div class="bar-fill blue" style="width:65%"></div></div><span class="pc">65%</span></div>
+              </div>
+            </div>
+            <div class="dom-item">
+              <button class="dom-head" data-dom>
+                <span class="chev">▸</span><span class="nm">Estatuto da polícia</span><span class="pc">70%</span>
+              </button>
+              <div style="margin-top:8px"><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div></div>
+              <div class="dom-sub">
+                <div class="row"><span class="nm">Regime disciplinar</span><div class="bar-track"><div class="bar-fill blue" style="width:72%"></div></div><span class="pc">72%</span></div>
+                <div class="row"><span class="nm">Hierarquia</span><div class="bar-track"><div class="bar-fill blue" style="width:66%"></div></div><span class="pc">66%</span></div>
+              </div>
+            </div>
+            <div class="dom-item">
+              <button class="dom-head" data-dom>
+                <span class="chev">▸</span><span class="nm">Português</span><span class="pc">45%</span>
+              </button>
+              <div style="margin-top:8px"><div class="bar-track"><div class="bar-fill" style="width:45%"></div></div></div>
+              <div class="dom-sub">
+                <div class="row"><span class="nm">Interpretação de texto</span><div class="bar-track"><div class="bar-fill blue" style="width:52%"></div></div><span class="pc">52%</span></div>
+                <div class="row"><span class="nm">Crase</span><div class="bar-track"><div class="bar-fill blue" style="width:31%"></div></div><span class="pc">31%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Quad Coin ≠ Domínio</h3>
+            <p class="sub"><strong>Quad Coin</strong> sobe por fazer (participação). <strong>Domínio</strong> sobe por acertar (evidência). Acertar não rende Quad Coin — as duas leituras nunca se confundem.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · QUADRÔMETRO ============ -->
+        <div class="view" id="v-perfil">
+          <div class="p-card">
+            <div class="k-label">Quadrômetro · sua jornada em números</div>
+            <h3 id="quadNome">Falcão-03 · Soldado</h3>
+            <p class="sub">Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10 encontros. Patente evolutiva entra na V1.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Constância · últimos 7 dias</div>
+            <div style="display:flex; gap:6px; margin-top:4px">
+              <span class="tag live">S</span><span class="tag live">T</span><span class="tag live">Q</span>
+              <span class="tag">Q</span><span class="tag live">S</span><span class="tag live">S</span><span class="tag gold">HOJE</span>
+            </div>
+            <p class="sub" style="margin-top:10px">A economia (V1) premia constância — nunca volume bruto.</p>
+          </div>
+          <div class="p-card" style="border-style:dashed; opacity:0.8">
+            <h3>Intendência · gastar Quad Coins <span class="tag v1">BLOQUEADO · V1</span></h3>
+            <p class="sub">A troca de Quad Coins por benefícios (aulões, simulados, itens, acessos) ativa na V1 (A→B→C), depois da linha de base provar o Retorno Saudável. Por enquanto, seus Coins só acumulam.</p>
+          </div>
+          <div class="p-card" style="opacity:0.7">
+            <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
+            <p class="sub" style="font-family:Consolas,monospace; font-size:11px" id="telemetry">origem: OPEN_ORGANIC · eventos: 14 · linha de base: ativa</p>
+          </div>
+          <button class="btn ghost small" id="btnSair" style="width:100%">Sair da conta</button>
+        </div>
+
+        <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
+        <div class="view" id="v-aluno">
+          <div class="p-card">
+            <div class="k-label">Perfil do aluno</div>
+            <h3>Identidade de combate</h3>
+            <p class="sub">Nome de guerra e avatar aparecem no Início e no ranking da turma. Respeito acima de tudo: nomes ofensivos são bloqueados.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Avatar · coleção da Polícia Militar</div>
+            <div class="avatar-preview">
+              <img id="avPreview" alt="Avatar selecionado">
+              <span class="nametag" id="avNametag">Falcão-03</span>
+            </div>
+            <div class="avatar-grid" id="avGrid"></div>
+            <p class="sub" style="margin-top:10px">O nome de guerra vai estampado na farda. Novas variações chegam com a patente evolutiva (V1).</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Nome de guerra</div>
+            <input id="nomeGuerra" class="fld" value="Falcão-03" maxlength="16" aria-label="Nome de guerra">
+          </div>
+          <div class="p-card">
+            <div class="k-label">Conta e senha</div>
+            <p class="sub">E-mail do curso: <strong id="contaEmail">aluno@quadconcursos.com.br</strong></p>
+            <div style="display:flex; gap:8px; margin-top:10px; align-items:center">
+              <input id="novaSenha" class="fld" type="password" placeholder="Nova senha" style="flex:1" aria-label="Nova senha">
+              <button class="btn small" id="btnSenha">Alterar</button>
+            </div>
+          </div>
+          <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
+        </div>
+
+        <!-- ============ ALUNO · PRÉ-TAF ============ -->
+        <div class="view" id="v-pretaf">
+          <div class="p-card">
+            <div class="k-label">Pré-TAF · preparo físico</div>
+            <h3>Rumo ao TAF <span class="tag gold">NOVO</span></h3>
+            <p class="sub">Treinos que preparam você para as provas físicas do concurso. Registrar treino alimenta sua constância e seus Quad Coins de participação — desempenho físico não entra no Domínio.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Suas marcas vs. meta do edital</div>
+            <div class="result-bar"><span class="q" style="width:72px">Corrida 12'</span><div class="bar-track"><div class="bar-fill" style="width:87%"></div></div><span class="n" style="width:88px">2.100/2.400 m</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Barra fixa</span><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><span class="n" style="width:88px">4/5</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Flexão</span><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><span class="n" style="width:88px">18/20</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Abdominal</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span class="n" style="width:88px">30/35</span></div>
+            <p class="sub" style="margin-top:8px">Metas de referência do edital PC-BA 2025. Suas marcas atualizam a cada teste registrado.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Treino desta semana</div>
+            <div class="mission-row">
+              <div class="m-dot done">✓</div>
+              <div class="grow"><div class="t">Corrida intervalada · 30 min</div><div class="d">Segunda · feito</div></div>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot" id="tafDot">2</div>
+              <div class="grow"><div class="t">Força · barra + flexão</div><div class="d" id="tafDesc">Hoje · 3 séries até a falha</div></div>
+              <button class="btn small" id="btnTreino">Registrar</button>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">3</div>
+              <div class="grow"><div class="t">Circuito TAF completo</div><div class="d">Sábado · simule a prova inteira</div></div>
+            </div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Teste oficial de corrida</h3>
+            <p class="sub">28/07 · 6h30 · pista do quartel. O resultado atualiza suas marcas — está no Calendário.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · CALENDÁRIO ============ -->
+        <div class="view" id="v-calendario">
+          <div class="p-card">
+            <div class="k-label">Calendário · agendamentos e momentos importantes</div>
+            <div class="mission-row">
+              <div class="cal-date">HOJE<small>TER</small></div>
+              <div class="grow"><div class="t">Aula · Dir. Administrativo — Poderes</div><div class="d">19h–22h · presencial · quiz ao vivo</div></div>
+              <span class="tag">AULA</span>
+            </div>
+            <div class="mission-row">
+              <div class="cal-date">17<small>SEX</small></div>
+              <div class="grow"><div class="t">Aulão de véspera — RONDESP</div><div class="d">19h · evento com Quad Coins para garimpar</div></div>
+              <span class="tag gold">EVENTO</span>
+            </div>
+            <div class="mission-row">
+              <div class="cal-date">18<small>SÁB</small></div>
+              <div class="grow"><div class="t">Simulado presencial</div><div class="d">8h · inscrição pelo link do aviso</div></div>
+              <span class="tag live">INSCRITO</span>
+            </div>
+            <div class="mission-row">
+              <div class="cal-date">18<small>SÁB</small></div>
+              <div class="grow"><div class="t">Corte das missões da semana</div><div class="d">23h59 · recupere as atrasadas antes</div></div>
+              <span class="tag warn">PRAZO</span>
+            </div>
+            <div class="mission-row">
+              <div class="cal-date">28<small>TER</small></div>
+              <div class="grow"><div class="t">Pré-TAF · teste de corrida 12 min</div><div class="d">6h30 · pista do quartel · atualiza suas marcas</div></div>
+              <span class="tag">TAF</span>
+            </div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Sincronizado com a plataforma</h3>
+            <p class="sub">Aulas e matrículas vêm do calendário da plataforma-base; simulados, eventos, prazos de missão e testes do Pré-TAF nascem aqui no app. Materiais de cada aula ficam na aba Materiais.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · MATERIAIS ============ -->
+        <div class="view" id="v-materiais">
+          <div class="p-card">
+            <div class="k-label">Materiais das aulas · por matéria e assunto</div>
+            <h3>Dir. Administrativo — Poderes <span class="tag gold">NOVO</span></h3>
+            <div class="mission-row">
+              <div class="m-dot">▤</div>
+              <div class="grow"><div class="t">Slides da aula</div><div class="d">PDF · 24 págs</div></div>
+              <button class="btn ghost small mat-dl">Abrir</button>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">✎</div>
+              <div class="grow"><div class="t">Resumo esquematizado</div><div class="d">PDF · 6 págs</div></div>
+              <button class="btn ghost small mat-dl">Abrir</button>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">◎</div>
+              <div class="grow"><div class="t">Lista extra · 30 questões</div><div class="d">Responda no app · pontua em Quad Coins</div></div>
+              <button class="btn ghost small mat-dl">Abrir</button>
+            </div>
+          </div>
+          <div class="p-card">
+            <h3>Português — Crase</h3>
+            <div class="mission-row">
+              <div class="m-dot">▶</div>
+              <div class="grow"><div class="t">Vídeo · revisão de crase</div><div class="d">18 min</div></div>
+              <button class="btn ghost small mat-dl">Abrir</button>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">▤</div>
+              <div class="grow"><div class="t">Mapa mental de crase</div><div class="d">PDF · 1 pág</div></div>
+              <button class="btn ghost small mat-dl">Abrir</button>
+            </div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Sempre da aula para cá</h3>
+            <p class="sub">O professor libera o material na aula e ele aparece aqui etiquetado por matéria e assunto — mesmo padrão do banco de questões. Sem caçar link em grupo.</p>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR ============ -->
+        <div class="view" id="v-sala">
+          <div class="p-card">
+            <div class="k-label">Turma</div>
+            <h3>PC-BA · PATAMO <span class="tag">EDITAL PC-BA 2025</span></h3>
+            <p class="sub">Aula de hoje: Dir. Administrativo — Poderes · 42 alunos esperados.</p>
+          </div>
+          <div class="p-card" id="quizCtl">
+            <div class="k-label">Quiz da aula</div>
+            <h3 id="qcTitle">Quiz fechado</h3>
+            <p class="sub" id="qcSub">3 questões selecionadas do banco (tag: Poderes). Abrir libera para a sala; o aluno responde sem ver acerto ou erro.</p>
+            <div style="display:flex; gap:8px; margin-top:12px">
+              <button class="btn small" id="btnAbrirQuiz">Abrir quiz</button>
+              <button class="btn ghost small" id="btnFinalizarQuiz" disabled>Finalizar</button>
+            </div>
+            <div id="pollBox" style="display:none; margin-top:14px">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div class="bar-track" style="flex:1"><div class="bar-fill" id="pollBar" style="width:0%"></div></div>
+                <span style="font:600 12px Consolas,monospace" id="pollCount">0/42</span>
+              </div>
+              <p class="sub" style="margin-top:8px">Respostas chegando (polling). Parcial por questão disponível ao vivo.</p>
+            </div>
+          </div>
+          <div class="p-card" id="relCard" style="display:none">
+            <div class="k-label">Relatório da sala · parcial</div>
+            <div class="result-bar"><span class="q">Q1</span><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><span class="n">74%</span></div>
+            <div class="result-bar"><span class="q">Q2</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><span class="n">41%</span></div>
+            <div class="result-bar"><span class="q">Q3</span><div class="bar-track"><div class="bar-fill" style="width:63%"></div></div><span class="n">63%</span></div>
+            <p class="sub" style="margin-top:8px">Q2 (Poder de polícia) travou a sala — vale retomar antes do fim da aula. Ajuste da questão pode ser feito ao vivo pelo Admin.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · TURMAS ============ -->
+        <div class="view" id="v-turmas">
+          <div class="p-card">
+            <div class="k-label">Turma = Edital × Modalidade</div>
+            <table class="mini">
+              <thead><tr><th>Turma</th><th>Edital</th><th>Modalidade</th></tr></thead>
+              <tbody>
+                <tr><td>PC-BA Noite</td><td>PC-BA 2025</td><td><span class="tag">PATAMO</span></td></tr>
+                <tr><td>PC-BA Intensivo</td><td>PC-BA 2025</td><td><span class="tag">BOPE</span></td></tr>
+                <tr><td>CFO Base</td><td>CFO 2024</td><td><span class="tag">RONDESP</span></td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:12px"><button class="btn small" id="btnNovaTurma">Abrir nova turma</button></div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Modalidades ≠ concursos</h3>
+            <p class="sub">RONDESP (nivelamento) · PATAMO (regular) · BOPE (blocos de questões). O mesmo edital roda em qualquer uma. A turma não é filha do assunto — referencia o edital.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · EDITAL ============ -->
+        <div class="view" id="v-edital">
+          <div class="p-card">
+            <div class="k-label">Árvore de conteúdo</div>
+            <div class="tree">
+              <div class="node"><span class="nname">Polícia Civil BA</span><span class="nmeta">concurso</span>
+                <div class="lvl1">
+                  <div class="node"><span class="nname">Edital PC-BA 2025</span><span class="nmeta">lançado</span>
+                    <div class="lvl1">
+                      <div class="node"><span class="nname">Dir. Administrativo</span><span class="nmeta">4 assuntos</span></div>
+                      <div class="node"><span class="nname">Estatuto da polícia</span><span class="nmeta">2 assuntos</span></div>
+                      <div class="node"><span class="nname">Português</span><span class="nmeta">2 assuntos</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px">
+              <button class="btn small" id="btnLancarEdital">Lançar novo edital</button>
+              <button class="btn ghost small" id="btnReconciliar">Simular reconciliação</button>
+            </div>
+          </div>
+          <div class="p-card" id="reconCard" style="display:none">
+            <div class="k-label">Reconciliação · edital novo vs. anterior</div>
+            <table class="mini">
+              <tbody>
+                <tr><td>Informática <span class="tag">SAIU</span></td><td class="sub">dados descartados</td></tr>
+                <tr><td>Dir. Constitucional <span class="tag gold">ENTROU</span></td><td class="sub">nasce zerada</td></tr>
+                <tr><td>Português · +1 assunto</td><td class="sub">recalcula %, histórico preservado</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>O edital é a espinha</h3>
+            <p class="sub">Lançar o edital de referência é o que monta o painel de domínio e cria os baldes da planilha geral. Nada é digitado solto.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · QUESTÕES ============ -->
+        <div class="view" id="v-questoes">
+          <div class="p-card">
+            <div class="k-label">Banco geral · puxado por tag, sem duplicar</div>
+            <table class="mini">
+              <thead><tr><th>Questão</th><th>Tag</th><th>Uso</th></tr></thead>
+              <tbody>
+                <tr><td>Q-1042 · Poder de polícia…</td><td class="sub">Dir. Adm / Poderes</td><td><span class="tag">AULA</span></td></tr>
+                <tr><td>Q-1043 · Ato discricionário…</td><td class="sub">Dir. Adm / Poderes</td><td><span class="tag">MISSÃO</span></td></tr>
+                <tr><td>Q-0987 · Crase em locuções…</td><td class="sub">Português / Crase</td><td><span class="tag">MISSÃO</span></td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:12px"><button class="btn small" id="btnNovaQuestao">Cadastrar questão</button></div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Ajustável ao vivo</h3>
+            <p class="sub">Questão com erro detectado em sala pode ser corrigida na hora, sem parar o quiz. Cada questão carrega dificuldade e campo de uso (aula / missão).</p>
+          </div>
+        </div>
+
+        <!-- ============ QUIZ OVERLAY ============ -->
+        <div class="quiz-layer" id="quizLayer">
+          <div class="quiz-head">
+            <div class="k-label" id="quizKicker">Missão · Bloco 2</div>
+            <h3 style="margin:0; font-size:15px" id="quizProgress">Questão 1 de 3</h3>
+            <p class="sub" style="margin-top:4px">Você não vê acerto ou erro agora — o resultado abre no fim.</p>
+          </div>
+          <div class="quiz-body" id="quizBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairQuiz">Sair</button>
+            <button class="btn" id="btnProxima" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ DANILO — vetorização da folha de personagem ============ -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <symbol id="daniloSvg" viewBox="0 0 200 236">
+              <!-- mochila -->
+              <rect x="66" y="66" width="68" height="46" rx="12" fill="#38517A" stroke="#2C3E5C" stroke-width="2"/>
+              <!-- ombros -->
+              <rect x="22" y="82" width="40" height="38" rx="14" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="138" y="82" width="40" height="38" rx="14" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- braços -->
+              <rect x="27" y="116" width="29" height="38" rx="11" fill="#6D8FB5" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="144" y="116" width="29" height="38" rx="11" fill="#6D8FB5" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="41" cy="163" r="11" fill="#4E71A0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="159" cy="163" r="11" fill="#4E71A0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- pernas -->
+              <rect x="69" y="156" width="25" height="40" rx="9" fill="#5578A8" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="106" y="156" width="25" height="40" rx="9" fill="#5578A8" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- botas -->
+              <rect x="61" y="192" width="39" height="24" rx="10" fill="#46648F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="100" y="192" width="39" height="24" rx="10" fill="#46648F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- quadril -->
+              <rect x="71" y="142" width="58" height="22" rx="10" fill="#3E5A85" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- torso -->
+              <path d="M64 84 h72 a14 14 0 0 1 14 14 v20 a30 30 0 0 1 -30 30 h-40 a30 30 0 0 1 -30 -30 v-20 a14 14 0 0 1 14 -14 z"
+                    fill="#4E71A0" stroke="#2C3E5C" stroke-width="3"/>
+              <rect x="78" y="120" width="44" height="24" rx="11" fill="#7C9BC0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="72" y="94" width="16" height="3.5" rx="1.75" fill="#2C3E5C" opacity="0.45"/>
+              <rect x="72" y="101" width="16" height="3.5" rx="1.75" fill="#2C3E5C" opacity="0.45"/>
+              <text x="118" y="110" font-family="Consolas, monospace" font-size="17" font-weight="700" fill="#C7DCEE">01</text>
+              <!-- cabeça -->
+              <circle cx="52" cy="52" r="9" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="148" cy="52" r="9" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <path d="M58 54 a42 40 0 0 1 84 0 v6 a16 16 0 0 1 -16 16 h-52 a16 16 0 0 1 -16 -16 z"
+                    fill="#B9D2E6" stroke="#2C3E5C" stroke-width="3"/>
+              <rect x="70" y="33" width="60" height="41" rx="11" fill="#132A40"/>
+              <rect x="73" y="36" width="54" height="35" rx="9" fill="#D9EEF9"/>
+              <!-- logo Q oficial (três azuis + cauda de balão) -->
+              <path d="M94.7 62 A10.5 10.5 0 1 1 109 47.7" fill="none" stroke="#2B5A8C" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M92.6 57.2 A8.5 8.5 0 0 0 104.2 60.4" fill="none" stroke="#7ECBF1" stroke-width="3" stroke-linecap="round"/>
+              <path d="M105.2 43.9 A10.5 10.5 0 0 1 102.7 63.1" fill="none" stroke="#1B9CD9" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M100 61 L110 69 L107.5 57.5 Z" fill="#1B9CD9"/>
+            </symbol>
+          </defs>
+        </svg>
+
+        <span class="danilo-hint" id="daniloHint">Fale comigo!</span>
+        <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
+          <video id="fabVideo" autoplay muted loop playsinline aria-hidden="true"></video>
+        </button>
+
+        <div class="danilo-pop" id="daniloPop">
+          <div class="danilo-sheet">
+            <div class="d-head">
+              <video id="popVideo" autoplay muted loop playsinline aria-hidden="true"></video>
+              <div>
+                <div class="d-name">Danilo</div>
+                <div class="d-role">Guia da jornada · Unidade 01</div>
+              </div>
+            </div>
+            <div class="d-bubble" id="daniloText"></div>
+            <div style="margin-top:14px; text-align:right">
+              <button class="btn small" id="daniloOk">Entendi, Danilo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ MENU + (MAIS) ============ -->
+        <div class="plus-pop" id="plusPop">
+          <div class="plus-sheet">
+            <div class="k-label">Mais do Viver o Quad</div>
+            <button class="plus-row" data-goto="v-aluno">
+              <span class="p-ico">✦</span>
+              <span class="grow"><span class="t">Perfil do aluno</span><span class="d">nome de guerra, avatar e senha</span></span>
+            </button>
+            <button class="plus-row" data-goto="v-pretaf">
+              <span class="p-ico">⚑</span>
+              <span class="grow"><span class="t">Pré-TAF</span><span class="d">preparo físico para as provas do concurso</span></span>
+              <span class="tag gold">NOVO</span>
+            </button>
+            <button class="plus-row" data-goto="v-calendario">
+              <span class="p-ico">▦</span>
+              <span class="grow"><span class="t">Calendário</span><span class="d">agendamentos e momentos importantes</span></span>
+            </button>
+            <button class="plus-row" data-goto="v-materiais">
+              <span class="p-ico">▤</span>
+              <span class="grow"><span class="t">Materiais das aulas</span><span class="d">slides, resumos, listas e vídeos por aula</span></span>
+            </button>
+            <button class="plus-row locked" data-lock="Quadcoin chega na V1 — depois da prova de vida da V0">
+              <span class="p-ico">◈</span>
+              <span class="grow"><span class="t">Quadcoin · Intendência</span><span class="d">economia de engajamento por Marcos de Conquista</span></span>
+              <span class="tag v1">V1</span>
+            </button>
+            <button class="plus-row locked" data-lock="Presença por geofencing chega na V1">
+              <span class="p-ico">◉</span>
+              <span class="grow"><span class="t">Presença automática</span><span class="d">geofencing do prédio, atraso e falta com cuidado</span></span>
+              <span class="tag v1">V1</span>
+            </button>
+            <button class="plus-row locked" data-lock="Camada viva — chat e grupos chegam na V2">
+              <span class="p-ico">✉</span>
+              <span class="grow"><span class="t">Chat e grupos de questões</span><span class="d">quiz anônimo estilo Telegram, sem expor ninguém</span></span>
+              <span class="tag v2">V2</span>
+            </button>
+            <button class="plus-row locked" data-lock="Guarnições, GvG e PvP chegam na V2">
+              <span class="p-ico">⚔</span>
+              <span class="grow"><span class="t">Guarnições · GvG/PvP</span><span class="d">competição por velocidade, em equipe</span></span>
+              <span class="tag v2">V2</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ VINHETA (toca logo após o login) ============ -->
+        <div class="splash-layer done" id="splashLayer" role="button" aria-label="Vinheta — toque para pular">
+          <img class="splash-logo" src="__QUAD_LOGO__" alt="Logo Quad Concursos">
+          <div class="splash-phrase">Comece seu sonho por aqui<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+          <div class="splash-load"><div class="fill"></div></div>
+          <div class="splash-brand">Quad Concursos</div>
+        </div>
+
+        <!-- ============ PORTÃO: JÁ É ALUNO / PRIMEIRA VEZ ============ -->
+        <div class="gate-layer" id="gateLayer">
+          <img class="gate-logo" src="__QUAD_LOGO__" alt="">
+
+          <div class="gate-step" id="gateChoice">
+            <h2>Bem-vindo ao Viver o Quad</h2>
+            <p class="login-sub">Como você chega até aqui?</p>
+            <button class="gate-opt" id="btnJaAluno">
+              <span class="t">Já sou aluno</span>
+              <span class="d">valide seu acesso com o e-mail cadastrado no curso</span>
+            </button>
+            <button class="gate-opt" id="btnPrimeiraVez">
+              <span class="t">Minha primeira vez</span>
+              <span class="d">crie seu cadastro — buscamos seus dados na plataforma</span>
+            </button>
+            <p class="login-note">V0 · público interno: todo aluno já existe na plataforma-base.</p>
+          </div>
+
+          <div class="gate-step" id="gateValida" style="display:none">
+            <h2>Validação por e-mail</h2>
+            <p class="login-sub">Digite o e-mail cadastrado. Enviaremos um código de acesso.</p>
+            <div class="login-field">
+              <label for="valEmail">E-mail cadastrado</label>
+              <input id="valEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off">
+            </div>
+            <button class="btn" id="btnEnviarCodigo" style="width:100%">Enviar código</button>
+            <div id="codigoBox" style="display:none; width:100%; margin-top:12px">
+              <div class="login-field">
+                <label for="valCodigo">Código de 6 dígitos</label>
+                <input id="valCodigo" inputmode="numeric" maxlength="6" placeholder="______">
+              </div>
+              <button class="btn" id="btnValidar" style="width:100%">Validar acesso</button>
+              <button class="btn ghost small" id="btnReenviar" style="width:100%; margin-top:8px">Reenviar código</button>
+            </div>
+            <button class="btn ghost small" data-gate-back style="width:100%; margin-top:14px">Voltar</button>
+          </div>
+
+          <div class="gate-step" id="gateCadastro" style="display:none">
+            <h2>Primeiro acesso</h2>
+            <p class="login-sub">Informe seu e-mail. Na próxima tela, buscamos seus dados na plataforma-base.</p>
+            <div class="login-field">
+              <label for="cadEmail">E-mail</label>
+              <input id="cadEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off">
+            </div>
+            <button class="btn" id="btnBuscar" style="width:100%">Continuar</button>
+            <button class="btn ghost small" data-gate-back style="width:100%; margin-top:10px">Voltar</button>
+          </div>
+
+          <div class="gate-step" id="gateCadastroDados" style="display:none">
+            <h2>Confira seus dados</h2>
+            <p class="login-sub" id="cadStatus">Consultando a plataforma-base…</p>
+            <div class="cad-progress"><div class="fill" id="cadBar"></div></div>
+            <div class="login-field"><label for="cadNome">Nome completo</label><input id="cadNome"></div>
+            <div class="login-field"><label for="cadCpf">CPF</label><input id="cadCpf"></div>
+            <div class="login-field"><label for="cadFone">Telefone</label><input id="cadFone"></div>
+            <div class="login-field"><label for="cadTurma">Turma</label><input id="cadTurma"></div>
+            <div class="login-field"><label for="cadMatricula">Matrícula</label><input id="cadMatricula"></div>
+            <button class="btn" id="btnConcluir" style="width:100%" disabled>Concluir cadastro</button>
+            <button class="btn ghost small" id="btnCadVoltar" style="width:100%; margin-top:10px">Voltar</button>
+          </div>
+        </div>
+
+        <!-- ============ TOUR OBRIGATÓRIO DO DANILO (1º acesso) ============ -->
+        <div class="tour-layer" id="tourLayer">
+          <div class="tour-halo" id="tourHalo"></div>
+          <div class="tour-box" id="tourBox">
+            <div class="tour-head">
+              <video id="tourVideo" autoplay muted loop playsinline aria-hidden="true"></video>
+              <div>
+                <div class="d-name">Danilo</div>
+                <div class="d-role">Tour de primeiro acesso</div>
+              </div>
+              <span class="tour-count" id="tourCount">1/9</span>
+            </div>
+            <div class="tour-text" id="tourText"></div>
+            <div class="tour-nav">
+              <button class="btn ghost small" id="tourPrev">Anterior</button>
+              <button class="btn small" id="tourNext">Próximo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ LOGIN ============ -->
+        <div class="login-layer" id="loginLayer">
+          <div class="login-logo-wrap" id="logoWrap">
+            <img class="login-logo" src="__QUAD_LOGO__" alt="Logo Quad Concursos">
+          </div>
+          <h2 class="login-title">VIVER O QUAD</h2>
+          <p class="login-sub">Do primeiro contato ao dia da farda.</p>
+          <div class="login-field">
+            <label for="loginEmail">E-mail do curso</label>
+            <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
+          </div>
+          <div class="login-field">
+            <label for="loginSenha">Senha</label>
+            <input id="loginSenha" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn" id="btnEntrar" style="width:100%; margin-top:6px">Entrar</button>
+          <p class="login-note">Mesma conta da plataforma do curso.<br>Protótipo: qualquer e-mail e senha entram.</p>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <!-- ============ NAV ============ -->
+        <nav class="navbar" id="navAluno">
+          <button class="nav-btn active" data-view="v-inicio"><span class="ico">⌂</span>Início</button>
+          <button class="nav-btn" data-view="v-missoes"><span class="ico">◎</span>Missões</button>
+          <button class="nav-plus" id="btnPlus" aria-label="Mais: Pré-TAF, calendário, materiais e prévias">+</button>
+          <button class="nav-btn" data-view="v-dominio"><span class="ico">▤</span>Domínio</button>
+          <button class="nav-btn" data-view="v-perfil"><span class="ico">◔</span>Quadrômetro</button>
+        </nav>
+        <nav class="navbar" id="navProfessor" style="display:none">
+          <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
+        </nav>
+        <nav class="navbar" id="navAdmin" style="display:none">
+          <button class="nav-btn active" data-view="v-turmas"><span class="ico">⬒</span>Turmas</button>
+          <button class="nav-btn" data-view="v-edital"><span class="ico">⌗</span>Edital</button>
+          <button class="nav-btn" data-view="v-questoes"><span class="ico">✎</span>Questões</button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ==================== ASIDE ==================== -->
+    <aside class="aside">
+      <div class="note-card">
+        <h2>Faseamento do projeto</h2>
+        <div class="fase-strip">
+          <div class="fase now">
+            <div class="f-id">V0</div><div class="f-nm">Prova de vida</div>
+            <div class="f-ds">30 dias · retorno espontâneo D1/D7/D30 · sem economia</div>
+          </div>
+          <div class="fase">
+            <div class="f-id">V1</div><div class="f-nm">Expansão A·B·C</div>
+            <div class="f-ds">Geofencing, domínio, push · Quadcoin faseado</div>
+          </div>
+          <div class="fase">
+            <div class="f-id">V2</div><div class="f-nm">Camada viva</div>
+            <div class="f-ds">Chat, guarnições, GvG/PvP</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <h2>O que este protótipo cobre</h2>
+        <ul>
+          <li><strong>Identidade fixa + Quad Coins</strong> — patente Soldado, apelido, posição; Quad Coin sobe por fazer, nunca por acertar. <span class="ref">§7 · §9.3</span></li>
+          <li><strong>Quiz sem feedback imediato</strong> — o aluno responde às cegas e vê tudo no fim (com vídeo de resolução); o professor abre/finaliza e recebe a parcial da sala. <span class="ref">§7 · §9.2</span></li>
+          <li><strong>Missões 10+10 com expiração</strong> — aversão à perda no bloco do dia, recuperação até o corte de sábado. <span class="ref">§9.2 · §15</span></li>
+          <li><strong>Minerar Quad Coins</strong> — pontos escondidos em eventos para quem explora (mecânica comportamental da V0, distinta do Ciclo de Conquista). <span class="ref">§8</span></li>
+          <li><strong>Admin por edital</strong> — árvore Concurso→Edital→Matéria→Assunto separada de Turma = Edital × Modalidade, banco de questões por tag e simulação de reconciliação. <span class="ref">§5</span></li>
+          <li><strong>Fronteira V0/V1 explícita</strong> — Domínio como prévia bloqueada, Quadcoin/Intendência trancados, telemetria (origem da sessão + linha de base) registrada desde o dia 1. <span class="ref">§6 · §8 · Anexo A</span></li>
+          <li><strong>Danilo, o guia</strong> — mascote vetorizado a partir da folha de personagem (Unidade 01). Toque nele em qualquer tela: o popup traz as orientações daquela etapa da jornada, para aluno, professor e admin. <span class="ref">novo · rev. desta proposta</span></li>
+          <li><strong>Login + vinheta com carregamento</strong> — e-mail do curso + senha com a logo oficial (arquivo da marca); ao entrar, vinheta animada "Comece seu sonho por aqui..." com barra de carregamento. Sair da conta (no Quadrômetro) volta ao login. <span class="ref">§14 · conta e acesso</span></li>
+          <li><strong>Portão de acesso</strong> — após a vinheta: "Já sou aluno" (validação por código enviado ao e-mail) ou "Minha primeira vez" (cadastro com preenchimento automático a partir da plataforma-base — V0 é público interno, o aluno já existe no banco). <span class="ref">§14 · conta e acesso</span></li>
+          <li><strong>Botão "+" — hub de módulos</strong> — Perfil do aluno (nome de guerra, avatar com fardamentos da PM, senha), Pré-TAF (metas do edital e treino da semana), Calendário e Materiais das aulas; prévias de V1 (Quadcoin, geofencing) e V2 (chat, guarnições) aparecem bloqueadas. <span class="ref">novo</span></li>
+          <li><strong>Quadrômetro</strong> — a antiga aba Perfil, rebatizada: Quad Coins, posição, presença e constância do aluno em números. <span class="ref">novo nome</span></li>
+        </ul>
+      </div>
+
+      <div class="note-card">
+        <h2>Decisões do documento que o protótipo respeita</h2>
+        <ul>
+          <li>Retorno espontâneo (só <span class="ref">OPEN_ORGANIC</span>) é a métrica-mãe — o app nunca "empurra" na V0.</li>
+          <li><strong>Atenção — divergência da rev. 2.3:</strong> a pontuação de participação foi rebatizada "Quad Coin" na UI por decisão do gestor (14/07). O documento trava "Score não é moeda"; recomenda-se revisar o Anexo A para realinhar as cinco camadas (participação × elegibilidade × moeda).</li>
+          <li>Dado → Cuidado → Valor → Oferta — nenhuma tela usa dificuldade para vender.</li>
+          <li>Nenhum rótulo de perfil (Amigo/Craca) aparece — comportamento é computado, não gravado.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  var score = 1240;
+  var missDone = 10;
+
+  function $(id) { return document.getElementById(id); }
+  function fmt(n) { return n.toLocaleString('pt-BR'); }
+
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('go');
+    void t.offsetWidth;
+    t.classList.add('go');
+    if (typeof queueSync === 'function') queueSync(); // estado mudou → replica nos clones do loop
+  }
+
+  function addScore(n, msg) {
+    score += n;
+    $('scoreVal').textContent = fmt(score);
+    $('scorePerfil').textContent = fmt(score);
+    var pop = $('scorePop');
+    pop.textContent = '+' + n;
+    pop.classList.remove('go');
+    void pop.offsetWidth;
+    pop.classList.add('go');
+    if (msg) toast(msg);
+  }
+
+  /* ---------- personas ---------- */
+  var personaViews = {
+    aluno: { nav: 'navAluno', home: 'v-inicio' },
+    professor: { nav: 'navProfessor', home: 'v-sala' },
+    admin: { nav: 'navAdmin', home: 'v-turmas' }
+  };
+  document.querySelectorAll('.persona-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.persona-btn').forEach(function (x) {
+        x.classList.remove('active'); x.setAttribute('aria-selected', 'false');
+      });
+      b.classList.add('active'); b.setAttribute('aria-selected', 'true');
+      var p = b.dataset.persona;
+      document.querySelectorAll('.app-top').forEach(function (t) {
+        t.style.display = (t.dataset.scope === p) ? 'flex' : 'none';
+      });
+      ['navAluno', 'navProfessor', 'navAdmin'].forEach(function (n) {
+        $(n).style.display = (n === personaViews[p].nav) ? 'flex' : 'none';
+      });
+      showView(personaViews[p].home, personaViews[p].nav);
+    });
+  });
+
+  /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
+  var LOOP_VIEWS = ['v-inicio', 'v-missoes', 'v-dominio', 'v-perfil', 'v-pretaf', 'v-calendario', 'v-materiais'];
+  var tourOn = false;
+  function spotlight(view) {
+    var rect = view.getBoundingClientRect();
+    var mid = rect.top + rect.height / 2;
+    var half = rect.height / 2 + 40;
+    var cards = view.querySelectorAll('.p-card');
+    if (!cards.length) return;
+    var best = null, bestD = Infinity;
+    cards.forEach(function (c) {
+      var r = c.getBoundingClientRect();
+      var off = (r.top + r.height / 2) - mid;
+      var d = Math.abs(off);
+      if (d < bestD) { bestD = d; best = c; }
+      var n = Math.max(-1, Math.min(1, off / half));
+      // dente da engrenagem: gira e recua conforme se afasta do centro
+      c.style.transform = 'perspective(900px) rotateX(' + (n * -18).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.12).toFixed(3) + ')';
+      c.style.opacity = (1 - Math.abs(n) * 0.5).toFixed(3);
+    });
+    cards.forEach(function (c) { c.classList.toggle('spot', c === best); });
+  }
+  function loopPeriod(v) {
+    var segs = v.querySelectorAll(':scope > .loop-seg');
+    return segs.length > 1 ? segs[1].offsetTop - segs[0].offsetTop : 0;
+  }
+  function initLoop(v) {
+    if (v.dataset.loop) return;
+    v.dataset.loop = '1';
+    // triplica o conteúdo: [original][clone][clone] — o fim liga com o início
+    var seg = document.createElement('div');
+    seg.className = 'loop-seg';
+    while (v.firstChild) seg.appendChild(v.firstChild);
+    v.appendChild(seg);
+    var c1 = seg.cloneNode(true), c2 = seg.cloneNode(true);
+    c1.setAttribute('aria-hidden', 'true'); c2.setAttribute('aria-hidden', 'true');
+    v.appendChild(c1); v.appendChild(c2);
+    // clique num clone dispara o botão equivalente do original (mapeado pela ordem)
+    [c1, c2].forEach(function (clone) {
+      clone.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b || !clone.contains(b)) return;
+        var i = [].indexOf.call(clone.querySelectorAll('button'), b);
+        var alvo = seg.querySelectorAll('button')[i];
+        if (alvo) { alvo.click(); queueSync(); }
+      });
+    });
+    v.scrollTop = loopPeriod(v);
+  }
+  function loopJump(v) {
+    if (tourOn || v.dataset.loop !== '1') return;
+    var H = loopPeriod(v);
+    if (!H) return;
+    if (v.scrollTop < H * 0.5) v.scrollTop += H;
+    else if (v.scrollTop > H * 1.5) v.scrollTop -= H;
+  }
+  function syncLoops() {
+    document.querySelectorAll('.view[data-loop="1"]').forEach(function (v) {
+      var segs = v.querySelectorAll(':scope > .loop-seg');
+      if (segs.length === 3) {
+        segs[1].innerHTML = segs[0].innerHTML;
+        segs[2].innerHTML = segs[0].innerHTML;
+      }
+      if (v.classList.contains('on')) spotlight(v);
+    });
+  }
+  var syncT = null;
+  function queueSync() { clearTimeout(syncT); syncT = setTimeout(syncLoops, 300); }
+  document.querySelectorAll('.view').forEach(function (v) {
+    v.addEventListener('scroll', function () { loopJump(v); spotlight(v); }, { passive: true });
+  });
+
+  /* ---------- nav ---------- */
+  var currentView = 'v-inicio';
+  function showView(id, navId) {
+    currentView = id;
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('on'); });
+    $(id).classList.add('on');
+    if (navId) {
+      document.querySelectorAll('#' + navId + ' .nav-btn').forEach(function (nb) {
+        nb.classList.toggle('active', nb.dataset.view === id);
+      });
+    }
+    if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
+    spotlight($(id));
+  }
+  initLoop($('v-inicio'));
+  spotlight($('v-inicio'));
+  document.querySelectorAll('.nav-btn').forEach(function (nb) {
+    nb.addEventListener('click', function () {
+      showView(nb.dataset.view, nb.closest('nav').id);
+    });
+  });
+
+  /* ---------- domínio accordion ---------- */
+  document.querySelectorAll('[data-dom]').forEach(function (h) {
+    h.addEventListener('click', function () {
+      var item = h.closest('.dom-item');
+      item.classList.toggle('open');
+      h.querySelector('.chev').textContent = item.classList.contains('open') ? '▾' : '▸';
+      queueSync();
+    });
+  });
+
+  /* ---------- minerar score ---------- */
+  var mined = false;
+  $('btnMinerar').addEventListener('click', function () {
+    if (mined) { toast('Já garimpado — volte amanhã.'); return; }
+    mined = true;
+    $('mineTag').textContent = 'GARIMPADO';
+    $('mineTag').classList.remove('gold');
+    $('mineTag').classList.add('live');
+    addScore(15, '+15 Quad Coins garimpados no evento');
+  });
+
+  /* ---------- quiz engine ---------- */
+  var QUESTIONS = [
+    {
+      txt: 'Sobre o poder de polícia, é correto afirmar que:',
+      alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.',
+             'Decorre da supremacia do interesse público e condiciona direitos individuais.',
+             'Confunde-se com o poder disciplinar aplicado a servidores.',
+             'Só pode ser exercido pelo Poder Judiciário.'],
+      right: 1
+    },
+    {
+      txt: 'O ato administrativo discricionário se caracteriza por:',
+      alts: ['Ausência total de limites legais.',
+             'Vinculação integral de todos os seus elementos.',
+             'Margem de escolha em motivo e objeto, dentro da lei.',
+             'Impossibilidade de controle judicial.'],
+      right: 2
+    },
+    {
+      txt: 'O poder hierárquico permite à Administração:',
+      alts: ['Aplicar sanções a particulares sem vínculo.',
+             'Escalonar funções, dar ordens e rever atos de subordinados.',
+             'Editar normas com força de lei.',
+             'Delegar competência exclusiva livremente.'],
+      right: 1
+    }
+  ];
+  var quiz = { idx: 0, sel: null, answers: [], source: null };
+
+  function openQuiz(source, kicker) {
+    quiz = { idx: 0, sel: null, answers: [], source: source };
+    $('quizKicker').textContent = kicker;
+    $('quizLayer').classList.add('on');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = QUESTIONS[quiz.idx];
+    $('quizProgress').textContent = 'Questão ' + (quiz.idx + 1) + ' de ' + QUESTIONS.length;
+    $('btnProxima').textContent = quiz.idx === QUESTIONS.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnProxima').disabled = true;
+    var body = $('quizBody');
+    body.innerHTML = '';
+    var p = document.createElement('p');
+    p.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 14px;font-weight:600';
+    p.textContent = q.txt;
+    body.appendChild(p);
+    q.alts.forEach(function (alt, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + 'ABCD'[i] + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = alt;
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel');
+        quiz.sel = i;
+        $('btnProxima').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+
+  function renderResult() {
+    var hits = 0;
+    quiz.answers.forEach(function (a, i) { if (a === QUESTIONS[i].right) hits++; });
+    var body = $('quizBody');
+    body.innerHTML = '';
+    $('quizProgress').textContent = 'Resultado';
+    var head = document.createElement('div');
+    head.className = 'p-card';
+    head.innerHTML = '<h3>' + hits + ' de ' + QUESTIONS.length + ' acertos</h3>' +
+      '<p class="sub">Acertos alimentam o Domínio (V1). Os Quad Coins vieram da participação: você fez, então pontuou.</p>';
+    body.appendChild(head);
+    QUESTIONS.forEach(function (q, i) {
+      var card = document.createElement('div');
+      card.className = 'p-card';
+      var ok = quiz.answers[i] === q.right;
+      card.innerHTML = '<div class="k-label">Questão ' + (i + 1) + ' · ' + (ok ? 'acertou' : 'errou') + '</div>' +
+        '<p class="sub" style="margin-bottom:8px"></p>' +
+        '<div class="q-alt ' + (ok ? 'hit' : 'miss') + '" style="cursor:default;margin-bottom:6px"><span class="letter">' + 'ABCD'[q.right] + '</span><span></span></div>' +
+        '<button class="btn ghost small">▶ Vídeo de resolução</button>';
+      card.querySelector('p').textContent = q.txt;
+      card.querySelector('.q-alt span:last-child').textContent = q.alts[q.right];
+      card.querySelector('button').addEventListener('click', function () { toast('Vídeo de resolução — placeholder do protótipo'); });
+      body.appendChild(card);
+    });
+    $('btnProxima').textContent = 'Concluir';
+    $('btnProxima').disabled = false;
+    quiz.idx = 'done';
+  }
+
+  $('btnProxima').addEventListener('click', function () {
+    if (quiz.idx === 'done') {
+      $('quizLayer').classList.remove('on');
+      if (quiz.source === 'missao') {
+        missDone = 20;
+        $('missBar').style.width = '100%';
+        $('missCount').textContent = '20/20';
+        $('missExpira').textContent = 'CONCLUÍDO';
+        $('b2dot').classList.add('done'); $('b2dot').textContent = '✓';
+        $('b2desc').textContent = '10/10 · concluído agora · +30 Quad Coins';
+        $('btnMissao2').disabled = true; $('btnMissao2').textContent = 'Feito';
+        $('btnMissaoHome').disabled = true; $('btnMissaoHome').textContent = 'Missão do dia concluída';
+        addScore(30, '+30 Quad Coins · missão do dia completa');
+      } else {
+        addScore(20, '+20 Quad Coins · quiz da aula');
+      }
+      $('telemetry').textContent = 'origem: OPEN_ORGANIC · eventos: ' + (14 + QUESTIONS.length * 2) + ' · linha de base: ativa';
+      return;
+    }
+    quiz.answers.push(quiz.sel);
+    quiz.sel = null;
+    if (quiz.idx < QUESTIONS.length - 1) {
+      quiz.idx++;
+      renderQuestion();
+    } else {
+      renderResult();
+    }
+  });
+  $('btnSairQuiz').addEventListener('click', function () {
+    $('quizLayer').classList.remove('on');
+    toast('Missão pausada — expira 23h59.');
+  });
+
+  $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 2 · Dir. Administrativo'); });
+  $('btnMissaoHome').addEventListener('click', function () {
+    showView('v-missoes', 'navAluno');
+  });
+
+  /* ---------- professor: quiz ao vivo ---------- */
+  var pollTimer = null, pollN = 0, quizLive = false;
+  $('btnAbrirQuiz').addEventListener('click', function () {
+    if (quizLive) return;
+    quizLive = true;
+    $('qcTitle').textContent = 'Quiz aberto — sala respondendo';
+    $('qcSub').textContent = 'Os alunos veem o quiz no Início. Nenhum feedback de acerto até você finalizar.';
+    $('liveTag').style.display = 'inline-block';
+    $('pollBox').style.display = 'block';
+    $('btnAbrirQuiz').disabled = true;
+    $('btnFinalizarQuiz').disabled = false;
+    $('salaTag').textContent = 'QUIZ AO VIVO';
+    $('salaTag').classList.add('live');
+    $('salaSub').textContent = 'O professor abriu o quiz de Poderes. Entre agora — pontua em Quad Coins.';
+    $('btnEntrarQuiz').style.display = 'inline-block';
+    pollN = 0;
+    pollTimer = setInterval(function () {
+      pollN = Math.min(42, pollN + Math.ceil(Math.random() * 5));
+      $('pollCount').textContent = pollN + '/42';
+      $('pollBar').style.width = (pollN / 42 * 100) + '%';
+      if (pollN >= 42) clearInterval(pollTimer);
+    }, 700);
+    toast('Quiz aberto para a sala');
+  });
+  $('btnFinalizarQuiz').addEventListener('click', function () {
+    if (!quizLive) return;
+    quizLive = false;
+    clearInterval(pollTimer);
+    $('qcTitle').textContent = 'Quiz finalizado';
+    $('qcSub').textContent = 'Alunos recebem o resultado completo + vídeo de resolução. Parcial abaixo.';
+    $('liveTag').style.display = 'none';
+    $('btnFinalizarQuiz').disabled = true;
+    $('relCard').style.display = 'block';
+    $('salaTag').textContent = 'SEM QUIZ ABERTO';
+    $('salaTag').classList.remove('live');
+    $('salaSub').textContent = 'Direito Administrativo — Poderes. Quando o professor abrir o quiz, ele aparece aqui.';
+    $('btnEntrarQuiz').style.display = 'none';
+    toast('Relatório da sala gerado');
+  });
+  $('btnEntrarQuiz').addEventListener('click', function () { openQuiz('aula', 'Quiz ao vivo · registrado como OPEN_CLASS'); });
+
+  /* ---------- vinheta (logo após o login) ---------- */
+  var splashTimer = null;
+  function playSplash() {
+    var s = $('splashLayer');
+    s.innerHTML = s.innerHTML; // recria os nós para reiniciar as animações
+    s.classList.remove('done');
+    clearTimeout(splashTimer);
+    splashTimer = setTimeout(function () { s.classList.add('done'); abrirGate(); }, 3400);
+  }
+  $('splashLayer').addEventListener('click', function () {
+    clearTimeout(splashTimer);
+    $('splashLayer').classList.add('done');
+    abrirGate();
+  });
+
+  /* ---------- portão: já é aluno / minha primeira vez ---------- */
+  var CODIGO = '';
+  function gateStep(id) {
+    ['gateChoice', 'gateValida', 'gateCadastro', 'gateCadastroDados'].forEach(function (s) {
+      $(s).style.display = (s === id) ? 'flex' : 'none';
+    });
+  }
+  function abrirGate() { gateStep('gateChoice'); $('gateLayer').classList.add('on'); }
+  function fecharGate() { $('gateLayer').classList.remove('on'); }
+  $('btnJaAluno').addEventListener('click', function () { gateStep('gateValida'); });
+  $('btnPrimeiraVez').addEventListener('click', function () { gateStep('gateCadastro'); });
+  document.querySelectorAll('[data-gate-back]').forEach(function (b) {
+    b.addEventListener('click', function () { gateStep('gateChoice'); });
+  });
+  function enviarCodigo() {
+    var em = $('valEmail').value.trim();
+    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
+    CODIGO = String(Math.floor(100000 + Math.random() * 900000));
+    $('codigoBox').style.display = 'block';
+    $('btnEnviarCodigo').disabled = true;
+    $('btnEnviarCodigo').textContent = 'Código enviado para ' + em;
+    // na versão real o código chega por e-mail; no protótipo, mostramos no toast
+    toast('Simulação do e-mail — seu código: ' + CODIGO);
+  }
+  $('btnEnviarCodigo').addEventListener('click', enviarCodigo);
+  $('btnReenviar').addEventListener('click', function () {
+    $('btnEnviarCodigo').disabled = false;
+    enviarCodigo();
+  });
+  $('btnValidar').addEventListener('click', function () {
+    if ($('valCodigo').value === CODIGO && CODIGO) {
+      $('contaEmail').textContent = $('valEmail').value.trim();
+      fecharGate();
+      toast('Acesso validado — bem-vindo de volta!');
+    } else {
+      toast('Código incorreto — confira seu e-mail');
+    }
+  });
+  // preenchimento automático: a tela seguinte abre já carregando; os dados
+  // chegam da plataforma-base campo a campo (V0 é público interno — o aluno existe no banco)
+  var cadTimers = [];
+  function carregarCadastro() {
+    var campos = [
+      ['cadNome', 'Vitor Santos de Almeida'],
+      ['cadCpf', '***.482.915-**'],
+      ['cadFone', '(71) 9 8877-2301'],
+      ['cadTurma', 'PC-BA Noite · PATAMO'],
+      ['cadMatricula', 'QD-2026-0341']
+    ];
+    cadTimers.forEach(clearTimeout); cadTimers = [];
+    campos.forEach(function (par) { $(par[0]).value = ''; $(par[0]).placeholder = 'carregando…'; });
+    $('btnConcluir').disabled = true;
+    $('cadStatus').textContent = 'Consultando a plataforma-base…';
+    $('cadBar').style.width = '12%';
+    campos.forEach(function (par, i) {
+      cadTimers.push(setTimeout(function () {
+        $(par[0]).value = par[1];
+        $('cadBar').style.width = (12 + (i + 1) * 17.6) + '%';
+        if (i === campos.length - 1) {
+          $('cadBar').style.width = '100%';
+          $('cadStatus').textContent = 'Dados encontrados na plataforma-base ✓';
+          $('btnConcluir').disabled = false;
+        }
+      }, 600 + i * 450));
+    });
+  }
+  $('btnBuscar').addEventListener('click', function () {
+    var em = $('cadEmail').value.trim();
+    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
+    gateStep('gateCadastroDados');
+    carregarCadastro();
+  });
+  $('btnCadVoltar').addEventListener('click', function () {
+    cadTimers.forEach(clearTimeout);
+    gateStep('gateCadastro');
+  });
+  $('btnConcluir').addEventListener('click', function () {
+    $('contaEmail').textContent = $('cadEmail').value.trim();
+    fecharGate();
+    iniciarTour(); // primeiro acesso: plataforma só libera após o tour completo
+  });
+
+  /* ---------- tour obrigatório do Danilo (primeiro acesso) ---------- */
+  var TOUR = [
+    { sel: null, txt: 'Missão dada é missão cumprida! Eu sou o <strong>Danilo</strong>, seu guia. Antes de liberar a plataforma, vou te mostrar cada canto do app. Vamos juntos?' },
+    { sel: '.app-top[data-scope="aluno"]', txt: 'Este é você: <strong>avatar, nome de guerra, patente</strong> e os seus <strong>Quad Coins</strong> com a posição na turma. Tudo se ajusta no Perfil do aluno, dentro do botão +.' },
+    { sel: '#salaCard', txt: 'A <strong>Sala de aula</strong>: quando o professor abrir o quiz ao vivo, é por aqui que você entra — respondendo sem ver acerto ou erro até o fim.' },
+    { sel: '[data-view="v-missoes"]', txt: '<strong>Missões</strong>: 20 questões novas por dia, em dois blocos de 10. O bloco expira 23h59 — e as atrasadas recuperam até sábado.' },
+    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: Perfil do aluno, <strong>Pré-TAF</strong>, Calendário e Materiais das aulas.' },
+    { sel: '[data-view="v-dominio"]', txt: '<strong>Domínio</strong>: o quanto você demonstra saber, por matéria e assunto do edital. Quad Coin é fazer; Domínio é acertar.' },
+    { sel: '[data-view="v-perfil"]', txt: 'O <strong>Quadrômetro</strong>: sua jornada em números — Quad Coins, posição, presença e constância.' },
+    { sel: '#daniloFab', txt: 'E eu fico sempre por aqui! Toque em mim em qualquer tela para receber as orientações daquela etapa.' },
+    { sel: null, txt: '<strong>Tour completo!</strong> Plataforma liberada. Agora é viver o Quad: presença, missão e constância até o dia da farda.' }
+  ];
+  var tourIdx = 0;
+  function tourGo(i) {
+    tourIdx = Math.max(0, Math.min(TOUR.length - 1, i));
+    var st = TOUR[tourIdx];
+    $('tourCount').textContent = (tourIdx + 1) + '/' + TOUR.length;
+    $('tourText').innerHTML = st.txt;
+    $('tourPrev').disabled = tourIdx === 0;
+    $('tourNext').textContent = tourIdx === TOUR.length - 1 ? 'Concluir' : 'Próximo';
+    var halo = $('tourHalo');
+    var scr = $('screen').getBoundingClientRect();
+    if (st.sel) {
+      var t = document.querySelector(st.sel).getBoundingClientRect();
+      halo.style.left = (t.left - scr.left - 6) + 'px';
+      halo.style.top = (t.top - scr.top - 6) + 'px';
+      halo.style.width = (t.width + 12) + 'px';
+      halo.style.height = (t.height + 12) + 'px';
+      var alvoEmbaixo = (t.top - scr.top) > scr.height * 0.55;
+      $('tourBox').style.bottom = alvoEmbaixo ? 'auto' : '14px';
+      $('tourBox').style.top = alvoEmbaixo ? '14px' : 'auto';
+    } else {
+      halo.style.left = '50%'; halo.style.top = '36%';
+      halo.style.width = '0px'; halo.style.height = '0px';
+      $('tourBox').style.bottom = '14px'; $('tourBox').style.top = 'auto';
+    }
+  }
+  function iniciarTour() {
+    tourOn = true; // pausa o loop da engrenagem para o holofote mirar os originais
+    showView('v-inicio', 'navAluno');
+    $('v-inicio').scrollTop = 0;
+    $('tourLayer').classList.add('on');
+    tourGo(0);
+  }
+  $('tourPrev').addEventListener('click', function () { tourGo(tourIdx - 1); });
+  $('tourNext').addEventListener('click', function () {
+    if (tourIdx === TOUR.length - 1) {
+      $('tourLayer').classList.remove('on');
+      tourOn = false;
+      toast('Plataforma liberada — bom estudo!');
+    } else {
+      tourGo(tourIdx + 1);
+    }
+  });
+
+  /* ---------- login ---------- */
+  function doLogin() {
+    var em = $('loginEmail').value.trim(), pw = $('loginSenha').value;
+    if (!em || !pw) { toast('Informe e-mail e senha'); return; }
+    $('loginLayer').classList.add('off');
+    playSplash(); // vinheta logo após o login
+    toast('Bem-vindo, ' + $('homeNome').textContent + '!');
+    $('contaEmail').textContent = em;
+    $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
+  }
+  $('btnEntrar').addEventListener('click', doLogin);
+  $('loginSenha').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+  $('btnSair').addEventListener('click', function () {
+    $('loginEmail').value = ''; $('loginSenha').value = '';
+    var w = $('logoWrap');
+    w.innerHTML = w.innerHTML; // recria os nós para reiniciar a animação da logo
+    $('loginLayer').classList.remove('off');
+    // zera o portão para o próximo acesso
+    fecharGate();
+    ['valEmail', 'valCodigo', 'cadEmail', 'cadNome', 'cadCpf', 'cadFone', 'cadTurma', 'cadMatricula'].forEach(function (id) { $(id).value = ''; });
+    $('codigoBox').style.display = 'none';
+    $('btnEnviarCodigo').disabled = false;
+    $('btnEnviarCodigo').textContent = 'Enviar código';
+    $('btnConcluir').disabled = true;
+    CODIGO = '';
+    document.querySelector('[data-persona="aluno"]').click();
+  });
+
+  /* ---------- botão + (mais) ---------- */
+  $('btnPlus').addEventListener('click', function () { $('plusPop').classList.add('on'); });
+  $('plusPop').addEventListener('click', function (e) { if (e.target === $('plusPop')) $('plusPop').classList.remove('on'); });
+  document.querySelectorAll('.plus-row').forEach(function (row) {
+    row.addEventListener('click', function () {
+      if (row.dataset.goto) {
+        $('plusPop').classList.remove('on');
+        showView(row.dataset.goto, 'navAluno');
+      } else {
+        toast(row.dataset.lock || 'Em breve');
+      }
+    });
+  });
+
+  /* ---------- pré-taf ---------- */
+  $('btnTreino').addEventListener('click', function () {
+    $('tafDot').classList.add('done'); $('tafDot').textContent = '✓';
+    $('tafDesc').textContent = 'Hoje · registrado agora';
+    $('btnTreino').disabled = true; $('btnTreino').textContent = 'Feito';
+    addScore(10, '+10 Quad Coins · treino Pré-TAF registrado');
+  });
+
+  /* ---------- materiais ---------- */
+  document.querySelectorAll('.mat-dl').forEach(function (b) {
+    b.addEventListener('click', function () { toast('Material — placeholder do protótipo'); });
+  });
+
+  /* ---------- perfil do aluno: avatares da coleção PM ---------- */
+  var AVATAR_SPRITE = '__AVATARS__'; // coleção oficial, embutida no build
+  var AV_CX = [0.1535, 0.3745, 0.6135, 0.8425], AV_CY = [0.1975, 0.50, 0.80], AV_R = 0.104;
+  var AV_LABELS = [
+    'Quepe clássico, bigode', 'Quepe, sorrindo', 'Boina preta, sério', 'Feminina, quepe, sorrindo',
+    'Tático preto, boina, bigode', 'Tático preto, boné', 'Feminina, farda azul, boina', 'Feminina, tático, boina',
+    'Feminina, tático, sorrindo', 'Boina preta, farda azul', 'Boina preta, farda azul II', 'Feminina, tático preto'
+  ];
+  var avatarThumbs = [], avatarIdx = 2; // boina preta é o padrão
+  function aplicarAvatar() {
+    if (!avatarThumbs.length) return;
+    var src = avatarThumbs[avatarIdx];
+    $('homeAvatar').innerHTML = '<img src="' + src + '" alt="">';
+    $('avPreview').src = src;
+  }
+  function montarAvatares() {
+    var img = new Image();
+    img.onload = function () {
+      var W = img.naturalWidth, H = img.naturalHeight, r = AV_R * W;
+      AV_CY.forEach(function (fy) { AV_CX.forEach(function (fx) {
+        var c = document.createElement('canvas'); c.width = 144; c.height = 144;
+        var x = c.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, 144, 144);
+        x.beginPath(); x.arc(72, 72, 72, 0, Math.PI * 2); x.clip();
+        x.drawImage(img, fx * W - r, fy * H - r, 2 * r, 2 * r, 0, 0, 144, 144);
+        avatarThumbs.push(c.toDataURL('image/jpeg', 0.85));
+      }); });
+      var grid = $('avGrid');
+      avatarThumbs.forEach(function (src, i) {
+        var b = document.createElement('button');
+        b.className = 'avatar-opt' + (i === avatarIdx ? ' sel' : '');
+        b.setAttribute('aria-label', AV_LABELS[i]);
+        b.innerHTML = '<img src="' + src + '" alt="">';
+        b.addEventListener('click', function () {
+          grid.querySelectorAll('.avatar-opt').forEach(function (x2) { x2.classList.remove('sel'); });
+          b.classList.add('sel');
+          avatarIdx = i;
+          aplicarAvatar();
+        });
+        grid.appendChild(b);
+      });
+      aplicarAvatar();
+    };
+    img.src = AVATAR_SPRITE;
+  }
+  if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
+  function syncNametag() {
+    $('avNametag').textContent = $('nomeGuerra').value.trim() || 'Falcão-03';
+  }
+  $('nomeGuerra').addEventListener('input', syncNametag);
+  $('btnSalvarPerfil').addEventListener('click', function () {
+    var nome = $('nomeGuerra').value.trim() || 'Falcão-03';
+    $('homeNome').textContent = nome;
+    $('quadNome').textContent = nome + ' · Soldado';
+    syncNametag();
+    aplicarAvatar();
+    toast('Perfil salvo — já aparece no Início');
+  });
+  $('btnSenha').addEventListener('click', function () {
+    if (!$('novaSenha').value) { toast('Digite a nova senha'); return; }
+    $('novaSenha').value = '';
+    toast('Senha alterada com sucesso');
+  });
+
+  /* ---------- Danilo, o guia ---------- */
+  // vídeo do personagem embutido no build (token substituído pelo script de build)
+  var DANILO_VIDEO = '__DANILO_VIDEO__';
+  if (DANILO_VIDEO.indexOf('data:') === 0) {
+    ['fabVideo', 'popVideo', 'tourVideo'].forEach(function (id) {
+      $(id).src = DANILO_VIDEO;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        $(id).removeAttribute('autoplay'); $(id).pause();
+      }
+    });
+  }
+  var DANILO_TIPS = {
+    'v-inicio': 'Bem-vindo ao <strong>Início</strong>! Aqui você vê a sala de aula — quando o professor abrir o quiz, entre por ali —, as <strong>missões do dia</strong> (o bloco expira 23h59!) e os avisos. Dica de veterano: os eventos escondem Quad Coins. Quem explora, <strong>garimpa</strong>.',
+    'v-missoes': 'São <strong>20 questões novas por dia</strong>, em dois blocos de 10. Não fazer não tira ponto — mas os Quad Coins do bloco vão embora com ele. Deixou passar? Recupere durante a semana: o <strong>corte é sábado 23h59</strong>.',
+    'v-dominio': 'Duas leituras que nunca se confundem: <strong>Quad Coin</strong> sobe por fazer; <strong>Domínio</strong> sobe por acertar. As barras seguem o edital do seu concurso. A visão completa chega na V1 — por enquanto eu anoto cada resposta sua para calibrar tudo.',
+    'v-perfil': 'Este é o seu <strong>Quadrômetro</strong>: Quad Coins, posição, presença e constância — sua jornada em números. Aqui a <strong>constância vale mais que o volume</strong>: melhor 20 questões todo dia do que 200 no domingo. E a Intendência para gastar seus Coins? Abre na V1. Continue marchando.',
+    'v-aluno': 'Monte sua <strong>identidade de combate</strong>: escolha seu avatar na coleção da PM — quepe, boina preta ou tático — e o <strong>nome de guerra vai estampado na farda</strong>. Tudo aparece no Início. Respeito acima de tudo no nome, combinado?',
+    'v-sala': 'Professor: abra o quiz quando quiser medir a sala. Os alunos respondem <strong>sem ver acerto ou erro</strong>; ao finalizar, eles recebem o resultado com vídeo e você recebe a <strong>parcial por questão</strong> — ótima para retomar o que travou.',
+    'v-turmas': '<strong>Turma = Edital × Modalidade.</strong> RONDESP nivela, PATAMO é o regular, BOPE é bloco de questões. O mesmo edital roda em qualquer uma — a turma nunca é filha do assunto.',
+    'v-edital': 'O edital é a <strong>espinha de tudo</strong>: lançá-lo monta o painel de domínio e cria os baldes da planilha geral. Quando o edital muda, eu reconcilio: descarto o que saiu, recalculo o que ficou e <strong>preservo o histórico</strong>.',
+    'v-questoes': 'As questões vivem num <strong>banco geral</strong> etiquetado por matéria e assunto. A turma puxa pela tag, sem duplicar. Cada questão diz onde serve: <strong>aula ou missão</strong>. Erro detectado em sala? Ajusta ao vivo, sem parar o quiz.',
+    'v-pretaf': 'A aprovação também passa pelo <strong>TAF</strong>! Corrida, barra, flexão e abdominal — treine constante e registre cada treino: ele alimenta sua constância. A farda se veste com o corpo pronto.',
+    'v-calendario': 'Seu <strong>calendário da jornada</strong>: aulas, simulados, eventos, prazos de missão e testes do Pré-TAF. Momento importante marcado é momento que não te pega de surpresa.',
+    'v-materiais': 'Os <strong>materiais</strong> chegam da aula direto para cá, etiquetados por matéria e assunto. Slides, resumos, listas e vídeos — tudo num lugar só, sem caçar link em grupo.'
+  };
+  $('daniloFab').addEventListener('click', function () {
+    $('daniloHint').style.display = 'none';
+    $('daniloText').innerHTML = DANILO_TIPS[currentView] || DANILO_TIPS['v-inicio'];
+    $('daniloPop').classList.add('on');
+  });
+  function daniloClose() { $('daniloPop').classList.remove('on'); }
+  $('daniloOk').addEventListener('click', daniloClose);
+  $('daniloPop').addEventListener('click', function (e) { if (e.target === $('daniloPop')) daniloClose(); });
+
+  /* ---------- admin ---------- */
+  $('btnNovaTurma').addEventListener('click', function () { toast('Nova turma: escolha o edital e a modalidade'); });
+  $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
+  $('btnReconciliar').addEventListener('click', function () {
+    var c = $('reconCard');
+    c.style.display = c.style.display === 'none' ? 'block' : 'none';
+  });
+  $('btnNovaQuestao').addEventListener('click', function () { toast('Cadastro: enunciado, alternativas, tag e campo de uso'); });
+})();
+</script>
