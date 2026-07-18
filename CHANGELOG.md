@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — Loja (Intendência) na navegação
+- **"Quadrômetro" sai da navegação inferior e entra no menu "+"**; no lugar dele
+  entra a **Loja**, com ícone de sacola
+- **Nova tela Loja**: itens reais e digitais comprados **exclusivamente com
+  Quad Coins** — Turma presencial (300), Evento presencial (150), Simulado
+  presencial (120), Aulão especial (80), Simulado digital (60), Evento online
+  (50), Aula isolada (40), Skin de personagem (35), Boina exclusiva (20)
+- Compra **simulada** funcional: desconta do saldo, marca "ADQUIRIDO", bloqueia
+  recompra e avisa quando faltam Coins; card de Quad Coins do perfil agora abre
+  a Loja; saldo visível no topo da Loja
+- Card "Intendência BLOQUEADO · V1" do Quadrômetro vira "LOJA ABERTA" com
+  atalho; linha do "+" idem; tour e dicas do Danilo atualizados
+- ⚠️ **Divergência da rev. 2.3 ampliada**: a Intendência (gastar Coins) estava
+  prevista só para a V1; por decisão do gestor, o protótipo já apresenta a Loja
+  na V0. Registrar no documento-base junto à decisão nº 11 ("Score não é moeda").
+
 ## 18/07/2026 (noite) — artes da Home refeitas em vetor (referências do gestor)
 - **Insígnia de patente** (brasão-casa azul com hexágono, estrela e divisas) refeita
   em SVG ao lado de "SOLDADO", com glow

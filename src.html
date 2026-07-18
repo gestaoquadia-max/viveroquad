@@ -421,6 +421,7 @@
     width: 36px; height: 36px; border-radius: 10px; flex: none; display: grid; place-items: center;
     background: #E6F3FC; border: 1px solid #BFE3F7; color: var(--p-gold); font-size: 16px;
   }
+  .plus-row .p-ico svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .plus-row.locked .p-ico { background: #F8FAFC; border-color: var(--p-line); color: var(--p-dim); }
   .plus-row .grow { flex: 1; min-width: 0; }
   .plus-row .t { display: block; font-weight: 600; font-size: 13.5px; }
@@ -776,6 +777,34 @@
     box-shadow: 0 10px 22px rgba(18,60,143,0.45), 0 0 0 7px rgba(59,139,255,0.18), inset 0 2px 0 rgba(255,255,255,0.55); }
   .nav-plus svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 3.2; stroke-linecap: round; margin: 0 auto; display: block; }
 
+  /* ---------- Loja (Intendência) ---------- */
+  .loja-saldo { display: inline-flex; align-items: center; gap: 5px; flex: none;
+    background: linear-gradient(180deg, #FFFDF4, #FFF3D6); border: 1px solid #EED9A2; border-radius: 999px;
+    padding: 5px 10px; font: 700 12px var(--ui); color: #9A7414; }
+  .loja-saldo svg { width: 18px; height: 18px; }
+  .loja-saldo b { color: var(--p-text); font-size: 13px; }
+  .loja-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .loja-item { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
+    background: linear-gradient(180deg, #FFFFFF, #F4F9FF); border: 1px solid var(--p-line); border-radius: 16px;
+    padding: 13px 10px 11px; cursor: pointer; font: inherit; color: var(--p-text); position: relative;
+    box-shadow: 0 5px 14px rgba(11,46,115,0.07); transition: transform .12s ease, box-shadow .12s ease; }
+  .loja-item:hover { transform: translateY(-2px); box-shadow: 0 9px 20px rgba(25,118,255,0.16); border-color: rgba(59,139,255,0.35); }
+  .loja-item:active { transform: none; }
+  .li-ico { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+    background: linear-gradient(160deg, #E7F1FF, #CFE2FF); color: var(--p-gold); }
+  .li-ico svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+  .li-nome { font: 800 12.5px var(--ui); line-height: 1.15; }
+  .li-desc { font: 400 10.5px var(--font); color: var(--p-dim); line-height: 1.2; }
+  .li-preco { margin-top: 3px; display: inline-flex; align-items: center; gap: 5px;
+    background: #FFF6DF; border: 1px solid #F1D488; color: #9A6B00; border-radius: 999px;
+    padding: 3px 9px; font: 700 10.5px var(--ui); letter-spacing: .03em; }
+  .li-preco::before { content: ""; width: 10px; height: 10px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 35% 30%, #FFE7A0, #F4B63A 60%, #C8860D);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
+  .loja-item.comprado { opacity: 0.6; }
+  .loja-item.comprado .li-preco { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
+  .loja-item.comprado .li-preco::before { background: #28A96B; box-shadow: none; }
+
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
   /* balão de fala preso à cabeça do Danilo (rabinho aponta para ele) */
   .danilo-hint { right: 30px; left: auto; bottom: 146px; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
@@ -1069,15 +1098,108 @@
             </div>
             <p class="sub" style="margin-top:10px">A economia (V1) premia constância — nunca volume bruto.</p>
           </div>
-          <div class="p-card" style="border-style:dashed; opacity:0.8">
-            <h3>Intendência · gastar Quad Coins <span class="tag v1">BLOQUEADO · V1</span></h3>
-            <p class="sub">A troca de Quad Coins por benefícios (aulões, simulados, itens, acessos) ativa na V1 (A→B→C), depois da linha de base provar o Retorno Saudável. Por enquanto, seus Coins só acumulam.</p>
+          <div class="p-card">
+            <h3>Intendência · gastar Quad Coins <span class="tag gold">LOJA ABERTA</span></h3>
+            <p class="sub">Troque seus Quad Coins por turmas, simulados, eventos e itens do personagem — exclusivamente em Coins.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnIrLoja">Ir para a Loja</button></div>
           </div>
           <div class="p-card" style="opacity:0.7">
             <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
             <p class="sub" style="font-family:Consolas,monospace; font-size:11px" id="telemetry">origem: OPEN_ORGANIC · eventos: 14 · linha de base: ativa</p>
           </div>
           <button class="btn ghost small" id="btnSair" style="width:100%">Sair da conta</button>
+        </div>
+
+        <!-- ============ ALUNO · LOJA (Intendência) ============ -->
+        <div class="view" id="v-loja">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">Intendência Quad</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Loja</h3>
+              </div>
+              <span class="loja-saldo"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg><b id="lojaSaldo">1.240</b>&nbsp;QdC</span>
+            </div>
+            <p class="sub">Itens reais e digitais, comprados <strong>exclusivamente com Quad Coins</strong>. Aqui dinheiro não entra — vale o seu esforço.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Turmas e aulas</div>
+            <div class="loja-grid">
+              <button class="loja-item" data-nome="Turma presencial" data-preco="300">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <span class="li-nome">Turma presencial</span>
+                <span class="li-desc">1 mês de acesso</span>
+                <span class="li-preco">300 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Aula isolada" data-preco="40">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>
+                <span class="li-nome">Aula isolada</span>
+                <span class="li-desc">qualquer matéria</span>
+                <span class="li-preco">40 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Aulão especial" data-preco="80">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></span>
+                <span class="li-nome">Aulão especial</span>
+                <span class="li-desc">véspera de prova</span>
+                <span class="li-preco">80 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Simulado presencial" data-preco="120">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>
+                <span class="li-nome">Simulado presencial</span>
+                <span class="li-desc">com ranking da turma</span>
+                <span class="li-preco">120 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Simulado digital" data-preco="60">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+                <span class="li-nome">Simulado digital</span>
+                <span class="li-desc">no app, hora marcada</span>
+                <span class="li-preco">60 QdC</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Eventos</div>
+            <div class="loja-grid">
+              <button class="loja-item" data-nome="Evento online" data-preco="50">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span>
+                <span class="li-nome">Evento online</span>
+                <span class="li-desc">ao vivo, com convidados</span>
+                <span class="li-preco">50 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Evento presencial" data-preco="150">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                <span class="li-nome">Evento presencial</span>
+                <span class="li-desc">na unidade Quad</span>
+                <span class="li-preco">150 QdC</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Seu personagem</div>
+            <div class="loja-grid">
+              <button class="loja-item" data-nome="Boina exclusiva" data-preco="20">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg></span>
+                <span class="li-nome">Boina exclusiva</span>
+                <span class="li-desc">decoração do avatar</span>
+                <span class="li-preco">20 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Skin de personagem" data-preco="35">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M20.4 6.5 17 4l-2 2h-6L7 4 3.6 6.5 5 10l2-1v11h10V9l2 1 1.4-3.5Z"/></svg></span>
+                <span class="li-nome">Skin de personagem</span>
+                <span class="li-desc">farda alternativa</span>
+                <span class="li-preco">35 QdC</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-card" style="opacity:0.85">
+            <h3>Como ganhar Quad Coins</h3>
+            <p class="sub">Missões do dia, presença nas aulas, treinos do Pré-TAF e garimpo em eventos. Constância vale mais que volume.</p>
+          </div>
         </div>
 
         <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
@@ -1458,6 +1580,10 @@
               <span class="p-ico">✦</span>
               <span class="grow"><span class="t">Perfil do aluno</span><span class="d">nome de guerra, avatar e senha</span></span>
             </button>
+            <button class="plus-row" data-goto="v-perfil">
+              <span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
+              <span class="grow"><span class="t">Quadrômetro</span><span class="d">sua jornada em números</span></span>
+            </button>
             <button class="plus-row" data-goto="v-pretaf">
               <span class="p-ico">⚑</span>
               <span class="grow"><span class="t">Pré-TAF</span><span class="d">preparo físico para as provas do concurso</span></span>
@@ -1471,10 +1597,10 @@
               <span class="p-ico">▤</span>
               <span class="grow"><span class="t">Materiais das aulas</span><span class="d">slides, resumos, listas e vídeos por aula</span></span>
             </button>
-            <button class="plus-row locked" data-lock="Quadcoin chega na V1 — depois da prova de vida da V0">
+            <button class="plus-row" data-goto="v-loja">
               <span class="p-ico">◈</span>
-              <span class="grow"><span class="t">Quadcoin · Intendência</span><span class="d">economia de engajamento por Marcos de Conquista</span></span>
-              <span class="tag v1">V1</span>
+              <span class="grow"><span class="t">Loja · Intendência</span><span class="d">gaste seus Quad Coins em turmas, eventos e itens</span></span>
+              <span class="tag gold">NOVO</span>
             </button>
             <button class="plus-row locked" data-lock="Presença por geofencing chega na V1">
               <span class="p-ico">◉</span>
@@ -1652,7 +1778,7 @@
           <button class="nav-btn" data-view="v-missoes"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.3"/><path d="M12 1.6v4M12 18.4v4M1.6 12h4M18.4 12h4"/></svg></span>Missões</button>
           <button class="nav-plus" id="btnPlus" aria-label="Mais: Pré-TAF, calendário, materiais e prévias"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
           <button class="nav-btn" data-view="v-dominio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 5 5v6.2c0 4.4 3 7.3 7 8.8 4-1.5 7-4.4 7-8.8V5l-7-2.5Z"/><path d="m12 8.2 1.15 2.35 2.6.38-1.88 1.83.44 2.59L12 14.13l-2.31 1.22.44-2.59-1.88-1.83 2.6-.38Z" fill="currentColor" stroke="none"/></svg></span>Domínio</button>
-          <button class="nav-btn" data-view="v-perfil"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>Quadrômetro</button>
+          <button class="nav-btn" data-view="v-loja"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Loja</button>
         </nav>
         <nav class="navbar" id="navProfessor" style="display:none">
           <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
@@ -1764,8 +1890,9 @@
     score += n;
     $('scoreVal').textContent = fmt(score);
     $('scorePerfil').textContent = fmt(score);
+    var ls = $('lojaSaldo'); if (ls) ls.textContent = fmt(score);
     var pop = $('scorePop');
-    pop.textContent = '+' + n;
+    pop.textContent = (n > 0 ? '+' : '') + n;
     pop.classList.remove('go');
     void pop.offsetWidth;
     pop.classList.add('go');
@@ -1796,7 +1923,7 @@
   });
 
   /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
-  var LOOP_VIEWS = ['v-inicio', 'v-missoes', 'v-dominio', 'v-perfil', 'v-pretaf', 'v-calendario', 'v-materiais'];
+  var LOOP_VIEWS = ['v-inicio', 'v-missoes', 'v-dominio', 'v-perfil', 'v-loja', 'v-pretaf', 'v-calendario', 'v-materiais'];
   var tourOn = false;
   function spotlight(view) {
     var rect = view.getBoundingClientRect();
@@ -2385,9 +2512,9 @@
     { sel: '.app-top[data-scope="aluno"]', txt: 'Este é você: <strong>avatar, nome de guerra, patente</strong> e os seus <strong>Quad Coins</strong> com a posição na turma. Tudo se ajusta no Perfil do aluno, dentro do botão +.' },
     { sel: '#salaCard', txt: 'A <strong>Sala de aula</strong>: quando o professor abrir o quiz ao vivo, é por aqui que você entra — respondendo sem ver acerto ou erro até o fim.' },
     { sel: '[data-view="v-missoes"]', txt: '<strong>Missões</strong>: 20 questões novas por dia, em dois blocos de 10. O bloco expira 23h59 — e as atrasadas recuperam até sábado.' },
-    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: Perfil do aluno, <strong>Pré-TAF</strong>, Calendário e Materiais das aulas.' },
+    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: Perfil do aluno, <strong>Quadrômetro</strong>, Pré-TAF, Calendário e Materiais das aulas.' },
     { sel: '[data-view="v-dominio"]', txt: '<strong>Domínio</strong>: o quanto você demonstra saber, por matéria e assunto do edital. Quad Coin é fazer; Domínio é acertar.' },
-    { sel: '[data-view="v-perfil"]', txt: 'O <strong>Quadrômetro</strong>: sua jornada em números — Quad Coins, posição, presença e constância.' },
+    { sel: '[data-view="v-loja"]', txt: 'A <strong>Loja</strong>: troque seus Quad Coins por turmas, simulados, eventos e itens do personagem. Aqui <strong>só entra Quad Coin</strong> — dinheiro não compra.' },
     { sel: '#daniloFab', txt: 'E eu fico sempre por aqui! Toque em mim em qualquer tela para receber as orientações daquela etapa.' },
     { sel: null, txt: '<strong>Tour completo!</strong> Plataforma liberada. Agora é viver o Quad: presença, missão e constância até o dia da farda.' }
   ];
@@ -2556,7 +2683,8 @@
     'v-inicio': 'Bem-vindo ao <strong>Início</strong>! Aqui você vê a sala de aula — quando o professor abrir o quiz, entre por ali —, as <strong>missões do dia</strong> (o bloco expira 23h59!) e os avisos. Dica de veterano: os eventos escondem Quad Coins. Quem explora, <strong>garimpa</strong>.',
     'v-missoes': 'São <strong>20 questões novas por dia</strong>, em dois blocos de 10. Não fazer não tira ponto — mas os Quad Coins do bloco vão embora com ele. Deixou passar? Recupere durante a semana: o <strong>corte é sábado 23h59</strong>.',
     'v-dominio': 'Duas leituras que nunca se confundem: <strong>Quad Coin</strong> sobe por fazer; <strong>Domínio</strong> sobe por acertar. As barras seguem o edital do seu concurso. A visão completa chega na V1 — por enquanto eu anoto cada resposta sua para calibrar tudo.',
-    'v-perfil': 'Este é o seu <strong>Quadrômetro</strong>: Quad Coins, posição, presença e constância — sua jornada em números. Aqui a <strong>constância vale mais que o volume</strong>: melhor 20 questões todo dia do que 200 no domingo. E a Intendência para gastar seus Coins? Abre na V1. Continue marchando.',
+    'v-perfil': 'Este é o seu <strong>Quadrômetro</strong>: Quad Coins, posição, presença e constância — sua jornada em números. Aqui a <strong>constância vale mais que o volume</strong>: melhor 20 questões todo dia do que 200 no domingo. Continue marchando.',
+    'v-loja': 'Bem-vindo à <strong>Intendência</strong>! Tudo aqui se compra <strong>só com Quad Coins</strong> — turmas, simulados, eventos e até itens do seu personagem. Fez missão, ganhou Coin; juntou Coin, escolheu a recompensa. Bora garimpar?',
     'v-aluno': 'Monte sua <strong>identidade de combate</strong>: escolha seu avatar na coleção da PM — quepe, boina preta ou tático — e o <strong>nome de guerra vai estampado na farda</strong>. Tudo aparece no Início. Respeito acima de tudo no nome, combinado?',
     'v-sala': 'Professor: abra o quiz quando quiser medir a sala. Os alunos respondem <strong>sem ver acerto ou erro</strong>; ao finalizar, eles recebem o resultado com vídeo e você recebe a <strong>parcial por questão</strong> — ótima para retomar o que travou.',
     'v-turmas': '<strong>Turma = Edital × Modalidade.</strong> RONDESP nivela, PATAMO é o regular, BOPE é bloco de questões. O mesmo edital roda em qualquer uma — a turma nunca é filha do assunto.',
@@ -2594,9 +2722,24 @@
     toast('Demonstração reiniciada — dispositivo não autorizado');
   });
 
-  /* ---------- card de Quad Coins abre o Quadrômetro ---------- */
+  /* ---------- card de Quad Coins abre a Loja (onde os Coins valem) ---------- */
   var coinsCardEl = $('coinsCard');
-  if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-perfil', 'navAluno'); });
+  if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-loja', 'navAluno'); });
+
+  var btnIrLojaEl = $('btnIrLoja');
+  if (btnIrLojaEl) btnIrLojaEl.addEventListener('click', function () { showView('v-loja', 'navAluno'); });
+
+  /* ---------- Loja: compra exclusiva em Quad Coins (simulada) ---------- */
+  document.querySelectorAll('.loja-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
+      var preco = parseInt(it.dataset.preco, 10), nome = it.dataset.nome;
+      if (score < preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
+      it.classList.add('comprado');
+      it.querySelector('.li-preco').textContent = 'ADQUIRIDO';
+      addScore(-preco, nome + ' adquirido · −' + preco + ' QdC');
+    });
+  });
 
   /* ---------- foto do personagem abre o Perfil do aluno ---------- */
   var btnAvatarEl = $('btnAvatarPerfil');
