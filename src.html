@@ -519,17 +519,18 @@
   .tour-nav { display: flex; justify-content: space-between; margin-top: 12px; }
 
   /* ============ DANILO, O GUIA ============ */
-  /* Danilo estático, integrado ao layout (sem círculo) — guia do tutorial */
+  /* Danilo integrado ao layout (sem círculo) — acena e fica parado */
   .danilo-fab {
     position: absolute; right: 4px; bottom: 74px; z-index: 25;
-    width: 118px; background: none; border: none; cursor: pointer; padding: 0;
+    background: none; border: none; cursor: pointer; padding: 0;
   }
-  .danilo-fab img {
-    width: 100%; height: auto; display: block;
+  .fab-sprite {
+    display: block; width: 118px; height: 86px;
+    background-size: 826px 86px; background-repeat: no-repeat; background-position: 0 0;
     filter: drop-shadow(0 10px 14px rgba(9,34,90,0.35));
     transition: transform 0.18s ease;
   }
-  .danilo-fab:hover img { transform: translateY(-3px) scale(1.03); }
+  .danilo-fab:hover .fab-sprite { transform: translateY(-3px) scale(1.03); }
   .danilo-fab:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; border-radius: 14px; }
   .danilo-hint {
     position: absolute; right: 78px; bottom: 108px; z-index: 25;
@@ -776,7 +777,7 @@
   .nav-plus svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 3.2; stroke-linecap: round; margin: 0 auto; display: block; }
 
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
-  .danilo-hint { right: 106px; left: auto; bottom: 138px; padding: 8px 12px; border-radius: 14px 14px 3px 14px;
+  .danilo-hint { right: 88px; left: auto; bottom: 122px; padding: 8px 12px; border-radius: 14px 14px 3px 14px;
     background: linear-gradient(180deg, #1E86FF, #1976FF); box-shadow: 0 8px 18px rgba(25,118,255,0.45);
     line-height: 1.2; text-align: left; max-width: 150px; white-space: normal; font-family: var(--ui); }
   .danilo-hint b { display: block; font-size: 12px; font-weight: 700; }
@@ -1428,7 +1429,7 @@
 
         <span class="danilo-hint" id="daniloHint"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
         <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
-          <img id="fabImg" src="__DANILO_IMG__" alt="" aria-hidden="true">
+          <span class="fab-sprite" id="fabSprite" style="background-image:url(__DANILO_SPRITE__)" aria-hidden="true"></span>
         </button>
 
         <div class="danilo-pop" id="daniloPop">
@@ -2306,6 +2307,7 @@
     lsSet(LS.sync, String(Date.now()));
     playSplash(function () {
       applyConnUI();
+      daniloWave(); // Danilo recebe o aluno acenando
       if (runTour) iniciarTour();
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
     });
@@ -2597,6 +2599,21 @@
   /* ---------- foto do personagem abre o Perfil do aluno ---------- */
   var btnAvatarEl = $('btnAvatarPerfil');
   if (btnAvatarEl) btnAvatarEl.addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
+
+  /* ---------- Danilo acena e depois fica parado (sprite de 7 poses) ---------- */
+  var fabSpriteEl = $('fabSprite'), waveTimers = [];
+  function daniloWave() {
+    if (!fabSpriteEl) return;
+    waveTimers.forEach(clearTimeout); waveTimers = [];
+    // parado → levanta o braço → acena (vai-e-vem) → abaixa → parado
+    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0];
+    seq.forEach(function (fr, i) {
+      waveTimers.push(setTimeout(function () {
+        fabSpriteEl.style.backgroundPosition = (-fr * 118) + 'px 0';
+      }, i * 110));
+    });
+  }
+  setTimeout(daniloWave, 1200); // acena ao chegar; depois fica quieto
 
   /* ---------- init do estado de acesso/conectividade ---------- */
   applyConnUI();
