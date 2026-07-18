@@ -521,7 +521,7 @@
   /* ============ DANILO, O GUIA ============ */
   /* Danilo integrado ao layout (sem círculo) — acena e fica parado */
   .danilo-fab {
-    position: absolute; right: 4px; bottom: 74px; z-index: 25;
+    position: absolute; right: -8px; bottom: 64px; z-index: 25;
     background: none; border: none; cursor: pointer; padding: 0;
   }
   .fab-sprite {
@@ -777,9 +777,12 @@
   .nav-plus svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 3.2; stroke-linecap: round; margin: 0 auto; display: block; }
 
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
-  .danilo-hint { right: 88px; left: auto; bottom: 122px; padding: 8px 12px; border-radius: 14px 14px 3px 14px;
+  /* balão de fala preso à cabeça do Danilo (rabinho aponta para ele) */
+  .danilo-hint { right: 30px; left: auto; bottom: 146px; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
     background: linear-gradient(180deg, #1E86FF, #1976FF); box-shadow: 0 8px 18px rgba(25,118,255,0.45);
     line-height: 1.2; text-align: left; max-width: 150px; white-space: normal; font-family: var(--ui); }
+  .danilo-hint::after { content: ""; position: absolute; right: 10px; bottom: -8px; width: 0; height: 0;
+    border-left: 9px solid transparent; border-right: 4px solid transparent; border-top: 9px solid #1976FF; }
   .danilo-hint b { display: block; font-size: 12px; font-weight: 700; }
   .danilo-hint small { font-size: 10px; opacity: .92; }
 
