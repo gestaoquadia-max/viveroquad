@@ -519,15 +519,17 @@
   .tour-nav { display: flex; justify-content: space-between; margin-top: 12px; }
 
   /* ============ DANILO, O GUIA ============ */
+  /* Danilo estático, integrado ao layout (sem círculo) — guia do tutorial */
   .danilo-fab {
-    position: absolute; right: 12px; bottom: 86px; z-index: 25;
-    width: 62px; height: 62px; background: none; border: none; cursor: pointer; padding: 0;
+    position: absolute; right: 4px; bottom: 74px; z-index: 25;
+    width: 118px; background: none; border: none; cursor: pointer; padding: 0;
   }
-  .danilo-fab video {
-    width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%;
-    border: 2px solid #FFFFFF; box-shadow: 0 6px 16px rgba(15,23,42,0.3); background: #E9E3DA;
+  .danilo-fab img {
+    width: 100%; height: auto; display: block;
+    filter: drop-shadow(0 10px 14px rgba(9,34,90,0.35));
+    transition: transform 0.18s ease;
   }
-  .danilo-fab:hover { transform: translateY(-2px); transition: transform 0.15s ease; }
+  .danilo-fab:hover img { transform: translateY(-3px) scale(1.03); }
   .danilo-fab:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; border-radius: 14px; }
   .danilo-hint {
     position: absolute; right: 78px; bottom: 108px; z-index: 25;
@@ -774,12 +776,11 @@
   .nav-plus svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 3.2; stroke-linecap: round; margin: 0 auto; display: block; }
 
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
-  .danilo-hint { right: 76px; left: auto; bottom: 92px; padding: 8px 12px; border-radius: 14px 14px 3px 14px;
+  .danilo-hint { right: 106px; left: auto; bottom: 138px; padding: 8px 12px; border-radius: 14px 14px 3px 14px;
     background: linear-gradient(180deg, #1E86FF, #1976FF); box-shadow: 0 8px 18px rgba(25,118,255,0.45);
     line-height: 1.2; text-align: left; max-width: 150px; white-space: normal; font-family: var(--ui); }
   .danilo-hint b { display: block; font-size: 12px; font-weight: 700; }
   .danilo-hint small { font-size: 10px; opacity: .92; }
-  .danilo-fab { bottom: 80px; }
 
   @media (max-width: 860px) {
     .stage { flex-direction: column; align-items: center; }
@@ -1427,7 +1428,7 @@
 
         <span class="danilo-hint" id="daniloHint"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
         <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
-          <video id="fabVideo" autoplay muted loop playsinline aria-hidden="true"></video>
+          <img id="fabImg" src="__DANILO_IMG__" alt="" aria-hidden="true">
         </button>
 
         <div class="danilo-pop" id="daniloPop">
@@ -2540,7 +2541,7 @@
   // vídeo do personagem embutido no build (token substituído pelo script de build)
   var DANILO_VIDEO = '__DANILO_VIDEO__';
   if (DANILO_VIDEO.indexOf('data:') === 0) {
-    ['fabVideo', 'popVideo', 'tourVideo'].forEach(function (id) {
+    ['popVideo', 'tourVideo'].forEach(function (id) {
       $(id).src = DANILO_VIDEO;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         $(id).removeAttribute('autoplay'); $(id).pause();
