@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — ajustes de diagramação do redesign
+- **Barra de rolagem** oculta nas telas (recupera a largura do enquadramento
+  que estava comendo ~15px à direita e desalinhando os itens)
+- Cabeçalho do card **Aula de hoje** corrigido: "SEM QUIZ ABERTO" não sobrepõe
+  mais o horário "19h–22h" (overflow do flex resolvido)
+- **Moeda do Quad Coin** redesenhada: moeda dourada com rim, centro azul e
+  brilho (antes era uma estrela chapada)
+- **Efeito engrenagem** suavizado (giro/desbotamento bem menores) para a
+  diagramação bater com o modelo plano
+
 ## 18/07/2026 (noite) — redesign gamificado (modelo do gestor)
 - Novo sistema visual "RPG militar": cartões de **vidro** (glass), botões **3D
   brilhantes**, ícones **hexagonais**, pílulas e brilhos — aplicado a todo o app

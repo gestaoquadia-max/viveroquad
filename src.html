@@ -587,6 +587,9 @@
          font-weight: 800; text-transform: uppercase; letter-spacing: .012em; }
 
   .screen { background: linear-gradient(180deg, #EEF6FD 0%, #DEEBF9 55%, #D3E4F6 100%); }
+  /* sem barra de rolagem visível — recupera a largura do enquadramento */
+  .view { scrollbar-width: none; -ms-overflow-style: none; }
+  .view::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
   /* cartões de vidro */
   .p-card {
@@ -633,9 +636,14 @@
   .coins-card { display: flex; align-items: center; gap: 7px; flex: none; cursor: pointer;
     background: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.9); border-radius: 13px;
     padding: 7px 9px; box-shadow: 0 6px 14px rgba(20,50,79,0.10); position: relative; font: inherit; color: var(--p-text); }
-  .coin { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #8a5a10; font-size: 12px;
-    background: radial-gradient(circle at 35% 30%, #FFE694, #F5BC3C 55%, #D98A1F);
-    box-shadow: 0 2px 5px rgba(180,110,10,0.4), inset 0 1px 1px rgba(255,255,255,0.7); }
+  .coin { position: relative; width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: radial-gradient(circle at 38% 30%, #FFE898, #F4B740 58%, #D2871A);
+    box-shadow: 0 2px 5px rgba(160,100,10,0.45), inset 0 0 0 2px rgba(255,255,255,0.32), inset 0 -2px 3px rgba(150,90,10,0.45); }
+  .coin i { width: 58%; height: 58%; border-radius: 50%; display: grid; place-items: center;
+    background: radial-gradient(circle at 38% 30%, #57B4EE, #1C74B4);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.45), 0 1px 1px rgba(10,50,90,0.3); }
+  .coin i::before { content: "★"; color: #EAF6FF; font-size: 8px; line-height: 1; }
+  .coin::after { content: "★"; position: absolute; top: -3px; right: -3px; font-size: 9px; color: #FFD24A; text-shadow: 0 0 3px rgba(255,180,20,0.95); }
   .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
   .coins-lbl { font: 700 8.5px Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--p-dim); }
   .coins-val { font: 800 16px var(--font); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
@@ -655,8 +663,10 @@
   .card-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
   .card-head .k-label, .card-head h3 { margin: 0; }
   .card-head .grow { flex: 1; min-width: 0; }
-  .card-eyebrow { font: 800 10px var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--p-gold);
-    display: flex; align-items: center; gap: 8px; margin-bottom: 2px; white-space: nowrap; }
+  .card-eyebrow { font: 800 10px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--p-gold);
+    display: flex; align-items: center; gap: 7px; white-space: nowrap; flex: 0 1 auto; min-width: 0; }
+  .card-eyebrow .tag.blue-fill { font-size: 8.5px; padding: 3px 7px; }
+  .card-head .tag.sq { margin-left: auto; flex: none; font-size: 8px; padding: 3px 7px; letter-spacing: .05em; }
   .aula-title { font-size: 15.5px; font-weight: 800; line-height: 1.15; margin: 4px 0 6px; }
   .hexi { width: 46px; height: 46px; flex: none; display: grid; place-items: center; color: #fff;
     background: linear-gradient(160deg, #45A7EC, #1B6FB0);
@@ -773,7 +783,7 @@
               <div class="rank-sub">Patente fixa na V0</div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
-              <span class="coin" aria-hidden="true">★</span>
+              <span class="coin" aria-hidden="true"><i></i></span>
               <span class="coins-txt">
                 <span class="coins-lbl">Quad Coins</span>
                 <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
@@ -822,8 +832,8 @@
           <div class="p-card" id="salaCard">
             <div class="card-head">
               <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg></div>
-              <div class="card-eyebrow grow">Aula de hoje <span class="tag blue-fill">19h–22h</span></div>
-              <span class="tag live" id="salaTag">SEM QUIZ ABERTO</span>
+              <div class="card-eyebrow">Aula de hoje <span class="tag blue-fill">19h–22h</span></div>
+              <span class="tag live sq" id="salaTag">SEM QUIZ ABERTO</span>
             </div>
             <h3 class="aula-title" id="salaTitle">Direito Administrativo — Poderes</h3>
             <p class="sub" id="salaSub">Sua próxima aula ao vivo. Prepare-se e avance na missão!</p>
@@ -1708,9 +1718,9 @@
       var d = Math.abs(off);
       if (d < bestD) { bestD = d; best = c; }
       var n = Math.max(-1, Math.min(1, off / half));
-      // dente da engrenagem: gira e recua conforme se afasta do centro
-      c.style.transform = 'perspective(900px) rotateX(' + (n * -18).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.12).toFixed(3) + ')';
-      c.style.opacity = (1 - Math.abs(n) * 0.5).toFixed(3);
+      // leve profundidade da engrenagem (suave, para não distorcer a diagramação)
+      c.style.transform = 'perspective(1100px) rotateX(' + (n * -7).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.04).toFixed(3) + ')';
+      c.style.opacity = (1 - Math.abs(n) * 0.22).toFixed(3);
     });
     cards.forEach(function (c) { c.classList.toggle('spot', c === best); });
   }
