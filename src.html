@@ -641,46 +641,49 @@
   /* rótulos e tags em Inter (spec proíbe fonte decorativa) */
   .k-label, .tag, .ev-date { font-family: var(--font); }
   .k-label { letter-spacing: .12em; }
-  .id-row { display: flex; align-items: center; gap: 12px; }
-  /* a foto é um botão: abre o Perfil do aluno */
-  .avatar-ring { width: 56px; height: 56px; flex: none; border-radius: 50%; padding: 3px;
+  .id-row { display: flex; align-items: center; gap: 8px; }
+  /* a foto é um botão: abre o Perfil do aluno (o nº da patente fica sobre ela) */
+  .avatar-ring { position: relative; width: 54px; height: 54px; flex: none; border-radius: 50%; padding: 3px;
     background: conic-gradient(from 200deg, #3B8BFF, #0B2E73, #6FB4FF, #3B8BFF);
-    box-shadow: 0 6px 16px rgba(25,118,255,0.35);
+    box-shadow: 0 6px 16px rgba(25,118,255,0.35); overflow: visible;
     border: none; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
   .avatar-ring:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(25,118,255,0.5); }
   .avatar-ring:active { transform: scale(0.97); }
   .avatar-ring:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; }
   .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; display: grid; place-items: center; }
-  .idbar .who { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
-  .idbar .who .name { font-size: 13px; line-height: 1; white-space: nowrap; font-weight: 800; letter-spacing: 0; }
+  .idbar .who { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .idbar .who .name { font-size: 14px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800; letter-spacing: 0; }
   .idbar .rank-line { margin-top: 0; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
-  .rank-name { font: 800 10.5px var(--ui); letter-spacing: .05em; text-transform: uppercase; color: var(--p-gold);
+  .rank-name { font: 800 10px var(--ui); letter-spacing: .02em; text-transform: uppercase; color: var(--p-gold);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; min-width: 0; }
   .rank-line { min-width: 0; }
 
-  .coins-card { display: flex; align-items: center; gap: 6px; flex: none; cursor: pointer;
-    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 13px;
-    padding: 6px 8px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
-  .coin-art { width: 27px; height: 27px; flex: none;
+  .coins-card { display: flex; align-items: center; gap: 4px; flex: none; cursor: pointer;
+    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 12px;
+    padding: 4px 7px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
+  .coin-art { width: 24px; height: 24px; flex: none;
     filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 9px rgba(244,182,58,0.5)); }
   .rank-badge { width: 22px; height: 24px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
   .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
-  .coins-lbl { font: 700 8px var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--p-dim); }
-  .coins-val { font: 800 16px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
+  .coins-lbl { font: 700 7px var(--font); letter-spacing: .03em; text-transform: uppercase; color: var(--p-dim); }
+  .coins-val { font: 800 15px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; line-height: 1.05; }
   .coins-card .chev { font-size: 16px; margin-left: 2px; }
   .coins-card .score-pop { top: -12px; right: 8px; }
 
+  /* Score — régua única: rótulo · barra · números */
   .xp-row { display: flex; align-items: center; gap: 10px; }
-  .level-badge { width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center;
-    background: linear-gradient(160deg, #18B7F4, #0878F8); color: #fff; font: 700 15px var(--num);
-    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(8,120,248,0.4); }
-  .xp-wrap { flex: 1; min-width: 0; }
-  .xp-top { display: flex; justify-content: space-between; font: 700 11px var(--num); color: var(--p-dim); margin-bottom: 4px; letter-spacing: .04em; }
-  .xp-track { height: 9px; border-radius: 99px; background: rgba(20,50,79,0.12); overflow: hidden; }
-  .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.6); }
+  .score-lbl { font: 700 12px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--p-gold); flex: none; }
+  .xp-num { font: 700 12.5px var(--ui); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums; }
+  .level-badge { position: absolute; right: -7px; bottom: -3px; width: 25px; height: 25px; border-radius: 50%;
+    display: grid; place-items: center; background: linear-gradient(160deg, #18B7F4, #0878F8); color: #fff;
+    font: 700 12px var(--ui); border: 2px solid #fff; box-shadow: 0 3px 8px rgba(8,120,248,0.4); }
+  .xp-track { flex: 1; min-width: 0; height: 11px; border-radius: 99px; background: rgba(18,60,143,0.14);
+    overflow: hidden; box-shadow: inset 0 1px 3px rgba(11,46,115,0.2); }
+  .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3B8BFF, #1976FF);
+    box-shadow: 0 0 10px rgba(25,118,255,0.65), inset 0 1px 0 rgba(255,255,255,0.45); }
 
   /* ---------- cabeçalho de cartão com ícone hexagonal ---------- */
   .card-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
@@ -900,26 +903,26 @@
         <!-- topo identidade (aluno) -->
         <div class="app-top idbar" data-scope="aluno">
           <div class="id-row">
-            <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno"><span class="insignia" id="homeAvatar" aria-hidden="true">▲</span></button>
+            <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno">
+              <span class="insignia" id="homeAvatar" aria-hidden="true">▲</span>
+              <span class="level-badge" id="levelBadge" title="Patente 1 de 14">1</span>
+            </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
-              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name" id="rankNome">Aluno a Soldado</span></div>
+              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name" id="rankNome">Aluno Soldado Quad</span></div>
             </div>
-            <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
+            <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
               <span class="coins-txt">
                 <span class="coins-lbl">Quad Coins</span>
                 <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
               </span>
-              <span class="chev">›</span>
             </button>
           </div>
           <div class="xp-row">
-            <span class="level-badge" id="levelBadge" title="Patente 1 de 14">1</span>
-            <div class="xp-wrap">
-              <div class="xp-top"><span>Score</span><span id="xpNum">620 / 900</span></div>
-              <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.9%"></div></div>
-            </div>
+            <span class="score-lbl">Score</span>
+            <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.9%"></div></div>
+            <span class="xp-num" id="xpNum">620 / 900</span>
           </div>
           <button class="promo-chip" id="promoChip" style="display:none">★ Promoção disponível — toque para realizar a prova</button>
         </div>
