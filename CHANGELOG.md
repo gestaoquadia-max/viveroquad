@@ -1,5 +1,25 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — gamificação: patentes, score e prova de promoção
+- **Configuração central `GAMI`** (seção 34 do documento): 14 patentes (Aluno
+  Soldado → Coronel), 4 fases com notas mínimas (70/75/80/85%), curva de pontos
+  e nº de questões — nada fixo espalhado no código
+- **Três scores** separados dos Quad Coins: carreira (nunca zera), patente
+  (620/900) e temporada; **score não é moeda e não promove sozinho**
+- **Card de perfil**: título abreviado (AL SD QUAD MOURA), barra do score da
+  patente, badge com nº da patente e aviso pulsante de promoção disponível
+- **Aba Perfil**: card de progressão (fase, título por extenso, barras, próxima
+  patente, status), botão de simulação "+275 pts/dia" e **histórico de carreira**
+- **Prova de promoção**: código do fiscal (uso único), 20 questões objetivas de
+  banco próprio com ordem e alternativas embaralhadas, correção automática,
+  aprovação pela nota mínima da fase, tela de reprovação com bloqueio de 24h
+  (simulado) e **PROMOÇÃO CONFIRMADA** com transferência do score excedente
+- **Trilha da jornada** no Quadrômetro: 14 patentes por fase com estados
+  (concluída ✓ · atual ● · prova disponível ★ · bloqueada 🔒 · máxima)
+- Ações geram score: questão respondida +1, bônus de missão +10, treino +5
+- Jornada da seção 35 demonstrada de ponta a ponta (Moura 620→900→prova→
+  Soldado Quad Moura com 270 pts excedentes no histórico)
+
 ## 18/07/2026 (noite) — nome de guerra composto + Perfil do aluno completo
 - **Nome de guerra em 3 partes**: classificação (AL SD / AL CB / AL SGT / AL OF)
   + **QUAD** (fixo, nunca muda) + nome escolhido — ex.: "AL SD QUAD MOURA";

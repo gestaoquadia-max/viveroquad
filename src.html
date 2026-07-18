@@ -657,7 +657,9 @@
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
-  .rank-name { font: 800 11.5px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--p-gold); white-space: nowrap; }
+  .rank-name { font: 800 10.5px var(--ui); letter-spacing: .05em; text-transform: uppercase; color: var(--p-gold);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; min-width: 0; }
+  .rank-line { min-width: 0; }
 
   .coins-card { display: flex; align-items: center; gap: 6px; flex: none; cursor: pointer;
     background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 13px;
@@ -825,6 +827,26 @@
     background-image: linear-gradient(45deg, transparent 50%, var(--p-dim) 50%), linear-gradient(135deg, var(--p-dim) 50%, transparent 50%);
     background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
 
+  /* ---------- gamificação: promoção + trilha de patentes ---------- */
+  .promo-chip { width: 100%; border: 1px solid #F1D488; cursor: pointer; border-radius: 12px;
+    background: linear-gradient(180deg, #FFF9E8, #FFF1CC); color: #9A6B00;
+    font: 700 12px var(--ui); letter-spacing: .03em; padding: 9px 12px; text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(190,140,30,0.2); animation: promoPulse 1.8s ease-in-out infinite; }
+  @keyframes promoPulse { 0%,100% { box-shadow: 0 4px 12px rgba(190,140,30,0.2);} 50% { box-shadow: 0 4px 18px rgba(244,182,58,0.5);} }
+  .tr-fase { font: 800 10px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--p-dim); margin: 12px 0 6px; }
+  .tr-fase:first-child { margin-top: 0; }
+  .tr-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--p-line); }
+  .tr-item:last-child { border-bottom: none; }
+  .tr-dot { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    font: 700 11px var(--ui); border: 2px solid var(--p-line); color: var(--p-dim); background: #fff; }
+  .tr-item.done .tr-dot { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
+  .tr-item.atual .tr-dot { background: linear-gradient(160deg, #3B8BFF, #1976FF); border-color: #fff; color: #fff; box-shadow: 0 0 8px rgba(25,118,255,0.6); }
+  .tr-item.prova .tr-dot { background: #FFF6DF; border-color: #F1D488; color: #9A6B00; }
+  .tr-nome { flex: 1; font: 700 12.5px var(--ui); color: var(--p-text); }
+  .tr-item.lock .tr-nome { color: var(--p-dim); font-weight: 600; }
+  .tr-meta { font: 600 10.5px var(--font); color: var(--p-dim); white-space: nowrap; }
+  .tr-item.atual .tr-nome { color: var(--p-gold); }
+
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
   /* balão de fala preso à cabeça do Danilo (rabinho aponta para ele) */
   .danilo-hint { right: 30px; left: auto; bottom: 146px; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
@@ -893,12 +915,13 @@
             </button>
           </div>
           <div class="xp-row">
-            <span class="level-badge" id="levelBadge">12</span>
+            <span class="level-badge" id="levelBadge" title="Patente 1 de 14">1</span>
             <div class="xp-wrap">
-              <div class="xp-top"><span>Score</span><span id="xpNum">6.850 / 10.000</span></div>
-              <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.5%"></div></div>
+              <div class="xp-top"><span>Score</span><span id="xpNum">620 / 900</span></div>
+              <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.9%"></div></div>
             </div>
           </div>
+          <button class="promo-chip" id="promoChip" style="display:none">★ Promoção disponível — toque para realizar a prova</button>
         </div>
 
         <!-- topo professor -->
@@ -1107,8 +1130,12 @@
         <div class="view" id="v-perfil">
           <div class="p-card">
             <div class="k-label">Quadrômetro · sua jornada em números</div>
-            <h3 id="quadNome">AL SD QUAD MOURA · Aluno a Soldado</h3>
-            <p class="sub">Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10 encontros. Patente evolutiva entra na V1.</p>
+            <h3 id="quadNome">Aluno Soldado Quad Moura</h3>
+            <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Jornada de patentes · Aluno Soldado ao Coronel</div>
+            <div id="trilhaList"></div>
           </div>
           <div class="p-card">
             <div class="k-label">Constância · últimos 7 dias</div>
@@ -1229,6 +1256,32 @@
             <h3>Identidade de combate</h3>
             <p class="sub">Nome de guerra e avatar aparecem no Início e no ranking da turma. Respeito acima de tudo: nomes ofensivos são bloqueados.</p>
           </div>
+
+          <!-- progressão de carreira (gamificação) -->
+          <div class="p-card" id="progCard">
+            <div class="card-head">
+              <svg class="rank-badge" style="width:30px;height:33px" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg>
+              <div class="grow">
+                <div class="card-eyebrow" id="progFase">Formação inicial · Patente 1 de 14</div>
+                <h3 class="aula-title" style="margin:2px 0 0" id="progTitulo">Aluno Soldado Quad Moura</h3>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px">
+              <div class="xp-track" style="flex:1"><div class="xp-fill" id="progFill" style="width:68.9%"></div></div>
+              <span class="xp-num" id="progNum">620 / 900</span>
+            </div>
+            <div class="uso-row"><span>Score de carreira</span><b id="progCarreira">620</b></div>
+            <div class="uso-row"><span>Score da temporada (semana)</span><b id="progTemporada">310</b></div>
+            <div class="uso-row"><span>Próxima patente</span><b id="progProxima">Soldado Quad · faltam 280 pts</b></div>
+            <div class="uso-row"><span>Status</span><b id="progEstado">Acumulando score</b></div>
+            <div id="promoBox" style="display:none; margin-top:12px">
+              <div class="gate-warn" style="margin-bottom:10px; border-color:#F1D488; background:#FFF6DF; color:#9A6B00"><strong id="promoMsg">Promoção disponível para Soldado Quad</strong></div>
+              <button class="btn" id="btnProva" style="width:100%">Realizar prova de promoção</button>
+            </div>
+            <button class="btn ghost small" id="btnDiaEstudo" style="width:100%; margin-top:12px">Registrar dia de estudo (simulação · +275 pts)</button>
+            <p class="sub" style="margin-top:8px">O score representa esforço — <strong>não é moeda e não promove sozinho</strong>. Ao atingir a meta, você ganha o direito à <strong>prova de promoção</strong> supervisionada por um fiscal Quad.</p>
+          </div>
+
           <div class="p-card">
             <div class="k-label">Avatar · coleção 3D · aluno de curso militar</div>
             <div class="avatar-preview">
@@ -1254,20 +1307,16 @@
 
           <div class="p-card">
             <div class="k-label">Nome de guerra</div>
-            <div class="login-field">
-              <label for="gradSelect">Classificação</label>
-              <select id="gradSelect" class="fld">
-                <option value="AL SD" selected>AL SD · Aluno a Soldado</option>
-                <option value="AL CB">AL CB · Aluno a Cabo</option>
-                <option value="AL SGT">AL SGT · Aluno a Sargento</option>
-                <option value="AL OF">AL OF · Aluno a Oficial</option>
-              </select>
-            </div>
             <div class="login-field" style="margin-bottom:0">
-              <label for="nomeGuerra">Seu nome de guerra</label>
+              <label for="nomeGuerra">Qual é o seu nome de guerra?</label>
               <input id="nomeGuerra" class="fld" value="Moura" maxlength="12" aria-label="Nome de guerra">
             </div>
-            <p class="sub" style="margin-top:10px">Nome completo de guerra: <strong id="gwPreview">AL SD QUAD MOURA</strong><br>Classificação + <strong>QUAD</strong> (fixo, é a nossa casa) + seu nome.</p>
+            <p class="sub" style="margin-top:10px">Seu título: <strong id="gwPreview">Aluno Soldado Quad Moura</strong><br>A patente vem da sua evolução (não se escolhe) e o <strong>Quad</strong> é fixo — é a nossa casa. O título atualiza sozinho a cada promoção.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Histórico de carreira</div>
+            <div id="histCarreira"></div>
           </div>
 
           <div class="p-card">
@@ -1510,6 +1559,20 @@
           <div class="p-card" style="opacity:0.85">
             <h3>Ajustável ao vivo</h3>
             <p class="sub">Questão com erro detectado em sala pode ser corrigida na hora, sem parar o quiz. Cada questão carrega dificuldade e campo de uso (aula / missão).</p>
+          </div>
+        </div>
+
+        <!-- ============ PROVA DE PROMOÇÃO (overlay próprio) ============ -->
+        <div class="quiz-layer" id="provaLayer">
+          <div class="quiz-head">
+            <div class="k-label" id="provaKicker">Prova de promoção</div>
+            <h3 style="margin:0; font-size:15px" id="provaProgress">Fiscalização</h3>
+            <p class="sub" style="margin-top:4px" id="provaSub">Avaliação supervisionada por fiscal credenciado do Quad.</p>
+          </div>
+          <div class="quiz-body" id="provaBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairProva">Sair</button>
+            <button class="btn" id="btnProvaNext" disabled>Responder</button>
           </div>
         </div>
 
@@ -1912,8 +1975,58 @@
 
 <script>
 (function () {
-  var score = 1240;
+  var score = 1240;   // Quad Coins (moeda da Loja — NÃO é o score de carreira)
   var missDone = 10;
+
+  /* ==================================================================
+     MÓDULO GAMIFICAÇÃO · configuração central (o admin ajustará no
+     sistema real — nada de valores fixos espalhados pelo código)
+     ================================================================== */
+  var GAMI = {
+    provaQuestoes: 20,
+    tentativaHoras: 24,
+    fases: [
+      { nome: 'Formação inicial',     notaMin: 0.70 },
+      { nome: 'Formação de liderança', notaMin: 0.75 },
+      { nome: 'Formação de oficial',  notaMin: 0.80 },
+      { nome: 'Alto comando',         notaMin: 0.85 }
+    ],
+    // pontos = score necessário para liberar a prova rumo à PRÓXIMA patente
+    patentes: [
+      { nome: 'Aluno Soldado Quad',   abrev: 'AL SD',  fase: 0, pontos: 900 },
+      { nome: 'Soldado Quad',         abrev: 'SD',     fase: 0, pontos: 3300 },
+      { nome: 'Aluno Cabo Quad',      abrev: 'AL CB',  fase: 0, pontos: 4200 },
+      { nome: 'Cabo Quad',            abrev: 'CB',     fase: 0, pontos: 5500 },
+      { nome: 'Aluno Sargento Quad',  abrev: 'AL SGT', fase: 1, pontos: 7000 },
+      { nome: 'Sargento Quad',        abrev: 'SGT',    fase: 1, pontos: 8500 },
+      { nome: 'Subtenente Quad',      abrev: 'ST',     fase: 1, pontos: 9500 },
+      { nome: 'Aluno Oficial Quad',   abrev: 'AL OF',  fase: 2, pontos: 11000 },
+      { nome: 'Aspirante Quad',       abrev: 'ASP',    fase: 2, pontos: 12500 },
+      { nome: 'Tenente Quad',         abrev: 'TEN',    fase: 2, pontos: 12500 },
+      { nome: 'Capitão Quad',         abrev: 'CAP',    fase: 3, pontos: 12500 },
+      { nome: 'Major Quad',           abrev: 'MAJ',    fase: 3, pontos: 12500 },
+      { nome: 'Tenente-Coronel Quad', abrev: 'TC',     fase: 3, pontos: 12500 },
+      { nome: 'Coronel Quad',         abrev: 'CEL',    fase: 3, pontos: null }  // patente máxima
+    ]
+  };
+
+  // estado do aluno (simulado; no sistema real vem validado do servidor —
+  // a interface nunca decide sozinha quantos pontos foram conquistados)
+  var carreira = {
+    nomeCompleto: 'Danilo Ribeiro Moura',
+    nomeGuerra: 'Moura',
+    patenteIdx: 0,
+    scorePatente: 620,
+    scoreCarreira: 620,
+    scoreTemporada: 310,
+    estado: 'acumulando', // acumulando · disponivel · aguardando-fiscal · prova · bloqueada
+    provaBloqueadaAte: null,
+    historico: [ { patente: 'Aluno Soldado Quad', data: '10/07/2026', obs: 'entrada no aplicativo' } ]
+  };
+  function patenteAtual() { return GAMI.patentes[carreira.patenteIdx]; }
+  function proximaPatente() { return GAMI.patentes[carreira.patenteIdx + 1] || null; }
+  function tituloCompleto() { return patenteAtual().nome + ' ' + carreira.nomeGuerra; }
+  function nomeCurto() { return (patenteAtual().abrev + ' QUAD ' + carreira.nomeGuerra).toUpperCase(); }
 
   // ---- estado de acesso e conectividade (SIMULADO no front-end) ----
   // [INTEGRAÇÃO REAL] trocar por: verificação no servidor, envio de e-mail,
@@ -2198,6 +2311,7 @@
         $('btnMissao2').disabled = true; $('btnMissao2').textContent = 'Feito';
         $('btnMissaoHome').disabled = true; $('btnMissaoHome').textContent = 'Missão do dia concluída';
         addScore(30, '+30 Quad Coins · missão do dia completa');
+        addPontos(10); // bônus de score por concluir o bloco de missão
         if (!online) {
           // offline: o progresso fica salvo no dispositivo, aguardando sincronização
           pendingAnswers += QUESTIONS.length;
@@ -2212,6 +2326,7 @@
       return;
     }
     quiz.answers.push(quiz.sel);
+    addPontos(1); // questão efetivamente respondida = 1 ponto de score
     quiz.sel = null;
     if (quiz.idx < QUESTIONS.length - 1) {
       quiz.idx++;
@@ -2654,6 +2769,7 @@
     $('tafDesc').textContent = 'Hoje · registrado agora';
     $('btnTreino').disabled = true; $('btnTreino').textContent = 'Feito';
     addScore(10, '+10 Quad Coins · treino Pré-TAF registrado');
+    addPontos(5); // treino registrado também gera score
   });
 
   /* ---------- materiais ---------- */
@@ -2707,26 +2823,236 @@
     img.src = AVATAR_SPRITE;
   }
   if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
-  /* nome de guerra = classificação + QUAD (fixo) + nome escolhido */
-  var GRAD_LABEL = { 'AL SD': 'Aluno a Soldado', 'AL CB': 'Aluno a Cabo', 'AL SGT': 'Aluno a Sargento', 'AL OF': 'Aluno a Oficial' };
-  function nomeGuerraComposto() {
-    return ($('gradSelect').value + ' QUAD ' + ($('nomeGuerra').value.trim() || 'Moura')).toUpperCase();
-  }
+  /* ==================================================================
+     GAMIFICAÇÃO · progressão, estados, prova de promoção e histórico
+     (dados simulados; no sistema real o servidor valida tudo)
+     ================================================================== */
   function syncNametag() {
-    var c = nomeGuerraComposto();
-    $('avNametag').textContent = c;
-    $('gwPreview').textContent = c;
+    carreira.nomeGuerra = $('nomeGuerra').value.trim() || 'Moura';
+    $('avNametag').textContent = nomeCurto();
+    $('gwPreview').textContent = tituloCompleto();
   }
   $('nomeGuerra').addEventListener('input', syncNametag);
-  $('gradSelect').addEventListener('change', syncNametag);
   $('btnSalvarPerfil').addEventListener('click', function () {
-    var c = nomeGuerraComposto(), grad = $('gradSelect').value;
-    $('homeNome').textContent = c;
-    $('rankNome').textContent = GRAD_LABEL[grad];
-    $('quadNome').textContent = c + ' · ' + GRAD_LABEL[grad];
     syncNametag();
+    renderCarreira();
     aplicarAvatar();
     toast('Perfil salvo — já aparece no Início');
+  });
+
+  function estadoLabel() {
+    return { 'acumulando': 'Acumulando score', 'disponivel': 'Promoção disponível',
+             'aguardando-fiscal': 'Aguardando fiscalização', 'prova': 'Prova em andamento',
+             'bloqueada': 'Nova tentativa em ' + GAMI.tentativaHoras + 'h' }[carreira.estado] || carreira.estado;
+  }
+  function renderCarreira() {
+    var p = patenteAtual(), prox = proximaPatente(), req = p.pontos;
+    var pct = req ? Math.min(100, carreira.scorePatente / req * 100) : 100;
+    // card de perfil (Início)
+    $('homeNome').textContent = nomeCurto();
+    $('rankNome').textContent = p.nome.toUpperCase();
+    $('levelBadge').textContent = carreira.patenteIdx + 1;
+    $('levelBadge').title = 'Patente ' + (carreira.patenteIdx + 1) + ' de ' + GAMI.patentes.length + ' · ' + p.nome;
+    $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
+    $('xpFill').style.width = pct + '%';
+    $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
+    // aba perfil
+    $('progFase').textContent = GAMI.fases[p.fase].nome + ' · Patente ' + (carreira.patenteIdx + 1) + ' de ' + GAMI.patentes.length;
+    $('progTitulo').textContent = tituloCompleto();
+    $('progFill').style.width = pct + '%';
+    $('progNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : 'máxima';
+    $('progCarreira').textContent = fmt(carreira.scoreCarreira);
+    $('progTemporada').textContent = fmt(carreira.scoreTemporada);
+    $('progProxima').textContent = prox
+      ? prox.nome + (req && carreira.scorePatente < req ? ' · faltam ' + fmt(req - carreira.scorePatente) + ' pts' : ' · pronta para a prova')
+      : 'Patente máxima — rumo ao Prestígio';
+    $('progEstado').textContent = estadoLabel();
+    $('promoBox').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
+    if (prox) $('promoMsg').textContent = 'Promoção disponível para ' + prox.nome;
+    // quadrômetro
+    $('quadNome').textContent = tituloCompleto();
+    $('qCarreira').textContent = fmt(carreira.scoreCarreira);
+    $('qTemporada').textContent = fmt(carreira.scoreTemporada);
+    syncNametag();
+    renderTrilha();
+    renderHistorico();
+    queueSync();
+  }
+  function renderTrilha() {
+    var el = $('trilhaList'); if (!el) return;
+    var html = '', faseAtual = -1;
+    GAMI.patentes.forEach(function (p, i) {
+      if (p.fase !== faseAtual) { faseAtual = p.fase; html += '<div class="tr-fase">' + GAMI.fases[p.fase].nome + '</div>'; }
+      var cls = 'lock', dot = '🔒', meta = p.pontos ? fmt(p.pontos) + ' pts' : 'máxima';
+      if (i < carreira.patenteIdx) { cls = 'done'; dot = '✓'; }
+      else if (i === carreira.patenteIdx) {
+        cls = (carreira.estado === 'disponivel') ? 'prova' : 'atual';
+        dot = (carreira.estado === 'disponivel') ? '★' : '●';
+        meta = (carreira.estado === 'disponivel') ? 'prova disponível' : fmt(carreira.scorePatente) + '/' + fmt(p.pontos) + ' pts';
+      }
+      html += '<div class="tr-item ' + cls + '"><span class="tr-dot">' + dot + '</span><span class="tr-nome">' + p.nome + '</span><span class="tr-meta">' + meta + '</span></div>';
+    });
+    el.innerHTML = html;
+  }
+  function renderHistorico() {
+    var el = $('histCarreira'); if (!el) return;
+    el.innerHTML = carreira.historico.map(function (h) {
+      return '<div class="uso-row"><span>' + h.patente + (h.obs ? ' <small style="color:var(--p-dim)">(' + h.obs + ')</small>' : '') + '</span><b>' + h.data + (h.prova ? ' · ' + h.prova : '') + '</b></div>';
+    }).join('');
+  }
+  // pontos de score (esforço) — separados dos Quad Coins (moeda)
+  function addPontos(n, msg) {
+    carreira.scorePatente += n;
+    carreira.scoreCarreira += n;
+    carreira.scoreTemporada += n;
+    var req = patenteAtual().pontos;
+    if (req && carreira.scorePatente >= req && carreira.estado === 'acumulando') {
+      carreira.estado = 'disponivel';
+      toast('Promoção disponível para ' + proximaPatente().nome + '!');
+    }
+    if (msg) toast(msg);
+    renderCarreira();
+  }
+  $('btnDiaEstudo').addEventListener('click', function () {
+    addPontos(275, '+275 pts · dia de estudo registrado (simulação)');
+  });
+  $('promoChip').addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
+
+  /* ---------- prova de promoção (20 questões, fiscal, correção automática) ---------- */
+  var PROVA_BANK = [
+    { t: 'O poder de polícia permite à Administração:', a: ['Condicionar direitos individuais em favor do interesse público.', 'Punir servidores hierarquicamente subordinados.', 'Editar leis em sentido estrito.', 'Julgar litígios entre particulares.'], r: 0 },
+    { t: 'O ato administrativo discricionário caracteriza-se por:', a: ['Ausência de qualquer limite legal.', 'Margem de escolha quanto ao motivo e ao objeto, dentro da lei.', 'Vinculação total de seus elementos.', 'Impossibilidade de revogação.'], r: 1 },
+    { t: 'Pelo poder hierárquico, a autoridade pode:', a: ['Aplicar multas a particulares.', 'Legislar sobre matéria administrativa.', 'Dar ordens, fiscalizar e rever atos de subordinados.', 'Desapropriar bens privados.'], r: 2 },
+    { t: 'O princípio da impessoalidade impõe que a atuação administrativa:', a: ['Priorize aliados políticos.', 'Seja sigilosa por padrão.', 'Dependa de aprovação judicial.', 'Vise ao interesse público, sem favorecimentos.'], r: 3 },
+    { t: 'Assinale a frase com uso correto da crase:', a: ['Refiro-me à aluna aprovada.', 'Vou à pé para o quartel.', 'Entreguei o material à ele.', 'Cheguei à um acordo.'], r: 0 },
+    { t: 'Assinale a opção correta quanto à concordância:', a: ['Fazem dois anos que estudo.', 'Faz dois anos que estudo.', 'Houveram muitos aprovados.', 'Existe muitos candidatos.'], r: 1 },
+    { t: 'A autotutela administrativa permite à Administração:', a: ['Punir juízes.', 'Recusar-se a cumprir a lei.', 'Anular seus próprios atos ilegais.', 'Alterar contratos privados alheios.'], r: 2 },
+    { t: 'Na sequência 2, 4, 8, 16, o próximo termo é:', a: ['24', '28', '30', '32'], r: 3 },
+    { t: 'Se 3 apostilas custam R$ 12, o valor de 5 apostilas é:', a: ['R$ 20', 'R$ 18', 'R$ 24', 'R$ 15'], r: 0 },
+    { t: 'É fundamento da República Federativa do Brasil:', a: ['O direito de propriedade absoluto.', 'A dignidade da pessoa humana.', 'A pena de caráter perpétuo.', 'O unitarismo estatal.'], r: 1 },
+    { t: 'São direitos sociais previstos na Constituição:', a: ['Herança e propriedade.', 'Voto censitário.', 'Saúde, educação e trabalho.', 'Anonimato e censura.'], r: 2 },
+    { t: 'A licitação pública busca, em regra:', a: ['Contratar sempre o menor preço, sem critérios.', 'Dispensar publicidade dos atos.', 'Favorecer empresas locais.', 'Selecionar a proposta mais vantajosa para a Administração.'], r: 3 },
+    { t: 'No ato vinculado, o administrador:', a: ['Não possui margem de escolha: cumpre o que a lei determina.', 'Escolhe livremente o conteúdo do ato.', 'Pode ignorar a forma legal.', 'Atua sem competência definida.'], r: 0 },
+    { t: 'Assinale a palavra grafada corretamente:', a: ['Excessão', 'Exceção', 'Esceção', 'Excesão'], r: 1 },
+    { t: '"Vossa Excelência" exige verbos e pronomes em:', a: ['2ª pessoa do singular.', '1ª pessoa do plural.', '3ª pessoa do singular.', '2ª pessoa do plural.'], r: 2 },
+    { t: '20% de 150 é igual a:', a: ['25', '20', '35', '30'], r: 3 },
+    { t: 'A vírgula está corretamente empregada em:', a: ['Soldado, apresente-se ao comando.', 'O aluno, estudou a matéria.', 'Chegou, o edital hoje.', 'Todos os candidatos, foram aprovados.'], r: 0 },
+    { t: 'Se "toda missão concluída gera ponto" e Moura concluiu uma missão, então:', a: ['Moura perdeu pontos.', 'Moura gerou ponto.', 'Nada se pode concluir.', 'A missão não valeu.'], r: 1 },
+    { t: 'O regime disciplinar militar fundamenta-se em:', a: ['Informalidade e improviso.', 'Autonomia absoluta do subordinado.', 'Hierarquia e disciplina.', 'Eleição dos comandantes.'], r: 2 },
+    { t: 'Um simulado com 140 questões, resolvido à razão de 20 por hora, dura:', a: ['5 horas', '6 horas', '8 horas', '7 horas'], r: 3 }
+  ];
+  var prova = { qs: [], idx: 0, sel: null, hits: 0, code: '' };
+  function embaralhar(arr) { return arr.map(function (x) { return [Math.random(), x]; }).sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; }); }
+  function abrirProva() {
+    carreira.estado = 'aguardando-fiscal';
+    renderCarreira();
+    prova.code = String(Math.floor(1000 + Math.random() * 9000));
+    $('provaLayer').classList.add('on');
+    $('provaProgress').textContent = 'Fiscalização';
+    $('provaSub').textContent = 'A prova só inicia após autorização de um fiscal credenciado do Quad.';
+    var body = $('provaBody');
+    body.innerHTML = '<div class="p-card"><div class="k-label">Fiscal do Quad</div>' +
+      '<p class="sub" style="margin-bottom:10px">O fiscal confirma sua identidade e libera um código temporário, de uso único, vinculado a esta tentativa.</p>' +
+      '<div class="login-field"><label for="fiscalCode">Código do fiscal</label><input id="fiscalCode" class="fld" inputmode="numeric" maxlength="4" placeholder="____"></div>' +
+      '<p class="sub">Prova: ' + GAMI.provaQuestoes + ' questões objetivas · nota mínima ' + Math.round(GAMI.fases[patenteAtual().fase].notaMin * 100) + '% (' + Math.ceil(GAMI.provaQuestoes * GAMI.fases[patenteAtual().fase].notaMin) + ' acertos).</p></div>';
+    $('btnProvaNext').textContent = 'Iniciar prova';
+    $('btnProvaNext').disabled = false;
+    toast('Simulação do fiscal — código: ' + prova.code);
+  }
+  function iniciarQuestoesProva() {
+    // sorteio: ordem e alternativas embaralhadas
+    prova.qs = embaralhar(PROVA_BANK).slice(0, GAMI.provaQuestoes).map(function (q) {
+      var alts = q.a.map(function (txt, i) { return { txt: txt, ok: i === q.r }; });
+      return { t: q.t, alts: embaralhar(alts) };
+    });
+    prova.idx = 0; prova.sel = null; prova.hits = 0;
+    carreira.estado = 'prova'; renderCarreira();
+    renderQuestaoProva();
+  }
+  function renderQuestaoProva() {
+    var q = prova.qs[prova.idx];
+    $('provaProgress').textContent = 'Questão ' + (prova.idx + 1) + ' de ' + prova.qs.length;
+    $('provaSub').textContent = 'Sem feedback durante a prova — o resultado sai no fim.';
+    $('btnProvaNext').textContent = prova.idx === prova.qs.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnProvaNext').disabled = true;
+    prova.sel = null;
+    var body = $('provaBody');
+    body.innerHTML = '';
+    var pEl = document.createElement('p');
+    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 14px;font-weight:600';
+    pEl.textContent = q.t;
+    body.appendChild(pEl);
+    q.alts.forEach(function (alt, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + 'ABCD'[i] + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = alt.txt;
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel');
+        prova.sel = i;
+        $('btnProvaNext').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+  function resultadoProva() {
+    var fase = GAMI.fases[patenteAtual().fase];
+    var minAcertos = Math.ceil(GAMI.provaQuestoes * fase.notaMin);
+    var aprovado = prova.hits >= minAcertos;
+    var prox = proximaPatente();
+    $('provaProgress').textContent = 'Resultado';
+    var body = $('provaBody');
+    if (aprovado) {
+      var req = patenteAtual().pontos;
+      var excedente = Math.max(0, carreira.scorePatente - req);
+      carreira.patenteIdx++;
+      carreira.scorePatente = excedente;
+      carreira.estado = 'acumulando';
+      carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes, obs: 'fiscal Souza' });
+      body.innerHTML = '<div class="p-card" style="text-align:center">' +
+        '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
+        '<h3 class="mil" style="font-size:22px">Promoção confirmada</h3>' +
+        '<p class="sub" style="margin-top:8px">Parabéns, ' + carreira.nomeGuerra + '. Você concluiu os requisitos e foi promovido a <strong>' + prox.nome + '</strong>.</p>' +
+        '<p class="sub" style="margin-top:6px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos · ' + (excedente ? fmt(excedente) + ' pts excedentes transferidos para a próxima etapa' : 'nova etapa iniciada') + '.</p></div>';
+      renderCarreira();
+      toast('PROMOÇÃO CONFIRMADA — ' + tituloCompleto());
+    } else {
+      carreira.estado = 'bloqueada';
+      renderCarreira();
+      body.innerHTML = '<div class="p-card" style="text-align:center">' +
+        '<div class="gate-badge warn" style="margin:0 auto 12px">!</div>' +
+        '<h3 class="mil" style="font-size:20px">Ainda não foi desta vez</h3>' +
+        '<p class="sub" style="margin-top:8px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (mínimo: ' + minAcertos + '). Você ainda não atingiu o aproveitamento necessário para esta promoção. Uma nova tentativa estará disponível em ' + GAMI.tentativaHoras + ' horas.</p>' +
+        '<p class="sub" style="margin-top:6px">Seu score e sua patente estão preservados — continue estudando e acumulando pontos.</p>' +
+        '<button class="btn ghost small" id="btnLiberarTentativa" style="margin-top:10px">Liberar nova tentativa (simulação)</button></div>';
+      var bl = document.getElementById('btnLiberarTentativa');
+      if (bl) bl.addEventListener('click', function () { carreira.estado = 'disponivel'; renderCarreira(); toast('Nova tentativa liberada (simulação).'); });
+    }
+    $('btnProvaNext').textContent = 'Concluir';
+    $('btnProvaNext').disabled = false;
+    prova.idx = 'done';
+  }
+  $('btnProva').addEventListener('click', abrirProva);
+  $('btnProvaNext').addEventListener('click', function () {
+    if (prova.idx === 'done') { $('provaLayer').classList.remove('on'); return; }
+    if (carreira.estado === 'aguardando-fiscal') {
+      var v = (document.getElementById('fiscalCode') || {}).value || '';
+      if (v.trim() === prova.code) { iniciarQuestoesProva(); }
+      else { toast('Código do fiscal incorreto.'); }
+      return;
+    }
+    if (prova.qs[prova.idx].alts[prova.sel].ok) prova.hits++;
+    if (prova.idx < prova.qs.length - 1) { prova.idx++; renderQuestaoProva(); }
+    else { resultadoProva(); }
+  });
+  $('btnSairProva').addEventListener('click', function () {
+    $('provaLayer').classList.remove('on');
+    if (carreira.estado === 'prova' || carreira.estado === 'aguardando-fiscal') {
+      carreira.estado = 'disponivel';
+      renderCarreira();
+      toast('Prova interrompida — você pode tentar novamente.');
+    }
   });
 
   /* itens do personagem: comprados na Loja, equipados aqui */
@@ -2847,6 +3173,7 @@
   setTimeout(daniloWave, 1200); // acena ao chegar; depois fica quieto
 
   /* ---------- init do estado de acesso/conectividade ---------- */
+  renderCarreira();
   applyConnUI();
   updatePending();
 })();
