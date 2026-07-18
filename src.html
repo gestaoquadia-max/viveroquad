@@ -909,7 +909,7 @@
             </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
-              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name" id="rankNome">Aluno Soldado Quad</span></div>
+              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 110" aria-hidden="true"><use href="#insigniaPatente"/></svg><span class="rank-name" id="rankNome">Aluno Soldado</span></div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
@@ -1263,7 +1263,7 @@
           <!-- progressão de carreira (gamificação) -->
           <div class="p-card" id="progCard">
             <div class="card-head">
-              <svg class="rank-badge" style="width:30px;height:33px" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg>
+              <svg class="rank-badge" style="width:30px;height:33px" viewBox="0 0 100 110" aria-hidden="true"><use href="#insigniaPatente"/></svg>
               <div class="grow">
                 <div class="card-eyebrow" id="progFase">Formação inicial · Patente 1 de 14</div>
                 <h3 class="aula-title" style="margin:2px 0 0" id="progTitulo">Aluno Soldado Quad Moura</h3>
@@ -1653,6 +1653,14 @@
               <path d="M24 72 50 84 76 72 76 80 50 92 24 80Z" fill="currentColor"/>
             </symbol>
 
+            <linearGradient id="ptFace" x1="0" y1="0" x2="0.7" y2="1"><stop offset="0" stop-color="#2E62C8"/><stop offset="0.5" stop-color="#1B3F9E"/><stop offset="1" stop-color="#0C2258"/></linearGradient>
+            <linearGradient id="ptChev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AFCFFA"/></linearGradient>
+            <symbol id="insigniaPatente" viewBox="0 0 100 110">
+              <path d="M50 3 C67 3 83 9 90 15 L90 57 L50 107 L10 57 L10 15 C17 9 33 3 50 3 Z" fill="url(#ptFace)" stroke="#8FC2FF" stroke-width="3.5" stroke-linejoin="round"/>
+              <path d="M50 9 C65 9 79 14 84 19 L84 54 L50 97 L16 54 L16 19 C21 14 35 9 50 9 Z" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="2"/>
+              <path d="M20 47 L50 77 L80 47 L80 60 L50 90 L20 60 Z" fill="url(#ptChev)" stroke="#7FB4F5" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M50 3 C67 3 83 9 90 15 L90 30 C75 22 60 18 50 18 C40 18 25 22 10 30 L10 15 C17 9 33 3 50 3 Z" fill="#FFFFFF" opacity="0.12"/>
+            </symbol>
             <symbol id="insigniaQuad" viewBox="0 0 100 112">
               <rect x="20" y="8" width="13" height="22" rx="2" fill="#A9D2F8" stroke="#E8F5FF" stroke-width="1"/>
               <path d="M50 2 98 36 86 36 86 74 50 108 14 74 14 36 2 36Z" fill="url(#insOut)"/>
@@ -2853,7 +2861,7 @@
     var pct = req ? Math.min(100, carreira.scorePatente / req * 100) : 100;
     // card de perfil (Início)
     $('homeNome').textContent = nomeCurto();
-    $('rankNome').textContent = p.nome.toUpperCase();
+    $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
     $('levelBadge').textContent = carreira.patenteIdx + 1;
     $('levelBadge').title = 'Patente ' + (carreira.patenteIdx + 1) + ' de ' + GAMI.patentes.length + ' · ' + p.nome;
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
