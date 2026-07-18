@@ -12,6 +12,7 @@
     --blue: #3E6288;
     --font: "Inter", "SF Pro Text", -apple-system, "Segoe UI", system-ui, sans-serif;
     --ui: "Exo 2", "Inter", system-ui, sans-serif;
+    --rj: "Rajdhani", "Exo 2", system-ui, sans-serif;
     --title: "Exo 2", "Inter", system-ui, sans-serif;
     --num: "Exo 2", "Inter", system-ui, sans-serif;
   }
@@ -637,39 +638,41 @@
   /* rótulos e tags em Inter (spec proíbe fonte decorativa) */
   .k-label, .tag, .ev-date { font-family: var(--font); }
   .k-label { letter-spacing: .12em; }
-  .id-row { display: flex; align-items: center; gap: 12px; }
-  .avatar-ring { width: 56px; height: 56px; flex: none; border-radius: 50%; padding: 3px;
+  /* card de perfil — foto central, nível sobre a foto, tudo em Rajdhani Bold */
+  .prof-hero { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .avatar-ring { position: relative; width: 76px; height: 76px; flex: none; border-radius: 50%; padding: 3px;
     background: conic-gradient(from 200deg, #3B8BFF, #0B2E73, #6FB4FF, #3B8BFF);
-    box-shadow: 0 6px 16px rgba(25,118,255,0.35); }
-  .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; }
-  .idbar .who { flex: 1; min-width: 0; }
-  .idbar .who .name { font-size: 19px; line-height: 1; white-space: nowrap; font-weight: 800; }
+    box-shadow: 0 8px 20px rgba(25,118,255,0.35); }
+  .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2.5px solid #fff; background: #DCEAF8; font-size: 26px; }
+  .prof-name { font: 700 27px var(--rj); text-transform: uppercase; letter-spacing: .04em;
+    line-height: 1; color: var(--p-text); margin-top: 3px; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-  .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
-    background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
-  .rank-name { font: 800 13px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--p-gold); }
-  .rank-sub { font-size: 10.5px; color: var(--p-dim); margin-top: 3px; white-space: nowrap; }
+  .rank-name { font: 700 15px var(--rj); letter-spacing: .18em; text-transform: uppercase; color: var(--p-gold); }
 
-  .coins-card { display: flex; align-items: center; gap: 7px; flex: none; cursor: pointer;
-    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 14px;
-    padding: 7px 9px; box-shadow: 0 8px 18px rgba(11,46,115,0.10); position: relative; font: inherit; color: var(--p-text); }
-  .coin-art { width: 31px; height: 31px; flex: none;
-    filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 9px rgba(244,182,58,0.5)); }
-  .rank-badge { width: 22px; height: 24px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
-  .coins-txt { display: flex; flex-direction: column; line-height: 1.05; }
-  .coins-lbl { font: 700 8.5px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--p-dim); }
-  .coins-val { font: 800 17px var(--num); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; }
-  .coins-card .chev { font-size: 16px; margin-left: 2px; }
-  .coins-card .score-pop { top: -12px; right: 8px; }
+  /* faixa de Quad Coins — recompensa dourada em toda a largura */
+  .coins-card { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer;
+    background: linear-gradient(180deg, #FFFDF4, #FFF3D6); border: 1px solid #EED9A2; border-radius: 16px;
+    padding: 8px 14px; box-shadow: 0 8px 18px rgba(190,140,30,0.16), inset 0 1px 0 rgba(255,255,255,0.8);
+    position: relative; font: inherit; color: var(--p-text); }
+  .coin-art { width: 40px; height: 40px; flex: none;
+    filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 10px rgba(244,182,58,0.5)); }
+  .rank-badge { width: 24px; height: 26px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
+  .coins-lbl { font: 700 13px var(--rj); letter-spacing: .16em; text-transform: uppercase; color: #9A7414; }
+  .coins-val { margin-left: auto; font: 700 24px var(--rj); color: var(--p-text); font-variant-numeric: tabular-nums; position: relative; line-height: 1; }
+  .coins-card .chev { font-size: 18px; color: #B08A28; }
+  .coins-card .score-pop { top: -14px; right: 0; }
 
+  /* Score (antigo XP) — rótulo, barra e números na mesma linha */
   .xp-row { display: flex; align-items: center; gap: 10px; }
-  .level-badge { width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center;
-    background: linear-gradient(160deg, #18B7F4, #0878F8); color: #fff; font: 700 15px var(--num);
-    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(8,120,248,0.4); }
-  .xp-wrap { flex: 1; min-width: 0; }
-  .xp-top { display: flex; justify-content: space-between; font: 700 11px var(--num); color: var(--p-dim); margin-bottom: 4px; letter-spacing: .04em; }
-  .xp-track { height: 9px; border-radius: 99px; background: rgba(20,50,79,0.12); overflow: hidden; }
-  .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #45A7EC, #1B7FC4); box-shadow: 0 0 8px rgba(27,127,196,0.6); }
+  .score-lbl { font: 700 14px var(--rj); letter-spacing: .18em; text-transform: uppercase; color: var(--p-gold); flex: none; }
+  .xp-num { font: 700 14px var(--rj); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums; }
+  .level-badge { position: absolute; right: -6px; bottom: -2px; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; background: linear-gradient(160deg, #3B8BFF, #1976FF); color: #fff;
+    font: 700 14px var(--rj); border: 2.5px solid #fff; box-shadow: 0 3px 8px rgba(25,118,255,0.45); }
+  .xp-track { flex: 1; min-width: 0; height: 11px; border-radius: 99px; background: rgba(18,60,143,0.14);
+    overflow: hidden; box-shadow: inset 0 1px 3px rgba(11,46,115,0.2); }
+  .xp-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3B8BFF, #1976FF);
+    box-shadow: 0 0 10px rgba(25,118,255,0.65), inset 0 1px 0 rgba(255,255,255,0.45); }
 
   /* ---------- cabeçalho de cartão com ícone hexagonal ---------- */
   .card-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
@@ -818,29 +821,25 @@
 
         <!-- topo identidade (aluno) -->
         <div class="app-top idbar" data-scope="aluno">
-          <div class="id-row">
-            <div class="avatar-ring"><div class="insignia" id="homeAvatar" aria-hidden="true">▲</div></div>
-            <div class="who">
-              <div class="name mil" id="homeNome">Falcão-03</div>
-              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
-              <div class="rank-sub">Patente fixa na V0</div>
+          <div class="prof-hero">
+            <div class="avatar-ring">
+              <div class="insignia" id="homeAvatar" aria-hidden="true">▲</div>
+              <span class="level-badge" id="levelBadge" title="Nível 12">12</span>
             </div>
-            <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
-              <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
-              <span class="coins-txt">
-                <span class="coins-lbl">Quad Coins</span>
-                <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
-              </span>
-              <span class="chev">›</span>
-            </button>
+            <div class="prof-name" id="homeNome">Falcão-03</div>
+            <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
           </div>
           <div class="xp-row">
-            <span class="level-badge" id="levelBadge">12</span>
-            <div class="xp-wrap">
-              <div class="xp-top"><span>XP</span><span id="xpNum">6.850 / 10.000</span></div>
-              <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.5%"></div></div>
-            </div>
+            <span class="score-lbl">Score</span>
+            <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.5%"></div></div>
+            <span class="xp-num" id="xpNum">6.850 / 10.000</span>
           </div>
+          <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
+            <svg class="coin-art" viewBox="0 0 120 120" aria-hidden="true"><use href="#coinMedal"/></svg>
+            <span class="coins-lbl">Quad Coins</span>
+            <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
+            <span class="chev">›</span>
+          </button>
         </div>
 
         <!-- topo professor -->
@@ -1404,6 +1403,43 @@
               <path d="M50 2 98 36 86 36 86 74 50 108 14 74 14 36 2 36Z" fill="url(#insOut)"/>
               <path d="M50 13 87 39 78 39 78 69 50 95 22 69 22 39 13 39Z" fill="url(#insIn)"/>
               <g color="#EAF4FF"><use href="#emblemaQuad" x="0" y="0" width="100" height="100" transform="translate(28,30) scale(0.45)"/></g>
+            </symbol>
+
+            <radialGradient id="mFace" cx="0.4" cy="0.32" r="0.95"><stop offset="0" stop-color="#F9E08A"/><stop offset="0.55" stop-color="#E3B84E"/><stop offset="0.85" stop-color="#B9891F"/><stop offset="1" stop-color="#8F6812"/></radialGradient>
+            <linearGradient id="mQ" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0B0"/><stop offset="0.55" stop-color="#E0AF3F"/><stop offset="1" stop-color="#A87A16"/></linearGradient>
+            <linearGradient id="mTxt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFEBA0"/><stop offset="1" stop-color="#C8961F"/></linearGradient>
+
+            <symbol id="coinMedal" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="58" fill="url(#mFace)"/>
+              <circle cx="60" cy="60" r="57" fill="none" stroke="#7A5510" stroke-width="2" stroke-dasharray="1.5 2.8" opacity="0.5"/>
+              <circle cx="60" cy="60" r="55" fill="none" stroke="#FFEBA0" stroke-width="1" opacity="0.5"/>
+              <path id="mArcTop" d="M14.7 38.9 A50 50 0 0 1 105.3 38.9" fill="none"/>
+              <path id="mArcBot" d="M14.7 81.1 A50 50 0 0 0 105.3 81.1" fill="none"/>
+              <text font-family="Rajdhani, Exo 2, sans-serif" font-weight="700" font-size="17" letter-spacing="7" fill="url(#mTxt)" stroke="#8A6210" stroke-width="0.5"><textPath href="#mArcTop" startOffset="50%" text-anchor="middle">QUAD</textPath></text>
+              <text font-family="Rajdhani, Exo 2, sans-serif" font-weight="700" font-size="12.5" letter-spacing="2.6" fill="url(#mTxt)" stroke="#8A6210" stroke-width="0.4"><textPath href="#mArcBot" startOffset="50%" text-anchor="middle">CONCURSOS</textPath></text>
+              <g fill="none" stroke="#8A6210" stroke-width="1.6" opacity="0.85">
+                <path d="M28 22 l8 3 -6 6 Z"/><path d="M92 22 l-8 3 6 6 Z"/>
+                <path d="M22 90 l8 -2 -5 -6 Z"/><path d="M98 90 l-8 -2 5 -6 Z"/>
+              </g>
+              <g fill="#E8C25C" stroke="#8A6210" stroke-width="0.7" opacity="0.95">
+                <ellipse cx="31.7" cy="93.7" rx="2.6" ry="5.5" transform="rotate(50 31.7 93.7)"/>
+                <ellipse cx="21.9" cy="82" rx="2.6" ry="5.5" transform="rotate(30 21.9 82)"/>
+                <ellipse cx="16.7" cy="67.6" rx="2.6" ry="5.5" transform="rotate(10 16.7 67.6)"/>
+                <ellipse cx="16.7" cy="52.4" rx="2.6" ry="5.5" transform="rotate(-10 16.7 52.4)"/>
+                <ellipse cx="21.9" cy="38" rx="2.6" ry="5.5" transform="rotate(-30 21.9 38)"/>
+                <ellipse cx="31.7" cy="26.3" rx="2.6" ry="5.5" transform="rotate(-50 31.7 26.3)"/>
+                <ellipse cx="88.3" cy="93.7" rx="2.6" ry="5.5" transform="rotate(-50 88.3 93.7)"/>
+                <ellipse cx="98.1" cy="82" rx="2.6" ry="5.5" transform="rotate(-30 98.1 82)"/>
+                <ellipse cx="103.3" cy="67.6" rx="2.6" ry="5.5" transform="rotate(-10 103.3 67.6)"/>
+                <ellipse cx="103.3" cy="52.4" rx="2.6" ry="5.5" transform="rotate(10 103.3 52.4)"/>
+                <ellipse cx="98.1" cy="38" rx="2.6" ry="5.5" transform="rotate(30 98.1 38)"/>
+                <ellipse cx="88.3" cy="26.3" rx="2.6" ry="5.5" transform="rotate(50 88.3 26.3)"/>
+              </g>
+              <circle cx="60" cy="62" r="23" fill="none" stroke="#8A5C06" stroke-width="11" opacity="0.45"/>
+              <path d="M66 86 L90 98 L82 74 Z" fill="#8A5C06" opacity="0.45"/>
+              <circle cx="60" cy="60" r="23" fill="none" stroke="url(#mQ)" stroke-width="10.5"/>
+              <path d="M64 84 L88 96 L80 72 Z" fill="url(#mQ)" stroke="#7A5510" stroke-width="0.8"/>
+              <circle cx="60" cy="60" r="23" fill="none" stroke="#FFF3C0" stroke-width="2.4" stroke-dasharray="42 103" stroke-dashoffset="118" opacity="0.8"/>
             </symbol>
 
             <symbol id="quadCoinSvg" viewBox="0 0 100 100">
