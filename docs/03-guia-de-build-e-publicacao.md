@@ -34,6 +34,20 @@ Fluxo (executado pelo Claude na sessão de trabalho):
    (sem isso o link público fica desatualizado — erro já cometido e corrigido
    em 14/07; nunca repetir)
 
+## Hospedar no GitHub (quando decidir)
+
+O repositório Git local já está pronto (branch `main`). Para enviar:
+
+1. Crie um repositório **privado** e vazio em github.com (New repository, sem
+   README nem .gitignore — já temos os nossos)
+2. No PowerShell, dentro desta pasta:
+   ```powershell
+   git remote add origin https://github.com/CONTA/NOME-DO-REPO.git
+   git push -u origin main
+   ```
+3. No primeiro push, o Windows abre a janela de login do GitHub — autorize e
+   pronto. Dali em diante, cada atualização sobe com `git push`.
+
 ## Detalhes técnicos do protótipo
 
 - **Sprite de avatares**: recortes por frações — colunas `[0.1535, 0.3745,
