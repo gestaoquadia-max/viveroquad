@@ -652,12 +652,12 @@
   .avatar-ring:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; }
   .avatar-ring .insignia { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background: #DCEAF8; font-size: 20px; display: grid; place-items: center; }
   .idbar .who { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
-  .idbar .who .name { font-size: 14.5px; line-height: 1; white-space: nowrap; font-weight: 800; letter-spacing: 0; }
+  .idbar .who .name { font-size: 13px; line-height: 1; white-space: nowrap; font-weight: 800; letter-spacing: 0; }
   .idbar .rank-line { margin-top: 0; }
   .rank-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
   .rank-hex { width: 20px; height: 20px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px;
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
-  .rank-name { font: 800 13px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--p-gold); }
+  .rank-name { font: 800 11.5px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--p-gold); white-space: nowrap; }
 
   .coins-card { display: flex; align-items: center; gap: 6px; flex: none; cursor: pointer;
     background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid rgba(25,118,255,0.14); border-radius: 13px;
@@ -805,6 +805,26 @@
   .loja-item.comprado .li-preco { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
   .loja-item.comprado .li-preco::before { background: #28A96B; box-shadow: none; }
 
+  /* ---------- perfil do aluno: itens do personagem + tempo de uso ---------- */
+  .equip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .equip-chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    background: #FFFFFF; border: 1px solid var(--p-line); border-radius: 999px;
+    padding: 7px 12px; font: 700 11.5px var(--ui); color: var(--p-text); letter-spacing: .02em; }
+  .equip-chip svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .equip-chip.locked { opacity: 0.55; }
+  .equip-chip.on { border-color: #F1D488; background: #FFF6DF; color: #9A6B00; }
+  .equip-badge { position: absolute; top: 2px; right: 4px; width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center; color: #fff; border: 2px solid #fff;
+    background: linear-gradient(160deg, #3B8BFF, #1976FF); box-shadow: 0 3px 8px rgba(25,118,255,0.45); }
+  .equip-badge svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+  .uso-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
+    border-bottom: 1px solid var(--p-line); font-size: 13px; color: var(--p-dim); }
+  .uso-row:last-of-type { border-bottom: none; }
+  .uso-row b { font: 700 14px var(--ui); color: var(--p-text); }
+  select.fld { appearance: none; -webkit-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--p-dim) 50%), linear-gradient(135deg, var(--p-dim) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
   /* balão de fala preso à cabeça do Danilo (rabinho aponta para ele) */
   .danilo-hint { right: 30px; left: auto; bottom: 146px; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
@@ -860,8 +880,8 @@
           <div class="id-row">
             <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno"><span class="insignia" id="homeAvatar" aria-hidden="true">▲</span></button>
             <div class="who">
-              <div class="name mil" id="homeNome">Al Quad Moura</div>
-              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name">Soldado</span></div>
+              <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
+              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 112" aria-hidden="true"><use href="#insigniaQuad"/></svg><span class="rank-name" id="rankNome">Aluno a Soldado</span></div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Ver Quadrômetro">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
@@ -1087,7 +1107,7 @@
         <div class="view" id="v-perfil">
           <div class="p-card">
             <div class="k-label">Quadrômetro · sua jornada em números</div>
-            <h3 id="quadNome">Al Quad Moura · Soldado</h3>
+            <h3 id="quadNome">AL SD QUAD MOURA · Aluno a Soldado</h3>
             <p class="sub">Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10 encontros. Patente evolutiva entra na V1.</p>
           </div>
           <div class="p-card">
@@ -1210,18 +1230,46 @@
             <p class="sub">Nome de guerra e avatar aparecem no Início e no ranking da turma. Respeito acima de tudo: nomes ofensivos são bloqueados.</p>
           </div>
           <div class="p-card">
-            <div class="k-label">Avatar · coleção da Polícia Militar</div>
+            <div class="k-label">Avatar · coleção 3D · aluno de curso militar</div>
             <div class="avatar-preview">
               <img id="avPreview" alt="Avatar selecionado">
-              <span class="nametag" id="avNametag">Al Quad Moura</span>
+              <span class="equip-badge" id="equipBoina" style="display:none" title="Boina exclusiva equipada"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg></span>
+              <span class="nametag" id="avNametag">AL SD QUAD MOURA</span>
             </div>
             <div class="avatar-grid" id="avGrid"></div>
-            <p class="sub" style="margin-top:10px">O nome de guerra vai estampado na farda. Novas variações chegam com a patente evolutiva (V1).</p>
+            <div class="k-label" style="margin-top:14px">Itens do personagem</div>
+            <div class="equip-row">
+              <button class="equip-chip locked" id="chipBoina"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>Boina</button>
+              <button class="equip-chip locked" data-lock="Capa de colete — em breve na Loja"><svg viewBox="0 0 24 24"><path d="M8 3v4a4 4 0 0 0 8 0V3"/><path d="M8 3 5 5v16h14V5l-3-2"/><path d="M12 11v10"/></svg>Colete</button>
+              <button class="equip-chip locked" data-lock="Quepe cerimonial — em breve na Loja"><svg viewBox="0 0 24 24"><path d="M3 13c2-2 6-3 9-3s7 1 9 3"/><path d="M5 13v3h14v-3"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>Quepe</button>
+            </div>
+            <p class="sub" style="margin-top:8px">Itens comprados na <strong>Loja</strong> aparecem aqui para equipar no seu personagem. Novas variações chegam com a patente evolutiva.</p>
           </div>
+
+          <div class="p-card">
+            <div class="k-label">Dados do aluno</div>
+            <div class="login-field"><label for="nomeCompleto">Nome completo</label><input id="nomeCompleto" class="fld" value="Danilo de Almeida Moura"></div>
+            <div class="login-field" style="margin-bottom:0"><label for="foneAluno">Telefone</label><input id="foneAluno" class="fld" value="(71) 9 8877-2301" inputmode="tel"></div>
+          </div>
+
           <div class="p-card">
             <div class="k-label">Nome de guerra</div>
-            <input id="nomeGuerra" class="fld" value="Al Quad Moura" maxlength="16" aria-label="Nome de guerra">
+            <div class="login-field">
+              <label for="gradSelect">Classificação</label>
+              <select id="gradSelect" class="fld">
+                <option value="AL SD" selected>AL SD · Aluno a Soldado</option>
+                <option value="AL CB">AL CB · Aluno a Cabo</option>
+                <option value="AL SGT">AL SGT · Aluno a Sargento</option>
+                <option value="AL OF">AL OF · Aluno a Oficial</option>
+              </select>
+            </div>
+            <div class="login-field" style="margin-bottom:0">
+              <label for="nomeGuerra">Seu nome de guerra</label>
+              <input id="nomeGuerra" class="fld" value="Moura" maxlength="12" aria-label="Nome de guerra">
+            </div>
+            <p class="sub" style="margin-top:10px">Nome completo de guerra: <strong id="gwPreview">AL SD QUAD MOURA</strong><br>Classificação + <strong>QUAD</strong> (fixo, é a nossa casa) + seu nome.</p>
           </div>
+
           <div class="p-card">
             <div class="k-label">Conta e senha</div>
             <p class="sub">E-mail do curso: <strong id="contaEmail">aluno@quadconcursos.com.br</strong></p>
@@ -1230,6 +1278,15 @@
               <button class="btn small" id="btnSenha">Alterar</button>
             </div>
           </div>
+
+          <div class="p-card">
+            <div class="k-label">Tempo de uso do aplicativo</div>
+            <div class="uso-row"><span>Hoje</span><b>42 min</b></div>
+            <div class="uso-row"><span>Esta semana</span><b>5h 10min</b></div>
+            <div class="uso-row"><span>Desde o primeiro acesso</span><b>37h 20min</b></div>
+            <p class="sub" style="margin-top:8px">Constância vale mais que volume — o Quadrômetro acompanha sua jornada.</p>
+          </div>
+
           <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
         </div>
 
@@ -2650,17 +2707,43 @@
     img.src = AVATAR_SPRITE;
   }
   if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
+  /* nome de guerra = classificação + QUAD (fixo) + nome escolhido */
+  var GRAD_LABEL = { 'AL SD': 'Aluno a Soldado', 'AL CB': 'Aluno a Cabo', 'AL SGT': 'Aluno a Sargento', 'AL OF': 'Aluno a Oficial' };
+  function nomeGuerraComposto() {
+    return ($('gradSelect').value + ' QUAD ' + ($('nomeGuerra').value.trim() || 'Moura')).toUpperCase();
+  }
   function syncNametag() {
-    $('avNametag').textContent = $('nomeGuerra').value.trim() || 'Al Quad Moura';
+    var c = nomeGuerraComposto();
+    $('avNametag').textContent = c;
+    $('gwPreview').textContent = c;
   }
   $('nomeGuerra').addEventListener('input', syncNametag);
+  $('gradSelect').addEventListener('change', syncNametag);
   $('btnSalvarPerfil').addEventListener('click', function () {
-    var nome = $('nomeGuerra').value.trim() || 'Al Quad Moura';
-    $('homeNome').textContent = nome;
-    $('quadNome').textContent = nome + ' · Soldado';
+    var c = nomeGuerraComposto(), grad = $('gradSelect').value;
+    $('homeNome').textContent = c;
+    $('rankNome').textContent = GRAD_LABEL[grad];
+    $('quadNome').textContent = c + ' · ' + GRAD_LABEL[grad];
     syncNametag();
     aplicarAvatar();
     toast('Perfil salvo — já aparece no Início');
+  });
+
+  /* itens do personagem: comprados na Loja, equipados aqui */
+  var boinaEquipada = false;
+  function refreshChips() {
+    var ch = $('chipBoina');
+    if (lojaOwned['Boina exclusiva']) ch.classList.remove('locked');
+  }
+  $('chipBoina').addEventListener('click', function () {
+    if (!lojaOwned['Boina exclusiva']) { toast('Boina exclusiva — compre na Loja por 20 QdC'); return; }
+    boinaEquipada = !boinaEquipada;
+    $('chipBoina').classList.toggle('on', boinaEquipada);
+    $('equipBoina').style.display = boinaEquipada ? 'grid' : 'none';
+    toast(boinaEquipada ? 'Boina equipada no personagem!' : 'Boina guardada no armário.');
+  });
+  document.querySelectorAll('.equip-chip[data-lock]').forEach(function (ch) {
+    ch.addEventListener('click', function () { toast(ch.dataset.lock); });
   });
   $('btnSenha').addEventListener('click', function () {
     if (!$('novaSenha').value) { toast('Digite a nova senha'); return; }
@@ -2730,6 +2813,7 @@
   if (btnIrLojaEl) btnIrLojaEl.addEventListener('click', function () { showView('v-loja', 'navAluno'); });
 
   /* ---------- Loja: compra exclusiva em Quad Coins (simulada) ---------- */
+  var lojaOwned = {};
   document.querySelectorAll('.loja-item').forEach(function (it) {
     it.addEventListener('click', function () {
       if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
@@ -2737,6 +2821,8 @@
       if (score < preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
       it.classList.add('comprado');
       it.querySelector('.li-preco').textContent = 'ADQUIRIDO';
+      lojaOwned[nome] = true;
+      if (typeof refreshChips === 'function') refreshChips();
       addScore(-preco, nome + ' adquirido · −' + preco + ' QdC');
     });
   });

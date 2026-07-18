@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 18/07/2026 (noite) — nome de guerra composto + Perfil do aluno completo
+- **Nome de guerra em 3 partes**: classificação (AL SD / AL CB / AL SGT / AL OF)
+  + **QUAD** (fixo, nunca muda) + nome escolhido — ex.: "AL SD QUAD MOURA";
+  refletido no card de perfil, na farda do avatar e no Quadrômetro
+- **Aba Perfil do aluno atualizada**: avatar (coleção rotulada 3D · aluno de
+  curso militar) com **itens do personagem** (Boina — comprada na Loja e
+  equipável com selo no avatar; Colete e Quepe "em breve"), **nome completo**,
+  **telefone**, classificação + nome de guerra com prévia ao vivo, troca de
+  senha e **tempo de uso do aplicativo** (hoje/semana/total)
+- Regras de alteração da graduação ficam pendentes (gestor definirá)
+
 ## 18/07/2026 (noite) — Loja (Intendência) na navegação
 - **"Quadrômetro" sai da navegação inferior e entra no menu "+"**; no lugar dele
   entra a **Loja**, com ícone de sacola
