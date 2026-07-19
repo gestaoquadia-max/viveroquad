@@ -384,11 +384,20 @@
   .gate-link:hover { background: var(--gold-soft); }
   .gate-link:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 2px; }
 
-  .access-spin {
-    width: 34px; height: 34px; border-radius: 50%; margin: 4px 0 14px;
-    border: 3px solid #D8E7F5; border-top-color: var(--p-gold);
-    animation: spin 0.8s linear infinite;
-  }
+  /* o próprio símbolo do Quad é o carregamento */
+  .q-loader { position: relative; width: 118px; height: 118px; display: grid; place-items: center; margin-bottom: 16px; }
+  .q-loader img { width: 72px; animation: qbreathe 1.6s ease-in-out infinite; }
+  .q-loader::before { content: ''; position: absolute; inset: 0; border-radius: 50%;
+    border: 3px solid rgba(25, 118, 255, 0.14); }
+  .q-loader::after { content: ''; position: absolute; inset: 0; border-radius: 50%;
+    border: 3px solid transparent; border-top-color: var(--p-blue); animation: qspin 0.9s linear infinite; }
+  @keyframes qspin { to { transform: rotate(360deg); } }
+  @keyframes qbreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+  .q-loader-txt { text-align: center; font-size: 13px; line-height: 1.7; color: var(--p-dim); }
+  .q-loader-txt strong { color: var(--p-text); }
+  .gate-layer.so-simbolo .gate-logo { display: none; }
+  .gate-alts-row { width: 100%; display: flex; gap: 8px; margin-top: 12px; }
+  .gate-alts-row .btn { flex: 1; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .gate-warn {
     width: 100%; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E;
@@ -1909,12 +1918,12 @@
         <div class="gate-layer" id="gateLayer">
           <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
 
-          <!-- verificação do e-mail (loading) -->
+          <!-- verificação do e-mail: o símbolo do Quad é o carregamento -->
           <div class="gate-step" id="gateVerify" style="display:none">
-            <div class="access-spin" aria-hidden="true"></div>
-            <h2>Verificando e-mail</h2>
-            <p class="login-sub">Consultando a plataforma-base…</p>
-            <div class="gate-email-chip" id="verifyEmail">voce@exemplo.com</div>
+            <div class="q-loader" role="status" aria-label="Verificando cadastro">
+              <img src="__QUAD_SIMBOLO__" alt="">
+            </div>
+            <p class="q-loader-txt">Verificando o cadastro de<br><strong id="verifyEmail">voce@exemplo.com</strong></p>
           </div>
 
           <!-- cenário 1: aluno com cadastro ativo → código por e-mail -->
@@ -1930,9 +1939,11 @@
               <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="______">
             </div>
             <button class="btn" id="btnEntrarCode" style="width:100%">Entrar</button>
+            <div class="gate-alts-row">
+              <button class="btn ghost small" id="btnReenviarCode">Reenviar código</button>
+              <button class="btn ghost small" id="btnUsarSenha">Entrar com senha</button>
+            </div>
             <div class="gate-alts">
-              <button class="gate-link" id="btnReenviarCode">Reenviar código</button>
-              <button class="gate-link" id="btnUsarSenha">Entrar com senha</button>
               <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
             </div>
           </div>
@@ -1947,9 +1958,11 @@
               <input id="pwInput" type="password" placeholder="••••••••">
             </div>
             <button class="btn" id="btnEntrarSenha" style="width:100%">Acessar o portal</button>
+            <div class="gate-alts-row">
+              <button class="btn ghost small" id="btnEsqueciSenha">Esqueci a senha</button>
+              <button class="btn ghost small" id="btnUsarCodigo">Código por e-mail</button>
+            </div>
             <div class="gate-alts">
-              <button class="gate-link" id="btnEsqueciSenha">Esqueci minha senha</button>
-              <button class="gate-link" id="btnUsarCodigo">Usar código por e-mail</button>
               <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
             </div>
             <p class="login-note">A senha é usada apenas no acesso online.</p>
@@ -2949,6 +2962,7 @@
 
   /* ---------- passos do portão ---------- */
   function gateStep(id) {
+    $('gateLayer').classList.toggle('so-simbolo', id === 'gateVerify');
     ['gateVerify', 'gateCode', 'gatePassword', 'gateActivate', 'gateCadastro', 'gateCadastroDados'].forEach(function (s) {
       $(s).style.display = (s === id) ? 'flex' : 'none';
     });

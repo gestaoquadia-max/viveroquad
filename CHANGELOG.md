@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — telas de acesso reorganizadas (verificação e código)
+- **Verificação (página 2)**: o próprio **símbolo do Quad virou o
+  carregamento** — anel girando ao redor dele com respiração suave — e
+  sobrou uma única linha: "Verificando o cadastro de <e-mail>". Saíram o
+  spinner separado, o título e o chip (4 itens viraram 2)
+- **Código (página 3)**: ações reorganizadas — **Reenviar código** e
+  **Entrar com senha** lado a lado como botões, e **Trocar e-mail**
+  discreto abaixo; mesmo padrão aplicado à tela de senha (Esqueci a senha
+  | Código por e-mail)
+
 ## 19/07/2026 — confirmação do nome de guerra no tutorial
 - Novo beat após digitar o nome de guerra: o QUAD pergunta **"Você quis
   dizer CLARA? Confirma?"** (nome interpolado) com dois botões no balão —
