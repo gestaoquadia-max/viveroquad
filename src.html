@@ -3364,19 +3364,24 @@
     var skip = st.onEnter ? st.onEnter() : null;
     if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
     tutExpect = st.expect || null;
-    tutSay(typeof st.txt === 'function' ? st.txt() : st.txt, st.mood);
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
     $('tutNext').textContent = st.btn || 'PRÓXIMO ›';
-    tutMood(st.mood);
+    /* silencia e trava o avanço enquanto rola até o alvo e posiciona o balão */
+    clearTimeout(tutSayT);
+    tutTyping = true;
+    $('tutText').innerHTML = '';
+    tutGesto(null);
     setTimeout(function () {
       var el = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
       if (el) el.scrollIntoView({ block: 'center' });
       setTimeout(function () {
         var el2 = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
         var ar = st.arrow ? document.querySelector(st.arrow) : null;
-        tutMask(el2, ar);
+        tutMask(el2, ar);           /* balão e robô já no lugar certo… */
+        tutMood(st.mood);
+        tutSay(typeof st.txt === 'function' ? st.txt() : st.txt, st.mood);   /* …só então fala */
       }, 340);
     }, 90);
   }
@@ -3545,9 +3550,7 @@
     carreira.estado = 'acumulando'; renderCarreira();
     tutResetBoina();
     tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
-    if (lsGet(TUT_LS.done) !== '1') {
-      $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';
-    }
+    $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';   /* preencher também */
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
     $('tutLayer').classList.add('on');

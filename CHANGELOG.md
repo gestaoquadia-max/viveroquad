@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial: fala no lugar certo e refazer 100% do zero
+- **Balão não salta mais no meio da fala**: a ordem virou silenciar →
+  rolar até o alvo → posicionar balão/robô → só então falar (antes a
+  digitação começava na posição do beat anterior e o balão pulava)
+- **Refazer limpa também nome, telefone e nome de guerra**: as etapas de
+  preenchimento voltaram a aparecer no refazer (elas se auto-pulavam com os
+  campos cheios, o que parecia "sumiço" e falta de resposta ao digitar)
+- Suíte: 62 verificações passando
+
 ## 19/07/2026 — remoção do selo azul na foto do personagem
 - O selo de boina sobre a foto do card (renderizava azul na paleta) foi
   removido — a foto fica limpa; o estado "equipada" segue visível nos itens
