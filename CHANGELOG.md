@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — correção: rolagem horizontal da esteira no desktop
+- Causa: em telas de toque a esteira rola nativamente, mas no desktop a barra
+  fica oculta (visual de app) e o mouse não arrasta conteúdo por padrão —
+  parecia travada
+- **Arrastar com o mouse** agora rola a esteira (drag-to-scroll com pointer
+  events; arrasto não conta como clique no tile), **roda do mouse** sobre a
+  esteira rola para o lado e o cursor vira "agarrar" para sinalizar
+- Toque no celular segue nativo (`touch-action: pan-x pan-y`); loop infinito
+  preservado nos dois sentidos
+
 ## 19/07/2026 — eventos da semana: esteira infinita + página própria por evento
 - **Esteira horizontal com rolagem infinita**: os blocos são botões renderizados
   a partir do módulo `EVENTOS` (o que a administração publica aparece como

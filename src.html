@@ -789,7 +789,9 @@
   .mission-row .chev { margin-left: auto; }
 
   /* ---------- eventos da semana (tiles) ---------- */
-  .ev-strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+  .ev-strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none;
+    cursor: grab; touch-action: pan-x pan-y; overscroll-behavior-x: contain; }
+  .ev-strip.dragging { cursor: grabbing; }
   .ev-strip::-webkit-scrollbar { display: none; }
   .ev-tile { flex: none; width: 116px; min-height: 96px; border-radius: 14px; padding: 11px; cursor: pointer;
     display: flex; flex-direction: column; gap: 3px; text-align: left; border: none; color: #EAF4FD; font: inherit;
@@ -2416,9 +2418,37 @@
     if (st.scrollLeft < W * 0.5) st.scrollLeft += W;
     else if (st.scrollLeft > W * 1.5) st.scrollLeft -= W;
   }, true);
+  /* desktop: arrastar com o mouse rola a esteira (no toque a rolagem é nativa) */
+  var evDrag = { on: false, strip: null, x: 0, left: 0, moved: false };
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var st = e.target.closest('.ev-strip');
+    if (!st) return;
+    evDrag.on = true; evDrag.strip = st; evDrag.x = e.clientX;
+    evDrag.left = st.scrollLeft; evDrag.moved = false;
+    st.classList.add('dragging');
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!evDrag.on || !evDrag.strip) return;
+    var dx = e.clientX - evDrag.x;
+    if (Math.abs(dx) > 5) evDrag.moved = true;
+    if (evDrag.moved) { evDrag.strip.scrollLeft = evDrag.left - dx; e.preventDefault(); }
+  });
+  document.addEventListener('pointerup', function () {
+    if (evDrag.strip) evDrag.strip.classList.remove('dragging');
+    evDrag.on = false; evDrag.strip = null;
+  });
+  /* desktop: roda do mouse sobre a esteira rola para o lado */
+  document.addEventListener('wheel', function (e) {
+    var st = e.target.closest('.ev-strip');
+    if (!st) return;
+    if (Math.abs(e.deltaY) >= Math.abs(e.deltaX)) { st.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, { passive: false });
   document.addEventListener('click', function (e) {
     var tile = e.target.closest('.ev-tile[data-ev]');
-    if (tile) openEvento(tile.dataset.ev);
+    if (!tile) return;
+    if (evDrag.moved) { evDrag.moved = false; return; }   /* arrasto não é clique */
+    openEvento(tile.dataset.ev);
   });
   function coinSvg() { return '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>'; }
   function openEvento(id) {
