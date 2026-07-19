@@ -1,5 +1,12 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — turma do aluno no card de perfil
+- Nova linha **"TURMA PATAMO (N)"** abaixo de ALUNO SOLDADO no card de perfil
+  — (N) = noite, (M) = manhã, (T) = tarde
+- Derivada da mesma variável de matrícula (`ALUNO_TURMA`) que alimenta o card
+  "Aula de hoje": mudou a matrícula, mudam juntos o rótulo da turma e o
+  cronograma exibido (`turmaLabel()`)
+
 ## 19/07/2026 — "Aula de hoje" conectada ao cronograma presencial
 - Card refeito: deixou de ser "próxima aula ao vivo" (conteúdo online) e passou
   a refletir a **aula presencial da turma do aluno** no Quad

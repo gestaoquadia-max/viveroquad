@@ -694,6 +694,10 @@
     background: linear-gradient(160deg, #3B8BFF, #123C8F); clip-path: polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%); }
   .rank-name { font: 800 10px var(--ui); letter-spacing: .02em; text-transform: uppercase; color: var(--p-gold);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; min-width: 0; }
+  .turma-line {
+    font: 700 9.5px var(--ui); letter-spacing: 0.06em; color: var(--p-dim);
+    text-transform: uppercase; margin-top: 3px; white-space: nowrap;
+  }
   .rank-line { min-width: 0; }
 
   .coins-card { display: flex; align-items: center; gap: 4px; flex: none; cursor: pointer;
@@ -981,6 +985,7 @@
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
               <div class="rank-line"><span class="insig-img" id="cardInsig" aria-hidden="true"></span><span class="rank-name" id="rankNome">Aluno Soldado</span></div>
+              <div class="turma-line" id="cardTurma"></div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
@@ -2523,7 +2528,15 @@
       ] }
     }
   };
-  var ALUNO_TURMA = 'PATAMO NOITE';
+  var ALUNO_TURMA = 'PATAMO NOITE';   /* vem da matrícula do aluno */
+  function turmaLabel() {
+    if (typeof ALUNO_TURMA === 'undefined' || !ALUNO_TURMA) { return ''; }
+    var partes = ALUNO_TURMA.split(' ');
+    var turno = partes[partes.length - 1];
+    var letra = { 'NOITE': 'N', 'MANHÃ': 'M', 'TARDE': 'T' }[turno];
+    var nome = letra ? partes.slice(0, -1).join(' ') : ALUNO_TURMA;
+    return 'Turma ' + nome + (letra ? ' (' + letra + ')' : '');
+  }
   function renderAulaHoje() {
     var t = CRONO.turmas[ALUNO_TURMA];
     if (!t) { return; }
@@ -3072,6 +3085,7 @@
     setInsig($('progInsig'), carreira.patenteIdx);
     $('homeNome').textContent = nomeCurto();
     $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
+    $('cardTurma').textContent = turmaLabel();
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
     $('xpFill').style.width = pct + '%';
     $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
