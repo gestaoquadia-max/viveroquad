@@ -1,5 +1,24 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial do QUAD: fala viva, loop da missão e balões corrigidos
+- **Balões reposicionados**: o robô maior estava parado NA FRENTE do balão
+  (cobria "Esse é você agora" e outros beats); folgas recalculadas para a
+  escala 1,32× — o robô fica sempre abaixo (ou acima) do balão, nunca sobre
+- **Fala datilografada**: as palavras aparecem no balão como se o QUAD
+  estivesse falando (palavra a palavra); um toque completa a fala, o
+  seguinte avança
+- **QUAD gesticula enquanto fala**: durante a fala os braços alternam como
+  quem explica; quando termina, descansa — a impressão é de explicação viva
+- **Missão de instrução com loop de reprovação**: agora é uma resposta por
+  questão (mostra a correta quando erra); se errar as 3, o QUAD diz "Você
+  ainda não conseguiu pontos suficientes para avançarmos — vou lançar as
+  perguntas novamente!" e relança, em loop, até o aluno acertar; o resultado
+  informa "você acertou X de 3"
+- **Skin de personagem sobe para 300 QdC**: no tutorial só a boina é
+  comprável (o aluno tem 25); tentar a skin mostra "Quad Coins
+  insuficientes"
+- Suíte: 52 verificações passando
+
 ## 19/07/2026 — tutorial do QUAD: diálogo em beats + acabamento
 - **Roteiro reescrito como conversa**: cada operação virou 2 falas curtas
   (28 beats no total) — "Tá vendo a sua foto ali em cima? Vamos começar

@@ -1341,11 +1341,11 @@
                 <span class="li-desc">decoração do avatar</span>
                 <span class="li-preco">20 QdC</span>
               </button>
-              <button class="loja-item" data-nome="Skin de personagem" data-preco="35">
+              <button class="loja-item" data-nome="Skin de personagem" data-preco="300">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M20.4 6.5 17 4l-2 2h-6L7 4 3.6 6.5 5 10l2-1v11h10V9l2 1 1.4-3.5Z"/></svg></span>
                 <span class="li-nome">Skin de personagem</span>
                 <span class="li-desc">farda alternativa</span>
-                <span class="li-preco">35 QdC</span>
+                <span class="li-preco">300 QdC</span>
               </button>
             </div>
           </div>
@@ -3260,27 +3260,55 @@
     var lado = (st.bot || 'br').indexOf('l') >= 0 ? 'l' : 'r';
     if ((st.bot || '').indexOf('t') === 0) emCima = true;
     bot.classList.toggle('flip', lado === 'l');
+    /* o visual do robô (escala 1.32) mede ~113px acima da base do contêiner:
+       as folgas abaixo garantem que ele NUNCA fique na frente do balão */
     if (emCima) {
-      bot.style.top = '58px'; bot.style.bottom = 'auto';
-      bub.style.top = '168px'; bub.style.bottom = 'auto';
+      bot.style.top = '58px'; bot.style.bottom = 'auto';          /* base visual: y=144 */
+      bub.style.top = '150px'; bub.style.bottom = 'auto';         /* balão nasce abaixo dele */
       bub.className = 'tut-bubble tail-t' + lado;
     } else {
-      bot.style.top = (scr.height - 102) + 'px'; bot.style.bottom = 'auto';
-      bub.style.top = 'auto'; bub.style.bottom = '112px';
+      bot.style.top = (scr.height - 112) + 'px'; bot.style.bottom = 'auto';  /* topo visual: h-139 */
+      bub.style.top = 'auto'; bub.style.bottom = '146px';                     /* balão termina acima */
       bub.className = 'tut-bubble tail-b' + lado;
     }
-    /* robô um pouco para dentro: o cantinho fica livre para o PRÓXIMO */
-    bot.style.left = lado === 'l' ? '4px' : (scr.width - 152) + 'px';
+    bot.style.left = lado === 'l' ? '10px' : (scr.width - 128) + 'px';
   }
   function tutMood(mood) {
-    var bot = $('tutQuad'), sp = $('tutSprite');
+    var bot = $('tutQuad');
     bot.className = bot.className.replace(/ ?mood-\w+/g, '');
     void bot.offsetWidth;   /* reinicia a animação */
     bot.classList.add('mood-' + (mood || 'talk'));
-    var seq = { wave: [0,1,2,3,4,5,6,5,6,5,4,3,2,1,0], cheer: [0,2,4,6,4,6,4,2,0], point: [0,1,2,2], salute: [0,1,2,3,3,2,1,0], talk: [0], bob: [0] }[mood || 'talk'] || [0];
-    seq.forEach(function (fr, i) {
-      setTimeout(function () { sp.style.backgroundPosition = (-fr * 118) + 'px 0'; }, i * 160);
-    });
+  }
+  /* enquanto "fala", o QUAD gesticula (braços alternando, como quem explica) */
+  var tutGestoT = null;
+  function tutGesto(on) {
+    clearInterval(tutGestoT);
+    var sp = $('tutSprite');
+    if (!on) { sp.style.backgroundPosition = '0 0'; return; }
+    var seq = [1, 2, 3, 2, 1, 0], gi = 0;
+    tutGestoT = setInterval(function () {
+      sp.style.backgroundPosition = (-seq[gi % seq.length] * 118) + 'px 0'; gi++;
+    }, 190);
+  }
+  /* as palavras aparecem como se o robô estivesse falando */
+  var tutSayT = null, tutTyping = false, tutSayFull = '';
+  function tutSay(html) {
+    clearInterval(tutSayT);
+    tutSayFull = html;
+    var palavras = html.split(' '), i = 0;
+    tutTyping = true;
+    $('tutText').innerHTML = '';
+    tutGesto(true);
+    tutSayT = setInterval(function () {
+      i++;
+      $('tutText').innerHTML = palavras.slice(0, i).join(' ');
+      if (i >= palavras.length) { clearInterval(tutSayT); tutTyping = false; tutGesto(false); }
+    }, 72);
+  }
+  function tutSayEnd() {
+    clearInterval(tutSayT);
+    $('tutText').innerHTML = tutSayFull;
+    tutTyping = false; tutGesto(false);
   }
   function tutGo(i) {
     tutIdx = i;
@@ -3291,7 +3319,7 @@
     var skip = st.onEnter ? st.onEnter() : null;
     if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
     tutExpect = st.expect || null;
-    $('tutText').innerHTML = typeof st.txt === 'function' ? st.txt() : st.txt;
+    tutSay(typeof st.txt === 'function' ? st.txt() : st.txt);
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
@@ -3307,7 +3335,11 @@
       }, 340);
     }, 90);
   }
-  function tutAvanca() { if (tutOn && !tutExpect) tutGo(tutIdx + 1); }
+  function tutAvanca() {
+    if (!tutOn) return;
+    if (tutTyping) { tutSayEnd(); return; }   /* 1º toque completa a fala */
+    if (!tutExpect) tutGo(tutIdx + 1);
+  }
   function tutEvent(name) {
     if (!tutOn || tutExpect !== name) return;
     tutExpect = null;
@@ -3336,7 +3368,7 @@
       fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Faltou o seu <b>telefone</b>. Preenche ali para a gente seguir.'],
       guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Seu <b>nome de guerra</b> precisa de pelo menos 2 letras — só letras, sem palavrão.']
     }[qual];
-    $('tutText').innerHTML = mapa[1];
+    tutSay(mapa[1]);
     if (qual === 'avatar') { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
     var el = mapa[0]();
     el.scrollIntoView({ block: 'center' });
@@ -3390,39 +3422,49 @@
     { q: 'Quais são as duas bases das instituições militares?', alts: ['Hierarquia e disciplina', 'Força e coragem', 'Ordem e progresso', 'Comando e obediência'], ok: 0 }
   ];
   var TUT_REW = { score: 30, coins: 25 };
-  var tqI = 0;
+  var tqI = 0, tqAcertos = 0, tqLock = false;
   function tqAbrir() {
-    tqI = 0;
+    tqI = 0; tqAcertos = 0;
     $('tutLayer').classList.remove('on');
     $('tqLayer').style.display = 'flex';
     tqRender();
   }
   function tqRender() {
     var st = TQ[tqI];
+    tqLock = false;
     $('tqProg').textContent = 'Questão ' + (tqI + 1) + ' de ' + TQ.length;
     var letras = ['A', 'B', 'C', 'D'];
     $('tqBody').innerHTML = '<div class="q-card"><p class="q-enun">' + st.q + '</p>' +
       st.alts.map(function (a, i) {
         return '<button class="q-alt" data-i="' + i + '"><span>' + letras[i] + '</span><span>' + a + '</span></button>';
       }).join('') + '</div>';
-    $('tqBody').querySelectorAll('.q-alt').forEach(function (b) {
+    var alts = $('tqBody').querySelectorAll('.q-alt');
+    alts.forEach(function (b) {
       b.addEventListener('click', function () {
-        if (parseInt(b.dataset.i, 10) === st.ok) {
-          b.classList.add('tq-alt-ok');
-          setTimeout(function () { tqI++; if (tqI < TQ.length) tqRender(); else tqResultado(); }, 650);
-        } else {
-          b.classList.add('tq-alt-bad');
-          setTimeout(function () { b.classList.remove('tq-alt-bad'); }, 700);
-          toast('Quase! Tente novamente.');
-        }
+        if (tqLock) return;
+        tqLock = true;   /* uma resposta por questão */
+        var certo = parseInt(b.dataset.i, 10) === st.ok;
+        if (certo) { tqAcertos++; b.classList.add('tq-alt-ok'); }
+        else { b.classList.add('tq-alt-bad'); alts[st.ok].classList.add('tq-alt-ok'); }
+        setTimeout(function () { tqI++; if (tqI < TQ.length) tqRender(); else tqResultado(); }, certo ? 700 : 1200);
       });
     });
   }
   function tqResultado() {
+    if (tqAcertos === 0) {
+      /* errou as 3: o QUAD relança as perguntas — em loop até acertar */
+      $('tqProg').textContent = 'Vamos de novo';
+      $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+        '<p class="q-enun" style="font-size:15px">Você ainda não conseguiu pontos suficientes para avançarmos — vou lançar as perguntas novamente!</p>' +
+        '<p class="sub" style="margin:8px 0 14px">— QUAD</p>' +
+        '<button class="btn" id="tqRetry" style="width:100%">Tentar novamente</button></div>';
+      $('tqRetry').addEventListener('click', function () { tqI = 0; tqAcertos = 0; tqRender(); });
+      return;
+    }
     $('tqProg').textContent = 'Missão concluída';
     $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">✓ Primeira missão cumprida!</p>' +
-      '<p class="sub" style="margin:8px 0 14px">Você ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>' +
+      '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + tqAcertos + ' de ' + TQ.length + '</strong> e ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>' +
       '<button class="btn" id="tqFim" style="width:100%">Continuar</button></div>';
     $('tqFim').addEventListener('click', function () {
       carreira.scorePatente += TUT_REW.score;
