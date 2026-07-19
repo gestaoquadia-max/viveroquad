@@ -603,6 +603,17 @@
     font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.75);
   }
   .tut-next:hover { color: #fff; }
+  /* segurar para ampliar a foto do personagem */
+  .zoom-layer { position: absolute; inset: 0; z-index: 48; display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: rgba(4, 16, 38, 0.84); border-radius: 26px; pointer-events: none; }
+  .zoom-layer.on { display: flex; }
+  #zoomImg { width: 300px; height: 300px; border-radius: 50%; border: 4px solid #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); animation: zoomIn 0.18s ease; background: #fff; }
+  @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } }
+  .zoom-nome { color: #fff; font: 700 13px var(--ui); letter-spacing: 0.07em; text-transform: uppercase; }
+  .avatar-opt, .avatar-preview img, .avatar-ring { -webkit-touch-callout: none; user-select: none; }
+
   /* menu de tutoriais do QUAD (clique no mascote) */
   .help-layer { position: absolute; inset: 0; z-index: 44; display: none;
     border-radius: 26px; overflow: hidden; background: rgba(4, 16, 38, 0.86); }
@@ -1198,19 +1209,28 @@
             <div style="margin-top:10px"><button class="btn small" id="btnNovaMissao">Iniciar missão</button></div>
           </div>
           <div class="p-card">
-            <div class="k-label">Hoje · 20 questões novas (10 + 10)</div>
+            <div class="k-label">Hoje · questões novas (3 + 10 + 10)</div>
+            <div class="mission-row" id="blocoIntroRow">
+              <div class="m-dot" id="biDot">1</div>
+              <div class="grow">
+                <div class="t">Bloco 1 · Introdução no Quad</div>
+                <div class="d">3 questões · o seu primeiro score</div>
+              </div>
+              <button class="btn small" id="btnBlocoIntro">Iniciar</button>
+              <span class="tag" id="biFeito" style="display:none">FEITO</span>
+            </div>
             <div class="mission-row">
               <div class="m-dot done">✓</div>
               <div class="grow">
-                <div class="t">Bloco 1 · Português</div>
+                <div class="t">Bloco 2 · Português</div>
                 <div class="d">10/10 · concluído no almoço · +25 Quad Coins</div>
               </div>
               <span class="tag">FEITO</span>
             </div>
             <div class="mission-row">
-              <div class="m-dot" id="b2dot">2</div>
+              <div class="m-dot" id="b2dot">3</div>
               <div class="grow">
-                <div class="t">Bloco 2 · Dir. Administrativo — Poderes</div>
+                <div class="t">Bloco 3 · Dir. Administrativo — Poderes</div>
                 <div class="d" id="b2desc">10 questões · ~15 min · expira 23h59</div>
               </div>
               <button class="btn small" id="btnMissao2">Iniciar</button>
@@ -1442,7 +1462,6 @@
               <span class="nametag" id="avNametag">AL SD QUAD MOURA</span>
             </div>
             <div class="avatar-grid" id="avGrid"></div>
-            <button class="btn ghost small" id="btnTrocarAvatar" style="width:100%; margin-top:10px; display:none">Trocar personagem</button>
             <div class="k-label" style="margin-top:14px">Itens do personagem</div>
             <div class="equip-row">
               <button class="equip-chip locked" id="chipBoina"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>Boina</button>
@@ -1733,7 +1752,7 @@
         <!-- ============ QUIZ OVERLAY ============ -->
         <div class="quiz-layer" id="quizLayer">
           <div class="quiz-head">
-            <div class="k-label" id="quizKicker">Missão · Bloco 2</div>
+            <div class="k-label" id="quizKicker">Missão · Bloco 3</div>
             <h3 style="margin:0; font-size:15px" id="quizProgress">Questão 1 de 3</h3>
             <p class="sub" style="margin-top:4px">Você não vê acerto ou erro agora — o resultado abre no fim.</p>
           </div>
@@ -2042,6 +2061,12 @@
           </div>
           <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
           <button class="tut-next" id="tutNext">Avançar ›</button>
+        </div>
+
+        <!-- ============ ZOOM DO PERSONAGEM (segurar para ampliar) ============ -->
+        <div class="zoom-layer" id="zoomLayer" aria-hidden="true">
+          <img id="zoomImg" alt="">
+          <div class="zoom-nome" id="zoomNome"></div>
         </div>
 
         <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
@@ -2724,7 +2749,7 @@
     toast('Missão pausada — expira 23h59.');
   });
 
-  $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 2 · Dir. Administrativo'); });
+  $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 3 · Dir. Administrativo'); });
   $('btnNovaMissao').addEventListener('click', function () {
     if (!online) { toast('Existe uma nova missão disponível. Conecte-se à internet para carregá-la.'); return; }
     openQuiz('missao', 'Nova missão · questões do dia');
@@ -3178,14 +3203,29 @@
     var ch = $('chipBoina'); if (ch) ch.classList.add('locked');
   }
   function tutDadosOk() {
-    return $('nomeCompleto').value.trim().length >= 5 && $('foneAluno').value.replace(/\D/g, '').length >= 8;
+    var partes = $('nomeCompleto').value.trim().split(/\s+/).filter(Boolean);
+    return partes.length >= 2 && $('nomeCompleto').value.trim().length >= 5 &&
+      $('foneAluno').value.replace(/\D/g, '').length >= 8;
   }
+  /* o nome de guerra tem que VIR do nome completo: um dos nomes ou uma
+     combinação deles em ordem — nunca o nome inteiro, nunca apelido */
   function tutGuerraOk() {
     var v = $('nomeGuerra').value.trim();
     if (v.length < 2) return false;
     if (!/^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/.test(v)) return false;   /* só letras */
     var lo = v.toLowerCase();
-    return !TUT_PALAVROES.some(function (p) { return lo.indexOf(p) >= 0; });
+    if (TUT_PALAVROES.some(function (p) { return lo.indexOf(p) >= 0; })) return false;
+    var nome = $('nomeCompleto').value.trim().toLowerCase();
+    if (!nome) return false;
+    var nw = nome.split(/\s+/), gw = lo.split(/\s+/);
+    if (gw.length >= nw.length) return false;   /* o nome completo não vale */
+    var j = 0;
+    for (var i = 0; i < gw.length; i++) {
+      while (j < nw.length && nw[j] !== gw[i]) j++;
+      if (j >= nw.length) return false;         /* palavra fora do nome (apelido) */
+      j++;
+    }
+    return true;
   }
   function tutGuerra() { return ($('nomeGuerra').value.trim() || 'Moura').toUpperCase(); }
 
@@ -3198,11 +3238,11 @@
       txt: 'Vou te acompanhar do primeiro dia até a <b>aprovação</b>. Bora conhecer a sua nova casa?' },
     { sel: '#btnAvatarPerfil', expect: 'abrir-perfil', mood: 'point', bot: 'bl',
       txt: 'Tá vendo a <b>sua foto</b> ali em cima? Vamos começar <b>tocando nela</b>!' },
-    { view: 'v-aluno', sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'talk', bot: 'br',
-      txt: 'É por ela que a gente entra no seu <b>perfil</b>. Aqui é o seu QG.' },
+    { view: 'v-aluno', sel: function () { return document.querySelector('.avatar-preview'); }, expect: 'zoom-foto', mood: 'point', bot: 'br',
+      txt: 'Esta é a <b>foto do seu personagem</b>. <b>Clica nela e segura</b> pra ver os detalhes de pertinho.' },
     { sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
-      onEnter: function () { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; if (tutAvatarOk) return 'skip'; },
-      txt: 'Escolhe aí: <b>qual desses é a sua cara?</b>' },
+      onEnter: function () { $('avGrid').style.display = 'grid'; if (tutAvatarOk) return 'skip'; },
+      txt: 'Escolhe aí: <b>qual desses é a sua cara?</b> Dica: <b>segura</b> em um personagem pra ampliar antes de decidir.' },
     { sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'cheer', bot: 'br',
       txt: '<b>Boa escolha!</b> Combinou com você.' },
     { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'bob', bot: 'bl',
@@ -3212,7 +3252,12 @@
       txt: 'Agora vem a parte que eu mais gosto: o <b>nome de guerra</b>.' },
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra', mood: 'bob', bot: 'br',
       onEnter: function () { if (tutGuerraOk()) return 'skip'; },
-      txt: 'Pode ser um nome, um sobrenome, o que te representar. <b>Escreve aí</b> — só letras, sem palavrão.' },
+      txt: function () {
+        var ws = $('nomeCompleto').value.trim().split(/\s+/).filter(Boolean);
+        function cap(x) { return x ? x.charAt(0).toUpperCase() + x.slice(1).toLowerCase() : ''; }
+        var a = cap(ws[0] || 'Danilo'), b = cap(ws[ws.length - 1] || 'Moura');
+        return 'Ele precisa <b>vir do seu nome</b>: tipo <b>' + a + '</b>, <b>' + b + '</b> ou <b>' + a + ' ' + b + '</b>. Só não vale o nome completo nem apelido. <b>Escreve aí!</b>';
+      } },
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'confirma-guerra', mood: 'talk', bot: 'br',
       txt: function () { return 'Você quis dizer <b>' + tutGuerra() + '</b>? Confirma?'; },
       opts: [
@@ -3235,17 +3280,8 @@
       txt: 'Tá <b>zerado</b> porque você acabou de chegar. Bora mudar isso <b>agora</b>?' },
     { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco', mood: 'point', bot: 'tr',
       txt: '<b>Toca em “Continuar missão”</b>. Suas primeiras questões estão te esperando.' },
-    { view: 'v-missoes', sel: '#novaMissaoCard', expect: 'missao', mood: 'point', bot: 'br',
-      onEnter: function () {
-        var c = $('novaMissaoCard');
-        c.style.display = 'block';
-        c.innerHTML = '<div class="k-label">Nova missão · Instrução inicial</div>' +
-          '<h3>Primeira missão — 3 questões</h3>' +
-          '<p class="sub">Rapidinha, só pra você sentir o gosto de pontuar.</p>' +
-          '<div style="margin-top:10px"><button class="btn" id="btnTutMissao" style="width:100%">Iniciar missão</button></div>';
-        $('btnTutMissao').addEventListener('click', tqAbrir);
-      },
-      txt: 'É aqui que as missões moram. <b>Toca em “Iniciar missão”</b>!' },
+    { view: 'v-missoes', sel: '#blocoIntroRow', arrow: '#btnBlocoIntro', expect: 'missao', mood: 'point', bot: 'br',
+      txt: 'Sua primeira missão tá aqui: <b>Bloco 1 · Introdução no Quad</b> — 3 questões rapidinhas. <b>Toca em “Iniciar”!</b>' },
     { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; }, mood: 'cheer', bot: 'br',
       txt: 'Olha lá o <b>score</b>! Seus primeiros pontos entraram.' },
     { sel: '#coinsCard', mood: 'talk', bot: 'bl',
@@ -3426,15 +3462,17 @@
       }, 340);
     }, 90);
   }
+  var tutAdvPend = false;   /* avanço agendado: ignora toques até concluir */
   function tutAvanca() {
-    if (!tutOn) return;
+    if (!tutOn || tutAdvPend) return;
     if (tutTyping) { tutSayEnd(); return; }   /* 1º toque completa a fala */
     if (!tutExpect) tutGo(tutIdx + 1);
   }
   function tutEvent(name) {
-    if (!tutOn || tutExpect !== name) return;
+    if (!tutOn || tutExpect !== name || tutAdvPend) return;
     tutExpect = null;
-    setTimeout(function () { tutGo(tutIdx + 1); }, 450);
+    tutAdvPend = true;
+    setTimeout(function () { tutAdvPend = false; tutGo(tutIdx + 1); }, 450);
   }
   /* falas sem ação: qualquer toque do meio para a direita avança (sombra,
      janela, balão ou o próprio "Avançar" — um caminho só, sem avanço duplo) */
@@ -3457,10 +3495,10 @@
       avatar: [function () { return $('avGrid').closest('.p-card'); }, 'Calma, guerreiro: primeiro <b>escolha o seu avatar</b> — toque em um dos personagens.'],
       nome: [function () { return $('nomeCompleto').closest('.p-card'); }, 'Faltou o seu <b>nome completo</b>. Preenche ali para a gente seguir.'],
       fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Faltou o seu <b>telefone</b>. Preenche ali para a gente seguir.'],
-      guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Seu <b>nome de guerra</b> precisa de pelo menos 2 letras — só letras, sem palavrão.']
+      guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'O <b>nome de guerra</b> precisa vir do seu <b>nome completo</b>: um dos nomes ou uma combinação — sem ser o nome inteiro, sem apelido.']
     }[qual];
     tutSay(mapa[1], 'point');
-    if (qual === 'avatar') { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
+    if (qual === 'avatar') { $('avGrid').style.display = 'grid'; }
     var el = mapa[0]();
     el.scrollIntoView({ block: 'center' });
     setTimeout(function () { tutMask(mapa[0]()); }, 340);
@@ -3520,7 +3558,18 @@
     { q: 'Quais são as duas bases das instituições militares?', alts: ['Hierarquia e disciplina', 'Força e coragem', 'Ordem e progresso', 'Comando e obediência'], ok: 0 }
   ];
   var TUT_REW = { score: 30, coins: 25 };
-  var tqI = 0, tqAcertos = 0, tqLock = false;
+  var tqI = 0, tqAcertos = 0, tqLock = false, blocoIntroFeito = false;
+  function blocoIntroMarca(feito) {
+    blocoIntroFeito = feito;
+    $('biDot').textContent = feito ? '✓' : '1';
+    $('biDot').classList.toggle('done', feito);
+    $('btnBlocoIntro').style.display = feito ? 'none' : '';
+    $('biFeito').style.display = feito ? '' : 'none';
+  }
+  $('btnBlocoIntro').addEventListener('click', function () {
+    if (blocoIntroFeito) return;
+    tqAbrir();
+  });
   function tqAbrir() {
     tqI = 0; tqAcertos = 0;
     $('tutLayer').classList.remove('on');
@@ -3569,11 +3618,16 @@
       carreira.scoreCarreira += TUT_REW.score;
       carreira.scoreTemporada += TUT_REW.score;
       renderCarreira();
-      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · missão de instrução');
+      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · Bloco 1 concluído');
+      blocoIntroMarca(true);
       $('tqLayer').style.display = 'none';
-      showView('v-inicio', 'navAluno');
-      $('tutLayer').classList.add('on');
-      tutEvent('missao');
+      if (tutOn) {
+        showView('v-inicio', 'navAluno');
+        $('tutLayer').classList.add('on');
+        tutEvent('missao');
+      } else {
+        toast('Bloco 1 · Introdução no Quad concluído!');
+      }
     });
   }
 
@@ -3591,6 +3645,7 @@
     carreira.estado = 'acumulando'; renderCarreira();
     tutResetBoina();
     tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
+    blocoIntroMarca(false);   /* o Bloco 1 · Introdução volta a ficar disponível */
     $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';   /* preencher também */
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
@@ -3603,8 +3658,6 @@
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
     $('daniloHint').style.display = '';
-    var bm = $('btnTutMissao');
-    if (bm) { bm.disabled = true; bm.textContent = 'Missão de instrução concluída ✓'; }
     toast('Instrução inicial concluída — plataforma liberada!');
     daniloWave();
   }
@@ -3661,7 +3714,38 @@
     'Homem · cabelo loiro', 'Homem · pele parda, corte raspado', 'Homem · ruivo', 'Homem · careca', 'Homem · negro, corte fade', 'Homem · corte militar',
     'Mulher · cabelo preto liso', 'Mulher · loira', 'Mulher · ruiva', 'Mulher · castanho curto', 'Mulher · negra, cabelo curto', 'Mulher · negra, tranças'
   ];
-  var avatarThumbs = [], avatarIdx = 0;
+  var avatarThumbs = [], avatarZoom = [], avatarIdx = 0;
+  /* segurar para ampliar a foto do personagem */
+  var zoomHold = { t: null, on: false };
+  function zoomShow(src, nome) {
+    $('zoomImg').src = src;
+    $('zoomNome').textContent = nome || '';
+    $('zoomLayer').classList.add('on');
+    zoomHold.on = true;
+  }
+  function zoomHide() {
+    if (!zoomHold.on) return;
+    $('zoomLayer').classList.remove('on');
+    zoomHold.on = false;
+    if (tutOn && tutExpect === 'zoom-foto') tutEvent('zoom-foto');
+  }
+  function bindHold(el, getDados) {
+    el.addEventListener('pointerdown', function () {
+      clearTimeout(zoomHold.t);
+      zoomHold.t = setTimeout(function () { var d = getDados(); zoomShow(d.src, d.nome); }, 350);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+      el.addEventListener(ev, function () {
+        clearTimeout(zoomHold.t);
+        if (zoomHold.on) {
+          zoomHide();
+          el.dataset.zoomed = '1';   /* soltar depois de ampliar não conta como clique */
+          setTimeout(function () { delete el.dataset.zoomed; }, 260);
+        }
+      });
+    });
+    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  }
   function aplicarAvatar() {
     if (!avatarThumbs.length) return;
     var src = avatarThumbs[avatarIdx];
@@ -3679,6 +3763,12 @@
         x.beginPath(); x.arc(72, 72, 72, 0, Math.PI * 2); x.clip();
         x.drawImage(img, fx * W - r, fy * H - r, 2 * r, 2 * r, 0, 0, 144, 144);
         avatarThumbs.push(c.toDataURL('image/jpeg', 0.85));
+        var cz = document.createElement('canvas'); cz.width = 320; cz.height = 320;
+        var xz = cz.getContext('2d');
+        xz.fillStyle = '#fff'; xz.fillRect(0, 0, 320, 320);
+        xz.beginPath(); xz.arc(160, 160, 160, 0, Math.PI * 2); xz.clip();
+        xz.drawImage(img, fx * W - r, fy * H - r, 2 * r, 2 * r, 0, 0, 320, 320);
+        avatarZoom.push(cz.toDataURL('image/jpeg', 0.88));
       }); });
       var grid = $('avGrid');
       avatarThumbs.forEach(function (src, i) {
@@ -3686,27 +3776,26 @@
         b.className = 'avatar-opt' + (i === avatarIdx ? ' sel' : '');
         b.setAttribute('aria-label', AV_LABELS[i]);
         b.innerHTML = '<img src="' + src + '" alt="">';
+        bindHold(b, function () { return { src: avatarZoom[i] || src, nome: AV_LABELS[i] }; });
         b.addEventListener('click', function () {
+          if (b.dataset.zoomed) return;   /* soltou depois de ampliar: não escolhe */
           grid.querySelectorAll('.avatar-opt').forEach(function (x2) { x2.classList.remove('sel'); });
           b.classList.add('sel');
           avatarIdx = i;
           aplicarAvatar();
           // escolheu: a área de escolha desaparece e o personagem vira o ícone do card
           grid.style.display = 'none';
-          $('btnTrocarAvatar').style.display = 'block';
           toast('Personagem definido — já é o seu ícone no perfil!');
         });
         grid.appendChild(b);
       });
       aplicarAvatar();
+      bindHold($('avPreview'), function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: AV_LABELS[avatarIdx] }; });
+      bindHold($('btnAvatarPerfil'), function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: AV_LABELS[avatarIdx] }; });
     };
     img.src = AVATAR_SPRITE;
   }
   if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();
-  $('btnTrocarAvatar').addEventListener('click', function () {
-    $('avGrid').style.display = 'grid';
-    $('btnTrocarAvatar').style.display = 'none';
-  });
   /* ==================================================================
      GAMIFICAÇÃO · progressão, estados, prova de promoção e histórico
      (dados simulados; no sistema real o servidor valida tudo)
@@ -3719,6 +3808,10 @@
   }
   $('nomeGuerra').addEventListener('input', syncNametag);
   $('btnSalvarPerfil').addEventListener('click', function () {
+    if (!tutOn && !tutGuerraOk()) {
+      toast('O nome de guerra precisa vir do seu nome completo — um dos nomes ou uma combinação.');
+      return;
+    }
     syncNametag();
     renderCarreira();
     aplicarAvatar();
@@ -4146,7 +4239,10 @@
 
   /* ---------- foto do personagem abre o Perfil do aluno ---------- */
   var btnAvatarEl = $('btnAvatarPerfil');
-  if (btnAvatarEl) btnAvatarEl.addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
+  if (btnAvatarEl) btnAvatarEl.addEventListener('click', function () {
+    if (btnAvatarEl.dataset.zoomed) return;   /* soltar do zoom não navega */
+    showView('v-aluno', 'navAluno');
+  });
 
   /* ---------- Danilo acena e depois fica parado (sprite de 7 poses) ---------- */
   var fabSpriteEl = $('fabSprite'), waveTimers = [];

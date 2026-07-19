@@ -1,5 +1,24 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — segurar para ampliar, regra do nome de guerra e Bloco 1
+- **Segurar para ampliar o personagem**: pressionar e segurar a foto (no
+  card, na prévia do perfil e em cada opção do grid) abre a foto grande em
+  círculo com o nome da arte; soltar fecha — e no grid, segurar NÃO escolhe
+  (toque rápido escolhe). O beat da foto virou ação ("Clica nela e segura")
+  e o da escolha ganhou a dica de inspecionar antes de decidir
+- **Botão "Trocar personagem" removido** — a escolha é definitiva (refazer a
+  instrução reabre o grid)
+- **Nome de guerra tem que vir do nome completo**: um dos nomes ou uma
+  combinação em ordem (Danilo, Ribeiro, Moura, Danilo Moura…) — nunca o
+  nome inteiro, nunca apelido; vale no tutorial (fala ensina com exemplos do
+  próprio nome do aluno) e no salvar normal do perfil
+- **Bloco 1 · Introdução no Quad**: a missão de instrução agora vive na
+  lista "Hoje · questões novas (3 + 10 + 10)" como primeiro bloco; ao
+  concluir vira **FEITO ✓**; os blocos existentes renumeraram para
+  Bloco 2 (Português) e Bloco 3 (Dir. Administrativo)
+- Corrigido avanço duplo ao soltar o zoom (trava de avanço pendente)
+- Suíte: 76 verificações passando
+
 ## 19/07/2026 — telas de acesso reorganizadas (verificação e código)
 - **Verificação (página 2)**: o próprio **símbolo do Quad virou o
   carregamento** — anel girando ao redor dele com respiração suave — e
