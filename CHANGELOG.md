@@ -1,5 +1,17 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — bloco "Hoje" enxuto: regras internas fora da tela
+- Removidos da interface: o texto explicativo do agendamento, o horário
+  "22h15" e o link "liberar (demo)" — **regras internas ficam no sistema**;
+  o bloco simplesmente aparece quando é liberado
+- **Bloco concluído desaparece da lista** (inclusive o Bloco 1 · Introdução,
+  que reaparece ao refazer a instrução); sem resposta, o bloco **expira em
+  7 dias** após ser criado (regra no código, invisível ao aluno)
+- **Rolagem interna**: o card "Hoje · questões novas" tem tamanho médio
+  (~264px) e as missões rolam dentro dele
+- Rótulos sem jargão (sem D0/D+1): "aula de hoje · 19h", "aula de ontem",
+  "semana passada", "mês passado"
+
 ## 19/07/2026 — rápidas do dia dentro do "Hoje" (correção do modelo)
 - **Removido o card "Aula → flashcards · repetição espaçada"** — era uma
   materialização errada: o agendamento do PDF 01 pertence DENTRO do bloco

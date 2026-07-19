@@ -670,7 +670,11 @@
   .onda-row:last-child { border-bottom: none; }
   .onda-row .nm { flex: 1; }
   .onda-row .quando { font: 600 11px Consolas, monospace; color: var(--p-dim); }
-  .onda-demo { background: none; border: none; cursor: pointer; font: 600 10.5px var(--ui); color: var(--p-blue); padding: 2px 0; }
+  /* missões do dia rolam dentro do card (tamanho médio) */
+  .dia-scroll { max-height: 264px; overflow-y: auto; overscroll-behavior: contain;
+    margin: 2px -4px 0 0; padding-right: 4px; scrollbar-width: thin; }
+  .dia-scroll::-webkit-scrollbar { width: 4px; }
+  .dia-scroll::-webkit-scrollbar-thumb { background: #C9DCF2; border-radius: 99px; }
 
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
   .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
@@ -1247,8 +1251,8 @@
           </div>
 
           <div class="p-card">
-            <div class="k-label">Hoje · questões novas (3 + 8 × 10)</div>
-            <p class="sub" style="margin-bottom:8px">As rápidas liberam às <strong>22h15</strong>: as 2 aulas de hoje (D0) + revisões de ontem (D+1), da semana (D+7) e do mês (D+30). Respondidas, entram no Treinamento Rápido.</p>
+            <div class="k-label">Hoje · questões novas</div>
+            <div class="dia-scroll">
             <div class="mission-row" id="blocoIntroRow">
               <div class="m-dot" id="biDot">1</div>
               <div class="grow">
@@ -1259,6 +1263,7 @@
               <span class="tag" id="biFeito" style="display:none">FEITO</span>
             </div>
             <div id="diaList"></div>
+            </div>
           </div>
           <div class="p-card">
             <div class="k-label">Atrasadas · recupere até sábado</div>
@@ -3739,35 +3744,33 @@
   /* PDF 01 → bloco Hoje: 2 aulas por dia × marcos D0 · D+1 · D+7 · D+30.
      Tudo libera às 22h15 do dia — o aluno só vê "as rápidas de hoje". */
   var DIA_BLOCOS = [
-    { rot: 'Bloco 2 · Dir. Constitucional', det: 'aula de hoje, 19h · D0', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
-    { rot: 'Bloco 3 · Matemática', det: 'aula de hoje, 20h30 · D0', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
-    { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem · D+1', fonte: 'aula', ini: 0 },
-    { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem · D+1', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
-    { rot: 'Revisão · Dir. Administrativo', det: 'semana passada · D+7', fonte: 'aula', ini: 10 },
-    { rot: 'Revisão · Língua Inglesa', det: 'semana passada · D+7', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
-    { rot: 'Revisão · Dir. Administrativo', det: 'mês passado · D+30', fonte: 'aula', ini: 20 },
-    { rot: 'Revisão · Informática', det: 'mês passado · D+30', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
+    { rot: 'Bloco 2 · Dir. Constitucional', det: 'aula de hoje · 19h', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+    { rot: 'Bloco 3 · Matemática', det: 'aula de hoje · 20h30', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem', fonte: 'aula', ini: 0 },
+    { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'semana passada', fonte: 'aula', ini: 10 },
+    { rot: 'Revisão · Língua Inglesa', det: 'semana passada', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'mês passado', fonte: 'aula', ini: 20 },
+    { rot: 'Revisão · Informática', det: 'mês passado', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
   ];
-  var diaFeito = DIA_BLOCOS.map(function () { return false; });
-  function rapidasLiberadas() {
-    var ag = new Date();
-    return ag.getHours() * 60 + ag.getMinutes() >= 22 * 60 + 15;
-  }
+  /* regras internas (não aparecem para o aluno):
+     · cada bloco nasce quando o sistema libera (22h15 do seu dia)
+     · concluído, desaparece da lista
+     · sem resposta, expira 7 dias após ser criado */
+  var DIA_EXPIRA_DIAS = 7;
+  DIA_BLOCOS.forEach(function (b) { b.criadoEm = Date.now(); b.feito = false; });
   function renderDia() {
-    var aberto = rapidasLiberadas();
-    $('diaList').innerHTML = DIA_BLOCOS.map(function (b, i) {
-      var st;
-      if (diaFeito[i]) st = '<span class="tag">FEITO</span>';
-      else if (aberto) st = '<button class="btn small" data-dia="' + i + '">Responder 10</button>';
-      else st = '<span class="quando">22h15</span> <button class="onda-demo" data-dia-demo="' + i + '">liberar (demo)</button>';
-      return '<div class="mission-row"><div class="m-dot' + (diaFeito[i] ? ' done' : '') + '">' + (diaFeito[i] ? '✓' : (i + 2)) + '</div>' +
-        '<div class="grow"><div class="t">' + b.rot + '</div><div class="d">' + b.det + ' · 10 rápidas</div></div>' + st + '</div>';
-    }).join('');
+    var agora = Date.now();
+    var vivos = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return !x.b.feito && (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
+    });
+    $('diaList').innerHTML = vivos.map(function (x) {
+      return '<div class="mission-row"><div class="m-dot">›</div>' +
+        '<div class="grow"><div class="t">' + x.b.rot + '</div><div class="d">' + x.b.det + ' · 10 rápidas</div></div>' +
+        '<button class="btn small" data-dia="' + x.i + '">Responder</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Tudo em dia por aqui — novos blocos chegam com as próximas aulas.</p>';
     $('diaList').querySelectorAll('[data-dia]').forEach(function (bt) {
       bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
-    });
-    $('diaList').querySelectorAll('[data-dia-demo]').forEach(function (bt) {
-      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.diaDemo, 10)); });
     });
   }
 
@@ -3892,7 +3895,7 @@
     if (typeof renderEdital === 'function') renderEdital();
     var deDia = trDia >= 0;
     if (deDia) {
-      diaFeito[trDia] = true;
+      DIA_BLOCOS[trDia].feito = true;
       if (DIA_BLOCOS[trDia].fonte === 'aula') {
         /* respondidas, as cartas do PDF 01 entram no banco do Treinamento Rápido */
         trCards.forEach(function (c) { TR_BANK.push(c); });
@@ -3940,10 +3943,7 @@
   var tqI = 0, tqAcertos = 0, tqLock = false, blocoIntroFeito = false;
   function blocoIntroMarca(feito) {
     blocoIntroFeito = feito;
-    $('biDot').textContent = feito ? '✓' : '1';
-    $('biDot').classList.toggle('done', feito);
-    $('btnBlocoIntro').style.display = feito ? 'none' : '';
-    $('biFeito').style.display = feito ? '' : 'none';
+    $('blocoIntroRow').style.display = feito ? 'none' : '';   /* concluído, some da lista */
   }
   $('btnBlocoIntro').addEventListener('click', function () {
     if (blocoIntroFeito) return;
