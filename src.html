@@ -874,6 +874,18 @@
   .tr-meta { font: 600 10.5px var(--font); color: var(--p-dim); white-space: nowrap; }
   .tr-item.atual .tr-nome { color: var(--p-gold); }
 
+  /* ---------- rankings do Quadrômetro (sala e geral) ---------- */
+  .rk-row { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--p-line); }
+  .rk-row:last-child { border-bottom: none; }
+  .rk-pos { font: 700 12px var(--ui); color: var(--p-dim); width: 40px; flex: none; font-variant-numeric: tabular-nums; }
+  .rk-nome { flex: 1; min-width: 0; font: 600 12px var(--ui); color: var(--p-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-pts { font: 700 12px var(--ui); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums; }
+  .rk-row.me { background: #FFF6DF; border: 1px solid #F1D488; border-radius: 10px; padding: 7px 8px; }
+  .rk-row.me .rk-pos, .rk-row.me .rk-nome { color: #9A6B00; font-weight: 800; }
+  .rk-row.me .rk-pts { color: #9A6B00; }
+  .rk-row.top3 .rk-pos { color: var(--p-gold); font-weight: 800; }
+  .rk-sep { text-align: center; color: var(--p-dim); font: 700 13px var(--ui); padding: 4px 0; letter-spacing: .3em; }
+
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
   /* balão de fala preso à cabeça do Danilo (rabinho aponta para ele) */
   .danilo-hint { right: 30px; left: auto; bottom: 146px; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
@@ -1158,6 +1170,14 @@
             <div class="k-label">Quadrômetro · sua jornada em números</div>
             <h3 id="quadNome">Aluno Soldado Quad Moura</h3>
             <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Ranking da sala · PC-BA Noite · 42 alunos</div>
+            <div id="rankSalaList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Ranking geral · 1.286 usuários</div>
+            <div id="rankGeralList"></div>
           </div>
           <div class="p-card">
             <div class="k-label">Jornada de patentes · Aluno Soldado ao Coronel</div>
@@ -2929,6 +2949,7 @@
     syncNametag();
     renderTrilha();
     renderHistorico();
+    renderRankings();
     queueSync();
   }
   function renderTrilha() {
@@ -2947,6 +2968,54 @@
     });
     el.innerHTML = html;
   }
+  /* rankings simulados: a posição do aluno é fixa (viria do servidor);
+     o nome e o score dele acompanham o estado real do protótipo */
+  var RK_NOMES = ['Braga','Nunes','Rocha','Teixeira','Dutra','Farias','Sales','Pires','Ramos','Costa','Lima','Souza','Prado','Viana','Barros','Melo','Freitas','Cunha','Aragão','Tavares','Xavier','Peixoto','Dantas','Moraes','Sampaio','Rezende','Queiroz','Amaral','Fontes','Guedes','Serra','Lacerda','Brandão','Camargo','Siqueira','Torres','Valente','Mattos','Azevedo','Furtado','Neves','Antunes','Ferraz','Galvão','Bastos','Coelho','Duarte','Jardim'];
+  var RK_OFF = [38,25,63,41,19,52,30,74,22,47,58,33,29,66,21,44,71,26,55,37,49,60,24,68,31,53,42,77,28,36,64,45,23,59,50,70,27,62,35,48];
+  function rkRow(pos, nome, pts, me, top3) {
+    return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
+      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + nome + (me ? ' · você' : '') + '</span>' +
+      '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
+  }
+  function rkScores(total, meuPos, meuScore) {
+    var arr = new Array(total + 1);
+    arr[meuPos] = meuScore;
+    for (var i = meuPos - 1; i >= 1; i--) arr[i] = arr[i + 1] + RK_OFF[(i * 3) % RK_OFF.length];
+    for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, arr[j - 1] - RK_OFF[(j * 5) % RK_OFF.length]);
+    return arr;
+  }
+  function renderRankings() {
+    var elS = $('rankSalaList'), elG = $('rankGeralList');
+    if (!elS || !elG) return;
+    // sala: 42 alunos, aluno em 12º
+    var sTot = 42, sPos = 12, sc = rkScores(sTot, sPos, carreira.scoreCarreira);
+    var html = '';
+    for (var i = 1; i <= sTot; i++) {
+      if (i === sPos) { html += rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false); continue; }
+      var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+      html += rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3);
+    }
+    elS.innerHTML = html;
+    // geral: 1.286 usuários, aluno em 87º — top 10, vizinhança do aluno e o último
+    var gTot = 1286, gPos = 87;
+    var topPref = ['CEL QUAD ', 'TC QUAD ', 'MAJ QUAD ', 'CAP QUAD ', 'TEN QUAD ', 'ASP QUAD ', 'SGT QUAD ', 'SGT QUAD ', 'CB QUAD ', 'CB QUAD '];
+    var g = '';
+    var topBase = 24870;
+    for (var t = 1; t <= 10; t++) {
+      g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3);
+    }
+    g += '<div class="rk-sep">···</div>';
+    var gv = rkScores(gPos + 4, gPos, carreira.scoreCarreira);
+    for (var v = gPos - 2; v <= gPos + 2; v++) {
+      if (v === gPos) { g += rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false); continue; }
+      var pf = (v % 2 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+      g += rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false);
+    }
+    g += '<div class="rk-sep">···</div>';
+    g += rkRow(gTot, 'AL SD QUAD ' + RK_NOMES[19], 15, false, false);
+    elG.innerHTML = g;
+  }
+
   function renderHistorico() {
     var el = $('histCarreira'); if (!el) return;
     el.innerHTML = carreira.historico.map(function (h) {
