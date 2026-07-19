@@ -1982,6 +1982,7 @@
               <button class="btn ghost small" id="btnUsarSenha">Entrar com senha</button>
             </div>
             <div class="gate-alts">
+              <button class="gate-link" id="btnCriarConta">Ainda não tem conta? <strong>Criar conta</strong></button>
               <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
             </div>
           </div>
@@ -3093,9 +3094,19 @@
   });
 
   /* ---------- cenário 3: ativar conta → fluxo de cadastro existente ---------- */
+  var cadOrigem = 'gateActivate'; // de onde o aluno entrou no cadastro (para o Voltar)
   $('btnAtivarConta').addEventListener('click', function () {
+    cadOrigem = 'gateActivate';
     $('cadEmail').value = currentEmail;
     gateStep('gateCadastro'); // reaproveita o fluxo de criação de conta já existente
+  });
+
+  /* ---------- criar conta a partir da validação por e-mail ----------
+     é a criação da conta que dispara o onboard obrigatório (tutorial) */
+  $('btnCriarConta').addEventListener('click', function () {
+    cadOrigem = 'gateCode';
+    $('cadEmail').value = currentEmail;
+    gateStep('gateCadastro');
   });
 
   /* ---------- conceder acesso / dispositivo autorizado ---------- */
@@ -3186,7 +3197,7 @@
     gateStep('gateCadastro');
   });
   document.querySelectorAll('[data-gate-back]').forEach(function (b) {
-    b.addEventListener('click', function () { gateStep('gateActivate'); });
+    b.addEventListener('click', function () { gateStep(cadOrigem); }); // volta para onde o aluno estava
   });
   $('btnConcluir').addEventListener('click', function () {
     currentEmail = $('cadEmail').value.trim() || currentEmail;

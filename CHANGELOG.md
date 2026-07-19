@@ -1,5 +1,18 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — "Criar conta" de volta à validação por e-mail
+- A tela do código ganhou a quarta saída que faltava: **"Ainda não tem
+  conta? Criar conta"** — é a criação da conta que dispara a automação
+  do **onboard obrigatório** (cadastro com busca automática na
+  plataforma-base → dispositivo autorizado → tutorial do QUAD)
+- O fluxo de cadastro já existia, mas ficou órfão numa revisão anterior:
+  só era alcançável pelo cenário raro "conta não ativada"; agora tem
+  entrada direta, com o e-mail já preenchido
+- **Voltar consciente da origem**: quem entra no cadastro pelo código
+  volta para o código; quem entra pela ativação volta para a ativação
+- Nova suíte `vconta` (4 cenários) cobrindo o caminho completo até o
+  tutorial disparar; acesso, tutorial e treinamento seguem verdes
+
 ## 19/07/2026 — Atrasadas e Simulados no mesmo padrão do "Hoje"
 - **Atrasadas**: blocos que estouram os 7 dias sem resposta **caem
   automaticamente ali** (não somem mais) — card de tamanho médio com
