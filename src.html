@@ -540,33 +540,52 @@
     50% { box-shadow: 0 0 0 8px rgba(255,215,106,0.12), 0 0 30px rgba(255,215,106,0.7); } }
   .tut-arrow {
     position: absolute; display: none; pointer-events: none; color: #FFD76A;
-    font-size: 26px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    font-size: 26px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 3;
     animation: tutBounce 0.8s ease-in-out infinite;
   }
   @keyframes tutBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-  .tut-quad { position: absolute; right: -6px; bottom: 6px; z-index: 3; background: none; border: none; padding: 0; pointer-events: none; }
-  .tut-quad .fab-sprite { filter: drop-shadow(0 10px 16px rgba(0,0,0,0.55)); }
+  /* o QUAD circula pela tela e gesticula conforme o assunto */
+  .tut-quad {
+    position: absolute; z-index: 3; pointer-events: none; width: 118px; height: 86px;
+    transition: left 0.5s ease, top 0.5s ease;
+  }
+  .tut-quad .fab-sprite { filter: drop-shadow(0 10px 14px rgba(9,34,90,0.35)); }
+  .tut-quad.flip .fab-sprite { transform: scaleX(-1); }
+  .tut-quad.mood-bob { animation: tutBob 1.8s ease-in-out infinite; }
+  @keyframes tutBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .tut-quad.mood-cheer { animation: tutCheer 0.55s ease-in-out 4; }
+  @keyframes tutCheer { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-13px) rotate(-4deg); } }
+  .tut-quad.mood-point { animation: tutPoint 1s ease-in-out infinite; }
+  @keyframes tutPoint { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+  .tut-quad.mood-salute { animation: tutSalute 1.2s ease-in-out 2; }
+  @keyframes tutSalute { 0%,100% { transform: rotate(0deg); } 40% { transform: rotate(-6deg) translateY(-5px); } }
+  /* balão claro, leitura direta; o rabinho aponta para o QUAD */
   .tut-bubble {
-    position: absolute; right: 14px; left: 14px; bottom: 96px; z-index: 2; pointer-events: auto;
-    background: linear-gradient(165deg, #123C8F, #0B2E73); color: #F2F8FF;
-    border: 1.5px solid rgba(255, 255, 255, 0.25); border-radius: 16px 16px 3px 16px;
-    padding: 13px 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+    position: absolute; right: 14px; left: 14px; z-index: 2; pointer-events: auto;
+    background: #FFFFFF; color: #1B2B45;
+    border: 1px solid #E2EAF5; border-radius: 16px;
+    padding: 12px 14px; box-shadow: 0 14px 34px rgba(4, 16, 38, 0.4);
   }
-  .tut-bubble::after {
-    content: ''; position: absolute; right: 26px; bottom: -11px;
-    border: 11px solid transparent; border-top-color: #0B2E73; border-right-width: 4px;
-  }
-  .tut-bubble.top { bottom: auto; top: 14px; border-radius: 16px 16px 16px 3px; }
-  .tut-bubble.top::after { display: none; }
-  .tut-name { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
-  .tut-name b { font: 800 12px var(--ui); letter-spacing: 0.08em; color: #FFD76A; }
-  .tut-name .tut-etapa { margin-left: auto; font: 600 10px Consolas, monospace; opacity: 0.65; }
-  .tut-text { font-size: 13px; line-height: 1.55; }
-  .tut-text b { color: #FFD76A; }
-  .tut-foot { margin-top: 10px; display: flex; justify-content: flex-end; }
-  .tut-wait { display: none; font-size: 11px; opacity: 0.75; font-style: italic; }
-  .tut-wait::before { content: '●'; color: #FFD76A; margin-right: 6px; animation: tutBlink 1.1s infinite; }
+  .tut-bubble::after { content: ''; position: absolute; border: 10px solid transparent; }
+  .tut-bubble.tail-br::after { right: 30px; bottom: -19px; border-top-color: #FFFFFF; }
+  .tut-bubble.tail-bl::after { left: 30px; bottom: -19px; border-top-color: #FFFFFF; }
+  .tut-bubble.tail-tr::after { right: 30px; top: -19px; border-bottom-color: #FFFFFF; }
+  .tut-bubble.tail-tl::after { left: 30px; top: -19px; border-bottom-color: #FFFFFF; }
+  .tut-name { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .tut-name b { font: 800 11.5px var(--ui); letter-spacing: 0.08em; color: var(--p-blue); }
+  .tut-name .tut-etapa { margin-left: auto; font: 600 10px Consolas, monospace; color: #8AA0BF; }
+  .tut-text { font-size: 13px; line-height: 1.55; color: #1B2B45; }
+  .tut-text b { color: var(--p-blue); }
+  .tut-wait { display: none; font-size: 11px; color: #8AA0BF; font-style: italic; margin-top: 7px; }
+  .tut-wait::before { content: '●'; color: var(--p-gold); margin-right: 6px; animation: tutBlink 1.1s infinite; }
   @keyframes tutBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  /* avanço discreto: Next pequeno no canto + toque na metade direita da tela */
+  .tut-next {
+    position: absolute; right: 16px; bottom: 12px; z-index: 4; pointer-events: auto;
+    background: none; border: none; cursor: pointer;
+    font: 700 12px var(--ui); letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.85);
+  }
+  .tut-next:hover { color: #fff; }
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
   .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
   @keyframes tqShake { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
@@ -1983,12 +2002,10 @@
           <div class="tut-bubble" id="tutBubble">
             <div class="tut-name"><b>QUAD</b><span class="tut-etapa" id="tutStepN"></span></div>
             <div class="tut-text" id="tutText"></div>
-            <div class="tut-foot">
-              <span class="tut-wait" id="tutWait">Complete a ação indicada para continuar</span>
-              <button class="btn small" id="tutNext">Continuar</button>
-            </div>
+            <div class="tut-wait" id="tutWait">Complete a ação indicada para continuar</div>
           </div>
-          <div class="tut-quad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
+          <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
+          <button class="tut-next" id="tutNext">Avançar ›</button>
         </div>
 
         <!-- ============ MISSÃO DEMONSTRATIVA (tutorial) ============ -->
@@ -3012,7 +3029,7 @@
       applyConnUI();
       daniloWave(); // o QUAD recebe o aluno acenando
       var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
-      if (runTour || tutAberta) iniciarTutorial();
+      if (runTour || tutAberta) iniciarTutorial();   /* V0: instrução interrompida recomeça do início */
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
     });
   }
@@ -3082,15 +3099,15 @@
   });
 
   /* ==================================================================
-     TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) — roteiro em 19 etapas
-     · fundo escurece (4 painéis), o alvo fica iluminado (anel + seta)
-     · mascote QUAD no canto inferior direito; balão aponta para ele
-     · etapas com ação só avançam quando a ação é concluída
-     · progresso salvo (retoma na etapa em aberto); recompensas únicas
+     TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) — roteiro em etapas
+     · fundo escurece (4 painéis) e fica TRAVADO (sem rolagem por trás)
+     · alvo iluminado (anel + seta no ponto exato do clique)
+     · QUAD circula pela tela, com gestos conforme o assunto da fala
+     · balão claro aponta para o QUAD; avanço = toque na direita ou "Avançar"
+     · tutorial roda sempre com score/Coins zerados (é o começo do jogo)
      ================================================================== */
   var TUT_LS = { step: 'vq_tut_step', done: 'vq_tut_done', rew: 'vq_tut_rew' };
-  var tutOn = false, tutIdx = 0, tutExpect = null, tutRefazer = false, tutAvatarOk = false;
-  var tutRewarded = lsGet(TUT_LS.rew) === '1';
+  var tutOn = false, tutIdx = 0, tutExpect = null, tutAvatarOk = false;
   var TUT_PALAVROES = ['merda', 'porra', 'bosta', 'caralho', 'puta', 'fdp', 'cacete'];
 
   function tutSetCoins(v) {
@@ -3104,98 +3121,151 @@
     $('homeBoina').style.display = 'grid';
     var ch = $('chipBoina'); if (ch) ch.classList.remove('locked');
   }
+  function tutResetBoina() {
+    var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
+    if (it && it.classList.contains('comprado')) {
+      it.classList.remove('comprado');
+      it.querySelector('.li-preco').textContent = '20 QdC';
+    }
+    lojaOwned['Boina exclusiva'] = false;
+    $('equipBoina').style.display = 'none';
+    $('homeBoina').style.display = 'none';
+    var ch = $('chipBoina'); if (ch) ch.classList.add('locked');
+  }
   function tutDadosOk() {
     return $('nomeCompleto').value.trim().length >= 5 && $('foneAluno').value.replace(/\D/g, '').length >= 8;
   }
   function tutGuerraOk() {
-    var v = $('nomeGuerra').value.trim().toLowerCase();
+    var v = $('nomeGuerra').value.trim();
     if (v.length < 2) return false;
-    return !TUT_PALAVROES.some(function (p) { return v.indexOf(p) >= 0; });
+    if (!/^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/.test(v)) return false;   /* só letras */
+    var lo = v.toLowerCase();
+    return !TUT_PALAVROES.some(function (p) { return lo.indexOf(p) >= 0; });
   }
+  function tutGuerra() { return ($('nomeGuerra').value.trim() || 'Moura').toUpperCase(); }
 
+  /* mood: gesto do QUAD conforme o assunto · bot: canto onde ele aparece */
   var TUT = [
-    { view: 'v-inicio', sel: null,
-      txt: 'Seja bem-vindo ao <b>Viver o Quad</b>! Eu sou o <b>QUAD</b> e vou te ajudar nos primeiros passos dentro do nosso aplicativo.' },
-    { sel: '#btnAvatarPerfil', expect: 'abrir-perfil',
-      txt: 'Para começarmos, <b>clique na imagem do personagem</b> que aparece na parte superior esquerda da tela.' },
-    { view: 'v-aluno', sel: function () { return $('avGrid').closest('.p-card'); }, expect: 'avatar',
-      onEnter: function () { if (!tutRefazer) { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; } if (tutAvatarOk) return 'skip'; },
-      txt: 'É aqui que você escolhe o personagem que mais se parece com você e que vai te representar dentro do Viver o Quad. <b>Escolha o seu avatar.</b>' },
-    { sel: function () { return document.querySelector('.avatar-preview'); },
-      txt: '<b>Parabéns!</b> Esse será o personagem que vai te acompanhar durante toda a nossa jornada, até a sua <b>aprovação no concurso</b>.' },
-    { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados',
+    { view: 'v-inicio', sel: null, mood: 'wave', bot: 'br',
+      txt: 'Oi! Eu sou o <b>QUAD</b>, seu companheiro aqui dentro. Vem comigo: em poucos minutos te mostro o essencial.' },
+    { sel: '#btnAvatarPerfil', expect: 'abrir-perfil', mood: 'point', bot: 'bl',
+      txt: 'Primeiro, <b>toque na sua foto</b>, ali em cima à esquerda. É por ela que você entra no seu perfil.' },
+    { view: 'v-aluno', sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
+      onEnter: function () { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; if (tutAvatarOk) return 'skip'; },
+      txt: 'Esse é o seu time de personagens. <b>Toque no que mais parece com você</b> — ele vai te representar por aqui.' },
+    { sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'cheer', bot: 'br',
+      txt: '<b>Boa escolha!</b> Esse aí vai te acompanhar até a aprovação.' },
+    { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'bob', bot: 'bl',
       onEnter: function () { if (tutDadosOk()) return 'skip'; },
-      txt: 'Agora precisamos completar o seu perfil. <b>Preencha os seus dados pessoais</b> — nome completo e telefone — para continuarmos.' },
-    { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra',
+      txt: 'Agora me conta quem você é: preencha o seu <b>nome completo</b> e o seu <b>telefone</b>.' },
+    { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra', mood: 'bob', bot: 'br',
       onEnter: function () { if (tutGuerraOk()) return 'skip'; },
-      txt: 'Chegamos a uma parte muito importante: o seu <b>nome de guerra</b>. Pode ser um dos seus nomes, um sobrenome ou outra forma pela qual deseja ser identificado. Ele será exibido junto à sua classificação durante toda a jornada. <b>Digite o seu nome de guerra.</b>' },
-    { sel: '#btnSalvarPerfil', expect: 'salvo',
-      txt: 'Está tudo pronto! Agora <b>clique em “Salvar alterações”</b> para concluir a criação do seu perfil.' },
-    { view: 'v-inicio', sel: '#homeNome',
-      txt: 'Agora você possui uma <b>identificação militar</b> dentro do Viver o Quad. No exemplo <b>AL SD QUAD MOURA</b>: <b>AL</b> significa Aluno, <b>SD</b> significa Soldado, <b>QUAD</b> representa a nossa casa — o Quad — e <b>Moura</b> é o nome de guerra escolhido por você.' },
-    { sel: function () { return document.querySelector('.rank-line'); },
-      txt: 'Esta é a sua <b>insígnia atual</b>. Você está começando como <b>Aluno Soldado Quad</b>. Para evoluir para as próximas classificações, você precisará acumular <b>score</b> e cumprir os requisitos de progressão.' },
-    { sel: function () { return $('xpNum').parentElement; },
-      txt: 'Este é o seu <b>score</b>: ele representa o seu desempenho e a sua evolução aqui dentro. Como você acabou de começar, ele ainda está <b>zerado</b>. Vamos aprender a ganhar os seus primeiros pontos?' },
-    { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco',
-      txt: 'Esta é uma das <b>missões</b> do Viver o Quad. Para ganhar score, você cumpre atividades e responde questões. <b>Clique em “Continuar missão”</b> para começar.' },
-    { view: 'v-missoes', sel: '#novaMissaoCard', expect: 'missao',
+      txt: 'Hora do <b>nome de guerra</b> — como todo mundo vai te chamar aqui. Pode ser um nome, um sobrenome, o que te representar. Digita aí (só letras, sem palavrão).' },
+    { sel: '#btnSalvarPerfil', expect: 'salvo', mood: 'point', bot: 'tr',
+      txt: 'Tudo certo? Então <b>toque em “Salvar alterações”</b> para gravar o seu perfil.' },
+    { view: 'v-inicio', sel: '#homeNome', mood: 'talk', bot: 'br',
+      txt: function () {
+        var g = tutGuerra();
+        return 'Olha só: agora você é <b>AL SD QUAD ' + g + '</b>. AL de Aluno, SD de Soldado, QUAD porque essa é a nossa casa — e <b>' + g + '</b>, o nome que você escolheu.';
+      } },
+    { sel: function () { return document.querySelector('.rank-line'); }, mood: 'talk', bot: 'bl',
+      txt: 'Essa é a sua <b>insígnia</b> de Aluno Soldado Quad — a primeira da carreira. Subir de patente só depende de você.' },
+    { sel: function () { return $('xpNum').parentElement; }, mood: 'talk', bot: 'br',
+      txt: 'E esse é o seu <b>score</b>: ele mede a sua evolução. Está <b>zerado</b> porque você acabou de chegar. Bora ganhar os primeiros pontos?' },
+    { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco', mood: 'point', bot: 'tr',
+      txt: 'Missão cumprida vale score. <b>Toque em “Continuar missão”</b> e vem responder comigo.' },
+    { view: 'v-missoes', sel: '#novaMissaoCard', expect: 'missao', mood: 'point', bot: 'br',
       onEnter: function () {
         var c = $('novaMissaoCard');
         c.style.display = 'block';
         c.innerHTML = '<div class="k-label">Nova missão · Instrução inicial</div>' +
           '<h3>Primeira missão — 3 questões</h3>' +
-          '<p class="sub">Curta e direta, para você sentir como nascem o score e os Quad Coins.</p>' +
+          '<p class="sub">Rapidinha, só para você sentir o gosto de pontuar.</p>' +
           '<div style="margin-top:10px"><button class="btn" id="btnTutMissao" style="width:100%">Iniciar missão</button></div>';
         $('btnTutMissao').addEventListener('click', tqAbrir);
       },
-      txt: 'Aqui estão as suas missões. Esta é a sua <b>primeira missão</b>: três questões simples. <b>Clique em “Iniciar missão”</b> para responder.' },
-    { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; },
-      txt: 'Está vendo? Antes o seu score estava <b>zerado</b> — agora você já conquistou os seus <b>primeiros pontos</b>.' },
-    { sel: '#coinsCard',
-      txt: 'Além do score, você também ganhou <b>Quad Coins</b> — a moeda virtual do Viver o Quad. Com ela você adquire itens, acessórios e personalizações para o seu personagem.' },
-    { sel: function () { return document.querySelector('#navAluno .nav-btn[data-view="v-loja"]'); }, expect: 'loja',
-      txt: 'Agora que você já ganhou os seus primeiros Quad Coins, vou te mostrar como utilizá-los. <b>Clique em “Loja”.</b>' },
-    { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens',
+      txt: 'Sua primeira missão: <b>3 questões</b> rapidinhas. <b>Toque em “Iniciar missão”.</b>' },
+    { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; }, mood: 'cheer', bot: 'br',
+      txt: 'Viu? <b>Score na conta.</b> Antes zerado, agora com os seus primeiros pontos — é assim que a sua evolução aparece.' },
+    { sel: '#coinsCard', mood: 'talk', bot: 'bl',
+      txt: 'E tem mais: você também ganhou <b>Quad Coins</b>, a nossa moeda. Com ela você compra itens e vantagens na <b>Loja</b>.' },
+    { sel: function () { return document.querySelector('#navAluno .nav-btn[data-view="v-loja"]'); }, expect: 'loja', mood: 'point', bot: 'tr',
+      txt: 'Vamos gastar? <b>Toque em “Loja”</b>, aí embaixo à direita.' },
+    { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens', mood: 'talk', bot: 'br',
       onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
-      txt: 'Aqui você encontra <b>itens para personalizar o seu personagem</b>. <b>Toque na área dos itens</b> para visualizar o que está disponível.' },
-    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, expect: 'boina',
-      onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
-      txt: 'Vamos utilizar os Quad Coins que você acabou de ganhar. <b>Clique em “Boina exclusiva”</b> para adquirir o seu primeiro item por <b>20 QdC</b>.' },
-    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); },
-      txt: '<b>Pronto!</b> Você acaba de comprar o seu primeiro produto — viu como é simples? Observe que o seu <b>saldo de Quad Coins diminuiu</b> após a compra. A boina já foi <b>aplicada automaticamente</b> ao seu personagem.' },
-    { view: 'v-inicio', sel: '#btnAvatarPerfil',
-      txt: 'Olhe para o seu personagem: ele agora está <b>usando a boina</b> que você acabou de adquirir. Os itens comprados na Loja personalizam o seu avatar durante a evolução.' },
-    { sel: null, btn: 'Concluir instrução',
-      txt: 'Agora você já sabe criar o seu perfil, escolher o personagem, <b>ganhar score</b>, conquistar <b>Quad Coins</b> e comprar itens na <b>Loja</b>. Várias outras áreas estão disponíveis para você descobrir. Explore, cumpra as suas missões e continue evoluindo até a sua <b>aprovação</b>. Sucesso — nos encontramos na caminhada!' }
+      txt: 'Aqui é onde você equipa o seu personagem. <b>Toque na área de itens</b> para ver o que tem.' },
+    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, expect: 'boina', mood: 'point', bot: 'bl',
+      txt: 'Essa <b>boina custa 20 Coins</b> — e você tem 25. <b>Toque nela</b> e garanta o seu primeiro item.' },
+    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, mood: 'cheer', bot: 'br',
+      txt: '<b>Comprou!</b> Repare que o saldo caiu: Coin entra com missão, sai com compra. A boina já foi direto para o seu personagem.' },
+    { view: 'v-inicio', sel: '#btnAvatarPerfil', mood: 'cheer', bot: 'bl',
+      txt: 'Olha ele aí de <b>boina nova</b>! Tudo o que você conquistar na Loja aparece no seu avatar.' },
+    { sel: null, mood: 'salute', bot: 'br', btn: 'Concluir ›',
+      txt: 'Pronto — você já sabe o principal: <b>perfil, missões, score, Coins e Loja</b>. O resto você descobre explorando, e eu fico por aqui se precisar. Bons estudos, e até a aprovação!' }
   ];
 
-  function tutMask(el) {
+  function tutMask(el, arrowEl) {
     var scr = $('screen').getBoundingClientRect();
     var T = $('tutShT'), B = $('tutShB'), L = $('tutShL'), R = $('tutShR');
-    var ring = $('tutRing'), arrow = $('tutArrow'), bub = $('tutBubble');
+    var ring = $('tutRing'), arrow = $('tutArrow');
     function setBox(p, x, y, w, h) { p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.width = Math.max(0, w) + 'px'; p.style.height = Math.max(0, h) + 'px'; }
+    var alvoY = null;
     if (!el) {
       setBox(T, 0, 0, scr.width, scr.height); setBox(B, 0, 0, 0, 0); setBox(L, 0, 0, 0, 0); setBox(R, 0, 0, 0, 0);
       ring.style.display = 'none'; arrow.style.display = 'none';
-      bub.classList.remove('top');
-      return;
+    } else {
+      var r = el.getBoundingClientRect(), pad = 6;
+      var x = Math.max(0, r.left - scr.left - pad), y = Math.max(0, r.top - scr.top - pad);
+      var w = Math.min(scr.width - x, r.width + pad * 2), h = Math.min(scr.height - y, r.height + pad * 2);
+      setBox(T, 0, 0, scr.width, y);
+      setBox(B, 0, y + h, scr.width, scr.height - y - h);
+      setBox(L, 0, y, x, h);
+      setBox(R, x + w, y, scr.width - x - w, h);
+      ring.style.display = 'block';
+      ring.style.left = x + 'px'; ring.style.top = y + 'px'; ring.style.width = w + 'px'; ring.style.height = h + 'px';
+      /* setinha no ponto exato do clique (pode ser um filho do quadro destacado) */
+      var ar = (arrowEl || el).getBoundingClientRect();
+      var ax = ar.left - scr.left + ar.width / 2 - 12;
+      var acima = (ar.top - scr.top) > 46;
+      arrow.style.display = 'block';
+      arrow.textContent = acima ? '▼' : '▲';
+      arrow.style.left = Math.max(6, Math.min(scr.width - 30, ax)) + 'px';
+      arrow.style.top = acima ? (ar.top - scr.top - 32) + 'px' : (ar.top - scr.top + ar.height + 8) + 'px';
+      alvoY = { y: y, h: h };
     }
-    var r = el.getBoundingClientRect(), pad = 6;
-    var x = Math.max(0, r.left - scr.left - pad), y = Math.max(0, r.top - scr.top - pad);
-    var w = Math.min(scr.width - x, r.width + pad * 2), h = Math.min(scr.height - y, r.height + pad * 2);
-    setBox(T, 0, 0, scr.width, y);
-    setBox(B, 0, y + h, scr.width, scr.height - y - h);
-    setBox(L, 0, y, x, h);
-    setBox(R, x + w, y, scr.width - x - w, h);
-    ring.style.display = 'block';
-    ring.style.left = x + 'px'; ring.style.top = y + 'px'; ring.style.width = w + 'px'; ring.style.height = h + 'px';
-    var acima = y > 46;
-    arrow.style.display = 'block';
-    arrow.textContent = acima ? '▼' : '▲';
-    arrow.style.left = (x + w / 2 - 12) + 'px';
-    arrow.style.top = acima ? (y - 32) + 'px' : (y + h + 6) + 'px';
-    bub.classList.toggle('top', y + h > scr.height * 0.52);
+    tutPlace(scr, alvoY);
+  }
+  /* posiciona QUAD + balão: balão no lado vertical oposto ao alvo; rabinho aponta para o robô */
+  function tutPlace(scr, alvo) {
+    var st = TUT[tutIdx] || {};
+    var bub = $('tutBubble'), bot = $('tutQuad');
+    var emCima = alvo ? (alvo.y + alvo.h > scr.height * 0.52) : false;   /* alvo embaixo → balão em cima */
+    var lado = (st.bot || 'br').indexOf('l') >= 0 ? 'l' : 'r';
+    if ((st.bot || '').indexOf('t') === 0) emCima = true;
+    bot.classList.toggle('flip', lado === 'l');
+    if (emCima) {
+      bot.style.top = '56px'; bot.style.bottom = 'auto';
+      bub.style.top = '150px'; bub.style.bottom = 'auto';
+      bub.className = 'tut-bubble tail-t' + lado;
+    } else {
+      bot.style.top = (scr.height - 92) + 'px'; bot.style.bottom = 'auto';
+      bub.style.top = (scr.height - 92 - 14) + 'px'; bub.style.bottom = 'auto';
+      bub.style.top = 'auto'; bub.style.bottom = '100px';
+      bub.className = 'tut-bubble tail-b' + lado;
+    }
+    bot.style.left = lado === 'l' ? '-4px' : (scr.width - 114) + 'px';
+    /* "Avançar" não fica embaixo do robô quando ele ocupa o canto inferior direito */
+    $('tutNext').style.right = (!emCima && lado === 'r') ? '124px' : '16px';
+  }
+  function tutMood(mood) {
+    var bot = $('tutQuad'), sp = $('tutSprite');
+    bot.className = bot.className.replace(/ ?mood-\w+/g, '');
+    void bot.offsetWidth;   /* reinicia a animação */
+    bot.classList.add('mood-' + (mood || 'talk'));
+    var seq = { wave: [0,1,2,3,4,5,6,5,6,5,4,3,2,1,0], cheer: [0,2,4,6,4,6,4,2,0], point: [0,1,2,2], salute: [0,1,2,3,3,2,1,0], talk: [0], bob: [0] }[mood || 'talk'] || [0];
+    seq.forEach(function (fr, i) {
+      setTimeout(function () { sp.style.backgroundPosition = (-fr * 118) + 'px 0'; }, i * 160);
+    });
   }
   function tutGo(i) {
     tutIdx = i;
@@ -3206,37 +3276,53 @@
     var skip = st.onEnter ? st.onEnter() : null;
     if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
     tutExpect = st.expect || null;
-    $('tutText').innerHTML = st.txt;
-    $('tutStepN').textContent = 'etapa ' + (i + 1) + ' de ' + TUT.length;
-    $('tutNext').style.display = st.expect ? 'none' : 'inline-block';
-    $('tutNext').textContent = st.btn || 'Continuar';
-    $('tutWait').style.display = st.expect ? 'inline' : 'none';
-    tutWave();
+    $('tutText').innerHTML = typeof st.txt === 'function' ? st.txt() : st.txt;
+    $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
+    $('tutNext').style.display = st.expect ? 'none' : 'block';
+    $('tutNext').textContent = st.btn || 'Avançar ›';
+    $('tutWait').style.display = st.expect ? 'block' : 'none';
+    tutMood(st.mood);
     setTimeout(function () {
       var el = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
       if (el) el.scrollIntoView({ block: 'center' });
       setTimeout(function () {
         var el2 = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
-        tutMask(el2);
+        var ar = st.arrow ? document.querySelector(st.arrow) : null;
+        tutMask(el2, ar);
       }, 340);
     }, 90);
   }
+  function tutAvanca() { if (tutOn && !tutExpect) tutGo(tutIdx + 1); }
   function tutEvent(name) {
     if (!tutOn || tutExpect !== name) return;
     tutExpect = null;
     setTimeout(function () { tutGo(tutIdx + 1); }, 450);
   }
-  $('tutNext').addEventListener('click', function () { if (!tutExpect) tutGo(tutIdx + 1); });
+  /* falas sem ação: qualquer toque do meio para a direita avança (sombra,
+     janela, balão ou o próprio "Avançar" — um caminho só, sem avanço duplo) */
+  document.addEventListener('click', function (e) {
+    if (!tutOn || tutExpect) return;
+    if ($('tqLayer').style.display === 'flex') return;
+    var scr = $('screen').getBoundingClientRect();
+    if (e.clientX - scr.left > scr.width * 0.35) tutAvanca();
+  }, true);
+  /* fundo travado: sem rolagem por trás do filtro escuro */
+  document.addEventListener('wheel', function (e) {
+    if (tutOn && $('tqLayer').style.display !== 'flex') e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchmove', function (e) {
+    if (tutOn && $('tqLayer').style.display !== 'flex') e.preventDefault();
+  }, { passive: false });
 
   function tutErro(qual) {
     var mapa = {
-      avatar: [function () { return $('avGrid').closest('.p-card'); }, 'Falta <b>escolher o seu avatar</b> — toque em um dos personagens.'],
-      nome: [function () { return $('nomeCompleto').closest('.p-card'); }, 'Falta o seu <b>nome completo</b> — preencha para continuar.'],
-      fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Falta o seu <b>telefone</b> — preencha para continuar.'],
-      guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Falta um <b>nome de guerra válido</b> (mínimo 2 letras, sem palavras ofensivas).']
+      avatar: [function () { return $('avGrid').closest('.p-card'); }, 'Calma, guerreiro: primeiro <b>escolha o seu avatar</b> — toque em um dos personagens.'],
+      nome: [function () { return $('nomeCompleto').closest('.p-card'); }, 'Faltou o seu <b>nome completo</b>. Preenche ali para a gente seguir.'],
+      fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Faltou o seu <b>telefone</b>. Preenche ali para a gente seguir.'],
+      guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Seu <b>nome de guerra</b> precisa de pelo menos 2 letras — só letras, sem palavrão.']
     }[qual];
     $('tutText').innerHTML = mapa[1];
-    if (qual === 'avatar' && !tutRefazer) { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
+    if (qual === 'avatar') { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
     var el = mapa[0]();
     el.scrollIntoView({ block: 'center' });
     setTimeout(function () { tutMask(mapa[0]()); }, 340);
@@ -3246,7 +3332,7 @@
   document.addEventListener('click', function (e) {
     if (!tutOn) return;
     if (tutExpect === 'salvo' && e.target.closest('#btnSalvarPerfil')) {
-      var falta = (!tutAvatarOk && !tutRefazer) ? 'avatar' :
+      var falta = !tutAvatarOk ? 'avatar' :
         ($('nomeCompleto').value.trim().length < 5 ? 'nome' :
         ($('foneAluno').value.replace(/\D/g, '').length < 8 ? 'fone' : (!tutGuerraOk() ? 'guerra' : null)));
       if (falta) { e.stopPropagation(); e.preventDefault(); tutErro(falta); return; }
@@ -3304,23 +3390,17 @@
     });
   }
   function tqResultado() {
-    var ganha = !tutRewarded;
     $('tqProg').textContent = 'Missão concluída';
     $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">✓ Primeira missão cumprida!</p>' +
-      (ganha
-        ? '<p class="sub" style="margin:8px 0 14px">Você ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>'
-        : '<p class="sub" style="margin:8px 0 14px">Missão de instrução refeita — as recompensas do tutorial são recebidas <strong>uma única vez</strong>.</p>') +
+      '<p class="sub" style="margin:8px 0 14px">Você ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>' +
       '<button class="btn" id="tqFim" style="width:100%">Continuar</button></div>';
     $('tqFim').addEventListener('click', function () {
-      if (ganha) {
-        carreira.scorePatente += TUT_REW.score;
-        carreira.scoreCarreira += TUT_REW.score;
-        carreira.scoreTemporada += TUT_REW.score;
-        renderCarreira();
-        addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · missão de instrução');
-        tutRewarded = true; lsSet(TUT_LS.rew, '1');
-      }
+      carreira.scorePatente += TUT_REW.score;
+      carreira.scoreCarreira += TUT_REW.score;
+      carreira.scoreTemporada += TUT_REW.score;
+      renderCarreira();
+      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · missão de instrução');
       $('tqLayer').style.display = 'none';
       showView('v-inicio', 'navAluno');
       $('tutLayer').classList.add('on');
@@ -3328,32 +3408,27 @@
     });
   }
 
-  function tutWave() {
-    var sp = $('tutSprite');
-    [0, 1, 2, 3, 2, 3, 1, 0].forEach(function (fr, i) {
-      setTimeout(function () { sp.style.backgroundPosition = (-fr * 118) + 'px 0'; }, i * 150);
-    });
-  }
-  function iniciarTutorial(refazer) {
-    tutOn = true; tourOn = true; tutRefazer = !!refazer;
+  function iniciarTutorial() {
+    tutOn = true; tourOn = true;
     $('daniloFab').style.display = 'none';
     $('daniloHint').style.display = 'none';
     $('tutSprite').style.backgroundImage = getComputedStyle($('fabSprite')).backgroundImage;
-    var primeiraVez = lsGet(TUT_LS.done) !== '1';
-    if (!refazer && primeiraVez) {
-      /* conta recém-criada: score e Quad Coins começam zerados (etapa 9 do roteiro) */
-      tutSetCoins(0);
-      carreira.scorePatente = 0; carreira.scoreCarreira = 0; carreira.scoreTemporada = 0;
-      carreira.estado = 'acumulando'; renderCarreira();
+    $('tutSprite').style.backgroundPosition = '0 0';
+    /* é o começo do jogo: tutorial roda SEMPRE do zero — score e Coins zerados,
+       boina devolvida; ao fim o aluno sai com +30 score, 5 Coins e a boina
+       (estado final constante — refazer não acumula nada) */
+    tutSetCoins(0);
+    carreira.scorePatente = 0; carreira.scoreCarreira = 0; carreira.scoreTemporada = 0;
+    carreira.estado = 'acumulando'; renderCarreira();
+    tutResetBoina();
+    if (lsGet(TUT_LS.done) !== '1') {
       $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';
       tutAvatarOk = false;
-      $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none';
     } else { tutAvatarOk = true; }
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
     $('tutLayer').classList.add('on');
-    var salvo = parseInt(lsGet(TUT_LS.step) || '0', 10);
-    tutGo(!refazer && primeiraVez && salvo > 0 && salvo < TUT.length ? salvo : 0);
+    tutGo(0);
   }
   function tutFim() {
     lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0');
@@ -3363,7 +3438,7 @@
     toast('Instrução inicial concluída — plataforma liberada!');
     daniloWave();
   }
-  $('btnRefazerTut').addEventListener('click', function () { iniciarTutorial(true); });
+  $('btnRefazerTut').addEventListener('click', iniciarTutorial);
   window.addEventListener('resize', function () { if (tutOn) tutGo(tutIdx); });
 
   /* ---------- sair da conta ---------- */

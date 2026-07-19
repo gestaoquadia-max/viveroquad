@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial do QUAD: revisão de UX pelo fundador
+- **Balão claro**: fundo branco com texto escuro e palavras-chave em azul
+  (o azul sólido estava carregado); rabinho sempre apontando para o QUAD
+- **Avanço discreto**: sem botão dentro do balão — "Avançar ›" pequeno na
+  parte inferior e **qualquer toque do meio para a direita da tela** passa a
+  fala (nas etapas de ação continua valendo só a ação)
+- **QUAD circula pela tela**: aparece em cantos diferentes conforme a etapa
+  (inferior direito/esquerdo, superior direito) com **gestos por assunto** —
+  acena na chegada, aponta nas ações, comemora nas conquistas, continência
+  no encerramento (sprite + animações CSS); mesmo robô do mascote do canto
+- **Destaque da escolha de avatar corrigido**: ilumina o quadrado inteiro
+  e a setinha indica exatamente o grid de personagens
+- **Fundo travado de verdade**: roda do mouse e arrasto não rolam mais a
+  tela atrás do filtro escuro (preventDefault em wheel/touchmove)
+- **Textos reescritos** em linguagem humana e direta ("Oi! Eu sou o QUAD…"),
+  com o nome de guerra real do aluno interpolado na fala da identificação
+- **Score sempre zerado no tutorial** (é o começo do jogo): também no
+  Refazer — zera score/Coins, devolve a boina à Loja e o estado final é
+  constante (+30 score, 5 Coins e boina), sem acúmulo por repetição
+- Nome de guerra agora aceita **apenas letras**; retomada V0 recomeça a
+  instrução do início (sem backend não há estado do meio para restaurar)
+
+
 ## 19/07/2026 — tutorial obrigatório do QUAD (roteiro completo de 19 etapas)
 - **Mascote renomeado para QUAD** (robô do canto); tutorial substitui o tour
   antigo de 9 passos e segue o roteiro oficial do fundador
