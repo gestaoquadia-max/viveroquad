@@ -2871,7 +2871,8 @@
     syncNametag();
     renderCarreira();
     aplicarAvatar();
-    toast('Perfil salvo — já aparece no Início');
+    showView('v-inicio', 'navAluno'); // salvar leva de volta ao Início
+    toast('Perfil salvo — bem-vindo de volta ao Início!');
   });
 
   function estadoLabel() {
