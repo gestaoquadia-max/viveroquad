@@ -2833,6 +2833,16 @@
     }
   };
   var ALUNO_TURMA = 'PATAMO NOITE';   /* vem da matrícula do aluno */
+  // [INTEGRAÇÃO REAL] a turma vem do cadastro geral do site; aqui, o valor
+  // confirmado no cadastro ("TURMA PATAMO (N)") vira a turma do app inteiro
+  function sincronizarTurma(rotulo) {
+    var m = /^TURMA\s+(.+?)\s*\(([NMT])\)$/i.exec((rotulo || '').trim());
+    if (!m) { return; }
+    ALUNO_TURMA = m[1].toUpperCase() + ' ' +
+      ({ N: 'NOITE', M: 'MANHÃ', T: 'TARDE' })[m[2].toUpperCase()];
+    renderCarreira();   /* card do Início, Quadrômetro, perfil, ranking da sala */
+    renderAulaHoje();   /* Aula de hoje segue o cronograma da turma */
+  }
   function turmaLabel() {
     if (typeof ALUNO_TURMA === 'undefined' || !ALUNO_TURMA) { return ''; }
     var partes = ALUNO_TURMA.split(' ');
@@ -3166,7 +3176,7 @@
       ['cadNome', 'Vitor Santos de Almeida'],
       ['cadCpf', '***.482.915-**'],
       ['cadFone', '(71) 9 8877-2301'],
-      ['cadTurma', 'PC-BA Noite · PATAMO'],
+      ['cadTurma', 'TURMA PATAMO (N)'],
       ['cadMatricula', 'QD-2026-0341']
     ];
     cadTimers.forEach(clearTimeout); cadTimers = [];
@@ -3201,6 +3211,7 @@
   });
   $('btnConcluir').addEventListener('click', function () {
     currentEmail = $('cadEmail').value.trim() || currentEmail;
+    sincronizarTurma($('cadTurma').value); // a turma cadastrada passa a valer no app todo
     // primeiro acesso: autoriza o dispositivo e, ao continuar, roda o tour obrigatório
     concederAcesso(true);
   });

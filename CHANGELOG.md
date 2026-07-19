@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — turma do cadastro sincroniza o app inteiro
+- O cadastro automático agora preenche **TURMA PATAMO (N)** (antes vinha
+  "PC-BA Noite · PATAMO", um formato que não existia no app)
+- Ao concluir o cadastro, a turma confirmada **passa a valer no app
+  todo**: card do Início, Quadrômetro, perfil, ranking da sala e o
+  cronograma da "Aula de hoje" — espelho do cadastro geral da turma no
+  site (`[INTEGRAÇÃO REAL]` marcado no código)
+- Verificado com outra turma no campo (TURMA RONDESP (M)) para provar a
+  sincronização de ponta a ponta; suíte `vconta` agora com 5 cenários
+
 ## 19/07/2026 — "Criar conta" de volta à validação por e-mail
 - A tela do código ganhou a quarta saída que faltava: **"Ainda não tem
   conta? Criar conta"** — é a criação da conta que dispara a automação
