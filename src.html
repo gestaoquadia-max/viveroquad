@@ -884,6 +884,7 @@
   .rk-row.me .rk-pos, .rk-row.me .rk-nome { color: #9A6B00; font-weight: 800; }
   .rk-row.me .rk-pts { color: #9A6B00; }
   .rk-row.top3 .rk-pos { color: var(--p-gold); font-weight: 800; }
+  .rk-toggle { width: 100%; margin-top: 10px; }
   .rk-sep { text-align: center; color: var(--p-dim); font: 700 13px var(--ui); padding: 4px 0; letter-spacing: .3em; }
 
   /* ---------- balão do Danilo (ao lado do robô, no rodapé) ---------- */
@@ -2984,36 +2985,49 @@
     for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, arr[j - 1] - RK_OFF[(j * 5) % RK_OFF.length]);
     return arr;
   }
+  var rkOpen = { sala: false, geral: false };
   function renderRankings() {
     var elS = $('rankSalaList'), elG = $('rankGeralList');
     if (!elS || !elG) return;
     // sala: 42 alunos, aluno em 12º
     var sTot = 42, sPos = 12, sc = rkScores(sTot, sPos, carreira.scoreCarreira);
-    var html = '';
-    for (var i = 1; i <= sTot; i++) {
-      if (i === sPos) { html += rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false); continue; }
+    function salaRow(i) {
+      if (i === sPos) return rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false);
       var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
-      html += rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3);
+      return rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3);
     }
+    var html = '';
+    if (rkOpen.sala) {
+      for (var i = 1; i <= sTot; i++) html += salaRow(i);
+    } else {
+      for (var i2 = sPos - 2; i2 <= sPos + 2; i2++) html += salaRow(i2);
+    }
+    html += '<button class="btn ghost small rk-toggle" id="rkSalaBtn">' + (rkOpen.sala ? 'Mostrar menos' : 'Ver ranking completo · 42 alunos') + '</button>';
     elS.innerHTML = html;
-    // geral: 1.286 usuários, aluno em 87º — top 10, vizinhança do aluno e o último
+    $('rkSalaBtn').onclick = function () { rkOpen.sala = !rkOpen.sala; renderRankings(); };
+    // geral: 1.286 usuários, aluno em 87º
     var gTot = 1286, gPos = 87;
     var topPref = ['CEL QUAD ', 'TC QUAD ', 'MAJ QUAD ', 'CAP QUAD ', 'TEN QUAD ', 'ASP QUAD ', 'SGT QUAD ', 'SGT QUAD ', 'CB QUAD ', 'CB QUAD '];
-    var g = '';
-    var topBase = 24870;
-    for (var t = 1; t <= 10; t++) {
-      g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3);
-    }
-    g += '<div class="rk-sep">···</div>';
-    var gv = rkScores(gPos + 4, gPos, carreira.scoreCarreira);
-    for (var v = gPos - 2; v <= gPos + 2; v++) {
-      if (v === gPos) { g += rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false); continue; }
+    var gv = rkScores(gPos + 12, gPos, carreira.scoreCarreira);
+    function geralRow(v) {
+      if (v === gPos) return rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false);
       var pf = (v % 2 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
-      g += rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false);
+      return rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false);
     }
-    g += '<div class="rk-sep">···</div>';
-    g += rkRow(gTot, 'AL SD QUAD ' + RK_NOMES[19], 15, false, false);
+    var g = '';
+    if (rkOpen.geral) {
+      var topBase = 24870;
+      for (var t = 1; t <= 10; t++) g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3);
+      g += '<div class="rk-sep">···</div>';
+      for (var v = gPos - 10; v <= gPos + 10; v++) g += geralRow(v);
+      g += '<div class="rk-sep">···</div>';
+      g += rkRow(gTot, 'AL SD QUAD ' + RK_NOMES[19], 15, false, false);
+    } else {
+      for (var v2 = gPos - 2; v2 <= gPos + 2; v2++) g += geralRow(v2);
+    }
+    g += '<button class="btn ghost small rk-toggle" id="rkGeralBtn">' + (rkOpen.geral ? 'Mostrar menos' : 'Ver ranking completo · 1.286 usuários') + '</button>';
     elG.innerHTML = g;
+    $('rkGeralBtn').onclick = function () { rkOpen.geral = !rkOpen.geral; renderRankings(); };
   }
 
   function renderHistorico() {
