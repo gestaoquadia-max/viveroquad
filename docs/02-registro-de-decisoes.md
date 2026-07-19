@@ -19,6 +19,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 12 | 14/07 | Efeito **engrenagem**: cartões giram em 3D na rolagem + scroll infinito | Conteúdo triplicado em segmentos; fim liga com o início; pausado durante o tour |
 | 13 | 16/07 | **Danilo Moura (Fundador) assume o controle do projeto** | Ele guia; execução com resumos de entendimento e perguntas em etapas |
 | 14 | 18/07 | Projeto versionado em Git para armazenamento no GitHub | Este repositório |
+| 15 | 19/07 | **Insígnias por dupla**: cada par Aluno/efetivo compartilha a arte (escala de evolução) | Decisão do gestor |
+| 16 | 19/07 | **Aluno Oficial Quad usa a insígnia do Aspirante** (sem arte própria) | Confirmado pelo gestor em 19/07 |
 
 ## Regras de trabalho vigentes
 
