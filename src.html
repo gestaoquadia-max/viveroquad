@@ -1479,7 +1479,6 @@
           </div>
 
           <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
-          <button class="btn ghost small" id="btnRefazerTut" style="width:100%; margin-top:10px">Refazer instrução inicial</button>
           <button class="btn ghost small btn-sair-conta" id="btnSairPerfil" style="width:100%; margin-top:10px">Sair da conta</button>
         </div>
 
@@ -3237,9 +3236,9 @@
     { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens', mood: 'talk', bot: 'br',
       onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
       txt: 'Essa é a área de <b>itens do seu personagem</b>. Toca pra dar uma olhada.' },
-    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, expect: 'boina', mood: 'point', bot: 'bl',
+    { sel: function () { return document.getElementById('tutLojaCard'); }, arrow: '.loja-item[data-nome="Boina exclusiva"]', expect: 'boina', mood: 'point', bot: 'bl',
       onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
-      txt: 'A <b>boina</b> custa 20 Coins e você tem 25. <b>Toca nela</b> e garante!' },
+      txt: 'Escolhe o seu primeiro item! Dica: a <b>boina</b> custa 20 Coins — e você tem 25.' },
     { sel: '#coinsCard', mood: 'cheer', bot: 'bl',
       txt: function () { return '<b>Comprou!</b> Olha o saldo ali em cima: tinha 25, ficou com <b>' + fmt(score) + ' Quad Coins</b>.'; } },
     { sel: '#coinsCard', mood: 'talk', bot: 'br',
@@ -3451,6 +3450,13 @@
       tutEvent('ver-itens');
     }
     else if (tutExpect === 'boina') {
+      var caro = e.target.closest('.loja-item:not([data-nome="Boina exclusiva"])');
+      if (caro) {
+        /* escolheu o item caro: o QUAD explica e devolve a escolha */
+        e.stopPropagation(); e.preventDefault();
+        tutSay('Infelizmente você <b>não pode comprar este item</b> — ele é mais caro do que o que você possui! Escolhe de novo: a <b>boina</b> cabe nos seus 25 Coins.', 'point');
+        return;
+      }
       var it = e.target.closest('.loja-item[data-nome="Boina exclusiva"]');
       if (it) setTimeout(function () { if (it.classList.contains('comprado')) { tutEquiparBoina(); tutEvent('boina'); } }, 120);
     }
@@ -3506,8 +3512,8 @@
     });
   }
   function tqResultado() {
-    if (tqAcertos === 0) {
-      /* errou as 3: o QUAD relança as perguntas — em loop até acertar */
+    if (tqAcertos < TQ.length) {
+      /* errou alguma: sem as 3 não há 25 Coins — o QUAD relança em loop */
       $('tqProg').textContent = 'Vamos de novo';
       $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
         '<p class="q-enun" style="font-size:15px">Você ainda não conseguiu pontos suficientes para avançarmos — vou lançar as perguntas novamente!</p>' +
@@ -3567,7 +3573,6 @@
     toast('Instrução inicial concluída — plataforma liberada!');
     daniloWave();
   }
-  $('btnRefazerTut').addEventListener('click', iniciarTutorial);
   window.addEventListener('resize', function () { if (tutOn) tutGo(tutIdx); });
 
   /* ---------- sair da conta ---------- */
@@ -3675,6 +3680,7 @@
     carreira.nomeGuerra = $('nomeGuerra').value.trim() || 'Moura';
     $('avNametag').textContent = nomeCurto();
     $('gwPreview').textContent = tituloCompleto();
+    $('homeNome').textContent = nomeCurto();   /* o nome principal muda ao vivo */
   }
   $('nomeGuerra').addEventListener('input', syncNametag);
   $('btnSalvarPerfil').addEventListener('click', function () {

@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial: nome ao vivo, missão 3 de 3 e bronca da skin
+- **Nome principal muda ao vivo**: enquanto o aluno digita o nome de guerra,
+  o card lá em cima já vira "AL SD QUAD <NOME>" na hora (não só ao salvar) —
+  vale no tutorial e no uso normal do Perfil do aluno
+- **Missão de instrução exige as 3 corretas**: acertar 2 de 3 também reprova
+  (sem as 3 não existem os 25 Quad Coins da jornada); o QUAD relança as
+  perguntas em loop até o aluno gabaritar
+- **Etapa da compra virou escolha real**: a vitrine inteira fica aberta; se
+  o aluno clicar na skin de 300 QdC, o QUAD avisa — "Infelizmente você não
+  pode comprar este item — ele é mais caro do que o que você possui!" — e
+  devolve a escolha, até ele pegar a boina; aí avança
+- **"Refazer instrução inicial" saiu do Perfil do aluno** — agora vive só na
+  central de tutoriais do mascote
+- Suíte: 60 verificações passando
+
 ## 19/07/2026 — central de tutoriais do QUAD (clique no mascote)
 - Clicar no robô não mostra mais a dica antiga mal diagramada: agora a tela
   **escurece**, o QUAD **cresce** (1,9×, acenando) e abre a caixa
