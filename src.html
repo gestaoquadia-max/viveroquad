@@ -215,6 +215,23 @@
   .ed-srow .ed-bar { width: 56px; height: 4px; flex: none; }
   .ed-srow .ed-pc { font: 600 11px Consolas, monospace; width: 34px; text-align: right; color: var(--p-dim); font-variant-numeric: tabular-nums; flex: none; }
 
+  /* aula de hoje (cronograma presencial) */
+  #aulaSlots { margin-top: 10px; }
+  .aula-slot { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--p-line); }
+  .aula-slot .a-hr {
+    font: 700 11px var(--ui); letter-spacing: 0.02em; color: var(--p-blue);
+    background: #EDF6FF; border-radius: 8px; padding: 5px 8px; flex: none;
+    font-variant-numeric: tabular-nums; min-width: 76px; text-align: center;
+  }
+  .aula-slot .a-info { flex: 1; min-width: 0; }
+  .aula-slot .a-info b { display: block; font: 700 13px var(--ui); }
+  .aula-slot .a-info span { display: block; font-size: 11.5px; color: var(--p-dim); margin-top: 1px; }
+  .aula-slot .a-st { font: 700 10px var(--ui); letter-spacing: 0.04em; border-radius: 99px; padding: 4px 8px; flex: none; }
+  .aula-slot.now .a-st { background: var(--p-gold); color: #3A2A00; }
+  .aula-slot.done { opacity: 0.55; }
+  .aula-slot.done .a-st { background: #E4EBF4; color: var(--p-dim); }
+  .aula-fonte { margin-top: 8px; font-size: 11px; }
+
   /* quiz overlay */
   .quiz-layer {
     position: absolute; inset: 0; background: var(--p-bg); z-index: 30;
@@ -1013,11 +1030,14 @@
           <div class="p-card" id="salaCard">
             <div class="card-head">
               <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg></div>
-              <div class="card-eyebrow">Aula de hoje <span class="tag blue-fill">19h–22h</span></div>
+              <div class="card-eyebrow">Aula de hoje</div>
               <span class="tag live sq" id="salaTag">SEM QUIZ ABERTO</span>
             </div>
-            <h3 class="aula-title" id="salaTitle">Direito Administrativo — Poderes</h3>
-            <p class="sub" id="salaSub">Sua próxima aula ao vivo. Prepare-se e avance na missão!</p>
+            <h3 class="aula-title" id="aulaTurma">—</h3>
+            <p class="sub" id="aulaDia">—</p>
+            <div id="aulaSlots"></div>
+            <p class="sub aula-fonte" id="aulaFonte"></p>
+            <p class="sub" id="salaSub">Quando o professor abrir o quiz da aula, ele aparece aqui.</p>
             <div style="margin-top:10px"><button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button></div>
           </div>
 
@@ -2461,6 +2481,79 @@
     showView('v-missoes', 'navAluno');
   });
 
+  /* ---------- aula de hoje · cronograma presencial ----------
+     Espelho da planilha "Cronograma semanal" da coordenação (Google Sheets).
+     Na V0 a semana vigente vem embutida (snapshot da semana 30); na V1 o app
+     sincroniza direto da planilha — o que for atualizado lá aparece aqui.
+     Estrutura avalia: dia da semana → turno → turma do aluno → 2 tempos.   */
+  var CRONO = {
+    semana: 30,
+    turno: 'NOITE',
+    slots: ['19h – 20h30', '20h30 – 22h'],
+    dias: ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'],
+    datas: ['20/07', '21/07', '22/07', '23/07', '24/07'],
+    turmas: {
+      'RONDESP NOITE': { sala: 'SALA 1', tipo: 'teoria', aulas: [
+        [{ e: 10, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 9, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 10, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 11, m: 'DIR. PENAL', p: 'Marcello Esquivel' }],
+        [{ e: 2, m: 'NAC', p: 'Danilo Moura' }, { e: 2, m: 'ATUALIDADES', p: 'Moab Kigran' }],
+        [{ e: 10, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 8, m: 'IGUALDADE', p: 'Bruno Araújo' }],
+        [{ e: 13, m: 'PORTUGUÊS', p: 'Alisson Lopes' }, { e: 4, m: 'PENAL MILITAR', p: 'Minho' }]
+      ] },
+      'PATAMO NOITE': { sala: 'SALA 4', tipo: 'teoria + questões', aulas: [
+        [{ e: 7, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 4, m: 'MATEMÁTICA', p: 'Dan Reis' }],
+        [{ e: 3, m: 'DIR. PENAL', p: 'Marcello Esquivel' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 3, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }],
+        [{ e: 7, m: 'GEOGRAFIA', p: 'Noelice' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 5, m: 'PENAL MILITAR', p: 'Minho' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }]
+      ] },
+      'BOPE': { sala: 'SALA 3', tipo: 'questões', aulas: [
+        [{ e: 2, m: 'MATEMÁTICA', p: 'Dan Reis' }, { e: 1, m: 'HISTÓRIA', p: 'Moab Kigran' }],
+        [{ e: 1, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 2, m: 'IGUALDADE', p: 'Bruno Araújo' }],
+        [{ e: 2, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 2, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }],
+        [{ e: 3, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 2, m: 'GEOGRAFIA', p: 'Noelice' }],
+        [{ e: 2, m: 'DIR. ADMIN.', p: 'Danilo Moura' }, { e: 2, m: 'REDAÇÃO', p: 'Rodrigo' }]
+      ] },
+      'CORE NOITE': { sala: 'SALA 2', tipo: 'questões', aulas: [
+        [{ e: 4, m: 'MED. LEGAL', p: 'Rodrigo' }, { e: 6, m: 'DIR. CONST.', p: 'John Bernam' }],
+        [{ e: 9, m: 'LEG. EXTRAVAGANTES', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'John Bernam' }],
+        [{ e: 4, m: 'MED. LEGAL', p: 'Rodrigo' }, { e: 5, m: 'LEG. GERAL', p: 'Alan' }],
+        [{ e: 7, m: 'IGUALDADE', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. CONST.', p: 'John Bernam' }],
+        [{ e: 4, m: 'DISCURSIVA', p: 'Rodrigo' }, { e: 11, m: 'PORTUGUÊS', p: 'Alisson Lopes' }]
+      ] }
+    }
+  };
+  var ALUNO_TURMA = 'PATAMO NOITE';
+  function renderAulaHoje() {
+    var t = CRONO.turmas[ALUNO_TURMA];
+    if (!t) { return; }
+    var agora = new Date();
+    var idx = agora.getDay() - 1;              /* seg=0 … sex=4 */
+    var temHoje = idx >= 0 && idx <= 4;
+    var showIdx = temHoje ? idx : 0;           /* sáb/dom → mostra segunda */
+    $('aulaTurma').textContent = ALUNO_TURMA + ' · ' + t.sala;
+    $('aulaDia').textContent =
+      (temHoje ? 'Hoje · ' : 'Sem aula da sua turma hoje · próxima: ') +
+      CRONO.dias[showIdx] + ' · ' + CRONO.datas[showIdx] +
+      ' · ' + CRONO.turno + ' · ' + t.tipo;
+    var mins = agora.getHours() * 60 + agora.getMinutes();
+    var faixas = [[19 * 60, 20 * 60 + 30], [20 * 60 + 30, 22 * 60]];
+    $('aulaSlots').innerHTML = t.aulas[showIdx].map(function (a, i) {
+      var cls = '', st = '';
+      if (temHoje) {
+        if (mins >= faixas[i][1]) { cls = ' done'; st = 'ENCERRADO'; }
+        else if (mins >= faixas[i][0]) { cls = ' now'; st = 'AGORA'; }
+      }
+      return '<div class="aula-slot' + cls + '"><span class="a-hr">' + CRONO.slots[i] + '</span>' +
+        '<div class="a-info"><b>' + a.m + '</b><span>Encontro ' + String(a.e).padStart(2, '0') +
+        ' · Prof. ' + a.p + '</span></div>' +
+        (st ? '<span class="a-st">' + st + '</span>' : '') + '</div>';
+    }).join('');
+    $('aulaFonte').textContent = 'Aula presencial · Cronograma semanal · Semana ' + CRONO.semana +
+      ' — atualizado pela planilha da coordenação.';
+  }
+  renderAulaHoje();
+
   /* ---------- professor: quiz ao vivo ---------- */
   var pollTimer = null, pollN = 0, quizLive = false;
   $('btnAbrirQuiz').addEventListener('click', function () {
@@ -2474,7 +2567,7 @@
     $('btnFinalizarQuiz').disabled = false;
     $('salaTag').textContent = 'QUIZ AO VIVO';
     $('salaTag').classList.add('live');
-    $('salaSub').textContent = 'O professor abriu o quiz de Poderes. Entre agora — pontua em Quad Coins.';
+    $('salaSub').textContent = 'O professor abriu o quiz da aula. Entre agora — pontua em Quad Coins.';
     $('btnEntrarQuiz').style.display = 'inline-block';
     refreshSalaLock(); // se o aluno estiver offline, o botão entra travado
     pollN = 0;
@@ -2497,7 +2590,7 @@
     $('relCard').style.display = 'block';
     $('salaTag').textContent = 'SEM QUIZ ABERTO';
     $('salaTag').classList.remove('live');
-    $('salaSub').textContent = 'Direito Administrativo — Poderes. Quando o professor abrir o quiz, ele aparece aqui.';
+    $('salaSub').textContent = 'Quiz encerrado. Quando o professor abrir o próximo, ele aparece aqui.';
     $('btnEntrarQuiz').style.display = 'none';
     toast('Relatório da sala gerado');
   });

@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — "Aula de hoje" conectada ao cronograma presencial
+- Card refeito: deixou de ser "próxima aula ao vivo" (conteúdo online) e passou
+  a refletir a **aula presencial da turma do aluno** no Quad
+- **Módulo `CRONO`**: espelho da planilha "Cronograma semanal" da coordenação
+  (Google Sheets, semana 30 · 20–24/07) com as 4 turmas da noite (RONDESP,
+  PATAMO, BOPE e CORE), sala, tipo e os **2 tempos por dia** (19h–20h30 e
+  20h30–22h) com encontro, matéria e professor; na V1 o app sincroniza direto
+  da planilha — o que for atualizado lá aparece aqui
+- **Estrutura avalia dia → turno → turma do aluno**: aluno demo na PATAMO
+  NOITE · SALA 4; o card mostra "Hoje · quarta-feira · 22/07" com os 2 tempos;
+  status por horário real ("AGORA" no tempo em andamento, "ENCERRADO" no que
+  passou); sábado/domingo mostra a próxima aula (segunda)
+- Quiz ao vivo do professor continua no mesmo card, com textos ajustados
+  ("quiz da aula" em vez de tema fixo)
+
 ## 19/07/2026 — botões de ação por assunto na árvore do edital
 - **Dois botões em cada um dos 100 assuntos** (aparecem ao expandir o assunto,
   acima dos sub-assuntos): **▶ Assistir aula** e **✎ Fazer questões**
