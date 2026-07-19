@@ -822,6 +822,16 @@
   .rank-tile.gold .rt-lbl { color: #9A6B00; }
   .rank-tile small { font: 400 10.5px var(--font); color: var(--p-dim); }
 
+  /* ---------- insígnias de patente (sprite 10 células, arte do gestor) ---------- */
+  .insig-img { display: inline-block; width: 36px; height: 24px; border-radius: 6px; flex: none;
+    background-image: url(__INSIGNIAS__); background-size: 1000% 100%; background-position: 0 0;
+    border: 1px solid rgba(90,160,255,0.4);
+    box-shadow: 0 2px 6px rgba(9,30,80,0.35), 0 0 8px rgba(59,139,255,0.35); }
+  .insig-img.big { width: 51px; height: 34px; border-radius: 8px; }
+  .insig-img.xl { width: 90px; height: 60px; border-radius: 12px; }
+  .tr-item .insig-img { width: 33px; height: 22px; }
+  .tr-item.lock .insig-img { filter: grayscale(0.65) brightness(0.65); }
+
   /* ---------- perfil do aluno: itens do personagem + tempo de uso ---------- */
   .equip-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .equip-chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
@@ -920,7 +930,7 @@
             </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
-              <div class="rank-line"><svg class="rank-badge" viewBox="0 0 100 110" aria-hidden="true"><use href="#insigniaPatente"/></svg><span class="rank-name" id="rankNome">Aluno Soldado</span></div>
+              <div class="rank-line"><span class="insig-img" id="cardInsig" aria-hidden="true"></span><span class="rank-name" id="rankNome">Aluno Soldado</span></div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
               <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
@@ -1287,7 +1297,7 @@
           <!-- progressão de carreira (gamificação) -->
           <div class="p-card" id="progCard">
             <div class="card-head">
-              <svg class="rank-badge" style="width:30px;height:33px" viewBox="0 0 100 110" aria-hidden="true"><use href="#insigniaPatente"/></svg>
+              <span class="insig-img big" aria-hidden="true" id="progInsig"></span>
               <div class="grow">
                 <div class="card-eyebrow" id="progFase">Formação inicial · Patente 1 de 14</div>
                 <h3 class="aula-title" style="margin:2px 0 0" id="progTitulo">Aluno Soldado Quad Moura</h3>
@@ -2875,6 +2885,12 @@
     toast('Perfil salvo — bem-vindo de volta ao Início!');
   });
 
+  // 10 artes para 14 patentes: pares Aluno/efetivo compartilham a insígnia
+  // (Aluno Oficial usa a do Aspirante — sem arte própria no PDF)
+  var INSIG_MAP = [0, 0, 1, 1, 2, 2, 3, 4, 4, 5, 6, 7, 8, 9];
+  function insigPos(idx) { return (INSIG_MAP[idx] * (100 / 9)) + '% 0'; }
+  function setInsig(el, idx) { if (el) el.style.backgroundPosition = insigPos(idx); }
+
   function estadoLabel() {
     return { 'acumulando': 'Acumulando score', 'disponivel': 'Promoção disponível',
              'aguardando-fiscal': 'Aguardando fiscalização', 'prova': 'Prova em andamento',
@@ -2884,6 +2900,8 @@
     var p = patenteAtual(), prox = proximaPatente(), req = p.pontos;
     var pct = req ? Math.min(100, carreira.scorePatente / req * 100) : 100;
     // card de perfil (Início)
+    setInsig($('cardInsig'), carreira.patenteIdx);
+    setInsig($('progInsig'), carreira.patenteIdx);
     $('homeNome').textContent = nomeCurto();
     $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
@@ -2923,7 +2941,7 @@
         dot = (carreira.estado === 'disponivel') ? '★' : '●';
         meta = (carreira.estado === 'disponivel') ? 'prova disponível' : fmt(carreira.scorePatente) + '/' + fmt(p.pontos) + ' pts';
       }
-      html += '<div class="tr-item ' + cls + '"><span class="tr-dot">' + dot + '</span><span class="tr-nome">' + p.nome + '</span><span class="tr-meta">' + meta + '</span></div>';
+      html += '<div class="tr-item ' + cls + '"><span class="tr-dot">' + dot + '</span><span class="insig-img" style="background-position:' + insigPos(i) + '"></span><span class="tr-nome">' + p.nome + '</span><span class="tr-meta">' + meta + '</span></div>';
     });
     el.innerHTML = html;
   }
@@ -3045,6 +3063,7 @@
       carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes, obs: 'fiscal Souza' });
       body.innerHTML = '<div class="p-card" style="text-align:center">' +
         '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
+        '<span class="insig-img xl" style="display:block;margin:0 auto 12px;background-position:' + insigPos(carreira.patenteIdx) + '"></span>' +
         '<h3 class="mil" style="font-size:22px">Promoção confirmada</h3>' +
         '<p class="sub" style="margin-top:8px">Parabéns, ' + carreira.nomeGuerra + '. Você concluiu os requisitos e foi promovido a <strong>' + prox.nome + '</strong>.</p>' +
         '<p class="sub" style="margin-top:6px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos · ' + (excedente ? fmt(excedente) + ' pts excedentes transferidos para a próxima etapa' : 'nova etapa iniciada') + '.</p></div>';
