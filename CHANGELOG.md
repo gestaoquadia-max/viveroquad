@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial do QUAD: diálogo em beats + acabamento
+- **Roteiro reescrito como conversa**: cada operação virou 2 falas curtas
+  (28 beats no total) — "Tá vendo a sua foto ali em cima? Vamos começar
+  tocando nela!" → "É por ela que a gente entra no seu perfil." O QUAD
+  dialoga, não palestra
+- **Robô 32% maior** e reposicionado um pouco para dentro da tela
+- Removida a frase "Complete a ação indicada para continuar" — o próprio
+  bloqueio ensina; **"PRÓXIMO ›" pequeno no cantinho** (era "Avançar" e
+  brigava com o robô)
+- **Fala pós-compra corrigida**: destaca o card de Quad Coins (que agora
+  fica visível) e diz o saldo real — "tinha 25, ficou com 5 Quad Coins"
+  (número dinâmico; antes o texto falava do saldo sem mostrá-lo)
+- Suíte reescrita para os 28 beats: 50 verificações passando
+
 ## 19/07/2026 — tutorial do QUAD: auditoria e 6 correções
 - **Janela informativa vazava cliques** (crítico): nas falas sem ação dava
   para clicar no elemento iluminado e navegar por trás do tutorial (ex.:

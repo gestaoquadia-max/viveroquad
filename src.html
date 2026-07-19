@@ -552,8 +552,9 @@
     position: absolute; z-index: 3; pointer-events: none; width: 118px; height: 86px;
     transition: left 0.5s ease, top 0.5s ease;
   }
-  .tut-quad .fab-sprite { filter: drop-shadow(0 10px 14px rgba(9,34,90,0.35)); }
-  .tut-quad.flip .fab-sprite { transform: scaleX(-1); }
+  .tut-quad .fab-sprite { filter: drop-shadow(0 10px 14px rgba(9,34,90,0.35));
+    transform: scale(1.32); transform-origin: bottom center; }
+  .tut-quad.flip .fab-sprite { transform: scale(-1.32, 1.32); }
   .tut-quad.mood-bob { animation: tutBob 1.8s ease-in-out infinite; }
   @keyframes tutBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   .tut-quad.mood-cheer { animation: tutCheer 0.55s ease-in-out 4; }
@@ -579,14 +580,11 @@
   .tut-name .tut-etapa { margin-left: auto; font: 600 10px Consolas, monospace; color: #8AA0BF; }
   .tut-text { font-size: 13px; line-height: 1.55; color: #1B2B45; }
   .tut-text b { color: var(--p-blue); }
-  .tut-wait { display: none; font-size: 11px; color: #8AA0BF; font-style: italic; margin-top: 7px; }
-  .tut-wait::before { content: '●'; color: var(--p-gold); margin-right: 6px; animation: tutBlink 1.1s infinite; }
-  @keyframes tutBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
-  /* avanço discreto: Next pequeno no canto + toque na metade direita da tela */
+  /* avanço discreto: PRÓXIMO pequeno no cantinho + toque na metade direita */
   .tut-next {
-    position: absolute; right: 16px; bottom: 12px; z-index: 4; pointer-events: auto;
+    position: absolute; right: 12px; bottom: 8px; z-index: 4; pointer-events: auto;
     background: none; border: none; cursor: pointer;
-    font: 700 12px var(--ui); letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.85);
+    font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.75);
   }
   .tut-next:hover { color: #fff; }
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
@@ -2005,7 +2003,6 @@
           <div class="tut-bubble" id="tutBubble">
             <div class="tut-name"><b>QUAD</b><span class="tut-etapa" id="tutStepN"></span></div>
             <div class="tut-text" id="tutText"></div>
-            <div class="tut-wait" id="tutWait">Complete a ação indicada para continuar</div>
           </div>
           <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
           <button class="tut-next" id="tutNext">Avançar ›</button>
@@ -3147,64 +3144,81 @@
   }
   function tutGuerra() { return ($('nomeGuerra').value.trim() || 'Moura').toUpperCase(); }
 
-  /* mood: gesto do QUAD conforme o assunto · bot: canto onde ele aparece */
+  /* mood: gesto do QUAD conforme o assunto · bot: canto onde ele aparece
+     Cada operação é contada em beats curtos — o QUAD conversa, não palestra. */
   var TUT = [
     { view: 'v-inicio', sel: null, mood: 'wave', bot: 'br',
-      txt: 'Oi! Eu sou o <b>QUAD</b>, seu companheiro aqui dentro. Vem comigo: em poucos minutos te mostro o essencial.' },
+      txt: 'Oi! Eu sou o <b>QUAD</b>.' },
+    { sel: null, mood: 'talk', bot: 'br',
+      txt: 'Vou te acompanhar do primeiro dia até a <b>aprovação</b>. Bora conhecer a sua nova casa?' },
     { sel: '#btnAvatarPerfil', expect: 'abrir-perfil', mood: 'point', bot: 'bl',
-      txt: 'Primeiro, <b>toque na sua foto</b>, ali em cima à esquerda. É por ela que você entra no seu perfil.' },
-    { view: 'v-aluno', sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
+      txt: 'Tá vendo a <b>sua foto</b> ali em cima? Vamos começar <b>tocando nela</b>!' },
+    { view: 'v-aluno', sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'talk', bot: 'br',
+      txt: 'É por ela que a gente entra no seu <b>perfil</b>. Aqui é o seu QG.' },
+    { sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
       onEnter: function () { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; if (tutAvatarOk) return 'skip'; },
-      txt: 'Esse é o seu time de personagens. <b>Toque no que mais parece com você</b> — ele vai te representar por aqui.' },
+      txt: 'Escolhe aí: <b>qual desses é a sua cara?</b>' },
     { sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'cheer', bot: 'br',
-      txt: '<b>Boa escolha!</b> Esse aí vai te acompanhar até a aprovação.' },
+      txt: '<b>Boa escolha!</b> Combinou com você.' },
     { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'bob', bot: 'bl',
       onEnter: function () { if (tutDadosOk()) return 'skip'; },
-      txt: 'Agora me conta quem você é: preencha o seu <b>nome completo</b> e o seu <b>telefone</b>.' },
+      txt: 'Agora me conta quem você é: preenche o seu <b>nome completo</b> e o seu <b>telefone</b>.' },
+    { sel: function () { return $('nomeGuerra').closest('.p-card'); }, mood: 'talk', bot: 'br',
+      txt: 'Agora vem a parte que eu mais gosto: o <b>nome de guerra</b>.' },
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra', mood: 'bob', bot: 'br',
       onEnter: function () { if (tutGuerraOk()) return 'skip'; },
-      txt: 'Hora do <b>nome de guerra</b> — como todo mundo vai te chamar aqui. Pode ser um nome, um sobrenome, o que te representar. Digita aí (só letras, sem palavrão).' },
+      txt: 'Pode ser um nome, um sobrenome, o que te representar. <b>Escreve aí</b> — só letras, sem palavrão.' },
     { sel: '#btnSalvarPerfil', expect: 'salvo', mood: 'point', bot: 'tr',
-      txt: 'Tudo certo? Então <b>toque em “Salvar alterações”</b> para gravar o seu perfil.' },
-    { view: 'v-inicio', sel: '#homeNome', mood: 'talk', bot: 'br',
+      txt: 'Fechou! Agora <b>toca em “Salvar alterações”</b> pra gravar tudo.' },
+    { view: 'v-inicio', sel: '#homeNome', mood: 'cheer', bot: 'br',
+      txt: function () { return 'Olha isso: <b>AL SD QUAD ' + tutGuerra() + '</b>. Esse é você agora.'; } },
+    { sel: '#homeNome', mood: 'talk', bot: 'bl',
       txt: function () {
-        var g = tutGuerra();
-        return 'Olha só: agora você é <b>AL SD QUAD ' + g + '</b>. AL de Aluno, SD de Soldado, QUAD porque essa é a nossa casa — e <b>' + g + '</b>, o nome que você escolheu.';
+        return '<b>AL</b> de Aluno, <b>SD</b> de Soldado, <b>QUAD</b> porque essa é a nossa casa — e <b>' + tutGuerra() + '</b>, o nome que você escolheu.';
       } },
     { sel: function () { return document.querySelector('.rank-line'); }, mood: 'talk', bot: 'bl',
-      txt: 'Essa é a sua <b>insígnia</b> de Aluno Soldado Quad — a primeira da carreira. Subir de patente só depende de você.' },
+      txt: 'E essa é a sua <b>insígnia</b> de Aluno Soldado. A primeira de muitas.' },
     { sel: function () { return $('xpNum').parentElement; }, mood: 'talk', bot: 'br',
-      txt: 'E esse é o seu <b>score</b>: ele mede a sua evolução. Está <b>zerado</b> porque você acabou de chegar. Bora ganhar os primeiros pontos?' },
+      txt: 'Esse é o seu <b>score</b> — ele mostra o quanto você evoluiu.' },
+    { sel: function () { return $('xpNum').parentElement; }, mood: 'talk', bot: 'br',
+      txt: 'Tá <b>zerado</b> porque você acabou de chegar. Bora mudar isso <b>agora</b>?' },
     { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco', mood: 'point', bot: 'tr',
-      txt: 'Missão cumprida vale score. <b>Toque em “Continuar missão”</b> e vem responder comigo.' },
+      txt: '<b>Toca em “Continuar missão”</b>. Suas primeiras questões estão te esperando.' },
     { view: 'v-missoes', sel: '#novaMissaoCard', expect: 'missao', mood: 'point', bot: 'br',
       onEnter: function () {
         var c = $('novaMissaoCard');
         c.style.display = 'block';
         c.innerHTML = '<div class="k-label">Nova missão · Instrução inicial</div>' +
           '<h3>Primeira missão — 3 questões</h3>' +
-          '<p class="sub">Rapidinha, só para você sentir o gosto de pontuar.</p>' +
+          '<p class="sub">Rapidinha, só pra você sentir o gosto de pontuar.</p>' +
           '<div style="margin-top:10px"><button class="btn" id="btnTutMissao" style="width:100%">Iniciar missão</button></div>';
         $('btnTutMissao').addEventListener('click', tqAbrir);
       },
-      txt: 'Sua primeira missão: <b>3 questões</b> rapidinhas. <b>Toque em “Iniciar missão”.</b>' },
+      txt: 'É aqui que as missões moram. <b>Toca em “Iniciar missão”</b>!' },
     { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; }, mood: 'cheer', bot: 'br',
-      txt: 'Viu? <b>Score na conta.</b> Antes zerado, agora com os seus primeiros pontos — é assim que a sua evolução aparece.' },
+      txt: 'Olha lá o <b>score</b>! Seus primeiros pontos entraram.' },
     { sel: '#coinsCard', mood: 'talk', bot: 'bl',
-      txt: 'E tem mais: você também ganhou <b>Quad Coins</b>, a nossa moeda. Com ela você compra itens e vantagens na <b>Loja</b>.' },
+      txt: 'E não é só isso: você ganhou <b>25 Quad Coins</b>.' },
+    { sel: '#coinsCard', mood: 'talk', bot: 'br',
+      txt: 'Coin é a nossa <b>moeda</b>. Com ela você compra itens e vantagens na <b>Loja</b>.' },
     { sel: function () { return document.querySelector('#navAluno .nav-btn[data-view="v-loja"]'); }, expect: 'loja', mood: 'point', bot: 'tr',
-      txt: 'Vamos gastar? <b>Toque em “Loja”</b>, aí embaixo à direita.' },
+      txt: 'Bora gastar? <b>Toca em “Loja”</b>, ali embaixo.' },
     { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens', mood: 'talk', bot: 'br',
       onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
-      txt: 'Aqui é onde você equipa o seu personagem. <b>Toque na área de itens</b> para ver o que tem.' },
+      txt: 'Essa é a área de <b>itens do seu personagem</b>. Toca pra dar uma olhada.' },
     { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, expect: 'boina', mood: 'point', bot: 'bl',
-      txt: 'Essa <b>boina custa 20 Coins</b> — e você tem 25. <b>Toque nela</b> e garanta o seu primeiro item.' },
-    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, mood: 'cheer', bot: 'br',
-      txt: '<b>Comprou!</b> Repare que o saldo caiu: Coin entra com missão, sai com compra. A boina já foi direto para o seu personagem.' },
+      onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
+      txt: 'A <b>boina</b> custa 20 Coins e você tem 25. <b>Toca nela</b> e garante!' },
+    { sel: '#coinsCard', mood: 'cheer', bot: 'bl',
+      txt: function () { return '<b>Comprou!</b> Olha o saldo ali em cima: tinha 25, ficou com <b>' + fmt(score) + ' Quad Coins</b>.'; } },
+    { sel: '#coinsCard', mood: 'talk', bot: 'br',
+      txt: 'É assim que funciona: Coin <b>entra</b> com missão, <b>sai</b> com compra. E a boina já foi direto pro seu personagem.' },
     { view: 'v-inicio', sel: '#btnAvatarPerfil', mood: 'cheer', bot: 'bl',
-      txt: 'Olha ele aí de <b>boina nova</b>! Tudo o que você conquistar na Loja aparece no seu avatar.' },
-    { sel: null, mood: 'salute', bot: 'br', btn: 'Concluir ›',
-      txt: 'Pronto — você já sabe o principal: <b>perfil, missões, score, Coins e Loja</b>. O resto você descobre explorando, e eu fico por aqui se precisar. Bons estudos, e até a aprovação!' }
+      txt: 'Olha ele aí de <b>boina nova</b>! Estiloso, hein?' },
+    { sel: null, mood: 'talk', bot: 'br',
+      txt: 'Pronto: você já sabe o principal — <b>perfil, missões, score, Coins e Loja</b>.' },
+    { sel: null, mood: 'salute', bot: 'br', btn: 'CONCLUIR ›',
+      txt: 'O resto você descobre explorando, e eu fico por aqui se precisar. <b>Bons estudos — e até a aprovação!</b>' }
   ];
 
   function tutMask(el, arrowEl) {
@@ -3247,18 +3261,16 @@
     if ((st.bot || '').indexOf('t') === 0) emCima = true;
     bot.classList.toggle('flip', lado === 'l');
     if (emCima) {
-      bot.style.top = '56px'; bot.style.bottom = 'auto';
-      bub.style.top = '150px'; bub.style.bottom = 'auto';
+      bot.style.top = '58px'; bot.style.bottom = 'auto';
+      bub.style.top = '168px'; bub.style.bottom = 'auto';
       bub.className = 'tut-bubble tail-t' + lado;
     } else {
-      bot.style.top = (scr.height - 92) + 'px'; bot.style.bottom = 'auto';
-      bub.style.top = (scr.height - 92 - 14) + 'px'; bub.style.bottom = 'auto';
-      bub.style.top = 'auto'; bub.style.bottom = '100px';
+      bot.style.top = (scr.height - 102) + 'px'; bot.style.bottom = 'auto';
+      bub.style.top = 'auto'; bub.style.bottom = '112px';
       bub.className = 'tut-bubble tail-b' + lado;
     }
-    bot.style.left = lado === 'l' ? '-4px' : (scr.width - 114) + 'px';
-    /* "Avançar" não fica embaixo do robô quando ele ocupa o canto inferior direito */
-    $('tutNext').style.right = (!emCima && lado === 'r') ? '124px' : '16px';
+    /* robô um pouco para dentro: o cantinho fica livre para o PRÓXIMO */
+    bot.style.left = lado === 'l' ? '4px' : (scr.width - 152) + 'px';
   }
   function tutMood(mood) {
     var bot = $('tutQuad'), sp = $('tutSprite');
@@ -3283,8 +3295,7 @@
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
-    $('tutNext').textContent = st.btn || 'Avançar ›';
-    $('tutWait').style.display = st.expect ? 'block' : 'none';
+    $('tutNext').textContent = st.btn || 'PRÓXIMO ›';
     tutMood(st.mood);
     setTimeout(function () {
       var el = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
