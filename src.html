@@ -1266,25 +1266,15 @@
             </div>
           </div>
           <div class="p-card">
-            <div class="k-label">Atrasadas · recupere até sábado</div>
-            <div class="mission-row">
-              <div class="m-dot">↺</div>
-              <div class="grow">
-                <div class="t">Bloco de terça · Legislação</div>
-                <div class="d">Corte no sábado 23h59 — depois disso, sai da semana.</div>
-              </div>
-              <button class="btn ghost small">Recuperar</button>
+            <div class="k-label">Atrasadas</div>
+            <div class="dia-scroll">
+              <div id="atrasadasList"></div>
             </div>
           </div>
           <div class="p-card">
             <div class="k-label">Simulados</div>
-            <div class="mission-row">
-              <div class="m-dot">◈</div>
-              <div class="grow">
-                <div class="t">Simulado interno · domingo</div>
-                <div class="d">Formato quiz, dentro do app. Pontua em Quad Coins.</div>
-              </div>
-              <span class="tag">EM BREVE</span>
+            <div class="dia-scroll">
+              <div id="simuladosList"></div>
             </div>
           </div>
         </div>
@@ -3758,7 +3748,52 @@
      · concluído, desaparece da lista
      · sem resposta, expira 7 dias após ser criado */
   var DIA_EXPIRA_DIAS = 7;
-  DIA_BLOCOS.forEach(function (b) { b.criadoEm = Date.now(); b.feito = false; });
+  /* blocos que estouraram os 7 dias caem em "Atrasadas" (seeds da demo) */
+  DIA_BLOCOS.push(
+    { rot: 'Bloco · Dir. Penal', det: 'aula de 8 dias atrás', m: 'Direito Penal', a: 'Aplicação da lei penal', fonte: 'deck', idadeDias: 8 },
+    { rot: 'Revisão · Dir. Administrativo', det: 'aula de 9 dias atrás', fonte: 'aula', ini: 30, idadeDias: 9 },
+    { rot: 'Revisão · Língua Portuguesa', det: 'aula de 10 dias atrás', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck', idadeDias: 10 }
+  );
+  DIA_BLOCOS.forEach(function (b) {
+    b.criadoEm = Date.now() - (b.idadeDias ? b.idadeDias * 864e5 : 0);
+    b.feito = false;
+  });
+  /* simulados chegam do admin e aparecem aqui */
+  var SIMULADOS = [
+    { rot: 'Simulado 63 · SD PMBA', det: 'pré-edital · domingo, 8h', tag: 'PRESENCIAL' },
+    { rot: 'Simuladão Quad', det: '140 questões · sábado, 8h', tag: 'PRESENCIAL' },
+    { rot: 'Simulado digital · CFO 1ª fase', det: 'dentro do app', tag: 'DIGITAL' }
+  ];
+  function renderAtrasadas() {
+    var agora = Date.now();
+    var tarde = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return !x.b.feito && (agora - x.b.criadoEm) >= DIA_EXPIRA_DIAS * 864e5;
+    });
+    $('atrasadasList').innerHTML = tarde.map(function (x) {
+      return '<div class="mission-row"><div class="m-dot">↺</div>' +
+        '<div class="grow"><div class="t">' + x.b.rot + '</div><div class="d">' + x.b.det + ' · 10 rápidas</div></div>' +
+        '<button class="btn ghost small" data-dia="' + x.i + '">Recuperar</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma missão atrasada — disciplina em dia!</p>';
+    $('atrasadasList').querySelectorAll('[data-dia]').forEach(function (bt) {
+      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
+    });
+  }
+  function renderSimulados() {
+    $('simuladosList').innerHTML = SIMULADOS.map(function (sm, i) {
+      return '<div class="mission-row"><div class="m-dot">◈</div>' +
+        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + sm.det + '</div></div>' +
+        '<span class="tag">' + sm.tag + '</span>' +
+        '<button class="btn ghost small" data-sim="' + i + '">' + (sm.tag === 'DIGITAL' ? 'Abrir' : 'Inscrever') + '</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado enviado ainda.</p>';
+    $('simuladosList').querySelectorAll('[data-sim]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var sm = SIMULADOS[parseInt(bt.dataset.sim, 10)];
+        toast(sm.tag === 'DIGITAL'
+          ? 'Simulado digital: a aplicação completa chega na V1.'
+          : 'Inscrição confirmada — ' + sm.rot + ' no seu calendário.');
+      });
+    });
+  }
   function renderDia() {
     var agora = Date.now();
     var vivos = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
@@ -3903,6 +3938,9 @@
         trFila.gerais = trMontarFila('gerais');
       }
       renderDia();
+  renderAtrasadas();
+  renderSimulados();
+      renderAtrasadas();
     }
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
@@ -3932,6 +3970,8 @@
   $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
   $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
   renderDia();
+  renderAtrasadas();
+  renderSimulados();
 
   /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
   var TQ = [

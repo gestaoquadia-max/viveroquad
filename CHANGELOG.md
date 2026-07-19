@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — Atrasadas e Simulados no mesmo padrão do "Hoje"
+- **Atrasadas**: blocos que estouram os 7 dias sem resposta **caem
+  automaticamente ali** (não somem mais) — card de tamanho médio com
+  rolagem interna, botão **Recuperar** abre os mesmos flashcards e, ao
+  concluir, a linha desaparece; lista vazia elogia a disciplina
+- **Simulados**: mesma configuração — os simulados **enviados pelo admin
+  aparecem na lista** (Simulado 63 · SD PMBA, Simuladão Quad, Simulado
+  digital · CFO), com Inscrever (presenciais → calendário) e Abrir
+  (digital → aplicação completa na V1)
+- Suíte do treinamento: 27 verificações passando
+
 ## 19/07/2026 — bloco "Hoje" enxuto: regras internas fora da tela
 - Removidos da interface: o texto explicativo do agendamento, o horário
   "22h15" e o link "liberar (demo)" — **regras internas ficam no sistema**;
