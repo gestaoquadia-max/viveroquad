@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — correção: rolagem do Início travando ao subir
+- Causa: `scroll-snap` (proximity + align center nos cards) brigando com o
+  teleporte da rolagem infinita e com o efeito engrenagem, que move os pontos
+  de snap durante o scroll — o navegador "agarrava" um card ao rolar para cima
+- Correções: snap removido (o efeito engrenagem continua dando o ritmo),
+  `overflow-anchor: none` na view (âncora de rolagem do Chrome também segura
+  a subida) e `spotlight()` reorganizado em fase de leitura + fase de escrita
+  (sem layout thrashing; ~0,17 ms por evento de scroll)
+- Teste automatizado: 300 passos contínuos subindo e 300 descendo sem tocar
+  as bordas e sem nenhum frame preso
+
 ## 19/07/2026 — turma do aluno no card de perfil
 - Nova linha **"TURMA PATAMO (N)"** abaixo de ALUNO SOLDADO no card de perfil
   — (N) = noite, (M) = manhã, (T) = tarde

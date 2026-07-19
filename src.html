@@ -112,14 +112,14 @@
 
   .view {
     flex: 1; overflow-y: auto; padding: 14px 14px 120px; display: none;
-    scroll-snap-type: y proximity;
+    overflow-anchor: none;
   }
   .view.on { display: block; }
 
   .p-card {
     background: var(--p-card); border: 1px solid var(--p-line); border-radius: 14px;
     padding: 14px; margin-bottom: 12px;
-    scroll-snap-align: center; will-change: transform, opacity;
+    will-change: transform, opacity;
     transition: transform 0.15s linear, opacity 0.15s linear, box-shadow 0.3s ease;
   }
   /* engrenagem: os blocos giram como dentes de uma roda; o central fica em destaque */
@@ -2173,18 +2173,23 @@
     var half = rect.height / 2 + 40;
     var cards = view.querySelectorAll('.p-card');
     if (!cards.length) return;
-    var best = null, bestD = Infinity;
-    cards.forEach(function (c) {
+    // fase 1: só leituras (evita layout thrashing durante o scroll)
+    var offs = [], best = null, bestD = Infinity;
+    cards.forEach(function (c, i) {
       var r = c.getBoundingClientRect();
       var off = (r.top + r.height / 2) - mid;
+      offs[i] = off;
       var d = Math.abs(off);
       if (d < bestD) { bestD = d; best = c; }
-      var n = Math.max(-1, Math.min(1, off / half));
+    });
+    // fase 2: só escritas
+    cards.forEach(function (c, i) {
+      var n = Math.max(-1, Math.min(1, offs[i] / half));
       // leve profundidade da engrenagem (suave, para não distorcer a diagramação)
       c.style.transform = 'perspective(1100px) rotateX(' + (n * -7).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.04).toFixed(3) + ')';
       c.style.opacity = (1 - Math.abs(n) * 0.22).toFixed(3);
+      c.classList.toggle('spot', c === best);
     });
-    cards.forEach(function (c) { c.classList.toggle('spot', c === best); });
   }
   function loopPeriod(v) {
     var segs = v.querySelectorAll(':scope > .loop-seg');
