@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — confirmação do avatar, título capitalizado e zoom no beat final
+- **Escolha do avatar em duas etapas**: segurar inspeciona quantos quiser;
+  um toque simples mostra o candidato na prévia e o QUAD pergunta
+  "Esse <arte> é o personagem que você escolheu?" — **"Sim, é esse!"**
+  aplica (grid recolhe); **"Ver outros"** devolve a prévia e o grid para
+  continuar olhando, quantas vezes precisar
+- **Nome de guerra sempre capitalizado** no título e nas exibições
+  ("clara" → "Clara"); nota do título atualizada: o nome de guerra pode
+  ser mudado refazendo a instrução inicial, na central do QUAD
+- **Beat final da boina virou ação**: "Clica e segura na sua foto pra ver
+  como ele tá agora" — segurar amplia o personagem atual e avança ao
+  soltar; o toque simples fica bloqueado nessa etapa (fora do tutorial,
+  toque entra no perfil e segurar amplia, como sempre)
+- Suíte: 84 verificações passando
+
 ## 19/07/2026 — segurar para ampliar, regra do nome de guerra e Bloco 1
 - **Segurar para ampliar o personagem**: pressionar e segurar a foto (no
   card, na prévia do perfil e em cada opção do grid) abre a foto grande em

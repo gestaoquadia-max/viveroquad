@@ -1483,7 +1483,7 @@
               <label for="nomeGuerra">Qual é o seu nome de guerra?</label>
               <input id="nomeGuerra" class="fld" value="Moura" maxlength="12" aria-label="Nome de guerra">
             </div>
-            <p class="sub" style="margin-top:10px">Seu título: <strong id="gwPreview">Aluno Soldado Quad Moura</strong><br>A patente vem da sua evolução (não se escolhe) e o <strong>Quad</strong> é fixo — é a nossa casa. O título atualiza sozinho a cada promoção.</p>
+            <p class="sub" style="margin-top:10px">Seu título: <strong id="gwPreview">Aluno Soldado Quad Moura</strong><br>A patente vem da sua evolução (não se escolhe) e o <strong>Quad</strong> é fixo — é a nossa casa. O <strong>nome de guerra</strong> pode ser mudado refazendo a <strong>instrução inicial</strong>, na central do QUAD.</p>
           </div>
 
           <div class="p-card">
@@ -3243,6 +3243,24 @@
     { sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
       onEnter: function () { $('avGrid').style.display = 'grid'; if (tutAvatarOk) return 'skip'; },
       txt: 'Escolhe aí: <b>qual desses é a sua cara?</b> Dica: <b>segura</b> em um personagem pra ampliar antes de decidir.' },
+    { sel: function () { return document.querySelector('.avatar-preview'); }, expect: 'confirma-avatar', mood: 'talk', bot: 'br',
+      txt: function () {
+        var nm = tutAvatarPend >= 0 && AV_LABELS[tutAvatarPend] ? ' <b>' + AV_LABELS[tutAvatarPend] + '</b>' : '';
+        return 'Esse' + nm + ' é o personagem que você <b>escolheu</b>?';
+      },
+      opts: [
+        { rotulo: 'Sim, é esse!', cls: 'sim', acao: function () {
+            if (tutAvatarPend >= 0) avatarIdx = tutAvatarPend;
+            aplicarAvatar();
+            $('avGrid').style.display = 'none';
+            tutAvatarOk = true;
+            tutEvent('confirma-avatar');
+          } },
+        { rotulo: 'Ver outros', cls: 'nao', acao: function () {
+            $('avPreview').src = avatarThumbs[avatarIdx];   /* volta a prévia atual */
+            tutGo(tutIdx - 1);
+          } }
+      ] },
     { sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'cheer', bot: 'br',
       txt: '<b>Boa escolha!</b> Combinou com você.' },
     { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'bob', bot: 'bl',
@@ -3300,8 +3318,8 @@
       txt: function () { return '<b>Comprou!</b> Olha o saldo ali em cima: tinha 25, ficou com <b>' + fmt(score) + ' Quad Coins</b>.'; } },
     { sel: '#coinsCard', mood: 'talk', bot: 'br',
       txt: 'É assim que funciona: Coin <b>entra</b> com missão, <b>sai</b> com compra. E a boina já foi direto pro seu personagem.' },
-    { view: 'v-inicio', sel: '#btnAvatarPerfil', mood: 'cheer', bot: 'bl',
-      txt: 'A <b>boina nova</b> já é sua — tá guardada nos itens do seu personagem, no perfil. Em breve ele aparece vestindo ela!' },
+    { view: 'v-inicio', sel: '#btnAvatarPerfil', expect: 'zoom-final', mood: 'point', bot: 'bl',
+      txt: 'A <b>boina nova</b> já é sua — tá guardada nos itens do personagem. <b>Clica e segura na sua foto</b> pra ver como ele tá agora! (Toque simples entra no perfil.)' },
     { sel: null, mood: 'talk', bot: 'br',
       txt: 'Pronto: você já sabe o principal — <b>perfil, missões, score, Coins e Loja</b>.' },
     { sel: null, mood: 'salute', bot: 'br', btn: 'CONCLUIR ›',
@@ -3463,6 +3481,7 @@
     }, 90);
   }
   var tutAdvPend = false;   /* avanço agendado: ignora toques até concluir */
+  var tutAvatarPend = -1;   /* candidato tocado no grid, aguardando confirmação */
   function tutAvanca() {
     if (!tutOn || tutAdvPend) return;
     if (tutTyping) { tutSayEnd(); return; }   /* 1º toque completa a fala */
@@ -3515,9 +3534,24 @@
       setTimeout(function () { tutEvent('salvo'); }, 350);
       return;
     }
-    if (e.target.closest('.avatar-opt')) { tutAvatarOk = true; }   /* registra a escolha em qualquer etapa */
+    if (tutExpect !== 'avatar' && e.target.closest('.avatar-opt')) { tutAvatarOk = true; }   /* fora da etapa própria (ex.: erro do salvar) */
+    if (tutExpect === 'zoom-final' && e.target.closest('#btnAvatarPerfil')) {
+      e.stopPropagation(); e.preventDefault();   /* nessa etapa só o segurar vale */
+      return;
+    }
     if (tutExpect === 'abrir-perfil' && e.target.closest('#btnAvatarPerfil')) { setTimeout(function () { tutEvent('abrir-perfil'); }, 300); }
-    else if (tutExpect === 'avatar' && e.target.closest('.avatar-opt')) { setTimeout(function () { tutEvent('avatar'); }, 350); }
+    else if (tutExpect === 'avatar') {
+      var opt = e.target.closest('.avatar-opt');
+      if (opt && !opt.dataset.zoomed) {
+        e.stopPropagation(); e.preventDefault();   /* ainda não aplica: o QUAD confirma antes */
+        var g = $('avGrid');
+        tutAvatarPend = [].indexOf.call(g.querySelectorAll('.avatar-opt'), opt);
+        g.querySelectorAll('.avatar-opt').forEach(function (x) { x.classList.remove('sel'); });
+        opt.classList.add('sel');
+        $('avPreview').src = avatarThumbs[tutAvatarPend];   /* prévia do candidato */
+        tutEvent('avatar');
+      }
+    }
     else if (tutExpect === 'bloco' && e.target.closest('#btnMissaoHome')) { setTimeout(function () { tutEvent('bloco'); }, 300); }
     else if (tutExpect === 'loja') { var nb = e.target.closest('.nav-btn'); if (nb && nb.dataset.view === 'v-loja') setTimeout(function () { tutEvent('loja'); }, 300); }
     else if (tutExpect === 'ver-itens' && e.target.closest('#tutLojaCard')) {
@@ -3727,7 +3761,7 @@
     if (!zoomHold.on) return;
     $('zoomLayer').classList.remove('on');
     zoomHold.on = false;
-    if (tutOn && tutExpect === 'zoom-foto') tutEvent('zoom-foto');
+    if (tutOn && (tutExpect === 'zoom-foto' || tutExpect === 'zoom-final')) tutEvent(tutExpect);
   }
   function bindHold(el, getDados) {
     el.addEventListener('pointerdown', function () {
@@ -3801,7 +3835,10 @@
      (dados simulados; no sistema real o servidor valida tudo)
      ================================================================== */
   function syncNametag() {
-    carreira.nomeGuerra = $('nomeGuerra').value.trim() || 'Moura';
+    var bruto = $('nomeGuerra').value.trim();
+    carreira.nomeGuerra = bruto
+      ? bruto.split(/\s+/).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ')
+      : 'Moura';
     $('avNametag').textContent = nomeCurto();
     $('gwPreview').textContent = tituloCompleto();
     $('homeNome').textContent = nomeCurto();   /* o nome principal muda ao vivo */
