@@ -807,6 +807,21 @@
   .loja-item.comprado .li-preco { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
   .loja-item.comprado .li-preco::before { background: #28A96B; box-shadow: none; }
 
+  /* ---------- perfil do aluno: classificação (sala e geral) ---------- */
+  .rank-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rank-tile { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+    background: linear-gradient(180deg, #F2F8FF, #E1EFFF); border: 1px solid rgba(59,139,255,0.25);
+    border-radius: 16px; padding: 14px 10px 12px; }
+  .rank-tile.gold { background: linear-gradient(180deg, #FFFBEF, #FFF1CF); border-color: #EED9A2; }
+  .rt-ico { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
+    background: linear-gradient(160deg, #3B8BFF, #1976FF); color: #fff; margin-bottom: 4px; }
+  .rank-tile.gold .rt-ico { background: linear-gradient(160deg, #F4C04E, #D89012); }
+  .rt-ico svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+  .rank-tile b { font: 800 26px var(--ui); color: var(--p-text); line-height: 1; }
+  .rt-lbl { font: 700 10.5px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--p-gold); }
+  .rank-tile.gold .rt-lbl { color: #9A6B00; }
+  .rank-tile small { font: 400 10.5px var(--font); color: var(--p-dim); }
+
   /* ---------- perfil do aluno: itens do personagem + tempo de uso ---------- */
   .equip-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .equip-chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
@@ -1251,9 +1266,22 @@
         <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
         <div class="view" id="v-aluno">
           <div class="p-card">
-            <div class="k-label">Perfil do aluno</div>
-            <h3>Identidade de combate</h3>
-            <p class="sub">Nome de guerra e avatar aparecem no Início e no ranking da turma. Respeito acima de tudo: nomes ofensivos são bloqueados.</p>
+            <div class="k-label">Classificação do aluno</div>
+            <div class="rank-tiles">
+              <div class="rank-tile">
+                <span class="rt-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <b id="rankSala">#12</b>
+                <span class="rt-lbl">na sala</span>
+                <small id="rankSalaTotal">de 42 alunos</small>
+              </div>
+              <div class="rank-tile gold">
+                <span class="rt-ico"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2.5 1.5 4 4 4.5M17 6h3a1 1 0 0 1 1 1c0 2.5-1.5 4-4 4.5"/></svg></span>
+                <b id="rankGeral">#87</b>
+                <span class="rt-lbl">geral</span>
+                <small id="rankGeralTotal">de 1.286 usuários</small>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:10px">Sua posição pelo <strong>score de carreira</strong> — sobe conforme você e a tropa pontuam.</p>
           </div>
 
           <!-- progressão de carreira (gamificação) -->
