@@ -635,6 +635,43 @@
   .help-fala { font: 500 13.5px var(--font); line-height: 1.55; color: #1B2B45;
     background: #F4F9FF; border-radius: 12px; padding: 12px; margin: 0 0 10px; }
 
+  /* Treinamento Rápido (flashcards) */
+  .tr-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .tr-head-row .btn { margin-top: 24px; }   /* não briga com o selo ONLINE */
+  .tr-tabs { display: flex; gap: 8px; margin-top: 12px; }
+  .tr-tab { flex: 1; cursor: pointer; border-radius: 99px; padding: 8px 10px;
+    font: 700 12px var(--ui); letter-spacing: 0.03em;
+    background: #EDF3FB; border: 1.5px solid #DCE8F7; color: var(--p-dim); }
+  .tr-tab.on { background: var(--p-blue); border-color: var(--p-blue); color: #fff; }
+  .tr-fila { border-top: 1px solid var(--p-line); }
+  .tr-fila-row { display: flex; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--p-line); font-size: 12.5px; }
+  .tr-fila-row .nm { flex: 1; }
+  .tr-fila-row.done { opacity: 0.5; }
+  .tr-fila-row.next .nm { font-weight: 700; color: var(--p-blue); }
+  .fc-enun { font: 600 15px var(--font); line-height: 1.55; margin: 4px 0 14px; }
+  .fc-ce { display: flex; gap: 10px; }
+  .fc-ce button { flex: 1; cursor: pointer; border-radius: 14px; padding: 15px 10px;
+    font: 800 14px var(--ui); letter-spacing: 0.06em; border: 2px solid; }
+  .fc-ce .certo { background: #EAF9F0; border-color: #2FA860; color: #1D7A44; }
+  .fc-ce .errado { background: #FDEEEE; border-color: #D34040; color: #A32626; }
+  .fc-verd { border-radius: 12px; padding: 11px 12px; font: 700 13px var(--ui); margin-bottom: 9px; }
+  .fc-verd.ok { background: #EAF9F0; color: #1D7A44; }
+  .fc-verd.bad { background: #FDEEEE; color: #A32626; }
+  .fc-obs { font-size: 12.5px; color: var(--p-dim); line-height: 1.55; margin: 0 0 12px; }
+  .fc-rate { display: flex; gap: 7px; }
+  .fc-rate button { flex: 1; cursor: pointer; border-radius: 10px; padding: 9px 4px;
+    font: 700 11px var(--ui); border: 1.5px solid; background: #fff; }
+  .fc-rate .r0 { border-color: #D34040; color: #A32626; }
+  .fc-rate .r1 { border-color: #E08A00; color: #9A6200; }
+  .fc-rate .r2 { border-color: var(--p-blue); color: var(--p-blue); }
+  .fc-rate .r3 { border-color: #2FA860; color: #1D7A44; }
+  .fc-rate-lbl { font-size: 10.5px; color: var(--p-dim); letter-spacing: 0.06em; text-transform: uppercase; margin: 12px 0 6px; }
+  .onda-row { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--p-line); font-size: 12.5px; }
+  .onda-row:last-child { border-bottom: none; }
+  .onda-row .nm { flex: 1; }
+  .onda-row .quando { font: 600 11px Consolas, monospace; color: var(--p-dim); }
+  .onda-demo { background: none; border: none; cursor: pointer; font: 600 10.5px var(--ui); color: var(--p-blue); padding: 2px 0; }
+
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
   .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
   @keyframes tqShake { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
@@ -1202,11 +1239,16 @@
 
         <!-- ============ ALUNO · MISSÕES ============ -->
         <div class="view" id="v-missoes">
-          <div class="p-card" id="novaMissaoCard" style="display:none">
-            <div class="k-label">Nova missão</div>
-            <h3 id="novaMissaoTitle">Nova missão disponível</h3>
-            <p class="sub" id="novaMissaoSub">Missão carregada e pronta. Toque para começar.</p>
-            <div style="margin-top:10px"><button class="btn small" id="btnNovaMissao">Iniciar missão</button></div>
+          <div class="p-card" id="trCard">
+            <div class="k-label">Treinamento Rápido · flashcards</div>
+            <h3>Certo ou errado, no ritmo Anki</h3>
+            <p class="sub" id="trCardSub">Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnTreinoRapido">Abrir treinamento</button></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Aula → flashcards · repetição espaçada</div>
+            <p class="sub" style="margin-bottom:8px">Aula de <strong>Poderes administrativos</strong> (Prof. Danilo Moura, presencial de hoje): o operador extraiu <strong>40 certo/errado</strong> do que foi falado — liberadas em 4 ondas. Respondidas, entram no banco do Treinamento Rápido.</p>
+            <div id="ondasList"></div>
           </div>
           <div class="p-card">
             <div class="k-label">Hoje · questões novas (3 + 10 + 10)</div>
@@ -2079,6 +2121,24 @@
           </div>
         </div>
 
+        <!-- ============ TREINAMENTO RÁPIDO (flashcards) ============ -->
+        <div class="quiz-layer" id="trLayer">
+          <div class="quiz-head">
+            <div class="tr-head-row">
+              <div>
+                <div class="k-label">Treinamento Rápido · flashcards</div>
+                <h3 style="margin:4px 0 0; font-size:15px" id="trTitulo">Escolha o bloco</h3>
+              </div>
+              <button class="btn ghost small" id="btnTrSair">Sair</button>
+            </div>
+            <div class="tr-tabs">
+              <button class="tr-tab on" id="tabTrGerais">Gerais</button>
+              <button class="tr-tab" id="tabTrEsp">Específicas</button>
+            </div>
+          </div>
+          <div class="quiz-body" id="trBody"></div>
+        </div>
+
         <!-- ============ MISSÃO DEMONSTRATIVA (tutorial) ============ -->
         <div class="quiz-layer" id="tqLayer">
           <div class="quiz-head">
@@ -2419,8 +2479,9 @@
     for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
     return h;
   }
+  var trAj = {};   /* 'matéria|assunto' → deslocamento vindo do Treinamento Rápido */
   function edSubPct(mi, mat, ass, sub) {
-    var v = ED_BASE[mi] + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20;
+    var v = ED_BASE[mi] + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[mat + '|' + ass] || 0);
     return Math.max(0, Math.min(100, v));
   }
   function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
@@ -2750,10 +2811,7 @@
   });
 
   $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 3 · Dir. Administrativo'); });
-  $('btnNovaMissao').addEventListener('click', function () {
-    if (!online) { toast('Existe uma nova missão disponível. Conecte-se à internet para carregá-la.'); return; }
-    openQuiz('missao', 'Nova missão · questões do dia');
-  });
+  $('btnTreinoRapido').addEventListener('click', function () { trAbrir(); });
   $('btnMissaoHome').addEventListener('click', function () {
     showView('v-missoes', 'navAluno');
   });
@@ -2940,18 +2998,11 @@
     }
   }
   function refreshNovaMissao() {
-    var card = $('novaMissaoCard');
-    if (!card) return;
-    card.style.display = 'block';
-    if (!online) {
-      $('novaMissaoSub').textContent = 'Existe uma nova missão disponível. Conecte-se à internet para carregá-la.';
-      $('btnNovaMissao').disabled = true;
-      $('btnNovaMissao').textContent = 'Aguardando conexão';
-    } else {
-      $('novaMissaoSub').textContent = 'Missão carregada e pronta. Toque para começar.';
-      $('btnNovaMissao').disabled = false;
-      $('btnNovaMissao').textContent = 'Iniciar missão';
-    }
+    var sub = $('trCardSub');
+    if (!sub) return;
+    sub.textContent = online
+      ? 'Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.'
+      : 'Você está offline: o treino roda local e o progresso sincroniza quando a conexão voltar.';
   }
   function applyConnUI() {
     var t = $('connToggle');
@@ -3584,6 +3635,307 @@
     $(id).addEventListener('input', function () { tutTypeCheck('dados'); });
   });
   $('nomeGuerra').addEventListener('input', function () { tutTypeCheck('guerra'); });
+
+  /* ==================================================================
+     TREINAMENTO RÁPIDO · flashcards estilo Anki
+     · Aula presencial → operador extrai 2 PDFs → PDF 01: 40 certo/errado
+       em 4 ondas (D0 22h15 · D+1 22h15 · D+7 · D+30); PDF 02: banco geral
+     · Rodízio de 10 por assunto, alternando as matérias da aba
+     · Feedback imediato + autoavaliação (Errei/Difícil/Bom/Fácil)
+     · Acerto: +1 score · bloco de 10: +5 Quad Coins · atualiza o Domínio
+     · Zerou a aba: baralho é redistribuído pela dificuldade informada
+     ================================================================== */
+  var TR_GERAIS = ['Língua Portuguesa', 'Língua Inglesa', 'Informática', 'Matemática', 'História', 'Geografia'];
+  var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
+  function fc(m, a, c, t, o) { return { m: m, a: a, c: c, t: t, o: o, nota: -1, resp: null }; }
+  var TR_BANK = [
+    fc('Língua Portuguesa','Interpretação de textos',true,'A ideia central de um texto pode aparecer de forma implícita.','Nem sempre a tese está escrita com todas as letras.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Inferir é copiar uma informação explícita do texto.','Inferir é concluir a partir de pistas — o explícito se localiza.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'O título costuma antecipar o tema e orientar a leitura.','Use o título como bússola antes de ler.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Textos não verbais não transmitem informação.','Imagens, gráficos e símbolos também comunicam.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'Charges combinam linguagem verbal e não verbal.','Humor gráfico é texto misto por natureza.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Em textos mistos, a imagem nunca altera o sentido do escrito.','A imagem pode reforçar, ironizar ou contradizer o texto.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'A ironia pode inverter o sentido literal de uma frase.','O contexto denuncia a inversão.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'O contexto ajuda a definir o sentido de palavras ambíguas.','“Manga”, “banco”, “vela”: o entorno decide.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'O texto publicitário é neutro, sem intenção de convencer.','Publicidade existe para persuadir.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Compreender um texto dispensa identificar o público-alvo.','Saber para quem se fala muda a leitura.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Cognatos são palavras parecidas com o português e ajudam na leitura.','“Important”, “diferent”… aliados do leitor.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Push” significa puxar.','Falso cognato: push = empurrar; pull = puxar.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Skimming é a leitura rápida para captar a ideia geral.','Passar o olho com propósito.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Scanning busca uma informação específica no texto.','Caçar um dado: nome, número, data.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Actually” significa atualmente.','Falso cognato: actually = na verdade.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Palavras repetidas ao longo do texto costumam indicar o tema.','Repetição é pista de assunto.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Parents” significa parentes.','Falso cognato: parents = pais.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Títulos e imagens ajudam a prever o conteúdo em inglês.','Predição é estratégia de leitura.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'Interpretar exige traduzir palavra por palavra.','O sentido global vale mais que a tradução literal.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'O sufixo “-ly” costuma indicar advérbio.','Quickly, carefully, really…'),
+    fc('Informática','Editores de texto',true,'Ctrl+C copia e Ctrl+V cola, no Word e no Writer.','Atalhos universais de edição.'),
+    fc('Informática','Editores de texto',false,'Ctrl+Z refaz a última ação.','Ctrl+Z desfaz; refazer é Ctrl+Y (ou Ctrl+R no Writer).'),
+    fc('Informática','Editores de texto',true,'O corretor ortográfico sublinha palavras não reconhecidas.','O sublinhado é alerta, não sentença.'),
+    fc('Informática','Editores de texto',false,'Salvar em PDF impede qualquer pessoa de ler o arquivo.','PDF é formato de leitura, não de sigilo.'),
+    fc('Informática','Editores de texto',true,'Cabeçalho e rodapé se repetem nas páginas do documento.','Por isso carregam título e numeração.'),
+    fc('Informática','Editores de texto',true,'No Word em português, Ctrl+B salva o documento.','Pegadinha clássica: negrito é Ctrl+N.'),
+    fc('Informática','Editores de texto',false,'A extensão .docx é típica de planilhas.','.docx é texto; planilha é .xlsx.'),
+    fc('Informática','Editores de texto',true,'Localizar e substituir troca uma palavra em todo o texto de uma vez.','Ctrl+U no Word pt-BR.'),
+    fc('Informática','Editores de texto',false,'Quebra de página e quebra de linha são o mesmo recurso.','Uma muda de página; a outra, de linha.'),
+    fc('Informática','Editores de texto',true,'O Writer, do LibreOffice, é um editor de textos gratuito.','Software livre, muito cobrado em prova.'),
+    fc('Matemática','Conjuntos numéricos',true,'Todo número natural é também inteiro.','ℕ está contido em ℤ.'),
+    fc('Matemática','Conjuntos numéricos',false,'Todo número inteiro é natural.','−3 é inteiro e não é natural.'),
+    fc('Matemática','Conjuntos numéricos',true,'−3 é um número inteiro.','ℤ inclui os negativos.'),
+    fc('Matemática','Conjuntos numéricos',false,'1/2 é um número irracional.','Fração de inteiros é racional.'),
+    fc('Matemática','Conjuntos numéricos',true,'√2 é um número irracional.','Não há fração exata para √2.'),
+    fc('Matemática','Conjuntos numéricos',true,'Todo racional pode ser escrito como fração de inteiros, com denominador não nulo.','Definição de ℚ.'),
+    fc('Matemática','Conjuntos numéricos',false,'O zero não pertence ao conjunto dos racionais.','0 = 0/1 — racional.'),
+    fc('Matemática','Conjuntos numéricos',true,'Dízimas periódicas são números racionais.','Toda dízima periódica vira fração.'),
+    fc('Matemática','Conjuntos numéricos',false,'π é um número racional.','π é o irracional mais famoso.'),
+    fc('Matemática','Conjuntos numéricos',true,'O conjunto dos reais reúne racionais e irracionais.','ℝ = ℚ ∪ irracionais.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A dignidade da pessoa humana é fundamento da República.','Art. 1º, III, da CF.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'A soberania é objetivo fundamental da República.','Soberania é fundamento (art. 1º); objetivos estão no art. 3º.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'Construir uma sociedade livre, justa e solidária é objetivo fundamental.','Art. 3º, I.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'Todo o poder emana do povo, que o exerce por representantes eleitos ou diretamente.','Parágrafo único do art. 1º.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'Os Poderes da União são dependentes e hierarquizados entre si.','São independentes e harmônicos (art. 2º).'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'O pluralismo político é fundamento da República.','Art. 1º, V.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'O presidencialismo está listado no art. 1º como fundamento.','Forma de governo não integra a lista de fundamentos.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A cidadania é fundamento da República.','Art. 1º, II.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'Promover o bem de todos, sem preconceitos, é fundamento da República.','É objetivo fundamental (art. 3º, IV).'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A independência nacional rege as relações internacionais do Brasil.','Art. 4º, I.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'A lei penal não retroage, salvo para beneficiar o réu.','Irretroatividade in pejus, retroatividade in bonam partem.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'A lei mais grave retroage para alcançar fatos antigos.','Nunca — só a mais benéfica retroage.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Considera-se praticado o crime no momento da ação ou omissão.','Teoria da atividade (art. 4º do CP).'),
+    fc('Direito Penal','Aplicação da lei penal',false,'O Brasil adota a teoria do resultado para o tempo do crime.','Adota a teoria da atividade.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Para o lugar do crime valem a conduta e o resultado.','Teoria da ubiquidade (art. 6º).'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Aplica-se a lei brasileira ao crime cometido no território nacional.','Princípio da territorialidade.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'Navio de guerra estrangeiro em águas brasileiras segue a lei brasileira.','É extensão do território de origem.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'A abolitio criminis extingue a punibilidade de fatos anteriores.','Lei que descriminaliza retroage sempre.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'A lei temporária perde força sobre os fatos da sua vigência após o prazo.','Ultratividade: continua alcançando aqueles fatos.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Não há crime sem lei anterior que o defina.','Legalidade estrita (art. 1º do CP).')
+  ];
+
+  /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
+  var AULA_DEMO = {
+    m: 'Direito Administrativo', a: 'Poderes administrativos',
+    titulo: 'Poderes administrativos', prof: 'Danilo Moura',
+    cards: [
+      ['C','O poder de polícia condiciona direitos individuais em favor do interesse público.','Essência do conceito.'],
+      ['E','O poder de polícia é exercido exclusivamente pelo Poder Judiciário.','É típico da Administração Pública.'],
+      ['C','O poder hierárquico autoriza dar ordens, fiscalizar e rever atos de subordinados.','Tríade clássica da hierarquia.'],
+      ['E','O poder disciplinar alcança qualquer cidadão, mesmo sem vínculo com a Administração.','Só quem tem vínculo funcional ou contratual.'],
+      ['C','O poder regulamentar permite editar decretos para a fiel execução das leis.','Art. 84, IV, da CF.'],
+      ['E','O decreto regulamentar pode criar obrigações novas sem base legal.','Regulamento não inova a ordem jurídica.'],
+      ['C','A discricionariedade envolve conveniência e oportunidade dentro dos limites da lei.','Mérito administrativo com moldura legal.'],
+      ['E','O ato discricionário dispensa qualquer limite legal.','Discricionário ≠ arbitrário.'],
+      ['C','O excesso de poder é uma espécie de abuso de poder.','Abuso = excesso de poder + desvio de finalidade.'],
+      ['E','Excesso de poder e desvio de finalidade são a mesma coisa.','Um extrapola a competência; o outro trai o fim.'],
+      ['C','Licenças e alvarás são manifestações preventivas do poder de polícia.','Polícia administrativa preventiva.'],
+      ['E','A multa de trânsito não é manifestação do poder de polícia.','É o exemplo clássico da face repressiva.'],
+      ['C','A autoexecutoriedade permite executar certas medidas sem ordem judicial.','Atributo do poder de polícia.'],
+      ['E','Toda medida de polícia exige autorização judicial prévia.','A autoexecutoriedade dispensa, em regra.'],
+      ['C','A coercibilidade torna a medida de polícia obrigatória para o particular.','Imposição independe de concordância.'],
+      ['E','O particular pode recusar a fiscalização sem qualquer consequência.','A recusa pode gerar sanção.'],
+      ['C','O poder disciplinar exige processo com ampla defesa para punir.','Contraditório e ampla defesa sempre.'],
+      ['E','A punição disciplinar dispensa motivação.','Ato punitivo sem motivação é nulo.'],
+      ['C','A hierarquia permite avocar e delegar competências nos termos da lei.','Instrumentos do poder hierárquico.'],
+      ['E','Competências exclusivas podem ser livremente delegadas.','Exclusiva não se delega.'],
+      ['C','O Judiciário pode anular ato praticado com abuso de poder.','Controle de legalidade.'],
+      ['E','O ato com desvio de finalidade é válido se der bom resultado.','Fim ilegítimo contamina o ato.'],
+      ['C','Interditar estabelecimento irregular é exemplo de polícia repressiva.','Atuação após a infração.'],
+      ['E','A licença é ato discricionário.','Licença é vinculada; autorização é discricionária.'],
+      ['C','A autorização é, em regra, discricionária e precária.','Pode ser revogada.'],
+      ['E','A autorização gera direito adquirido definitivo ao particular.','Precariedade afasta o direito adquirido.'],
+      ['C','O poder regulamentar do chefe do Executivo se expressa tipicamente por decretos.','Decreto é o veículo típico.'],
+      ['E','Portaria de ministro tem força superior à lei.','Ato infralegal não supera a lei.'],
+      ['C','Parte do poder de polícia pode ser delegada a entidades de direito público.','Consenso na jurisprudência.'],
+      ['E','Empresas privadas podem aplicar sanções de polícia livremente.','Sanção exige regime de direito público.'],
+      ['C','A proporcionalidade limita a intensidade das medidas de polícia.','Meio adequado, necessário e proporcional.'],
+      ['E','A interdição de atividade dispensa juízo de proporcionalidade.','Medida drástica exige proporcionalidade reforçada.'],
+      ['C','A omissão do dever de agir também pode configurar abuso de poder.','Abuso por omissão existe.'],
+      ['E','Abuso de poder só ocorre por ação, nunca por omissão.','Omissão indevida também é abuso.'],
+      ['C','A revisão hierárquica permite anular atos ilegais de subordinados.','Autotutela + hierarquia.'],
+      ['E','O superior só pode rever ato de subordinado se for provocado.','Pode rever de ofício.'],
+      ['C','As sanções disciplinares devem respeitar o contraditório.','Devido processo também na via administrativa.'],
+      ['E','A “verdade sabida” autoriza punir sem defesa nos dias de hoje.','Superada pela CF/88.'],
+      ['C','O poder de polícia alcança atividades, bens e direitos dos particulares.','Campo amplo de incidência.'],
+      ['E','O poder de polícia não alcança bens, somente pessoas.','Bens também se sujeitam (ex.: interdição).']
+    ]
+  };
+  var TR_ONDAS = [
+    { rot: 'Onda 1 · hoje, 22h15 (D0)', ini: 0 },
+    { rot: 'Onda 2 · amanhã, 22h15 (D+1)', ini: 10 },
+    { rot: 'Onda 3 · em 1 semana (D+7)', ini: 20 },
+    { rot: 'Onda 4 · em 1 mês (D+30)', ini: 30 }
+  ];
+  var ondaFeita = [false, false, false, false];
+  function ondaDisponivel(i) {
+    if (i > 0) return ondaFeita[i];   /* futuras: só via demo */
+    var ag = new Date();
+    return ag.getHours() * 60 + ag.getMinutes() >= 22 * 60 + 15;
+  }
+  function renderOndas() {
+    $('ondasList').innerHTML = TR_ONDAS.map(function (o, i) {
+      var st;
+      if (ondaFeita[i]) st = '<span class="tag">FEITO</span>';
+      else if (i === 0 && ondaDisponivel(0)) st = '<button class="btn small" data-onda="' + i + '">Responder 10</button>';
+      else st = '<span class="quando">bloqueada</span> <button class="onda-demo" data-onda-demo="' + i + '">liberar (demo)</button>';
+      return '<div class="onda-row"><div class="m-dot' + (ondaFeita[i] ? ' done' : '') + '">' + (ondaFeita[i] ? '✓' : (i + 1)) + '</div>' +
+        '<div class="nm">' + o.rot + '</div>' + st + '</div>';
+    }).join('');
+    $('ondasList').querySelectorAll('[data-onda]').forEach(function (b) {
+      b.addEventListener('click', function () { trAbrirOnda(parseInt(b.dataset.onda, 10)); });
+    });
+    $('ondasList').querySelectorAll('[data-onda-demo]').forEach(function (b) {
+      b.addEventListener('click', function () { trAbrirOnda(parseInt(b.dataset.ondaDemo, 10)); });
+    });
+  }
+
+  /* ---------- motor do treinamento ---------- */
+  var trTab = 'gerais', trFila = { gerais: [], esp: [] }, trPos = { gerais: 0, esp: 0 };
+  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trOnda = -1;
+  function trEhGeral(m) { return TR_GERAIS.indexOf(m) >= 0; }
+  function trMontarFila(tab) {
+    var mats = EDITAL_CFO.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
+    var fila = [], maxA = 0;
+    mats.forEach(function (m) { maxA = Math.max(maxA, m[1].length); });
+    for (var r = 0; r < maxA; r++) {
+      mats.forEach(function (m) {
+        if (!m[1][r]) return;
+        var a = m[1][r][0];
+        if (TR_BANK.some(function (c) { return c.m === m[0] && c.a === a; })) fila.push({ m: m[0], a: a });
+      });
+    }
+    return fila;
+  }
+  function trPeso(c) { return { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] !== undefined ? { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] : 2; }
+  function trCartasDo(deck) {
+    var cs = TR_BANK.filter(function (c) { return c.m === deck.m && c.a === deck.a; });
+    cs.sort(function (x, y) { return trPeso(y) - trPeso(x); });   /* difíceis primeiro na 2ª volta */
+    return cs.slice(0, TR_REW.blocoTam);
+  }
+  function trAbrir() {
+    trFila.gerais = trMontarFila('gerais');
+    trFila.esp = trMontarFila('esp');
+    trDeck = null; trOnda = -1;
+    $('trLayer').style.display = 'flex';
+    trHome();
+  }
+  function trSetTab(t) {
+    trTab = t;
+    $('tabTrGerais').classList.toggle('on', t === 'gerais');
+    $('tabTrEsp').classList.toggle('on', t === 'esp');
+    trHome();
+  }
+  function trHome() {
+    var fila = trFila[trTab], pos = trPos[trTab];
+    $('trTitulo').textContent = trTab === 'gerais' ? 'Bloco de Gerais' : 'Bloco de Específicas (Direito)';
+    if (!fila.length) { $('trBody').innerHTML = '<div class="q-card"><p class="sub">Sem cartas ainda — as aulas alimentam este bloco.</p></div>'; return; }
+    if (pos >= fila.length) { trRedistribuir(); return; }
+    var prox = fila[pos];
+    var h = '<div class="q-card">' +
+      '<div class="k-label">Rodízio · 10 por assunto, alternando as matérias</div>' +
+      '<p class="sub" style="margin:6px 0 12px">Próximo: <strong>' + prox.a + '</strong> (' + prox.m + ')</p>' +
+      '<button class="btn" id="btnTrComecar" style="width:100%">Responder 10 de ' + prox.a + '</button>' +
+      '<div class="tr-fila" style="margin-top:14px">' +
+      fila.map(function (d, i) {
+        var cls = i < pos ? ' done' : (i === pos ? ' next' : '');
+        return '<div class="tr-fila-row' + cls + '"><div class="m-dot' + (i < pos ? ' done' : '') + '">' + (i < pos ? '✓' : (i + 1)) + '</div>' +
+          '<span class="nm">' + d.a + ' · ' + d.m + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="sub" style="margin-top:10px; font-size:11px">Novos assuntos entram conforme as aulas alimentam o banco (PDF 02 do operador).</p></div>';
+    $('trBody').innerHTML = h;
+    $('btnTrComecar').addEventListener('click', function () {
+      trDeck = prox; trCards = trCartasDo(prox); trIdx = 0; trAcertos = 0; trOnda = -1;
+      trCarta();
+    });
+  }
+  function trAbrirOnda(i) {
+    trOnda = i;
+    trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
+    trCards = AULA_DEMO.cards.slice(TR_ONDAS[i].ini, TR_ONDAS[i].ini + 10).map(function (r) {
+      return fc(AULA_DEMO.m, AULA_DEMO.a, r[0] === 'C', r[1], r[2]);
+    });
+    trIdx = 0; trAcertos = 0;
+    $('trLayer').style.display = 'flex';
+    $('trTitulo').textContent = 'Aula: ' + AULA_DEMO.titulo + ' · ' + TR_ONDAS[i].rot;
+    trCarta();
+  }
+  function trCarta() {
+    var c = trCards[trIdx];
+    var h = '<div class="q-card">' +
+      '<div class="k-label">' + c.a + ' · ' + c.m + ' — carta ' + (trIdx + 1) + ' de ' + trCards.length + '</div>' +
+      '<p class="fc-enun">' + c.t + '</p>' +
+      '<div class="fc-ce"><button class="certo" id="fcCerto">CERTO</button><button class="errado" id="fcErrado">ERRADO</button></div>' +
+      '</div>';
+    $('trBody').innerHTML = h;
+    $('fcCerto').addEventListener('click', function () { trResponde(c, true); });
+    $('fcErrado').addEventListener('click', function () { trResponde(c, false); });
+  }
+  function trResponde(c, marcouCerto) {
+    var acertou = (marcouCerto === c.c);
+    if (acertou) trAcertos++;
+    c.resp = acertou;
+    var h = '<div class="q-card">' +
+      '<div class="k-label">' + c.a + ' · ' + c.m + ' — carta ' + (trIdx + 1) + ' de ' + trCards.length + '</div>' +
+      '<p class="fc-enun">' + c.t + '</p>' +
+      '<div class="fc-verd ' + (acertou ? 'ok' : 'bad') + '">' + (acertou ? '✓ Você acertou!' : '✗ Errou — gabarito: ' + (c.c ? 'CERTO' : 'ERRADO')) + '</div>' +
+      '<p class="fc-obs">' + c.o + '</p>' +
+      '<div class="fc-rate-lbl">Como foi essa pra você?</div>' +
+      '<div class="fc-rate">' +
+      '<button class="r0" data-nota="0">Errei</button><button class="r1" data-nota="1">Difícil</button>' +
+      '<button class="r2" data-nota="2">Bom</button><button class="r3" data-nota="3">Fácil</button></div></div>';
+    $('trBody').innerHTML = h;
+    $('trBody').querySelectorAll('[data-nota]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        c.nota = parseInt(b.dataset.nota, 10);
+        trIdx++;
+        if (trIdx < trCards.length) trCarta(); else trFimBloco();
+      });
+    });
+  }
+  function trFimBloco() {
+    /* pagamento: +1 score por acerto · +5 QdC pelo bloco · Domínio atualiza */
+    carreira.scorePatente += trAcertos * TR_REW.scorePorAcerto;
+    carreira.scoreCarreira += trAcertos * TR_REW.scorePorAcerto;
+    carreira.scoreTemporada += trAcertos * TR_REW.scorePorAcerto;
+    renderCarreira();
+    addScore(TR_REW.coinsPorBloco, '+' + TR_REW.coinsPorBloco + ' Quad Coins · bloco de flashcards');
+    var chave = trDeck.m + '|' + trDeck.a;
+    trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
+    if (typeof renderEdital === 'function') renderEdital();
+    var deOnda = trOnda >= 0;
+    if (deOnda) {
+      ondaFeita[trOnda] = true;
+      /* respondidas, as cartas da aula entram no banco geral */
+      trCards.forEach(function (c) { TR_BANK.push(c); });
+      renderOndas();
+      trFila.esp = trMontarFila('esp');
+    }
+    var h = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
+      '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
+      '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
+      'O Domínio de <strong>' + trDeck.a + '</strong> foi atualizado.' +
+      (deOnda ? '<br>As 10 cartas da aula entraram no banco do Treinamento Rápido.' : '') + '</p>' +
+      '<button class="btn" id="btnTrProx" style="width:100%">' + (deOnda ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
+    $('trBody').innerHTML = h;
+    $('btnTrProx').addEventListener('click', function () {
+      if (deOnda) { $('trLayer').style.display = 'none'; return; }
+      trPos[trTab]++;
+      trHome();
+    });
+  }
+  function trRedistribuir() {
+    trPos[trTab] = 0;
+    trFila[trTab] = trMontarFila(trTab);
+    $('trBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">Você zerou o bloco! 🎖️</p>' +
+      '<p class="sub" style="margin:8px 0 14px">O baralho foi <strong>redistribuído pela dificuldade</strong> que você informou: as cartas marcadas como Errei e Difícil voltam primeiro.</p>' +
+      '<button class="btn" id="btnTrDeNovo" style="width:100%">Recomeçar o rodízio</button></div>';
+    $('btnTrDeNovo').addEventListener('click', trHome);
+  }
+  window.TR_BANK = TR_BANK; window.AULA_DEMO = AULA_DEMO;   /* exposto para a suíte de testes */
+  $('btnTrSair').addEventListener('click', function () { $('trLayer').style.display = 'none'; });
+  $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
+  $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
+  renderOndas();
 
   /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
   var TQ = [

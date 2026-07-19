@@ -1,5 +1,30 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — Treinamento Rápido: flashcards estilo Anki (substitui a "Nova missão")
+- **Pipeline aula → flashcards**: aula presencial gravada → operador extrai
+  2 PDFs. PDF 01 = 40 certo/errado da fala do professor, liberados em
+  **4 ondas de 10** (D0 às 22h15 · D+1 às 22h15 · D+7 · D+30 — repetição
+  espaçada); respondidas, as cartas **migram para o banco geral**. PDF 02
+  alimenta o banco direto. Card das ondas na aba Missões com estados
+  (bloqueada/responder/FEITO) e liberação demo
+- **Treinamento Rápido** (novo card no lugar da "Nova missão"): duas abas —
+  **Gerais** (Português, Inglês, Informática, Matemática, História,
+  Geografia) e **Específicas** (os 7 Direitos). **Rodízio de 10 por
+  assunto alternando as matérias**: Interpretação (PT) → Interpretação
+  (EN) → Editores de texto → Conjuntos numéricos → …; na volta, entra o
+  2º assunto de cada matéria
+- **Flashcard clássico**: enunciado + CERTO/ERRADO → gabarito na hora com
+  comentário da aula → autoavaliação **Errei / Difícil / Bom / Fácil**
+- **Pagamento**: +1 score por acerto · +5 Quad Coins por bloco de 10 ·
+  a barra do **Domínio** do assunto treinado se move (68%→73% com 9/10);
+  métricas calibradas ficam para a V2
+- **Zerou a aba → redistribuição**: o baralho volta ordenado pela
+  dificuldade informada (Errei/Difícil primeiro)
+- **Banco V0**: 100 cartas autorais etiquetadas pela árvore CFO — 6
+  baralhos de assunto (60) + a aula demo de Poderes administrativos (40)
+- Suíte própria: 17 verificações (rodízio, feedback, pagamento, Domínio,
+  ondas, migração para o banco)
+
 ## 19/07/2026 — confirmação do avatar, título capitalizado e zoom no beat final
 - **Escolha do avatar em duas etapas**: segurar inspeciona quantos quiser;
   um toque simples mostra o candidato na prévia e o QUAD pergunta
