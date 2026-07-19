@@ -1,5 +1,13 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — remoção do selo azul na foto do personagem
+- O selo de boina sobre a foto do card (renderizava azul na paleta) foi
+  removido — a foto fica limpa; o estado "equipada" segue visível nos itens
+  do personagem, no Perfil do aluno
+- Fala do beat da boina ajustada: "tá guardada nos itens do seu personagem
+  — em breve ele aparece vestindo ela" (a arte do avatar com boina fica
+  para quando existir a imagem)
+
 ## 19/07/2026 — tutorial: nome ao vivo, missão 3 de 3 e bronca da skin
 - **Nome principal muda ao vivo**: enquanto o aluno digita o nome de guerra,
   o card lá em cima já vira "AL SD QUAD <NOME>" na hora (não só ao salvar) —

@@ -611,12 +611,6 @@
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
   .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
   @keyframes tqShake { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
-  #homeBoina {
-    position: absolute; right: -2px; top: -4px; width: 21px; height: 21px; z-index: 2;
-    background: var(--p-gold); border: 2px solid #fff; border-radius: 50%;
-    display: grid; place-items: center; pointer-events: none;
-  }
-  #homeBoina svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.4; }
 
   /* ============ DANILO, O GUIA ============ */
   /* Danilo integrado ao layout (sem círculo) — acena e fica parado */
@@ -1067,7 +1061,6 @@
           <div class="id-row">
             <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno">
               <span class="insignia" id="homeAvatar" aria-hidden="true">▲</span>
-              <span id="homeBoina" style="display:none" title="Boina exclusiva equipada"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/></svg></span>
             </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
@@ -3148,7 +3141,6 @@
   }
   function tutEquiparBoina() {
     $('equipBoina').style.display = 'flex';
-    $('homeBoina').style.display = 'grid';
     var ch = $('chipBoina'); if (ch) ch.classList.remove('locked');
   }
   function tutResetBoina() {
@@ -3159,7 +3151,6 @@
     }
     lojaOwned['Boina exclusiva'] = false;
     $('equipBoina').style.display = 'none';
-    $('homeBoina').style.display = 'none';
     var ch = $('chipBoina'); if (ch) ch.classList.add('locked');
   }
   function tutDadosOk() {
@@ -3244,7 +3235,7 @@
     { sel: '#coinsCard', mood: 'talk', bot: 'br',
       txt: 'É assim que funciona: Coin <b>entra</b> com missão, <b>sai</b> com compra. E a boina já foi direto pro seu personagem.' },
     { view: 'v-inicio', sel: '#btnAvatarPerfil', mood: 'cheer', bot: 'bl',
-      txt: 'Olha ele aí de <b>boina nova</b>! Estiloso, hein?' },
+      txt: 'A <b>boina nova</b> já é sua — tá guardada nos itens do seu personagem, no perfil. Em breve ele aparece vestindo ela!' },
     { sel: null, mood: 'talk', bot: 'br',
       txt: 'Pronto: você já sabe o principal — <b>perfil, missões, score, Coins e Loja</b>.' },
     { sel: null, mood: 'salute', bot: 'br', btn: 'CONCLUIR ›',
