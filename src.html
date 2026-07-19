@@ -580,6 +580,13 @@
   .tut-name .tut-etapa { margin-left: auto; font: 600 10px Consolas, monospace; color: #8AA0BF; }
   .tut-text { font-size: 13px; line-height: 1.55; color: #1B2B45; }
   .tut-text b { color: var(--p-blue); }
+  .tut-opts { display: none; gap: 8px; margin-top: 11px; }
+  .tut-opts.on { display: flex; }
+  .tut-opts button { flex: 1; cursor: pointer; border-radius: 10px; padding: 9px 8px;
+    font: 700 12px var(--ui); }
+  .tut-opts .sim { background: var(--p-blue); border: none; color: #fff; }
+  .tut-opts .nao { background: #fff; border: 1.5px solid #DCE8F7; color: #14324F; }
+
   /* avanço discreto: PRÓXIMO pequeno no cantinho + toque na metade direita */
   .tut-next {
     position: absolute; right: 12px; bottom: 8px; z-index: 4; pointer-events: auto;
@@ -2018,6 +2025,7 @@
           <div class="tut-bubble" id="tutBubble">
             <div class="tut-name"><b>QUAD</b><span class="tut-etapa" id="tutStepN"></span></div>
             <div class="tut-text" id="tutText"></div>
+            <div class="tut-opts" id="tutOpts"></div>
           </div>
           <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
           <button class="tut-next" id="tutNext">Avançar ›</button>
@@ -3191,6 +3199,12 @@
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra', mood: 'bob', bot: 'br',
       onEnter: function () { if (tutGuerraOk()) return 'skip'; },
       txt: 'Pode ser um nome, um sobrenome, o que te representar. <b>Escreve aí</b> — só letras, sem palavrão.' },
+    { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'confirma-guerra', mood: 'talk', bot: 'br',
+      txt: function () { return 'Você quis dizer <b>' + tutGuerra() + '</b>? Confirma?'; },
+      opts: [
+        { rotulo: 'Sim, confirmo!', cls: 'sim', acao: function () { tutEvent('confirma-guerra'); } },
+        { rotulo: 'Não, quero mudar', cls: 'nao', acao: function () { $('nomeGuerra').value = ''; syncNametag(); tutGo(tutIdx - 1); } }
+      ] },
     { sel: '#btnSalvarPerfil', expect: 'salvo', mood: 'point', bot: 'tr',
       txt: 'Fechou! Agora <b>toca em “Salvar alterações”</b> pra gravar tudo.' },
     { view: 'v-inicio', sel: '#homeNome', mood: 'cheer', bot: 'br',
@@ -3366,6 +3380,17 @@
     var skip = st.onEnter ? st.onEnter() : null;
     if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
     tutExpect = st.expect || null;
+    var opts = $('tutOpts');
+    opts.innerHTML = ''; opts.classList.remove('on');
+    if (st.opts) {
+      opts.classList.add('on');
+      st.opts.forEach(function (o) {
+        var b = document.createElement('button');
+        b.className = o.cls; b.textContent = o.rotulo;
+        b.addEventListener('click', o.acao);
+        opts.appendChild(b);
+      });
+    }
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';

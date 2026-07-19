@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — confirmação do nome de guerra no tutorial
+- Novo beat após digitar o nome de guerra: o QUAD pergunta **"Você quis
+  dizer CLARA? Confirma?"** (nome interpolado) com dois botões no balão —
+  **"Sim, confirmo!"** avança para o Salvar; **"Não, quero mudar"** limpa o
+  campo e volta para a digitação, quantas vezes precisar
+- Infra de beats com opções (`opts`) no balão — reutilizável para futuras
+  escolhas dentro de tutoriais
+- Suíte: 67 verificações passando (confirmar, mudar e reconfirmar testados)
+
 ## 19/07/2026 — turma do aluno em todas as identidades
 - **TURMA PATAMO (N)** agora aparece abaixo do nome/patente em todos os
   pontos de identidade: card principal (já existia), resumo do Quadrômetro,
