@@ -533,11 +533,14 @@
   .tut-shade { position: absolute; background: rgba(4, 16, 38, 0.78); transition: all 0.3s ease; pointer-events: auto; }
   .tut-ring {
     position: absolute; border-radius: 14px; pointer-events: none; display: none;
+    cursor: pointer;
     border: 2.5px solid #FFD76A; box-shadow: 0 0 0 4px rgba(255, 215, 106, 0.28), 0 0 22px rgba(255, 215, 106, 0.5);
     transition: all 0.3s ease; animation: tutPulse 1.4s ease-in-out infinite;
   }
   @keyframes tutPulse { 0%,100% { box-shadow: 0 0 0 4px rgba(255,215,106,0.28), 0 0 22px rgba(255,215,106,0.5); }
     50% { box-shadow: 0 0 0 8px rgba(255,215,106,0.12), 0 0 30px rgba(255,215,106,0.7); } }
+  /* fala sem ação: a janela vira só visual — o anel captura o toque (e avança) */
+  .tut-layer.livre .tut-ring { pointer-events: auto; }
   .tut-arrow {
     position: absolute; display: none; pointer-events: none; color: #FFD76A;
     font-size: 26px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 3;
@@ -3278,6 +3281,7 @@
     tutExpect = st.expect || null;
     $('tutText').innerHTML = typeof st.txt === 'function' ? st.txt() : st.txt;
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
+    $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
     $('tutNext').textContent = st.btn || 'Avançar ›';
     $('tutWait').style.display = st.expect ? 'block' : 'none';
@@ -3339,20 +3343,34 @@
       setTimeout(function () { tutEvent('salvo'); }, 350);
       return;
     }
+    if (e.target.closest('.avatar-opt')) { tutAvatarOk = true; }   /* registra a escolha em qualquer etapa */
     if (tutExpect === 'abrir-perfil' && e.target.closest('#btnAvatarPerfil')) { setTimeout(function () { tutEvent('abrir-perfil'); }, 300); }
-    else if (tutExpect === 'avatar' && e.target.closest('.avatar-opt')) { tutAvatarOk = true; setTimeout(function () { tutEvent('avatar'); }, 350); }
+    else if (tutExpect === 'avatar' && e.target.closest('.avatar-opt')) { setTimeout(function () { tutEvent('avatar'); }, 350); }
     else if (tutExpect === 'bloco' && e.target.closest('#btnMissaoHome')) { setTimeout(function () { tutEvent('bloco'); }, 300); }
     else if (tutExpect === 'loja') { var nb = e.target.closest('.nav-btn'); if (nb && nb.dataset.view === 'v-loja') setTimeout(function () { tutEvent('loja'); }, 300); }
-    else if (tutExpect === 'ver-itens' && e.target.closest('#tutLojaCard')) { tutEvent('ver-itens'); }
+    else if (tutExpect === 'ver-itens' && e.target.closest('#tutLojaCard')) {
+      e.stopPropagation(); e.preventDefault();   /* nesta etapa é só olhar — compra é na próxima */
+      tutEvent('ver-itens');
+    }
     else if (tutExpect === 'boina') {
       var it = e.target.closest('.loja-item[data-nome="Boina exclusiva"]');
       if (it) setTimeout(function () { if (it.classList.contains('comprado')) { tutEquiparBoina(); tutEvent('boina'); } }, 120);
     }
   }, true);
+  /* avança só quando o aluno PAROU de digitar (não no meio do nome) */
+  var tutTypeT = null;
+  function tutTypeCheck(kind) {
+    clearTimeout(tutTypeT);
+    tutTypeT = setTimeout(function () {
+      if (!tutOn) return;
+      if (kind === 'dados' && tutExpect === 'dados' && tutDadosOk()) tutEvent('dados');
+      if (kind === 'guerra' && tutExpect === 'guerra' && tutGuerraOk()) tutEvent('guerra');
+    }, 900);
+  }
   ['nomeCompleto', 'foneAluno'].forEach(function (id) {
-    $(id).addEventListener('input', function () { if (tutOn && tutExpect === 'dados' && tutDadosOk()) tutEvent('dados'); });
+    $(id).addEventListener('input', function () { tutTypeCheck('dados'); });
   });
-  $('nomeGuerra').addEventListener('input', function () { if (tutOn && tutExpect === 'guerra' && tutGuerraOk()) tutEvent('guerra'); });
+  $('nomeGuerra').addEventListener('input', function () { tutTypeCheck('guerra'); });
 
   /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
   var TQ = [
@@ -3421,10 +3439,10 @@
     carreira.scorePatente = 0; carreira.scoreCarreira = 0; carreira.scoreTemporada = 0;
     carreira.estado = 'acumulando'; renderCarreira();
     tutResetBoina();
+    tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
     if (lsGet(TUT_LS.done) !== '1') {
       $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';
-      tutAvatarOk = false;
-    } else { tutAvatarOk = true; }
+    }
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
     $('tutLayer').classList.add('on');
@@ -3435,6 +3453,9 @@
     tutOn = false; tourOn = false; tutExpect = null;
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
+    $('daniloHint').style.display = '';
+    var bm = $('btnTutMissao');
+    if (bm) { bm.disabled = true; bm.textContent = 'Missão de instrução concluída ✓'; }
     toast('Instrução inicial concluída — plataforma liberada!');
     daniloWave();
   }

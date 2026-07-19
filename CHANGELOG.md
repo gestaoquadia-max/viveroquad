@@ -1,5 +1,23 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial do QUAD: auditoria e 6 correções
+- **Janela informativa vazava cliques** (crítico): nas falas sem ação dava
+  para clicar no elemento iluminado e navegar por trás do tutorial (ex.:
+  card de Coins abria a Loja). Agora o anel captura o toque — e avança
+- **Avanço no meio da digitação**: bastavam 2 letras para o tutorial pular
+  a etapa do nome de guerra enquanto o aluno ainda digitava; agora só
+  avança após ~1s sem digitar (dados e nome de guerra)
+- **Softlock do "falta avatar"**: no erro de validação do salvar, escolher
+  o avatar não era registrado (só valia na etapa própria) e o salvar
+  falharia para sempre; escolha agora registra em qualquer etapa
+- **Refazer pulava a escolha do avatar** e elogiava sem escolha; refazer
+  agora exige escolher o personagem de novo
+- **Compra acidental na vitrine**: na etapa "veja os itens", clicar num
+  item comprava; agora essa etapa é só visual (compra é na seguinte)
+- **Farm da missão de instrução**: após o tutorial o botão "Iniciar missão"
+  continuava ativo pagando +30/+25 por rodada; agora encerra ("concluída ✓")
+- Suíte ampliada para 44 verificações (todas as falhas viraram testes)
+
 ## 19/07/2026 — tutorial do QUAD: revisão de UX pelo fundador
 - **Balão claro**: fundo branco com texto escuro e palavras-chave em azul
   (o azul sólido estava carregado); rabinho sempre apontando para o QUAD
