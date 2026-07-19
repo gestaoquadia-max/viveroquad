@@ -200,6 +200,15 @@
   .ed-ass .ed-head .ed-pc { font-size: 12px; color: var(--p-text); width: 38px; }
   .ed-ass > .ed-bar { height: 5px; margin: 6px 0 0 20px; }
   .ed-sublist { display: none; margin: 8px 0 2px 20px; }
+  .ed-actions { display: flex; gap: 8px; margin: 2px 0 10px; }
+  .ed-actions a {
+    display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+    font: 700 11px var(--ui); letter-spacing: 0.02em; padding: 6px 11px;
+    border-radius: 99px; border: 1.5px solid var(--p-blue); color: var(--p-blue);
+    background: #fff;
+  }
+  .ed-actions a:first-child { background: var(--p-blue); color: #fff; }
+  .ed-actions a:active { transform: scale(0.97); }
   .ed-ass.open > .ed-sublist { display: block; }
   .ed-srow { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
   .ed-srow .ed-nm { flex: 1; font-size: 12px; color: var(--p-dim); }
@@ -2263,6 +2272,11 @@
       });
       var matPct = edAvg(assPcts);
       var assHtml = assuntos.map(function (ass, ai) {
+        var q = encodeURIComponent(matNm + ' ' + ass[0]);
+        var acoes = '<div class="ed-actions">' +
+          '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent('aula ' + matNm + ' ' + ass[0] + ' concurso') + '" target="_blank" rel="noopener">\u25B6 Assistir aula</a>' +
+          '<a href="https://www.qconcursos.com/questoes-de-concursos/questoes?q=' + q + '" target="_blank" rel="noopener">\u270E Fazer quest\u00F5es</a>' +
+          '</div>';
         var subHtml = ass[1].map(function (sub) {
           var sp = edSubPct(mi, matNm, ass[0], sub);
           return '<div class="ed-srow"><span class="ed-nm">' + sub + '</span>' + edBar(sp) +
@@ -2273,7 +2287,7 @@
           '<span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + ' ' + ass[0] + '</span>' +
           '<span class="ed-pc" style="color:' + edPcColor(assPcts[ai]) + '">' + Math.round(assPcts[ai]) + '%</span></button>' +
           '<div class="ed-bar">' + edFill(assPcts[ai]) + '</div>' +
-          '<div class="ed-sublist">' + subHtml + '</div></div>';
+          '<div class="ed-sublist">' + acoes + subHtml + '</div></div>';
       }).join('');
       html += '<div class="ed-mat' + (mi === 0 ? ' open' : '') + '">' +
         '<button class="ed-head" type="button"><span class="chev">' + (mi === 0 ? '\u25BE' : '\u25B8') + '</span>' +

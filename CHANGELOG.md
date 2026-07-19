@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — botões de ação por assunto na árvore do edital
+- **Dois botões em cada um dos 100 assuntos** (aparecem ao expandir o assunto,
+  acima dos sub-assuntos): **▶ Assistir aula** e **✎ Fazer questões**
+- Ambos abrem **link externo em nova aba**, montado com matéria + assunto:
+  aula → busca no YouTube ("aula [matéria] [assunto] concurso"); questões →
+  busca no banco do QConcursos. Na V1 os links passam a apontar para a aula
+  e a lista de questões oficiais do Quad de cada assunto
+- Estilo pílula: aula em azul sólido (ação primária), questões em contorno;
+  clicar nos botões não fecha o acordeão
+
 ## 19/07/2026 — escala térmica de cores na árvore do edital
 - **Barras e percentuais coloridos por valor** em todos os 3 níveis da árvore:
   quanto mais perto de 0% mais **vermelho**, quanto mais perto de 100% mais
