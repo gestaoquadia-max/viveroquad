@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — árvore do edital CFO PM-BA no Domínio
+- **Árvore completa do edital do CFO** (Curso de Formação de Oficiais da PM-BA)
+  na aba Domínio: **13 matérias · 100 assuntos · 427 sub-assuntos**, transcrita
+  integralmente da árvore enviada pelo fundador (dados centralizados em
+  `EDITAL_CFO`)
+- **Barra de progresso em todos os níveis**, relacionadas de baixo para cima:
+  a barra do assunto é a **média das barras dos sub-assuntos** e a barra da
+  matéria é a **média das barras dos assuntos** (função `edAvg`)
+- Acordeão em 3 níveis: matéria ▸ assunto ▸ sub-assunto, com numeração do
+  edital (1., 1.1, …), percentual ao lado de cada barra e 1ª matéria aberta
+  por padrão; hierarquia visual por tamanho de barra e recuo
+- Progresso simulado da V0 é **determinístico** (hash do nome + viés por
+  matéria) — recarregar não muda os números; a metodologia calibrada entra
+  na V1 com dados reais
+- Removidos a árvore antiga de amostra (PC-BA) e o CSS/JS correspondentes
+
 ## 18/07/2026 (noite) — gamificação: patentes, score e prova de promoção
 - **Configuração central `GAMI`** (seção 34 do documento): 14 patentes (Aluno
   Soldado → Coronel), 4 fases com notas mínimas (70/75/80/85%), curva de pontos
