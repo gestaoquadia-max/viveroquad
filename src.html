@@ -1245,13 +1245,10 @@
             <p class="sub" id="trCardSub">Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.</p>
             <div style="margin-top:10px"><button class="btn small" id="btnTreinoRapido">Abrir treinamento</button></div>
           </div>
+
           <div class="p-card">
-            <div class="k-label">Aula → flashcards · repetição espaçada</div>
-            <p class="sub" style="margin-bottom:8px">Aula de <strong>Poderes administrativos</strong> (Prof. Danilo Moura, presencial de hoje): o operador extraiu <strong>40 certo/errado</strong> do que foi falado — liberadas em 4 ondas. Respondidas, entram no banco do Treinamento Rápido.</p>
-            <div id="ondasList"></div>
-          </div>
-          <div class="p-card">
-            <div class="k-label">Hoje · questões novas (3 + 10 + 10)</div>
+            <div class="k-label">Hoje · questões novas (3 + 8 × 10)</div>
+            <p class="sub" style="margin-bottom:8px">As rápidas liberam às <strong>22h15</strong>: as 2 aulas de hoje (D0) + revisões de ontem (D+1), da semana (D+7) e do mês (D+30). Respondidas, entram no Treinamento Rápido.</p>
             <div class="mission-row" id="blocoIntroRow">
               <div class="m-dot" id="biDot">1</div>
               <div class="grow">
@@ -1261,22 +1258,7 @@
               <button class="btn small" id="btnBlocoIntro">Iniciar</button>
               <span class="tag" id="biFeito" style="display:none">FEITO</span>
             </div>
-            <div class="mission-row">
-              <div class="m-dot done">✓</div>
-              <div class="grow">
-                <div class="t">Bloco 2 · Português</div>
-                <div class="d">10/10 · concluído no almoço · +25 Quad Coins</div>
-              </div>
-              <span class="tag">FEITO</span>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot" id="b2dot">3</div>
-              <div class="grow">
-                <div class="t">Bloco 3 · Dir. Administrativo — Poderes</div>
-                <div class="d" id="b2desc">10 questões · ~15 min · expira 23h59</div>
-              </div>
-              <button class="btn small" id="btnMissao2">Iniciar</button>
-            </div>
+            <div id="diaList"></div>
           </div>
           <div class="p-card">
             <div class="k-label">Atrasadas · recupere até sábado</div>
@@ -2776,9 +2758,6 @@
         $('missBar').style.width = '100%';
         $('missCount').textContent = '20/20';
         $('missExpira').textContent = 'CONCLUÍDO';
-        $('b2dot').classList.add('done'); $('b2dot').textContent = '✓';
-        $('b2desc').textContent = '10/10 · concluído agora · +30 Quad Coins';
-        $('btnMissao2').disabled = true; $('btnMissao2').textContent = 'Feito';
         $('btnMissaoHome').disabled = true; $('btnMissaoHome').textContent = 'Missão do dia concluída';
         addScore(30, '+30 Quad Coins · missão do dia completa');
         addPontos(10); // bônus de score por concluir o bloco de missão
@@ -2810,7 +2789,6 @@
     toast('Missão pausada — expira 23h59.');
   });
 
-  $('btnMissao2').addEventListener('click', function () { openQuiz('missao', 'Missão · Bloco 3 · Dir. Administrativo'); });
   $('btnTreinoRapido').addEventListener('click', function () { trAbrir(); });
   $('btnMissaoHome').addEventListener('click', function () {
     showView('v-missoes', 'navAluno');
@@ -3758,38 +3736,44 @@
       ['E','O poder de polícia não alcança bens, somente pessoas.','Bens também se sujeitam (ex.: interdição).']
     ]
   };
-  var TR_ONDAS = [
-    { rot: 'Onda 1 · hoje, 22h15 (D0)', ini: 0 },
-    { rot: 'Onda 2 · amanhã, 22h15 (D+1)', ini: 10 },
-    { rot: 'Onda 3 · em 1 semana (D+7)', ini: 20 },
-    { rot: 'Onda 4 · em 1 mês (D+30)', ini: 30 }
+  /* PDF 01 → bloco Hoje: 2 aulas por dia × marcos D0 · D+1 · D+7 · D+30.
+     Tudo libera às 22h15 do dia — o aluno só vê "as rápidas de hoje". */
+  var DIA_BLOCOS = [
+    { rot: 'Bloco 2 · Dir. Constitucional', det: 'aula de hoje, 19h · D0', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+    { rot: 'Bloco 3 · Matemática', det: 'aula de hoje, 20h30 · D0', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem · D+1', fonte: 'aula', ini: 0 },
+    { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem · D+1', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'semana passada · D+7', fonte: 'aula', ini: 10 },
+    { rot: 'Revisão · Língua Inglesa', det: 'semana passada · D+7', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'mês passado · D+30', fonte: 'aula', ini: 20 },
+    { rot: 'Revisão · Informática', det: 'mês passado · D+30', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
   ];
-  var ondaFeita = [false, false, false, false];
-  function ondaDisponivel(i) {
-    if (i > 0) return ondaFeita[i];   /* futuras: só via demo */
+  var diaFeito = DIA_BLOCOS.map(function () { return false; });
+  function rapidasLiberadas() {
     var ag = new Date();
     return ag.getHours() * 60 + ag.getMinutes() >= 22 * 60 + 15;
   }
-  function renderOndas() {
-    $('ondasList').innerHTML = TR_ONDAS.map(function (o, i) {
+  function renderDia() {
+    var aberto = rapidasLiberadas();
+    $('diaList').innerHTML = DIA_BLOCOS.map(function (b, i) {
       var st;
-      if (ondaFeita[i]) st = '<span class="tag">FEITO</span>';
-      else if (i === 0 && ondaDisponivel(0)) st = '<button class="btn small" data-onda="' + i + '">Responder 10</button>';
-      else st = '<span class="quando">bloqueada</span> <button class="onda-demo" data-onda-demo="' + i + '">liberar (demo)</button>';
-      return '<div class="onda-row"><div class="m-dot' + (ondaFeita[i] ? ' done' : '') + '">' + (ondaFeita[i] ? '✓' : (i + 1)) + '</div>' +
-        '<div class="nm">' + o.rot + '</div>' + st + '</div>';
+      if (diaFeito[i]) st = '<span class="tag">FEITO</span>';
+      else if (aberto) st = '<button class="btn small" data-dia="' + i + '">Responder 10</button>';
+      else st = '<span class="quando">22h15</span> <button class="onda-demo" data-dia-demo="' + i + '">liberar (demo)</button>';
+      return '<div class="mission-row"><div class="m-dot' + (diaFeito[i] ? ' done' : '') + '">' + (diaFeito[i] ? '✓' : (i + 2)) + '</div>' +
+        '<div class="grow"><div class="t">' + b.rot + '</div><div class="d">' + b.det + ' · 10 rápidas</div></div>' + st + '</div>';
     }).join('');
-    $('ondasList').querySelectorAll('[data-onda]').forEach(function (b) {
-      b.addEventListener('click', function () { trAbrirOnda(parseInt(b.dataset.onda, 10)); });
+    $('diaList').querySelectorAll('[data-dia]').forEach(function (bt) {
+      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
     });
-    $('ondasList').querySelectorAll('[data-onda-demo]').forEach(function (b) {
-      b.addEventListener('click', function () { trAbrirOnda(parseInt(b.dataset.ondaDemo, 10)); });
+    $('diaList').querySelectorAll('[data-dia-demo]').forEach(function (bt) {
+      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.diaDemo, 10)); });
     });
   }
 
   /* ---------- motor do treinamento ---------- */
   var trTab = 'gerais', trFila = { gerais: [], esp: [] }, trPos = { gerais: 0, esp: 0 };
-  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trOnda = -1;
+  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trDia = -1;
   function trEhGeral(m) { return TR_GERAIS.indexOf(m) >= 0; }
   function trMontarFila(tab) {
     var mats = EDITAL_CFO.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
@@ -3813,7 +3797,7 @@
   function trAbrir() {
     trFila.gerais = trMontarFila('gerais');
     trFila.esp = trMontarFila('esp');
-    trDeck = null; trOnda = -1;
+    trDeck = null; trDia = -1;
     $('trLayer').style.display = 'flex';
     trHome();
   }
@@ -3842,19 +3826,25 @@
       '<p class="sub" style="margin-top:10px; font-size:11px">Novos assuntos entram conforme as aulas alimentam o banco (PDF 02 do operador).</p></div>';
     $('trBody').innerHTML = h;
     $('btnTrComecar').addEventListener('click', function () {
-      trDeck = prox; trCards = trCartasDo(prox); trIdx = 0; trAcertos = 0; trOnda = -1;
+      trDeck = prox; trCards = trCartasDo(prox); trIdx = 0; trAcertos = 0; trDia = -1;
       trCarta();
     });
   }
-  function trAbrirOnda(i) {
-    trOnda = i;
-    trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
-    trCards = AULA_DEMO.cards.slice(TR_ONDAS[i].ini, TR_ONDAS[i].ini + 10).map(function (r) {
-      return fc(AULA_DEMO.m, AULA_DEMO.a, r[0] === 'C', r[1], r[2]);
-    });
+  function trAbrirBloco(i) {
+    var b = DIA_BLOCOS[i];
+    trDia = i;
+    if (b.fonte === 'aula') {
+      trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
+      trCards = AULA_DEMO.cards.slice(b.ini, b.ini + 10).map(function (r) {
+        return fc(AULA_DEMO.m, AULA_DEMO.a, r[0] === 'C', r[1], r[2]);
+      });
+    } else {
+      trDeck = { m: b.m, a: b.a };
+      trCards = trCartasDo(trDeck);
+    }
     trIdx = 0; trAcertos = 0;
     $('trLayer').style.display = 'flex';
-    $('trTitulo').textContent = 'Aula: ' + AULA_DEMO.titulo + ' · ' + TR_ONDAS[i].rot;
+    $('trTitulo').textContent = b.rot + ' · ' + b.det;
     trCarta();
   }
   function trCarta() {
@@ -3900,24 +3890,27 @@
     var chave = trDeck.m + '|' + trDeck.a;
     trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
     if (typeof renderEdital === 'function') renderEdital();
-    var deOnda = trOnda >= 0;
-    if (deOnda) {
-      ondaFeita[trOnda] = true;
-      /* respondidas, as cartas da aula entram no banco geral */
-      trCards.forEach(function (c) { TR_BANK.push(c); });
-      renderOndas();
-      trFila.esp = trMontarFila('esp');
+    var deDia = trDia >= 0;
+    if (deDia) {
+      diaFeito[trDia] = true;
+      if (DIA_BLOCOS[trDia].fonte === 'aula') {
+        /* respondidas, as cartas do PDF 01 entram no banco do Treinamento Rápido */
+        trCards.forEach(function (c) { TR_BANK.push(c); });
+        trFila.esp = trMontarFila('esp');
+        trFila.gerais = trMontarFila('gerais');
+      }
+      renderDia();
     }
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
       '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
       '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
       'O Domínio de <strong>' + trDeck.a + '</strong> foi atualizado.' +
-      (deOnda ? '<br>As 10 cartas da aula entraram no banco do Treinamento Rápido.' : '') + '</p>' +
-      '<button class="btn" id="btnTrProx" style="width:100%">' + (deOnda ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
+      (deDia ? '<br>As 10 rápidas entraram no banco do Treinamento Rápido.' : '') + '</p>' +
+      '<button class="btn" id="btnTrProx" style="width:100%">' + (deDia ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
     $('trBody').innerHTML = h;
     $('btnTrProx').addEventListener('click', function () {
-      if (deOnda) { $('trLayer').style.display = 'none'; return; }
+      if (deDia) { $('trLayer').style.display = 'none'; return; }
       trPos[trTab]++;
       trHome();
     });
@@ -3935,7 +3928,7 @@
   $('btnTrSair').addEventListener('click', function () { $('trLayer').style.display = 'none'; });
   $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
   $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
-  renderOndas();
+  renderDia();
 
   /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
   var TQ = [

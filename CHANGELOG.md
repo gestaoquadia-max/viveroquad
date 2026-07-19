@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — rápidas do dia dentro do "Hoje" (correção do modelo)
+- **Removido o card "Aula → flashcards · repetição espaçada"** — era uma
+  materialização errada: o agendamento do PDF 01 pertence DENTRO do bloco
+  "Hoje · questões novas", não num card à parte
+- **"Hoje · questões novas (3 + 8 × 10)"**: Bloco 1 · Introdução (3) +
+  **Blocos 2 e 3 = as duas aulas de hoje** (Dir. Constitucional 19h e
+  Matemática 20h30 · D0) + **revisões**: 2×10 de ontem (D+1), 2×10 da
+  semana passada (D+7) e 2×10 do mês passado (D+30) — tudo liberando às
+  **22h15** (com "liberar (demo)" para testes)
+- Respondidas, as rápidas **entram no banco do Treinamento Rápido**
+  (que segue sendo PDF 02 + PDF 01 já resolvido)
+- Título do card: "Questões rápidas para revisão!"; caminho morto do quiz
+  antigo de missão limpo (Bloco 3 estático e botão Iniciar removidos)
+- Suíte do treinamento: 19 verificações passando
+
 ## 19/07/2026 — Treinamento Rápido: flashcards estilo Anki (substitui a "Nova missão")
 - **Pipeline aula → flashcards**: aula presencial gravada → operador extrai
   2 PDFs. PDF 01 = 40 certo/errado da fala do professor, liberados em
