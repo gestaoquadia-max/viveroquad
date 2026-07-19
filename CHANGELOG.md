@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — escala térmica de cores na árvore do edital
+- **Barras e percentuais coloridos por valor** em todos os 3 níveis da árvore:
+  quanto mais perto de 0% mais **vermelho**, quanto mais perto de 100% mais
+  **azul** (`edHue`/`edFill`/`edPcColor`)
+- Curva em dois trechos para leitura honesta: 0→50% varre vermelho→laranja→
+  âmbar (o quente domina a metade baixa) e 50→100% varre âmbar→verde→azul —
+  assim 39% aparece laranja (alerta) e não verde
+- Cores calculadas em HSL na renderização; removidas as cores fixas por nível
+  no CSS (dourado/azul/cinza)
+
 ## 19/07/2026 — árvore do edital CFO PM-BA no Domínio
 - **Árvore completa do edital do CFO** (Curso de Formação de Oficiais da PM-BA)
   na aba Domínio: **13 matérias · 100 assuntos · 427 sub-assuntos**, transcrita

@@ -199,13 +199,11 @@
   .ed-ass .ed-head .ed-nm { font-weight: 600; font-size: 12.5px; }
   .ed-ass .ed-head .ed-pc { font-size: 12px; color: var(--p-text); width: 38px; }
   .ed-ass > .ed-bar { height: 5px; margin: 6px 0 0 20px; }
-  .ed-ass > .ed-bar > i { background: var(--p-blue); }
   .ed-sublist { display: none; margin: 8px 0 2px 20px; }
   .ed-ass.open > .ed-sublist { display: block; }
   .ed-srow { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
   .ed-srow .ed-nm { flex: 1; font-size: 12px; color: var(--p-dim); }
   .ed-srow .ed-bar { width: 56px; height: 4px; flex: none; }
-  .ed-srow .ed-bar > i { background: #9DB6D6; }
   .ed-srow .ed-pc { font: 600 11px Consolas, monospace; width: 34px; text-align: right; color: var(--p-dim); font-variant-numeric: tabular-nums; flex: none; }
 
   /* quiz overlay */
@@ -2243,7 +2241,17 @@
     return Math.max(0, Math.min(100, v));
   }
   function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
-  function edBar(pct) { return '<span class="ed-bar"><i style="width:' + Math.round(pct) + '%"></i></span>'; }
+  /* escala térmica: 0% = vermelho → 50% = âmbar → 100% = azul Quad.
+     Curva em dois trechos para o quente dominar a metade baixa da escala. */
+  function edHue(pct) {
+    if (pct <= 50) { return Math.round((pct / 50) * 45); }        /* 0..45: vermelho → âmbar */
+    return Math.round(45 + ((pct - 50) / 50) * 172);              /* 45..217: âmbar → azul  */
+  }
+  function edFill(pct) {
+    return '<i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i>';
+  }
+  function edPcColor(pct) { return 'hsl(' + edHue(pct) + ',78%,38%)'; }
+  function edBar(pct) { return '<span class="ed-bar">' + edFill(pct) + '</span>'; }
   function renderEdital() {
     var box = $('editalTree');
     if (!box) { return; }
@@ -2258,20 +2266,20 @@
         var subHtml = ass[1].map(function (sub) {
           var sp = edSubPct(mi, matNm, ass[0], sub);
           return '<div class="ed-srow"><span class="ed-nm">' + sub + '</span>' + edBar(sp) +
-                 '<span class="ed-pc">' + Math.round(sp) + '%</span></div>';
+                 '<span class="ed-pc" style="color:' + edPcColor(sp) + '">' + Math.round(sp) + '%</span></div>';
         }).join('');
         return '<div class="ed-ass">' +
           '<button class="ed-head" type="button"><span class="chev">\u25B8</span>' +
           '<span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + ' ' + ass[0] + '</span>' +
-          '<span class="ed-pc">' + Math.round(assPcts[ai]) + '%</span></button>' +
-          '<div class="ed-bar">' + '<i style="width:' + Math.round(assPcts[ai]) + '%"></i></div>' +
+          '<span class="ed-pc" style="color:' + edPcColor(assPcts[ai]) + '">' + Math.round(assPcts[ai]) + '%</span></button>' +
+          '<div class="ed-bar">' + edFill(assPcts[ai]) + '</div>' +
           '<div class="ed-sublist">' + subHtml + '</div></div>';
       }).join('');
       html += '<div class="ed-mat' + (mi === 0 ? ' open' : '') + '">' +
         '<button class="ed-head" type="button"><span class="chev">' + (mi === 0 ? '\u25BE' : '\u25B8') + '</span>' +
         '<span class="ed-nm">' + (mi + 1) + '. ' + matNm + '</span>' +
-        '<span class="ed-pc">' + Math.round(matPct) + '%</span></button>' +
-        '<div class="ed-bar"><i style="width:' + Math.round(matPct) + '%"></i></div>' +
+        '<span class="ed-pc" style="color:' + edPcColor(matPct) + '">' + Math.round(matPct) + '%</span></button>' +
+        '<div class="ed-bar">' + edFill(matPct) + '</div>' +
         '<div class="ed-asslist">' + assHtml + '</div></div>';
     });
     box.innerHTML = html;
