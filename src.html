@@ -587,6 +587,27 @@
     font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.75);
   }
   .tut-next:hover { color: #fff; }
+  /* menu de tutoriais do QUAD (clique no mascote) */
+  .help-layer { position: absolute; inset: 0; z-index: 44; display: none;
+    border-radius: 26px; overflow: hidden; background: rgba(4, 16, 38, 0.86); }
+  .help-layer.on { display: block; }
+  .help-quad { position: absolute; right: 30px; z-index: 2; width: 118px; height: 86px; pointer-events: none; }
+  .help-quad .fab-sprite { transform: scale(1.9); transform-origin: bottom center;
+    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.55)); }
+  .help-box { position: absolute; left: 14px; right: 14px; bottom: 14px;
+    background: #FFFFFF; border-radius: 18px 18px 16px 16px; padding: 15px 14px 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); }
+  .help-title { margin: 2px 0 12px; font: 700 15px var(--ui); color: #14324F; }
+  .help-opt { display: block; width: 100%; text-align: left; cursor: pointer;
+    background: #F4F9FF; border: 1px solid #DCE8F7; border-radius: 12px;
+    padding: 11px 12px; margin-bottom: 8px; font: 600 12.5px var(--ui); color: #14324F; }
+  .help-opt:hover { border-color: var(--p-blue); color: var(--p-blue); }
+  .help-opt.destaque { background: #FFF6DF; border-color: #F1D488; color: #9A6B00; }
+  .help-fechar { display: block; width: 100%; background: none; border: none; cursor: pointer;
+    padding: 9px 0 2px; font: 700 11px var(--ui); letter-spacing: 0.06em; color: #8AA0BF; }
+  .help-fala { font: 500 13.5px var(--font); line-height: 1.55; color: #1B2B45;
+    background: #F4F9FF; border-radius: 12px; padding: 12px; margin: 0 0 10px; }
+
   .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
   .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
   @keyframes tqShake { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
@@ -2006,6 +2027,16 @@
           </div>
           <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
           <button class="tut-next" id="tutNext">Avançar ›</button>
+        </div>
+
+        <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
+        <div class="help-layer" id="helpLayer">
+          <div class="help-quad" id="helpQuad" aria-hidden="true"><span class="fab-sprite" id="helpSprite"></span></div>
+          <div class="help-box" id="helpBox">
+            <div class="tut-name"><b>QUAD</b><span class="tut-etapa">central de tutoriais</span></div>
+            <h3 class="help-title">O que você quer aprender agora?</h3>
+            <div id="helpBody"></div>
+          </div>
         </div>
 
         <!-- ============ MISSÃO DEMONSTRATIVA (tutorial) ============ -->
@@ -3972,29 +4003,60 @@
       }
     });
   }
-  var DANILO_TIPS = {
-    'v-inicio': 'Bem-vindo ao <strong>Início</strong>! Aqui você vê a sala de aula — quando o professor abrir o quiz, entre por ali —, as <strong>missões do dia</strong> (o bloco expira 23h59!) e os avisos. Dica de veterano: os eventos escondem Quad Coins. Quem explora, <strong>garimpa</strong>.',
-    'v-missoes': 'São <strong>20 questões novas por dia</strong>, em dois blocos de 10. Não fazer não tira ponto — mas os Quad Coins do bloco vão embora com ele. Deixou passar? Recupere durante a semana: o <strong>corte é sábado 23h59</strong>.',
-    'v-dominio': 'Duas leituras que nunca se confundem: <strong>Quad Coin</strong> sobe por fazer; <strong>Domínio</strong> sobe por acertar. As barras seguem o edital do seu concurso. A visão completa chega na V1 — por enquanto eu anoto cada resposta sua para calibrar tudo.',
-    'v-perfil': 'Este é o seu <strong>Quadrômetro</strong>: Quad Coins, posição, presença e constância — sua jornada em números. Aqui a <strong>constância vale mais que o volume</strong>: melhor 20 questões todo dia do que 200 no domingo. Continue marchando.',
-    'v-loja': 'Bem-vindo à <strong>Intendência</strong>! Tudo aqui se compra <strong>só com Quad Coins</strong> — turmas, simulados, eventos e até itens do seu personagem. Fez missão, ganhou Coin; juntou Coin, escolheu a recompensa. Bora garimpar?',
-    'v-aluno': 'Monte sua <strong>identidade de combate</strong>: escolha seu avatar na coleção da PM — quepe, boina preta ou tático — e o <strong>nome de guerra vai estampado na farda</strong>. Tudo aparece no Início. Respeito acima de tudo no nome, combinado?',
-    'v-sala': 'Professor: abra o quiz quando quiser medir a sala. Os alunos respondem <strong>sem ver acerto ou erro</strong>; ao finalizar, eles recebem o resultado com vídeo e você recebe a <strong>parcial por questão</strong> — ótima para retomar o que travou.',
-    'v-turmas': '<strong>Turma = Edital × Modalidade.</strong> RONDESP nivela, PATAMO é o regular, BOPE é bloco de questões. O mesmo edital roda em qualquer uma — a turma nunca é filha do assunto.',
-    'v-edital': 'O edital é a <strong>espinha de tudo</strong>: lançá-lo monta o painel de domínio e cria os baldes da planilha geral. Quando o edital muda, eu reconcilio: descarto o que saiu, recalculo o que ficou e <strong>preservo o histórico</strong>.',
-    'v-questoes': 'As questões vivem num <strong>banco geral</strong> etiquetado por matéria e assunto. A turma puxa pela tag, sem duplicar. Cada questão diz onde serve: <strong>aula ou missão</strong>. Erro detectado em sala? Ajusta ao vivo, sem parar o quiz.',
-    'v-pretaf': 'A aprovação também passa pelo <strong>TAF</strong>! Corrida, barra, flexão e abdominal — treine constante e registre cada treino: ele alimenta sua constância. A farda se veste com o corpo pronto.',
-    'v-calendario': 'Seu <strong>calendário da jornada</strong>: aulas, simulados, eventos, prazos de missão e testes do Pré-TAF. Momento importante marcado é momento que não te pega de surpresa.',
-    'v-materiais': 'Os <strong>materiais</strong> chegam da aula direto para cá, etiquetados por matéria e assunto. Slides, resumos, listas e vídeos — tudo num lugar só, sem caçar link em grupo.'
-  };
-  $('daniloFab').addEventListener('click', function () {
+  /* ---------- central de tutoriais do QUAD ----------
+     O mascote é quem ensina: clicou nele, a tela escurece, ele cresce e
+     pergunta qual função o aluno quer aprender. Cada opção levará a um
+     tutorial guiado como o inicial (na V0, aviso de "em construção"). */
+  var HELP_TUTS = [
+    'Como realizar uma missão',
+    'Como funciona a lógica dos Quad Coins',
+    'Como funciona o Pré-TAF',
+    'Como funciona a Árvore do edital',
+    'Como funciona a Aula de hoje',
+    'Como funciona a prova de promoção'
+  ];
+  var helpGestoT = null;
+  function helpPos() {
+    $('helpQuad').style.bottom = ($('helpBox').offsetHeight + 26) + 'px';
+  }
+  function helpRender() {
+    $('helpBody').innerHTML = HELP_TUTS.map(function (t, i) {
+      return '<button class="help-opt" data-i="' + i + '">' + (i + 1) + ' · ' + t + '</button>';
+    }).join('') +
+      '<button class="help-opt destaque" id="btnHelpInstrucao">↻ Refazer a instrução inicial</button>' +
+      '<button class="help-fechar" id="btnHelpFechar">AGORA NÃO</button>';
+    $('helpBody').querySelectorAll('.help-opt[data-i]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        $('helpBody').innerHTML =
+          '<p class="help-fala">“Este tutorial está em construção — logo logo eu te guio por ele, pode deixar!”</p>' +
+          '<button class="help-opt" id="btnHelpVoltar">‹ Voltar às opções</button>' +
+          '<button class="help-fechar" id="btnHelpFechar2">FECHAR</button>';
+        $('btnHelpVoltar').addEventListener('click', helpRender);
+        $('btnHelpFechar2').addEventListener('click', helpClose);
+        helpPos();
+      });
+    });
+    $('btnHelpInstrucao').addEventListener('click', function () { helpClose(); iniciarTutorial(); });
+    $('btnHelpFechar').addEventListener('click', helpClose);
+    helpPos();
+  }
+  function helpOpen() {
     $('daniloHint').style.display = 'none';
-    $('daniloText').innerHTML = DANILO_TIPS[currentView] || DANILO_TIPS['v-inicio'];
-    $('daniloPop').classList.add('on');
-  });
-  function daniloClose() { $('daniloPop').classList.remove('on'); }
-  $('daniloOk').addEventListener('click', daniloClose);
-  $('daniloPop').addEventListener('click', function (e) { if (e.target === $('daniloPop')) daniloClose(); });
+    $('helpSprite').style.backgroundImage = getComputedStyle($('fabSprite')).backgroundImage;
+    $('helpLayer').classList.add('on');
+    helpRender();
+    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], gi = 0;
+    clearInterval(helpGestoT);
+    helpGestoT = setInterval(function () {
+      $('helpSprite').style.backgroundPosition = (-seq[gi % seq.length] * 118) + 'px 0'; gi++;
+    }, 185);
+  }
+  function helpClose() {
+    clearInterval(helpGestoT);
+    $('helpLayer').classList.remove('on');
+  }
+  $('daniloFab').addEventListener('click', helpOpen);
+  $('helpLayer').addEventListener('click', function (e) { if (e.target === $('helpLayer')) helpClose(); });
 
   /* ---------- admin ---------- */
   $('btnNovaTurma').addEventListener('click', function () { toast('Nova turma: escolha o edital e a modalidade'); });

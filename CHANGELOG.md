@@ -1,5 +1,17 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — central de tutoriais do QUAD (clique no mascote)
+- Clicar no robô não mostra mais a dica antiga mal diagramada: agora a tela
+  **escurece**, o QUAD **cresce** (1,9×, acenando) e abre a caixa
+  "**O que você quer aprender agora?**"
+- **6 tutoriais listados**: realizar uma missão, lógica dos Quad Coins,
+  Pré-TAF, Árvore do edital, Aula de hoje e prova de promoção — cada um
+  levará a um tutorial guiado como o inicial; na V0 respondem
+  "Este tutorial está em construção", com voltar às opções
+- Botão **"Refazer a instrução inicial"** funcional na própria central
+  (o de dentro do Perfil do aluno continua)
+- Fechar por "AGORA NÃO" ou tocando fora da caixa
+
 ## 19/07/2026 — fala do QUAD em ritmo humano + gestos por conteúdo
 - **Digitação caractere a caractere** (~30ms por letra), respirando nas
   vírgulas (160ms) e pausando nos pontos (330ms) — ritmo de conversa real,
