@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — tutorial obrigatório do QUAD (roteiro completo de 19 etapas)
+- **Mascote renomeado para QUAD** (robô do canto); tutorial substitui o tour
+  antigo de 9 passos e segue o roteiro oficial do fundador
+- **Mecânica da referência** (vídeo de jogo): fundo escurecido em 4 painéis,
+  alvo iluminado com anel dourado pulsante + seta animada, balão de diálogo
+  com palavras-chave em destaque e o QUAD no canto inferior direito; nas
+  etapas de ação o botão Continuar some e só a ação destacada avança
+- **Fluxo completo**: boas-vindas → clique na foto → escolha do avatar →
+  dados pessoais → nome de guerra (validação: vazio, mínimo, palavrões) →
+  salvar (erros apontam o campo faltante) → identificação militar (AL SD
+  QUAD MOURA explicada) → insígnia → score zerado → Bloco da Noite →
+  **missão demonstrativa** (3 questões com feedback imediato e nova
+  tentativa: LIMPE · 1+1 · hierarquia e disciplina) → +30 score e +25 Quad
+  Coins → Loja → **compra da Boina exclusiva (20 QdC)** com saldo caindo →
+  boina aplicada automaticamente (selo no card) → encerramento
+- **Conta nova começa zerada** (score 0 · 0 Quad Coins) — o aluno vê os
+  primeiros pontos nascerem; recompensas do tutorial são **reais e únicas**
+  (refazer não paga de novo)
+- **Regras de bloqueio**: só o alvo destacado é clicável (4 painéis capturam
+  o resto), navegação inferior bloqueada, tocar fora não fecha
+- **Progresso salvo** (localStorage): fechar no meio retoma na etapa aberta;
+  `tutorial_concluido` registrado; botão **"Refazer instrução inicial"** no
+  Perfil do aluno; reset da demo limpa o estado
+- Suíte automatizada: 35 verificações cobrindo as 19 etapas de ponta a ponta
+
+
 ## 19/07/2026 — correção: rolagem horizontal da esteira no desktop
 - Causa: em telas de toque a esteira rola nativamente, mas no desktop a barra
   fica oculta (visual de app) e o mouse não arrasta conteúdo por padrão —

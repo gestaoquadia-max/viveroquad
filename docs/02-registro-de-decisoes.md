@@ -21,6 +21,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 14 | 18/07 | Projeto versionado em Git para armazenamento no GitHub | Este repositório |
 | 15 | 19/07 | **Insígnias por dupla**: cada par Aluno/efetivo compartilha a arte (escala de evolução) | Decisão do gestor |
 | 16 | 19/07 | **Aluno Oficial Quad usa a insígnia do Aspirante** (sem arte própria) | Confirmado pelo gestor em 19/07 |
+| 17 | 19/07 | **Mascote renomeado para "QUAD"** (antes "Danilo"); tutorial obrigatório de 19 etapas substitui o tour de 9 passos | Roteiro completo definido pelo fundador em 19/07 |
+| 18 | 19/07 | Na identificação militar, a partícula fixa segue **"QUAD"** (o roteiro citava "QD" como alternativa a padronizar) | Mantida a decisão anterior do nome de guerra composto; mudar para "QD" exige só ajustar `GAMI`/`nomeCurto` |
 
 ## Regras de trabalho vigentes
 

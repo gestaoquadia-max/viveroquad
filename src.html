@@ -527,32 +527,55 @@
     transition: width 0.4s ease;
   }
 
-  /* ============ TOUR OBRIGATÓRIO DO DANILO ============ */
-  .tour-layer {
-    position: absolute; inset: 0; z-index: 45; display: none;
-    border-radius: 26px; overflow: hidden;
+  /* ============ TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) ============ */
+  .tut-layer { position: absolute; inset: 0; z-index: 46; display: none; border-radius: 26px; overflow: hidden; pointer-events: none; }
+  .tut-layer.on { display: block; }
+  .tut-shade { position: absolute; background: rgba(4, 16, 38, 0.78); transition: all 0.3s ease; pointer-events: auto; }
+  .tut-ring {
+    position: absolute; border-radius: 14px; pointer-events: none; display: none;
+    border: 2.5px solid #FFD76A; box-shadow: 0 0 0 4px rgba(255, 215, 106, 0.28), 0 0 22px rgba(255, 215, 106, 0.5);
+    transition: all 0.3s ease; animation: tutPulse 1.4s ease-in-out infinite;
   }
-  .tour-layer.on { display: block; }
-  .tour-halo {
-    position: absolute; border-radius: 14px; pointer-events: none;
-    box-shadow: 0 0 0 9999px rgba(10, 35, 58, 0.62);
-    border: 2px solid #54B2E8;
-    transition: left 0.35s ease, top 0.35s ease, width 0.35s ease, height 0.35s ease;
+  @keyframes tutPulse { 0%,100% { box-shadow: 0 0 0 4px rgba(255,215,106,0.28), 0 0 22px rgba(255,215,106,0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(255,215,106,0.12), 0 0 30px rgba(255,215,106,0.7); } }
+  .tut-arrow {
+    position: absolute; display: none; pointer-events: none; color: #FFD76A;
+    font-size: 26px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    animation: tutBounce 0.8s ease-in-out infinite;
   }
-  .tour-box {
-    position: absolute; left: 12px; right: 12px; bottom: 14px;
-    background: #FFFFFF; border-radius: 16px; padding: 14px;
-    box-shadow: 0 12px 30px rgba(10, 35, 58, 0.35);
+  @keyframes tutBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  .tut-quad { position: absolute; right: -6px; bottom: 6px; z-index: 3; background: none; border: none; padding: 0; pointer-events: none; }
+  .tut-quad .fab-sprite { filter: drop-shadow(0 10px 16px rgba(0,0,0,0.55)); }
+  .tut-bubble {
+    position: absolute; right: 14px; left: 14px; bottom: 96px; z-index: 2; pointer-events: auto;
+    background: linear-gradient(165deg, #123C8F, #0B2E73); color: #F2F8FF;
+    border: 1.5px solid rgba(255, 255, 255, 0.25); border-radius: 16px 16px 3px 16px;
+    padding: 13px 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
   }
-  .tour-head { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-  .tour-head video {
-    width: 44px; height: 54px; object-fit: cover; border-radius: 10px;
-    flex: none; background: #E9E3DA;
+  .tut-bubble::after {
+    content: ''; position: absolute; right: 26px; bottom: -11px;
+    border: 11px solid transparent; border-top-color: #0B2E73; border-right-width: 4px;
   }
-  .tour-count { margin-left: auto; font: 600 10px Consolas, monospace; color: var(--p-dim); }
-  .tour-text { font-size: 13px; line-height: 1.55; color: var(--p-text); }
-  .tour-text strong { color: var(--p-gold); }
-  .tour-nav { display: flex; justify-content: space-between; margin-top: 12px; }
+  .tut-bubble.top { bottom: auto; top: 14px; border-radius: 16px 16px 16px 3px; }
+  .tut-bubble.top::after { display: none; }
+  .tut-name { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+  .tut-name b { font: 800 12px var(--ui); letter-spacing: 0.08em; color: #FFD76A; }
+  .tut-name .tut-etapa { margin-left: auto; font: 600 10px Consolas, monospace; opacity: 0.65; }
+  .tut-text { font-size: 13px; line-height: 1.55; }
+  .tut-text b { color: #FFD76A; }
+  .tut-foot { margin-top: 10px; display: flex; justify-content: flex-end; }
+  .tut-wait { display: none; font-size: 11px; opacity: 0.75; font-style: italic; }
+  .tut-wait::before { content: '●'; color: #FFD76A; margin-right: 6px; animation: tutBlink 1.1s infinite; }
+  @keyframes tutBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .tq-alt-ok { border-color: #2FA860 !important; background: #EAF9F0 !important; }
+  .tq-alt-bad { border-color: #D34040 !important; background: #FDEEEE !important; animation: tqShake 0.3s; }
+  @keyframes tqShake { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
+  #homeBoina {
+    position: absolute; right: -2px; top: -4px; width: 21px; height: 21px; z-index: 2;
+    background: var(--p-gold); border: 2px solid #fff; border-radius: 50%;
+    display: grid; place-items: center; pointer-events: none;
+  }
+  #homeBoina svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.4; }
 
   /* ============ DANILO, O GUIA ============ */
   /* Danilo integrado ao layout (sem círculo) — acena e fica parado */
@@ -1003,6 +1026,7 @@
           <div class="id-row">
             <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno">
               <span class="insignia" id="homeAvatar" aria-hidden="true">▲</span>
+              <span id="homeBoina" style="display:none" title="Boina exclusiva equipada"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/></svg></span>
             </button>
             <div class="who">
               <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
@@ -1414,6 +1438,7 @@
           </div>
 
           <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
+          <button class="btn ghost small" id="btnRefazerTut" style="width:100%; margin-top:10px">Refazer instrução inicial</button>
           <button class="btn ghost small btn-sair-conta" id="btnSairPerfil" style="width:100%; margin-top:10px">Sair da conta</button>
         </div>
 
@@ -1772,7 +1797,7 @@
         </svg>
 
         <span class="danilo-hint" id="daniloHint"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
-        <button class="danilo-fab" id="daniloFab" aria-label="Falar com Danilo, o guia">
+        <button class="danilo-fab" id="daniloFab" aria-label="Falar com o QUAD, o guia">
           <span class="fab-sprite" id="fabSprite" style="background-image:url(__DANILO_SPRITE__)" aria-hidden="true"></span>
         </button>
 
@@ -1781,13 +1806,13 @@
             <div class="d-head">
               <video id="popVideo" autoplay muted loop playsinline aria-hidden="true"></video>
               <div>
-                <div class="d-name">Danilo</div>
-                <div class="d-role">Guia da jornada · Unidade 01</div>
+                <div class="d-name">QUAD</div>
+                <div class="d-role">Mascote e guia da jornada</div>
               </div>
             </div>
             <div class="d-bubble" id="daniloText"></div>
             <div style="margin-top:14px; text-align:right">
-              <button class="btn small" id="daniloOk">Entendi, Danilo</button>
+              <button class="btn small" id="daniloOk">Entendi, QUAD</button>
             </div>
           </div>
         </div>
@@ -1947,24 +1972,33 @@
           </div>
         </div>
 
-        <!-- ============ TOUR OBRIGATÓRIO DO DANILO (1º acesso) ============ -->
-        <div class="tour-layer" id="tourLayer">
-          <div class="tour-halo" id="tourHalo"></div>
-          <div class="tour-box" id="tourBox">
-            <div class="tour-head">
-              <video id="tourVideo" autoplay muted loop playsinline aria-hidden="true"></video>
-              <div>
-                <div class="d-name">Danilo</div>
-                <div class="d-role">Tour de primeiro acesso</div>
-              </div>
-              <span class="tour-count" id="tourCount">1/9</span>
-            </div>
-            <div class="tour-text" id="tourText"></div>
-            <div class="tour-nav">
-              <button class="btn ghost small" id="tourPrev">Anterior</button>
-              <button class="btn small" id="tourNext">Próximo</button>
+        <!-- ============ TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) ============ -->
+        <div class="tut-layer" id="tutLayer">
+          <div class="tut-shade" id="tutShT"></div>
+          <div class="tut-shade" id="tutShB"></div>
+          <div class="tut-shade" id="tutShL"></div>
+          <div class="tut-shade" id="tutShR"></div>
+          <div class="tut-ring" id="tutRing"></div>
+          <div class="tut-arrow" id="tutArrow">▼</div>
+          <div class="tut-bubble" id="tutBubble">
+            <div class="tut-name"><b>QUAD</b><span class="tut-etapa" id="tutStepN"></span></div>
+            <div class="tut-text" id="tutText"></div>
+            <div class="tut-foot">
+              <span class="tut-wait" id="tutWait">Complete a ação indicada para continuar</span>
+              <button class="btn small" id="tutNext">Continuar</button>
             </div>
           </div>
+          <div class="tut-quad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
+        </div>
+
+        <!-- ============ MISSÃO DEMONSTRATIVA (tutorial) ============ -->
+        <div class="quiz-layer" id="tqLayer">
+          <div class="quiz-head">
+            <div class="k-label">Missão de instrução · QUAD</div>
+            <h3 style="margin:0; font-size:15px" id="tqProg">Questão 1 de 3</h3>
+            <p class="sub" style="margin-top:4px">Feedback imediato: errou, tenta de novo — aqui é treino.</p>
+          </div>
+          <div class="quiz-body" id="tqBody"></div>
         </div>
 
         <!-- ============ LOGIN ============ -->
@@ -2976,8 +3010,9 @@
     lsSet(LS.sync, String(Date.now()));
     playSplash(function () {
       applyConnUI();
-      daniloWave(); // Danilo recebe o aluno acenando
-      if (runTour) iniciarTour();
+      daniloWave(); // o QUAD recebe o aluno acenando
+      var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
+      if (runTour || tutAberta) iniciarTutorial();
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
     });
   }
@@ -3046,60 +3081,290 @@
     concederAcesso(true);
   });
 
-  /* ---------- tour obrigatório do Danilo (primeiro acesso) ---------- */
-  var TOUR = [
-    { sel: null, txt: 'Missão dada é missão cumprida! Eu sou o <strong>Danilo</strong>, seu guia. Antes de liberar a plataforma, vou te mostrar cada canto do app. Vamos juntos?' },
-    { sel: '.app-top[data-scope="aluno"]', txt: 'Este é você: <strong>avatar, nome de guerra, patente</strong> e os seus <strong>Quad Coins</strong> com a posição na turma. Tudo se ajusta no Perfil do aluno — basta tocar na sua foto.' },
-    { sel: '#salaCard', txt: 'A <strong>Sala de aula</strong>: quando o professor abrir o quiz ao vivo, é por aqui que você entra — respondendo sem ver acerto ou erro até o fim.' },
-    { sel: '[data-view="v-missoes"]', txt: '<strong>Missões</strong>: 20 questões novas por dia, em dois blocos de 10. O bloco expira 23h59 — e as atrasadas recuperam até sábado.' },
-    { sel: '#btnPlus', txt: 'O botão <strong>+</strong> guarda o resto do arsenal: <strong>Quadrômetro</strong>, Loja·Intendência, Calendário e Materiais das aulas.' },
-    { sel: '[data-view="v-dominio"]', txt: '<strong>Domínio</strong>: o quanto você demonstra saber, por matéria e assunto do edital. Quad Coin é fazer; Domínio é acertar.' },
-    { sel: '[data-view="v-loja"]', txt: 'A <strong>Loja</strong>: troque seus Quad Coins por turmas, simulados, eventos e itens do personagem. Aqui <strong>só entra Quad Coin</strong> — dinheiro não compra.' },
-    { sel: '#daniloFab', txt: 'E eu fico sempre por aqui! Toque em mim em qualquer tela para receber as orientações daquela etapa.' },
-    { sel: null, txt: '<strong>Tour completo!</strong> Plataforma liberada. Agora é viver o Quad: presença, missão e constância até o dia da farda.' }
-  ];
-  var tourIdx = 0;
-  function tourGo(i) {
-    tourIdx = Math.max(0, Math.min(TOUR.length - 1, i));
-    var st = TOUR[tourIdx];
-    $('tourCount').textContent = (tourIdx + 1) + '/' + TOUR.length;
-    $('tourText').innerHTML = st.txt;
-    $('tourPrev').disabled = tourIdx === 0;
-    $('tourNext').textContent = tourIdx === TOUR.length - 1 ? 'Concluir' : 'Próximo';
-    var halo = $('tourHalo');
-    var scr = $('screen').getBoundingClientRect();
-    if (st.sel) {
-      var t = document.querySelector(st.sel).getBoundingClientRect();
-      halo.style.left = (t.left - scr.left - 6) + 'px';
-      halo.style.top = (t.top - scr.top - 6) + 'px';
-      halo.style.width = (t.width + 12) + 'px';
-      halo.style.height = (t.height + 12) + 'px';
-      var alvoEmbaixo = (t.top - scr.top) > scr.height * 0.55;
-      $('tourBox').style.bottom = alvoEmbaixo ? 'auto' : '14px';
-      $('tourBox').style.top = alvoEmbaixo ? '14px' : 'auto';
-    } else {
-      halo.style.left = '50%'; halo.style.top = '36%';
-      halo.style.width = '0px'; halo.style.height = '0px';
-      $('tourBox').style.bottom = '14px'; $('tourBox').style.top = 'auto';
-    }
+  /* ==================================================================
+     TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) — roteiro em 19 etapas
+     · fundo escurece (4 painéis), o alvo fica iluminado (anel + seta)
+     · mascote QUAD no canto inferior direito; balão aponta para ele
+     · etapas com ação só avançam quando a ação é concluída
+     · progresso salvo (retoma na etapa em aberto); recompensas únicas
+     ================================================================== */
+  var TUT_LS = { step: 'vq_tut_step', done: 'vq_tut_done', rew: 'vq_tut_rew' };
+  var tutOn = false, tutIdx = 0, tutExpect = null, tutRefazer = false, tutAvatarOk = false;
+  var tutRewarded = lsGet(TUT_LS.rew) === '1';
+  var TUT_PALAVROES = ['merda', 'porra', 'bosta', 'caralho', 'puta', 'fdp', 'cacete'];
+
+  function tutSetCoins(v) {
+    score = v;
+    $('scoreVal').textContent = fmt(score);
+    $('scorePerfil').textContent = fmt(score);
+    var ls = $('lojaSaldo'); if (ls) ls.textContent = fmt(score);
   }
-  function iniciarTour() {
-    tourOn = true; // pausa o loop da engrenagem para o holofote mirar os originais
+  function tutEquiparBoina() {
+    $('equipBoina').style.display = 'flex';
+    $('homeBoina').style.display = 'grid';
+    var ch = $('chipBoina'); if (ch) ch.classList.remove('locked');
+  }
+  function tutDadosOk() {
+    return $('nomeCompleto').value.trim().length >= 5 && $('foneAluno').value.replace(/\D/g, '').length >= 8;
+  }
+  function tutGuerraOk() {
+    var v = $('nomeGuerra').value.trim().toLowerCase();
+    if (v.length < 2) return false;
+    return !TUT_PALAVROES.some(function (p) { return v.indexOf(p) >= 0; });
+  }
+
+  var TUT = [
+    { view: 'v-inicio', sel: null,
+      txt: 'Seja bem-vindo ao <b>Viver o Quad</b>! Eu sou o <b>QUAD</b> e vou te ajudar nos primeiros passos dentro do nosso aplicativo.' },
+    { sel: '#btnAvatarPerfil', expect: 'abrir-perfil',
+      txt: 'Para começarmos, <b>clique na imagem do personagem</b> que aparece na parte superior esquerda da tela.' },
+    { view: 'v-aluno', sel: function () { return $('avGrid').closest('.p-card'); }, expect: 'avatar',
+      onEnter: function () { if (!tutRefazer) { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; } if (tutAvatarOk) return 'skip'; },
+      txt: 'É aqui que você escolhe o personagem que mais se parece com você e que vai te representar dentro do Viver o Quad. <b>Escolha o seu avatar.</b>' },
+    { sel: function () { return document.querySelector('.avatar-preview'); },
+      txt: '<b>Parabéns!</b> Esse será o personagem que vai te acompanhar durante toda a nossa jornada, até a sua <b>aprovação no concurso</b>.' },
+    { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados',
+      onEnter: function () { if (tutDadosOk()) return 'skip'; },
+      txt: 'Agora precisamos completar o seu perfil. <b>Preencha os seus dados pessoais</b> — nome completo e telefone — para continuarmos.' },
+    { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra',
+      onEnter: function () { if (tutGuerraOk()) return 'skip'; },
+      txt: 'Chegamos a uma parte muito importante: o seu <b>nome de guerra</b>. Pode ser um dos seus nomes, um sobrenome ou outra forma pela qual deseja ser identificado. Ele será exibido junto à sua classificação durante toda a jornada. <b>Digite o seu nome de guerra.</b>' },
+    { sel: '#btnSalvarPerfil', expect: 'salvo',
+      txt: 'Está tudo pronto! Agora <b>clique em “Salvar alterações”</b> para concluir a criação do seu perfil.' },
+    { view: 'v-inicio', sel: '#homeNome',
+      txt: 'Agora você possui uma <b>identificação militar</b> dentro do Viver o Quad. No exemplo <b>AL SD QUAD MOURA</b>: <b>AL</b> significa Aluno, <b>SD</b> significa Soldado, <b>QUAD</b> representa a nossa casa — o Quad — e <b>Moura</b> é o nome de guerra escolhido por você.' },
+    { sel: function () { return document.querySelector('.rank-line'); },
+      txt: 'Esta é a sua <b>insígnia atual</b>. Você está começando como <b>Aluno Soldado Quad</b>. Para evoluir para as próximas classificações, você precisará acumular <b>score</b> e cumprir os requisitos de progressão.' },
+    { sel: function () { return $('xpNum').parentElement; },
+      txt: 'Este é o seu <b>score</b>: ele representa o seu desempenho e a sua evolução aqui dentro. Como você acabou de começar, ele ainda está <b>zerado</b>. Vamos aprender a ganhar os seus primeiros pontos?' },
+    { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco',
+      txt: 'Esta é uma das <b>missões</b> do Viver o Quad. Para ganhar score, você cumpre atividades e responde questões. <b>Clique em “Continuar missão”</b> para começar.' },
+    { view: 'v-missoes', sel: '#novaMissaoCard', expect: 'missao',
+      onEnter: function () {
+        var c = $('novaMissaoCard');
+        c.style.display = 'block';
+        c.innerHTML = '<div class="k-label">Nova missão · Instrução inicial</div>' +
+          '<h3>Primeira missão — 3 questões</h3>' +
+          '<p class="sub">Curta e direta, para você sentir como nascem o score e os Quad Coins.</p>' +
+          '<div style="margin-top:10px"><button class="btn" id="btnTutMissao" style="width:100%">Iniciar missão</button></div>';
+        $('btnTutMissao').addEventListener('click', tqAbrir);
+      },
+      txt: 'Aqui estão as suas missões. Esta é a sua <b>primeira missão</b>: três questões simples. <b>Clique em “Iniciar missão”</b> para responder.' },
+    { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; },
+      txt: 'Está vendo? Antes o seu score estava <b>zerado</b> — agora você já conquistou os seus <b>primeiros pontos</b>.' },
+    { sel: '#coinsCard',
+      txt: 'Além do score, você também ganhou <b>Quad Coins</b> — a moeda virtual do Viver o Quad. Com ela você adquire itens, acessórios e personalizações para o seu personagem.' },
+    { sel: function () { return document.querySelector('#navAluno .nav-btn[data-view="v-loja"]'); }, expect: 'loja',
+      txt: 'Agora que você já ganhou os seus primeiros Quad Coins, vou te mostrar como utilizá-los. <b>Clique em “Loja”.</b>' },
+    { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens',
+      onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
+      txt: 'Aqui você encontra <b>itens para personalizar o seu personagem</b>. <b>Toque na área dos itens</b> para visualizar o que está disponível.' },
+    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, expect: 'boina',
+      onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
+      txt: 'Vamos utilizar os Quad Coins que você acabou de ganhar. <b>Clique em “Boina exclusiva”</b> para adquirir o seu primeiro item por <b>20 QdC</b>.' },
+    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); },
+      txt: '<b>Pronto!</b> Você acaba de comprar o seu primeiro produto — viu como é simples? Observe que o seu <b>saldo de Quad Coins diminuiu</b> após a compra. A boina já foi <b>aplicada automaticamente</b> ao seu personagem.' },
+    { view: 'v-inicio', sel: '#btnAvatarPerfil',
+      txt: 'Olhe para o seu personagem: ele agora está <b>usando a boina</b> que você acabou de adquirir. Os itens comprados na Loja personalizam o seu avatar durante a evolução.' },
+    { sel: null, btn: 'Concluir instrução',
+      txt: 'Agora você já sabe criar o seu perfil, escolher o personagem, <b>ganhar score</b>, conquistar <b>Quad Coins</b> e comprar itens na <b>Loja</b>. Várias outras áreas estão disponíveis para você descobrir. Explore, cumpra as suas missões e continue evoluindo até a sua <b>aprovação</b>. Sucesso — nos encontramos na caminhada!' }
+  ];
+
+  function tutMask(el) {
+    var scr = $('screen').getBoundingClientRect();
+    var T = $('tutShT'), B = $('tutShB'), L = $('tutShL'), R = $('tutShR');
+    var ring = $('tutRing'), arrow = $('tutArrow'), bub = $('tutBubble');
+    function setBox(p, x, y, w, h) { p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.width = Math.max(0, w) + 'px'; p.style.height = Math.max(0, h) + 'px'; }
+    if (!el) {
+      setBox(T, 0, 0, scr.width, scr.height); setBox(B, 0, 0, 0, 0); setBox(L, 0, 0, 0, 0); setBox(R, 0, 0, 0, 0);
+      ring.style.display = 'none'; arrow.style.display = 'none';
+      bub.classList.remove('top');
+      return;
+    }
+    var r = el.getBoundingClientRect(), pad = 6;
+    var x = Math.max(0, r.left - scr.left - pad), y = Math.max(0, r.top - scr.top - pad);
+    var w = Math.min(scr.width - x, r.width + pad * 2), h = Math.min(scr.height - y, r.height + pad * 2);
+    setBox(T, 0, 0, scr.width, y);
+    setBox(B, 0, y + h, scr.width, scr.height - y - h);
+    setBox(L, 0, y, x, h);
+    setBox(R, x + w, y, scr.width - x - w, h);
+    ring.style.display = 'block';
+    ring.style.left = x + 'px'; ring.style.top = y + 'px'; ring.style.width = w + 'px'; ring.style.height = h + 'px';
+    var acima = y > 46;
+    arrow.style.display = 'block';
+    arrow.textContent = acima ? '▼' : '▲';
+    arrow.style.left = (x + w / 2 - 12) + 'px';
+    arrow.style.top = acima ? (y - 32) + 'px' : (y + h + 6) + 'px';
+    bub.classList.toggle('top', y + h > scr.height * 0.52);
+  }
+  function tutGo(i) {
+    tutIdx = i;
+    if (i >= TUT.length) { return tutFim(); }
+    lsSet(TUT_LS.step, String(i));
+    var st = TUT[i];
+    if (st.view) showView(st.view, 'navAluno');
+    var skip = st.onEnter ? st.onEnter() : null;
+    if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
+    tutExpect = st.expect || null;
+    $('tutText').innerHTML = st.txt;
+    $('tutStepN').textContent = 'etapa ' + (i + 1) + ' de ' + TUT.length;
+    $('tutNext').style.display = st.expect ? 'none' : 'inline-block';
+    $('tutNext').textContent = st.btn || 'Continuar';
+    $('tutWait').style.display = st.expect ? 'inline' : 'none';
+    tutWave();
+    setTimeout(function () {
+      var el = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
+      if (el) el.scrollIntoView({ block: 'center' });
+      setTimeout(function () {
+        var el2 = typeof st.sel === 'function' ? st.sel() : (st.sel ? document.querySelector(st.sel) : null);
+        tutMask(el2);
+      }, 340);
+    }, 90);
+  }
+  function tutEvent(name) {
+    if (!tutOn || tutExpect !== name) return;
+    tutExpect = null;
+    setTimeout(function () { tutGo(tutIdx + 1); }, 450);
+  }
+  $('tutNext').addEventListener('click', function () { if (!tutExpect) tutGo(tutIdx + 1); });
+
+  function tutErro(qual) {
+    var mapa = {
+      avatar: [function () { return $('avGrid').closest('.p-card'); }, 'Falta <b>escolher o seu avatar</b> — toque em um dos personagens.'],
+      nome: [function () { return $('nomeCompleto').closest('.p-card'); }, 'Falta o seu <b>nome completo</b> — preencha para continuar.'],
+      fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Falta o seu <b>telefone</b> — preencha para continuar.'],
+      guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Falta um <b>nome de guerra válido</b> (mínimo 2 letras, sem palavras ofensivas).']
+    }[qual];
+    $('tutText').innerHTML = mapa[1];
+    if (qual === 'avatar' && !tutRefazer) { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
+    var el = mapa[0]();
+    el.scrollIntoView({ block: 'center' });
+    setTimeout(function () { tutMask(mapa[0]()); }, 340);
+  }
+
+  /* avanço por ação: captura no documento (roda antes dos handlers dos alvos) */
+  document.addEventListener('click', function (e) {
+    if (!tutOn) return;
+    if (tutExpect === 'salvo' && e.target.closest('#btnSalvarPerfil')) {
+      var falta = (!tutAvatarOk && !tutRefazer) ? 'avatar' :
+        ($('nomeCompleto').value.trim().length < 5 ? 'nome' :
+        ($('foneAluno').value.replace(/\D/g, '').length < 8 ? 'fone' : (!tutGuerraOk() ? 'guerra' : null)));
+      if (falta) { e.stopPropagation(); e.preventDefault(); tutErro(falta); return; }
+      setTimeout(function () { tutEvent('salvo'); }, 350);
+      return;
+    }
+    if (tutExpect === 'abrir-perfil' && e.target.closest('#btnAvatarPerfil')) { setTimeout(function () { tutEvent('abrir-perfil'); }, 300); }
+    else if (tutExpect === 'avatar' && e.target.closest('.avatar-opt')) { tutAvatarOk = true; setTimeout(function () { tutEvent('avatar'); }, 350); }
+    else if (tutExpect === 'bloco' && e.target.closest('#btnMissaoHome')) { setTimeout(function () { tutEvent('bloco'); }, 300); }
+    else if (tutExpect === 'loja') { var nb = e.target.closest('.nav-btn'); if (nb && nb.dataset.view === 'v-loja') setTimeout(function () { tutEvent('loja'); }, 300); }
+    else if (tutExpect === 'ver-itens' && e.target.closest('#tutLojaCard')) { tutEvent('ver-itens'); }
+    else if (tutExpect === 'boina') {
+      var it = e.target.closest('.loja-item[data-nome="Boina exclusiva"]');
+      if (it) setTimeout(function () { if (it.classList.contains('comprado')) { tutEquiparBoina(); tutEvent('boina'); } }, 120);
+    }
+  }, true);
+  ['nomeCompleto', 'foneAluno'].forEach(function (id) {
+    $(id).addEventListener('input', function () { if (tutOn && tutExpect === 'dados' && tutDadosOk()) tutEvent('dados'); });
+  });
+  $('nomeGuerra').addEventListener('input', function () { if (tutOn && tutExpect === 'guerra' && tutGuerraOk()) tutEvent('guerra'); });
+
+  /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
+  var TQ = [
+    { q: 'Quais são os princípios expressos da Administração Pública presentes no artigo 37 da Constituição Federal?', alts: ['LIMPE', 'PULME', 'LEMPA', 'SIMPE'], ok: 0 },
+    { q: 'Quanto é 1 + 1?', alts: ['1', '2', '3', '4'], ok: 1 },
+    { q: 'Quais são as duas bases das instituições militares?', alts: ['Hierarquia e disciplina', 'Força e coragem', 'Ordem e progresso', 'Comando e obediência'], ok: 0 }
+  ];
+  var TUT_REW = { score: 30, coins: 25 };
+  var tqI = 0;
+  function tqAbrir() {
+    tqI = 0;
+    $('tutLayer').classList.remove('on');
+    $('tqLayer').style.display = 'flex';
+    tqRender();
+  }
+  function tqRender() {
+    var st = TQ[tqI];
+    $('tqProg').textContent = 'Questão ' + (tqI + 1) + ' de ' + TQ.length;
+    var letras = ['A', 'B', 'C', 'D'];
+    $('tqBody').innerHTML = '<div class="q-card"><p class="q-enun">' + st.q + '</p>' +
+      st.alts.map(function (a, i) {
+        return '<button class="q-alt" data-i="' + i + '"><span>' + letras[i] + '</span><span>' + a + '</span></button>';
+      }).join('') + '</div>';
+    $('tqBody').querySelectorAll('.q-alt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (parseInt(b.dataset.i, 10) === st.ok) {
+          b.classList.add('tq-alt-ok');
+          setTimeout(function () { tqI++; if (tqI < TQ.length) tqRender(); else tqResultado(); }, 650);
+        } else {
+          b.classList.add('tq-alt-bad');
+          setTimeout(function () { b.classList.remove('tq-alt-bad'); }, 700);
+          toast('Quase! Tente novamente.');
+        }
+      });
+    });
+  }
+  function tqResultado() {
+    var ganha = !tutRewarded;
+    $('tqProg').textContent = 'Missão concluída';
+    $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">✓ Primeira missão cumprida!</p>' +
+      (ganha
+        ? '<p class="sub" style="margin:8px 0 14px">Você ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>'
+        : '<p class="sub" style="margin:8px 0 14px">Missão de instrução refeita — as recompensas do tutorial são recebidas <strong>uma única vez</strong>.</p>') +
+      '<button class="btn" id="tqFim" style="width:100%">Continuar</button></div>';
+    $('tqFim').addEventListener('click', function () {
+      if (ganha) {
+        carreira.scorePatente += TUT_REW.score;
+        carreira.scoreCarreira += TUT_REW.score;
+        carreira.scoreTemporada += TUT_REW.score;
+        renderCarreira();
+        addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · missão de instrução');
+        tutRewarded = true; lsSet(TUT_LS.rew, '1');
+      }
+      $('tqLayer').style.display = 'none';
+      showView('v-inicio', 'navAluno');
+      $('tutLayer').classList.add('on');
+      tutEvent('missao');
+    });
+  }
+
+  function tutWave() {
+    var sp = $('tutSprite');
+    [0, 1, 2, 3, 2, 3, 1, 0].forEach(function (fr, i) {
+      setTimeout(function () { sp.style.backgroundPosition = (-fr * 118) + 'px 0'; }, i * 150);
+    });
+  }
+  function iniciarTutorial(refazer) {
+    tutOn = true; tourOn = true; tutRefazer = !!refazer;
+    $('daniloFab').style.display = 'none';
+    $('daniloHint').style.display = 'none';
+    $('tutSprite').style.backgroundImage = getComputedStyle($('fabSprite')).backgroundImage;
+    var primeiraVez = lsGet(TUT_LS.done) !== '1';
+    if (!refazer && primeiraVez) {
+      /* conta recém-criada: score e Quad Coins começam zerados (etapa 9 do roteiro) */
+      tutSetCoins(0);
+      carreira.scorePatente = 0; carreira.scoreCarreira = 0; carreira.scoreTemporada = 0;
+      carreira.estado = 'acumulando'; renderCarreira();
+      $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';
+      tutAvatarOk = false;
+      $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none';
+    } else { tutAvatarOk = true; }
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
-    $('tourLayer').classList.add('on');
-    tourGo(0);
+    $('tutLayer').classList.add('on');
+    var salvo = parseInt(lsGet(TUT_LS.step) || '0', 10);
+    tutGo(!refazer && primeiraVez && salvo > 0 && salvo < TUT.length ? salvo : 0);
   }
-  $('tourPrev').addEventListener('click', function () { tourGo(tourIdx - 1); });
-  $('tourNext').addEventListener('click', function () {
-    if (tourIdx === TOUR.length - 1) {
-      $('tourLayer').classList.remove('on');
-      tourOn = false;
-      toast('Plataforma liberada — bom estudo!');
-    } else {
-      tourGo(tourIdx + 1);
-    }
-  });
+  function tutFim() {
+    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0');
+    tutOn = false; tourOn = false; tutExpect = null;
+    $('tutLayer').classList.remove('on');
+    $('daniloFab').style.display = '';
+    toast('Instrução inicial concluída — plataforma liberada!');
+    daniloWave();
+  }
+  $('btnRefazerTut').addEventListener('click', function () { iniciarTutorial(true); });
+  window.addEventListener('resize', function () { if (tutOn) tutGo(tutIdx); });
 
   /* ---------- sair da conta ---------- */
   function sairConta() {
@@ -3527,7 +3792,7 @@
   // vídeo do personagem embutido no build (token substituído pelo script de build)
   var DANILO_VIDEO = '__DANILO_VIDEO__';
   if (DANILO_VIDEO.indexOf('data:') === 0) {
-    ['popVideo', 'tourVideo'].forEach(function (id) {
+    ['popVideo'].forEach(function (id) {
       $(id).src = DANILO_VIDEO;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         $(id).removeAttribute('autoplay'); $(id).pause();
@@ -3571,6 +3836,7 @@
   var btnReset = $('btnResetDemo');
   if (btnReset) btnReset.addEventListener('click', function () {
     lsDel(LS.auth); lsDel(LS.sync); lsDel(LS.pend);
+    lsDel(TUT_LS.step); lsDel(TUT_LS.done); lsDel(TUT_LS.rew);
     deviceAuthorized = false; pendingAnswers = 0; online = true;
     updatePending();
     sairConta();
