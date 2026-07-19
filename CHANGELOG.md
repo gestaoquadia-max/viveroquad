@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — eventos da semana: esteira infinita + página própria por evento
+- **Esteira horizontal com rolagem infinita**: os blocos são botões renderizados
+  a partir do módulo `EVENTOS` (o que a administração publica aparece como
+  atalho); conteúdo triplicado e teleporte de `scrollLeft` nos dois sentidos
+- **5 eventos da semana 30**: NAC · Atualidades (qua), Aulão de véspera
+  RONDESP (qui, garimpo), Gincana Quad Coins (sex, garimpo), Simuladão Quad
+  (sáb) e Revisão turbinada (dom), cada um com cor própria
+- **Página própria de evento** (overlay): tipo, data/hora, descrição e as
+  **regras de ganho definidas por evento** — seção "Regras de score" e seção
+  "Regras de Quad Coins" (com a moeda oficial), botão de inscrição (vai ao
+  calendário) e, quando o evento tem, botão de **garimpo** (+15 Quad Coins,
+  uma vez) — substitui o antigo garimpo fixo do tile
+- Estado por evento persiste na sessão (inscrito/garimpado); clique nos tiles
+  das cópias da rolagem infinita abre a mesma página
+
+
 ## 19/07/2026 — correção: rolagem do Início travando ao subir
 - Causa: `scroll-snap` (proximity + align center nos cards) brigando com o
   teleporte da rolagem infinita e com o efeito engrenagem, que move os pontos

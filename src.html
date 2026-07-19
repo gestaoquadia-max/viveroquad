@@ -798,12 +798,32 @@
   .ev-tile.teal { background: linear-gradient(155deg, #18B7F4, #0878F8); }
   .ev-tile.add { background: rgba(255,255,255,0.55); border: 1px dashed var(--p-line); color: var(--p-dim);
     align-items: center; justify-content: center; box-shadow: none; }
-  .ev-date { font: 800 9.5px Consolas, monospace; letter-spacing: .06em; opacity: .85; }
+  .ev-date { font: 800 9.5px Consolas, monospace; letter-spacing: .06em; opacity: .85; padding-right: 44px; }
   .ev-name { font-weight: 800; font-size: 12.5px; line-height: 1.12; text-transform: uppercase; }
   .ev-meta { font-size: 10px; opacity: .8; margin-top: auto; }
   .ev-tile .tag { position: absolute; top: 9px; right: 9px; font-size: 8px; padding: 2px 6px; }
-  .ev-plus { font-size: 24px; font-weight: 300; line-height: 1; }
-  .ev-tile.add .ev-name { color: var(--p-dim); }
+  .ev-tile.gold { background: linear-gradient(155deg, #F4B63A, #D08F0F); }
+  .ev-tile.navy2 { background: linear-gradient(155deg, #2C5FBF, #123C8F); }
+
+  /* página do evento */
+  .ev-hero { color: #EAF4FD; padding: 18px 16px 16px; border-radius: 26px 26px 0 0;
+    background: linear-gradient(155deg, #0A4A9E, #062B64); }
+  .ev-hero.purple { background: linear-gradient(155deg, #7B4DE8, #6237D8); }
+  .ev-hero.teal { background: linear-gradient(155deg, #18B7F4, #0878F8); }
+  .ev-hero.gold { background: linear-gradient(155deg, #F4B63A, #D08F0F); }
+  .ev-hero.navy2 { background: linear-gradient(155deg, #2C5FBF, #123C8F); }
+  .ev-hero-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .ev-back { background: rgba(255,255,255,0.16); border: none; color: inherit; font: 700 12px var(--ui);
+    border-radius: 99px; padding: 7px 12px; cursor: pointer; }
+  .ev-hero .tag { background: rgba(255,255,255,0.2); color: #fff; }
+  .ev-hero h2 { margin: 3px 0 4px; font: 800 20px var(--ui); text-transform: uppercase; line-height: 1.1; }
+  .ev-hero p { margin: 0; font-size: 12px; opacity: 0.85; }
+  .ev-rule { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--p-line); }
+  .ev-rule:last-child { border-bottom: none; }
+  .ev-rule .r-nm { flex: 1; font-size: 12.5px; }
+  .ev-rule .r-pts { font: 700 12.5px Consolas, monospace; color: var(--p-gold); white-space: nowrap; }
+  .ev-rule .r-pts.coin { display: inline-flex; align-items: center; gap: 4px; color: #9A7414; }
+  .ev-rule .r-pts svg { width: 15px; height: 15px; }
 
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
@@ -1088,25 +1108,8 @@
           <!-- eventos da semana -->
           <div class="p-card" id="mineCard">
             <div class="k-label">Eventos da semana</div>
-            <div class="ev-strip">
-              <button class="ev-tile" id="btnMinerar">
-                <span class="ev-date">QUI · 23/05</span>
-                <span class="ev-name">Aulão de véspera RONDESP</span>
-                <span class="ev-meta">Explore para garimpar</span>
-                <span class="tag gold" id="mineTag">COINS</span>
-              </button>
-              <div class="ev-tile purple">
-                <span class="ev-date">SÁB · 25/05</span>
-                <span class="ev-name">Simuladão Quad</span>
-                <span class="ev-meta">140 questões</span>
-              </div>
-              <div class="ev-tile teal">
-                <span class="ev-date">DOM · 26/05</span>
-                <span class="ev-name">Revisão turbinada</span>
-                <span class="ev-meta">Ao vivo</span>
-              </div>
-              <button class="ev-tile add"><span class="ev-plus">+</span><span class="ev-name">Mais eventos</span></button>
-            </div>
+            <div class="ev-strip" id="evStrip" aria-label="Eventos da semana — role para o lado"></div>
+            <p class="sub" style="margin-top:8px; font-size:11px">Eventos produzidos pelo Quad — cada um pontua score e Quad Coins pelas regras da sua página.</p>
           </div>
         </div>
 
@@ -1661,6 +1664,20 @@
             <button class="btn ghost small" id="btnSairQuiz">Sair</button>
             <button class="btn" id="btnProxima" disabled>Responder</button>
           </div>
+        </div>
+
+        <!-- ============ PÁGINA DO EVENTO ============ -->
+        <div class="quiz-layer" id="evLayer">
+          <div class="ev-hero" id="evHero">
+            <div class="ev-hero-top">
+              <button class="ev-back" id="btnEvVoltar" aria-label="Voltar">‹ Voltar</button>
+              <span class="tag" id="evTipo"></span>
+            </div>
+            <div class="ev-date" id="evQuando"></div>
+            <h2 id="evNome"></h2>
+            <p id="evMetaP"></p>
+          </div>
+          <div class="quiz-body" id="evBody"></div>
         </div>
 
         <!-- ============ DANILO — vetorização da folha de personagem ============ -->
@@ -2232,6 +2249,9 @@
         segs[1].innerHTML = segs[0].innerHTML;
         segs[2].innerHTML = segs[0].innerHTML;
       }
+      v.querySelectorAll('.ev-strip').forEach(function (st) {
+        if (st.scrollLeft === 0 && typeof evPeriod === 'function') st.scrollLeft = evPeriod(st);
+      });
       if (v.classList.contains('on')) spotlight(v);
     });
   }
@@ -2338,16 +2358,111 @@
     queueSync();
   });
 
-  /* ---------- minerar score ---------- */
-  var mined = false;
-  $('btnMinerar').addEventListener('click', function () {
-    if (mined) { toast('Já garimpado — volte amanhã.'); return; }
-    mined = true;
-    $('mineTag').textContent = 'GARIMPADO';
-    $('mineTag').classList.remove('gold');
-    $('mineTag').classList.add('live');
-    addScore(15, '+15 Quad Coins garimpados no evento');
+  /* ---------- eventos da semana ----------
+     Cada evento é produzido pela administração do Quad, que define as regras
+     de ganho de score e de Quad Coins. O que o admin publica aparece como
+     atalho na esteira (rolagem horizontal infinita) e abre a página própria. */
+  var EVENTOS = [
+    { id: 'nac', nome: 'NAC · Atualidades', tipo: 'ENCONTRO · AO VIVO', quando: 'QUA · 22/07 · 19H',
+      cor: 'teal', meta: 'Atualidades da semana com Danilo Moura',
+      desc: 'Encontro semanal do Núcleo de Atualidades e Conhecimentos: os fatos da semana que podem cair na sua prova, analisados ao vivo.',
+      score: [['Presença no encontro', '+30 score'], ['Acerto no quiz de atualidades', '+2 score por questão']],
+      coins: [['Check-in ao vivo', '+10']] },
+    { id: 'aulao-rondesp', nome: 'Aulão de véspera RONDESP', tipo: 'AULÃO · PRESENCIAL', quando: 'QUI · 23/07 · 19H',
+      cor: '', meta: 'Revisão final antes da prova', tag: 'COINS', garimpo: true,
+      desc: 'Aulão de véspera com os professores do Quad: pontos quentes do edital RONDESP, macetes de prova e rodada de questões comentadas.',
+      score: [['Presença confirmada', '+40 score'], ['Acerto na rodada de questões', '+1 score por questão']],
+      coins: [['Check-in no evento', '+10'], ['Garimpo escondido no aulão', '+15']] },
+    { id: 'gincana', nome: 'Gincana Quad Coins', tipo: 'EVENTO · ONLINE', quando: 'SEX · 24/07 · 20H',
+      cor: 'gold', meta: 'Caça aos Coins escondidos', tag: 'COINS', garimpo: true,
+      desc: 'Uma hora de desafios-relâmpago no app: quem explora e resolve primeiro, garimpa mais. Os Coins da gincana expiram com ela.',
+      score: [['Desafio concluído', '+5 score por desafio']],
+      coins: [['Desafio vencido', '+5 por desafio'], ['Garimpo escondido na gincana', '+15'], ['Top 3 da noite', '+30']] },
+    { id: 'simuladao', nome: 'Simuladão Quad', tipo: 'SIMULADO · PRESENCIAL', quando: 'SÁB · 25/07 · 8H',
+      cor: 'purple', meta: '140 questões · formato da banca',
+      desc: 'Simulado completo no formato e no tempo da banca, com ranking geral e correção comentada no fim do dia.',
+      score: [['Simulado concluído', '+120 score'], ['Aproveitamento acima de 70%', '+80 score bônus']],
+      coins: [['Participação', '+25'], ['Top 10 do ranking', '+50']] },
+    { id: 'revisao', nome: 'Revisão turbinada', tipo: 'AULA · AO VIVO', quando: 'DOM · 26/07 · 9H',
+      cor: 'navy2', meta: 'Transmissão com quiz relâmpago',
+      desc: 'Revisão intensiva transmitida ao vivo, com quiz relâmpago valendo pontos durante a aula.',
+      score: [['Presença na transmissão', '+30 score'], ['Quiz relâmpago', '+2 score por acerto']],
+      coins: [['Check-in ao vivo', '+10']] }
+  ];
+  var evState = {};   /* por evento: { garimpado, inscrito } */
+  function evTileHTML(ev) {
+    return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
+      '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
+      '<span class="ev-name">' + ev.nome + '</span>' +
+      '<span class="ev-meta">' + ev.meta + '</span>' +
+      (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : '') + '</button>';
+  }
+  function evPeriod(st) {
+    var tiles = st.querySelectorAll('.ev-tile');
+    if (tiles.length < EVENTOS.length * 2) return 0;
+    return tiles[EVENTOS.length].offsetLeft - tiles[0].offsetLeft;
+  }
+  function renderEvStrip() {
+    var um = EVENTOS.map(evTileHTML).join('');
+    $('evStrip').innerHTML = um + um + um;   /* 3 cópias → fim liga com início */
+    $('evStrip').scrollLeft = evPeriod($('evStrip'));
+  }
+  /* rolagem infinita horizontal — captura pega também as cópias da rolagem vertical */
+  document.addEventListener('scroll', function (e) {
+    var st = e.target;
+    if (!st || !st.classList || !st.classList.contains('ev-strip')) return;
+    var W = evPeriod(st);
+    if (!W) return;
+    if (st.scrollLeft < W * 0.5) st.scrollLeft += W;
+    else if (st.scrollLeft > W * 1.5) st.scrollLeft -= W;
+  }, true);
+  document.addEventListener('click', function (e) {
+    var tile = e.target.closest('.ev-tile[data-ev]');
+    if (tile) openEvento(tile.dataset.ev);
   });
+  function coinSvg() { return '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>'; }
+  function openEvento(id) {
+    var ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    var st = evState[id] || (evState[id] = { garimpado: false, inscrito: false });
+    $('evHero').className = 'ev-hero ' + (ev.cor || '');
+    $('evTipo').textContent = ev.tipo;
+    $('evQuando').textContent = ev.quando;
+    $('evNome').textContent = ev.nome;
+    $('evMetaP').textContent = ev.meta;
+    var h = '<div class="p-card"><p class="sub" style="font-size:12.5px">' + ev.desc + '</p></div>';
+    h += '<div class="p-card"><div class="k-label">Regras de score</div>' +
+      ev.score.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts">' + r[1] + '</span></div>'; }).join('') + '</div>';
+    h += '<div class="p-card"><div class="k-label">Regras de Quad Coins</div>' +
+      ev.coins.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts coin">' + coinSvg() + r[1] + '</span></div>'; }).join('') + '</div>';
+    h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
+    h += '<button class="btn" id="btnEvInscrever"' + (st.inscrito ? ' disabled' : '') + '>' +
+      (st.inscrito ? 'Inscrito ✓ · no seu calendário' : 'Confirmar inscrição') + '</button>';
+    if (ev.garimpo) {
+      h += '<button class="btn ghost" id="btnEvGarimpo"' + (st.garimpado ? ' disabled' : '') + '>' +
+        (st.garimpado ? 'Garimpado ✓ · +15 Quad Coins' : 'Garimpar Quad Coins escondidos') + '</button>';
+    }
+    h += '</div>';
+    h += '<p class="sub" style="margin-top:12px; font-size:11px">Evento criado pela administração do Quad — regras de score e de Quad Coins são definidas por evento e podem mudar a cada edição.</p>';
+    $('evBody').innerHTML = h;
+    $('btnEvInscrever').onclick = function () {
+      st.inscrito = true;
+      this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
+      toast('Inscrição confirmada — o evento entrou no seu calendário.');
+    };
+    var g = $('btnEvGarimpo');
+    if (g) g.onclick = function () {
+      if (st.garimpado) return;
+      st.garimpado = true;
+      this.disabled = true; this.textContent = 'Garimpado ✓ · +15 Quad Coins';
+      addScore(15, '+15 Quad Coins garimpados no evento');
+    };
+    $('evLayer').style.display = 'flex';
+  }
+  $('btnEvVoltar').addEventListener('click', function () { $('evLayer').style.display = 'none'; });
+  renderEvStrip();
+  queueSync();   /* leva a esteira para as cópias da rolagem infinita vertical */
 
   /* ---------- quiz engine ---------- */
   var QUESTIONS = [
