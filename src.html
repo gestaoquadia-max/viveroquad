@@ -1245,10 +1245,11 @@
           <div class="p-card">
             <div class="k-label">Quadrômetro · sua jornada em números</div>
             <h3 id="quadNome">Aluno Soldado Quad Moura</h3>
+            <div class="turma-line" id="quadTurma" style="margin:2px 0 6px"></div>
             <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10.</p>
           </div>
           <div class="p-card">
-            <div class="k-label">Ranking da sala · PC-BA Noite · 42 alunos</div>
+            <div class="k-label" id="rankSalaHead">Ranking da sala · 42 alunos</div>
             <div id="rankSalaList"></div>
           </div>
           <div class="p-card">
@@ -1398,6 +1399,7 @@
               <div class="grow">
                 <div class="card-eyebrow" id="progFase">Formação inicial · Patente 1 de 14</div>
                 <h3 class="aula-title" style="margin:2px 0 0" id="progTitulo">Aluno Soldado Quad Moura</h3>
+                <div class="turma-line" id="progTurma"></div>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px">
@@ -3705,6 +3707,9 @@
     $('homeNome').textContent = nomeCurto();
     $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
     $('cardTurma').textContent = turmaLabel();
+    var pt = $('progTurma'); if (pt) pt.textContent = turmaLabel();
+    var qt = $('quadTurma'); if (qt) qt.textContent = turmaLabel();
+    var rh = $('rankSalaHead'); if (rh) rh.textContent = 'Ranking da sala · ' + turmaLabel().replace('Turma ', '') + ' · 42 alunos';
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
     $('xpFill').style.width = pct + '%';
     $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';

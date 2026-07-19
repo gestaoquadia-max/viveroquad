@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — turma do aluno em todas as identidades
+- **TURMA PATAMO (N)** agora aparece abaixo do nome/patente em todos os
+  pontos de identidade: card principal (já existia), resumo do Quadrômetro,
+  card de Progressão de carreira — tudo derivado da mesma matrícula
+  (`ALUNO_TURMA`)
+- **Ranking da sala corrigido**: o cabeçalho dizia "PC-BA Noite" (fixo);
+  agora mostra a turma real do aluno — "Ranking da sala · PATAMO (N) · 42
+  alunos"
+
 ## 19/07/2026 — tutorial: fala no lugar certo e refazer 100% do zero
 - **Balão não salta mais no meio da fala**: a ordem virou silenciar →
   rolar até o alvo → posicionar balão/robô → só então falar (antes a
