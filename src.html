@@ -807,6 +807,8 @@
   .loja-item.comprado .li-preco { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
   .loja-item.comprado .li-preco::before { background: #28A96B; box-shadow: none; }
 
+  .btn-sair-conta { color: #C24333; border-color: #EFC0B8; }
+
   /* ---------- perfil do aluno: classificação (sala e geral) ---------- */
   .rank-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .rank-tile { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
@@ -1178,7 +1180,6 @@
             <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
             <p class="sub" style="font-family:Consolas,monospace; font-size:11px" id="telemetry">origem: OPEN_ORGANIC · eventos: 14 · linha de base: ativa</p>
           </div>
-          <button class="btn ghost small" id="btnSair" style="width:100%">Sair da conta</button>
         </div>
 
         <!-- ============ ALUNO · LOJA (Intendência) ============ -->
@@ -1375,6 +1376,7 @@
           </div>
 
           <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
+          <button class="btn ghost small btn-sair-conta" id="btnSairPerfil" style="width:100%; margin-top:10px">Sair da conta</button>
         </div>
 
         <!-- ============ ALUNO · PRÉ-TAF ============ -->
@@ -2784,7 +2786,7 @@
     applyConnUI();
     document.querySelector('[data-persona="aluno"]').click();
   }
-  $('btnSair').addEventListener('click', sairConta);
+  $('btnSairPerfil').addEventListener('click', sairConta);
 
   /* ---------- botão + (mais) ---------- */
   $('btnPlus').addEventListener('click', function () { $('plusPop').classList.add('on'); });
