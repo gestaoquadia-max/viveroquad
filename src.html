@@ -3279,36 +3279,60 @@
     void bot.offsetWidth;   /* reinicia a animação */
     bot.classList.add('mood-' + (mood || 'talk'));
   }
-  /* enquanto "fala", o QUAD gesticula (braços alternando, como quem explica) */
+  /* cada humor tem seu próprio gesto enquanto fala — o movimento conversa
+     com o conteúdo: acena na saudação, aponta na ação, vibra na conquista */
+  var GESTOS = {
+    wave:   { seq: [4, 5, 6, 5], t: 170 },   /* aceno largo de "oi" */
+    talk:   { seq: [0, 1, 2, 1], t: 270 },   /* explicação calma */
+    point:  { seq: [2, 3, 3, 2], t: 230 },   /* braço firme indicando */
+    cheer:  { seq: [4, 6, 4, 6], t: 145 },   /* vibração rápida */
+    bob:    { seq: [0, 1, 1, 0], t: 320 },   /* acompanhando você escrever */
+    salute: { seq: [2, 3, 3, 3, 3, 2], t: 210 } /* continência de despedida */
+  };
   var tutGestoT = null;
-  function tutGesto(on) {
+  function tutGesto(mood) {
     clearInterval(tutGestoT);
     var sp = $('tutSprite');
-    if (!on) { sp.style.backgroundPosition = '0 0'; return; }
-    var seq = [1, 2, 3, 2, 1, 0], gi = 0;
+    if (!mood) { sp.style.backgroundPosition = '0 0'; return; }
+    var g = GESTOS[mood] || GESTOS.talk, gi = 0;
     tutGestoT = setInterval(function () {
-      sp.style.backgroundPosition = (-seq[gi % seq.length] * 118) + 'px 0'; gi++;
-    }, 190);
+      sp.style.backgroundPosition = (-g.seq[gi % g.seq.length] * 118) + 'px 0'; gi++;
+    }, g.t);
   }
-  /* as palavras aparecem como se o robô estivesse falando */
+  /* fala caractere a caractere, no ritmo de uma conversa real:
+     ~30ms por letra, respirando nas vírgulas e parando nos pontos */
   var tutSayT = null, tutTyping = false, tutSayFull = '';
-  function tutSay(html) {
-    clearInterval(tutSayT);
+  function tutSay(html, mood) {
+    clearTimeout(tutSayT);
     tutSayFull = html;
-    var palavras = html.split(' '), i = 0;
     tutTyping = true;
     $('tutText').innerHTML = '';
-    tutGesto(true);
-    tutSayT = setInterval(function () {
-      i++;
-      $('tutText').innerHTML = palavras.slice(0, i).join(' ');
-      if (i >= palavras.length) { clearInterval(tutSayT); tutTyping = false; tutGesto(false); }
-    }, 72);
+    $('tutText').setAttribute('data-typing', '1');
+    tutGesto(mood || 'talk');
+    /* tokens: tags inteiras (sem custo) e caracteres (com ritmo) */
+    var tokens = [];
+    for (var i = 0; i < html.length; i++) {
+      if (html[i] === '<') { var j = html.indexOf('>', i); tokens.push(html.slice(i, j + 1)); i = j; }
+      else { tokens.push(html[i]); }
+    }
+    var pos = 0, out = '';
+    function passo() {
+      if (pos >= tokens.length) { tutTyping = false; $('tutText').removeAttribute('data-typing'); tutGesto(null); return; }
+      var tk = tokens[pos++];
+      out += tk;
+      $('tutText').innerHTML = out;
+      var espera = tk.length > 1 ? 0 : 30;                    /* tags entram de graça */
+      if (',;'.indexOf(tk) >= 0) espera = 160;                /* respira na vírgula */
+      if ('.!?:—'.indexOf(tk) >= 0) espera = 330;             /* pausa no ponto */
+      tutSayT = setTimeout(passo, espera);
+    }
+    passo();
   }
   function tutSayEnd() {
-    clearInterval(tutSayT);
+    clearTimeout(tutSayT);
     $('tutText').innerHTML = tutSayFull;
-    tutTyping = false; tutGesto(false);
+    $('tutText').removeAttribute('data-typing');
+    tutTyping = false; tutGesto(null);
   }
   function tutGo(i) {
     tutIdx = i;
@@ -3319,7 +3343,7 @@
     var skip = st.onEnter ? st.onEnter() : null;
     if (skip === 'skip') { setTimeout(function () { tutGo(i + 1); }, 60); return; }
     tutExpect = st.expect || null;
-    tutSay(typeof st.txt === 'function' ? st.txt() : st.txt);
+    tutSay(typeof st.txt === 'function' ? st.txt() : st.txt, st.mood);
     $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
@@ -3368,7 +3392,7 @@
       fone: [function () { return $('foneAluno').closest('.p-card'); }, 'Faltou o seu <b>telefone</b>. Preenche ali para a gente seguir.'],
       guerra: [function () { return $('nomeGuerra').closest('.p-card'); }, 'Seu <b>nome de guerra</b> precisa de pelo menos 2 letras — só letras, sem palavrão.']
     }[qual];
-    tutSay(mapa[1]);
+    tutSay(mapa[1], 'point');
     if (qual === 'avatar') { $('avGrid').style.display = 'grid'; $('btnTrocarAvatar').style.display = 'none'; }
     var el = mapa[0]();
     el.scrollIntoView({ block: 'center' });

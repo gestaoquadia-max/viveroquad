@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 19/07/2026 — fala do QUAD em ritmo humano + gestos por conteúdo
+- **Digitação caractere a caractere** (~30ms por letra), respirando nas
+  vírgulas (160ms) e pausando nos pontos (330ms) — ritmo de conversa real,
+  não mais palavra a palavra acelerada
+- **Gestos diferentes por conteúdo**: cada humor tem sequência e cadência
+  próprias enquanto a fala sai — aceno largo na saudação, explicação calma
+  nos conceitos, braço firme apontando nas ações, vibração rápida nas
+  conquistas, acompanhamento leve nos formulários e continência na
+  despedida; ao terminar a fala, descansa
+- Sinal `data-typing` no balão (usado pela suíte para sincronizar)
+
 ## 19/07/2026 — tutorial do QUAD: fala viva, loop da missão e balões corrigidos
 - **Balões reposicionados**: o robô maior estava parado NA FRENTE do balão
   (cobria "Esse é você agora" e outros beats); folgas recalculadas para a
