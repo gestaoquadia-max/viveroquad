@@ -1,11 +1,5 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
-## 19/07/2026 — alinhamento da turma no card principal
-- **TURMA PATAMO (N)** agora alinha exatamente sob o texto **ALUNO
-  SOLDADO** (recuo de 42px compensando a insígnia) — as três linhas do
-  card (nome, patente e turma) compartilham a mesma margem esquerda,
-  verificado ao pixel no navegador
-
 ## 19/07/2026 — telas de acesso reorganizadas (verificação e código)
 - **Verificação (página 2)**: o próprio **símbolo do Quad virou o
   carregamento** — anel girando ao redor dele com respiração suave — e
