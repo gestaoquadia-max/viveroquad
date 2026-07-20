@@ -1901,7 +1901,7 @@
           </defs>
         </svg>
 
-        <span class="danilo-hint" id="daniloHint"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
+        <span class="danilo-hint" id="daniloHint" style="display:none"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
         <button class="danilo-fab" id="daniloFab" aria-label="Falar com o QUAD, o guia">
           <span class="fab-sprite" id="fabSprite" style="background-image:url(__DANILO_SPRITE__)" aria-hidden="true"></span>
         </button>
@@ -3149,6 +3149,7 @@
     playSplash(function () {
       applyConnUI();
       daniloWave(); // o QUAD recebe o aluno acenando
+      daniloHintMostra(); // "Precisa de ajuda?" fica 10s na tela
       var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
       if (runTour || tutAberta) iniciarTutorial();   /* V0: instrução interrompida recomeça do início */
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
@@ -3166,6 +3167,7 @@
     $('loginLayer').classList.add('off');
     applyConnUI();   // mostra o banner de modo offline dentro do app
     updatePending();
+    daniloHintMostra();
     toast('Modo offline — conteúdos já carregados disponíveis.');
   });
   $('btnTentarNovamente').addEventListener('click', function () {
@@ -4128,7 +4130,7 @@
     tutOn = false; tourOn = false; tutExpect = null;
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
-    $('daniloHint').style.display = '';
+    daniloHintMostra();   /* reaparece por 10s e some sozinho */
     toast('Instrução inicial concluída — plataforma liberada!');
     daniloWave();
   }
@@ -4739,6 +4741,15 @@
     if (btnAvatarEl.dataset.zoomed) return;   /* soltar do zoom não navega */
     showView('v-aluno', 'navAluno');
   });
+
+  /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
+  var daniloHintT = null;
+  function daniloHintMostra() {
+    var h = $('daniloHint');
+    h.style.display = '';
+    clearTimeout(daniloHintT);
+    daniloHintT = setTimeout(function () { h.style.display = 'none'; }, 10000);
+  }
 
   /* ---------- Danilo acena e depois fica parado (sprite de 7 poses) ---------- */
   var fabSpriteEl = $('fabSprite'), waveTimers = [];

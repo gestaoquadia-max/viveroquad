@@ -1,5 +1,12 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — "Precisa de ajuda?" temporizado
+- O balão do robô **aparece quando o aluno loga e some sozinho em 10
+  segundos** (antes ficava fixo na tela); vale para o login normal, a
+  entrada offline e o fim da instrução inicial
+- Suíte `vhint` (5 verificações, com cronômetro real) verde; central de
+  tutoriais e tutorial completo sem regressões
+
 ## 20/07/2026 — instrução fora da conta · zoom com nome de guerra
 - **"Introdução no Quad" saiu da conta do Bloco da noite** (é instrução,
   não missão): o cartão agora marca 0/8; concluída, ela só desaparece
