@@ -3,9 +3,9 @@
 ## 20/07/2026 — fotos oficiais com boina (homens) no guarda-roupa
 - As artes do gestor entraram no app: **comprar a boina troca a foto do
   personagem de verdade** — card do Início, preview do Perfil e zoom
-- Lote 1 mapeado: loiro (0), pardo raspado (1), ruivo (2), careca (3) e
-  corte militar (5); **pendente: homem negro corte fade (4)** e o lote
-  das mulheres (chega na sequência)
+- Lote masculino **completo**: loiro (0), pardo raspado (1), ruivo (2),
+  careca (3), negro corte fade (4) e corte militar (5); pendente o lote
+  das mulheres (reenvio solicitado)
 - Ativos em `fotos/boina-<índice>.webp` (320px); token `__FOTOS_BOINA__`
   no build (python e build.ps1); avatar sem variante segue na foto base
 - Suíte `vfoto2` (4 checagens com as fotos reais) verde; tutorial, herói
