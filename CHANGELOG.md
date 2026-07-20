@@ -1,5 +1,17 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — gandola: fotos femininas + esteira multivariante
+- Lote **mulheres com boina e gandola**: preto liso (6), loira (7),
+  ruiva (8), castanho curto (9) e tranças (11) — comprar a **Gandola**
+  na cadeia veste a foto oficial; falta a "negra, cabelo curto" (10)
+  e o lote masculino
+- Build generalizado: token único `__FOTOS_VARIANTES__` injeta todas as
+  variantes de `fotos/<variante>-<índice>.webp` (boina, gandola, colete,
+  fuzil, cipe, patamo, bope) — lotes novos entram sem mexer em código
+- Personagem sem arte da variante cai no degrau anterior (boina → base),
+  nunca numa foto errada; recorte do miolo aplicado na esteira
+- Suíte `vgand` verde; boina e cadeia de skins sem regressões
+
 ## 20/07/2026 — encaixe das fotos com boina corrigido
 - As artes vinham com a moldura do gabarito (fundo bege + anel branco) e
   o personagem ficava encolhido no círculo; agora cada foto é **recortada

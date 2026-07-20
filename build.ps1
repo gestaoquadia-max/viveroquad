@@ -23,8 +23,9 @@ function Fotos-Variante($prefixo) {
   }
   return '{ ' + ($itens -join ', ') + ' }'
 }
-$fotosBoina = Fotos-Variante "boina"
-$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__FOTOS_BOINA__", $fotosBoina)
+$variantes = @("boina", "gandola", "colete", "fuzil", "cipe", "patamo", "bope")
+$fotosVar = '{ ' + (($variantes | ForEach-Object { '{0}: {1}' -f $_, (Fotos-Variante $_) }) -join ', ') + ' }'
+$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__FOTOS_VARIANTES__", $fotosVar)
 $enc = New-Object System.Text.UTF8Encoding $false
 # artifact.html: conteúdo sem esqueleto (o Artifact adiciona doctype/head/body ao publicar)
 [System.IO.File]::WriteAllText((Join-Path $dir "artifact.html"), $out, $enc)
