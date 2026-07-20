@@ -1496,6 +1496,8 @@
               <button class="btn" id="btnProva" style="width:100%">Realizar prova de promoção</button>
             </div>
             <button class="btn ghost small" id="btnDiaEstudo" style="width:100%; margin-top:12px">Registrar dia de estudo (simulação · +275 pts)</button>
+            <!-- [DEMO PROVISÓRIO — REMOVER] atalho para percorrer todas as patentes -->
+            <button class="btn ghost small" id="btnDemoPatente" style="width:100%; margin-top:10px; border-color:#C99B2F; color:#9A6B00">▶ Passar prova pelo gabarito (demo) · sobe 1 patente</button>
             <p class="sub" style="margin-top:8px">O score representa esforço — <strong>não é moeda e não promove sozinho</strong>. Ao atingir a meta, você ganha o direito à <strong>prova de promoção</strong>: acertando <strong>80%</strong> você sobe de patente na hora.</p>
           </div>
 
@@ -4373,7 +4375,8 @@
       else if (i === carreira.patenteIdx) {
         cls = (carreira.estado === 'disponivel') ? 'prova' : 'atual';
         dot = (carreira.estado === 'disponivel') ? '★' : '●';
-        meta = (carreira.estado === 'disponivel') ? 'prova disponível' : fmt(carreira.scorePatente) + '/' + fmt(p.pontos) + ' pts';
+        meta = (carreira.estado === 'disponivel') ? 'prova disponível'
+             : (p.pontos ? fmt(carreira.scorePatente) + '/' + fmt(p.pontos) + ' pts' : 'patente máxima');
       }
       html += '<div class="tr-item ' + cls + '"><span class="tr-dot">' + dot + '</span><span class="insig-img" style="background-position:' + insigPos(i) + '"></span><span class="tr-nome">' + p.nome + '</span><span class="tr-meta">' + meta + '</span></div>';
     });
@@ -4557,7 +4560,6 @@
         '<div class="gate-badge warn" style="margin:0 auto 12px">!</div>' +
         '<h3 class="mil" style="font-size:20px">Ainda não foi desta vez</h3>' +
         '<p class="sub" style="margin-top:8px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (' + Math.round(prova.hits / GAMI.provaQuestoes * 100) + '%). O mínimo é ' + Math.round(PROVA_APROV * 100) + '% (' + minAcertos + ' acertos). Uma nova tentativa fica disponível em ' + GAMI.tentativaHoras + ' horas.</p>' +
-        '<p class="sub" style="margin-top:6px">Seu score e sua patente estão preservados — continue treinando as questões que você marcou como difíceis.</p>' +
         '<button class="btn ghost small" id="btnLiberarTentativa" style="margin-top:10px">Liberar nova tentativa (simulação)</button></div>';
       var bl = document.getElementById('btnLiberarTentativa');
       if (bl) bl.addEventListener('click', function () { carreira.estado = 'disponivel'; carreira.provaBloqueadaAte = null; renderCarreira(); toast('Nova tentativa liberada (simulação).'); });
@@ -4581,6 +4583,26 @@
       toast('Prova interrompida — você pode tentar novamente.');
     }
   });
+
+  /* ================= [DEMO PROVISÓRIO — REMOVER] =================
+     Atalho de teste: sobe uma patente por clique (como se a prova de
+     promoção tivesse sido aprovada pelo gabarito). Serve só para o gestor
+     percorrer TODAS as patentes e ver a evolução (insígnia, título, trilha).
+     Para remover: apague este bloco e o botão #btnDemoPatente no HTML. */
+  function demoSobePatente() {
+    if (carreira.patenteIdx >= GAMI.patentes.length - 1) { toast('Você já está na patente máxima do jogo!'); return; }
+    var prox = proximaPatente();
+    carreira.patenteIdx++;
+    carreira.scorePatente = 0;
+    carreira.estado = 'acumulando';
+    carreira.provaBloqueadaAte = null;
+    carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: 'gabarito demo' });
+    renderCarreira();
+    toast('DEMO · promovido a ' + tituloCompleto());
+  }
+  var btnDemoP = $('btnDemoPatente');
+  if (btnDemoP) btnDemoP.addEventListener('click', demoSobePatente);
+  /* =============== fim do bloco provisório =============== */
 
   /* itens do personagem: comprados na Loja, equipados aqui */
   var boinaEquipada = false;

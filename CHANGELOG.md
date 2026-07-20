@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — ajustes da prova + atalho de teste de carreira
+- Removido o texto "Seu score e sua patente estão preservados…" da tela
+  de reprovação da prova
+- **[DEMO PROVISÓRIO]** botão no card de carreira "▶ Passar prova pelo
+  gabarito (demo) · sobe 1 patente": promove uma patente por clique, para
+  o gestor percorrer as 14 patentes e ver a evolução (insígnia, título,
+  fase, trilha). Marcado no código para remoção posterior
+- Corrigido erro na patente máxima (Coronel · sem pontos) na trilha
+
 ## 20/07/2026 — acesso pelo site, dados do banco e prova automática
 - **Login do app = e-mail + senha + "Ainda não tem conta? Criar conta"**.
   A conta é criada no **checkout do site** (junto da matrícula); com a
