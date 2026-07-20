@@ -1,5 +1,11 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — encaixe das fotos com boina corrigido
+- As artes vinham com a moldura do gabarito (fundo bege + anel branco) e
+  o personagem ficava encolhido no círculo; agora cada foto é **recortada
+  no miolo** (só o círculo interno) e preenche o avatar igual à foto base
+- Recorte proporcional aplicado aos 12 personagens; ativos regenerados
+
 ## 20/07/2026 — fotos oficiais com boina (homens) no guarda-roupa
 - As artes do gestor entraram no app: **comprar a boina troca a foto do
   personagem de verdade** — card do Início, preview do Perfil e zoom
