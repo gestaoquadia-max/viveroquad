@@ -1217,13 +1217,13 @@
               <div class="card-head">
                 <div class="hm-plaque" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.2v3.4M12 18.4v3.4M2.2 12h3.4M18.4 12h3.4"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
                 <div class="k-label grow">Missão de hoje</div>
-                <span class="hm-status"><i class="dot" aria-hidden="true"></i><span id="missRestam">FALTAM 9</span></span>
+                <span class="hm-status"><i class="dot" aria-hidden="true"></i><span id="missRestam">FALTAM 8</span></span>
               </div>
               <h2 class="mil hero-title">Bloco da noite</h2>
               <p class="hero-sub">Complete as missões desta noite para ganhar score e Quad Coins. Avante!</p>
               <div class="hero-prog">
                 <div class="hseg-track" id="missSegs" aria-hidden="true"></div>
-                <div class="hero-count-wrap"><span class="hero-count" id="missCount">0/9</span><span class="hero-count-lbl">missões</span></div>
+                <div class="hero-count-wrap"><span class="hero-count" id="missCount">0/8</span><span class="hero-count-lbl">missões</span></div>
               </div>
               <div class="hero-btn-wrap">
                 <button class="btn hero-btn" id="btnMissaoHome">Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
@@ -1272,7 +1272,7 @@
             <div class="mission-row" id="blocoIntroRow">
               <div class="m-dot" id="biDot">1</div>
               <div class="grow">
-                <div class="t">Bloco 1 · Introdução no Quad</div>
+                <div class="t">Introdução no Quad</div>
                 <div class="d">3 questões · o seu primeiro score</div>
               </div>
               <button class="btn small" id="btnBlocoIntro">Iniciar</button>
@@ -2405,6 +2405,7 @@
       clone.addEventListener('click', function (e) {
         var b = e.target.closest('button');
         if (!b || !clone.contains(b)) return;
+        if (Date.now() < zoomSupTs) return;   /* soltar do zoom não vira clique */
         var i = [].indexOf.call(clone.querySelectorAll('button'), b);
         var alvo = seg.querySelectorAll('button')[i];
         if (alvo) { alvo.click(); queueSync(); }
@@ -2788,8 +2789,7 @@
      abre direto a próxima missão da noite ainda pendente */
   $('btnMissaoHome').addEventListener('click', function () {
     showView('v-missoes', 'navAluno');
-    if (typeof tutOn !== 'undefined' && tutOn) { return; }  /* no tutorial, o QUAD guia o Bloco 1 */
-    if (!blocoIntroFeito) { return; }                       /* 1ª missão da noite é o Bloco 1, já em destaque */
+    if (typeof tutOn !== 'undefined' && tutOn) { return; }  /* no tutorial, o QUAD guia a Introdução */
     var pend = missoesDaNoite().filter(function (x) { return !x.b.feito; });
     if (pend.length) { trAbrirBloco(pend[0].i); }
   });
@@ -3349,7 +3349,7 @@
     { sel: function () { return document.querySelector('#v-inicio #btnMissaoHome'); }, expect: 'bloco', mood: 'point', bot: 'tr',
       txt: '<b>Toca em “Continuar missão”</b>. Suas primeiras questões estão te esperando.' },
     { view: 'v-missoes', sel: '#blocoIntroRow', arrow: '#btnBlocoIntro', expect: 'missao', mood: 'point', bot: 'br',
-      txt: 'Sua primeira missão tá aqui: <b>Bloco 1 · Introdução no Quad</b> — 3 questões rapidinhas. <b>Toca em “Iniciar”!</b>' },
+      txt: 'Sua primeira missão tá aqui: <b>Introdução no Quad</b> — 3 questões rapidinhas. <b>Toca em “Iniciar”!</b>' },
     { view: 'v-inicio', sel: function () { return $('xpNum').parentElement; }, mood: 'cheer', bot: 'br',
       txt: 'Olha lá o <b>score</b>! Seus primeiros pontos entraram.' },
     { sel: '#coinsCard', mood: 'talk', bot: 'bl',
@@ -3760,8 +3760,8 @@
   /* PDF 01 → bloco Hoje: 2 aulas por dia × marcos D0 · D+1 · D+7 · D+30.
      Tudo libera às 22h15 do dia — o aluno só vê "as rápidas de hoje". */
   var DIA_BLOCOS = [
-    { rot: 'Bloco 2 · Dir. Constitucional', det: 'aula de hoje · 19h', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
-    { rot: 'Bloco 3 · Matemática', det: 'aula de hoje · 20h30', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+    { rot: 'Bloco 1 · Dir. Constitucional', det: 'aula de hoje · 19h', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+    { rot: 'Bloco 2 · Matemática', det: 'aula de hoje · 20h30', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
     { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem', fonte: 'aula', ini: 0 },
     { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
     { rot: 'Revisão · Dir. Administrativo', det: 'semana passada', fonte: 'aula', ini: 10 },
@@ -3831,8 +3831,8 @@
      registrada como concluída acende mais um segmento da trilha */
   function heroSync() {
     var noite = missoesDaNoite();
-    var total = noite.length + 1;   /* +1 = Bloco 1 · Introdução */
-    var feitas = noite.filter(function (x) { return x.b.feito; }).length + (blocoIntroFeito ? 1 : 0);
+    var total = noite.length;      /* a Introdução (instrução) fica fora da conta */
+    var feitas = noite.filter(function (x) { return x.b.feito; }).length;
     $('missCount').textContent = feitas + '/' + total;
     var segs = '';
     for (var s = 0; s < total; s++) { segs += '<span class="hseg' + (s < feitas ? ' on' : '') + '"></span>'; }
@@ -4035,8 +4035,7 @@
   var tqI = 0, tqAcertos = 0, tqLock = false, blocoIntroFeito = false;
   function blocoIntroMarca(feito) {
     blocoIntroFeito = feito;
-    $('blocoIntroRow').style.display = feito ? 'none' : '';   /* concluído, some da lista */
-    heroSync();   /* o Bloco 1 também conta como missão da noite */
+    $('blocoIntroRow').style.display = feito ? 'none' : '';   /* concluída, some da lista */
   }
   $('btnBlocoIntro').addEventListener('click', function () {
     if (blocoIntroFeito) return;
@@ -4090,7 +4089,7 @@
       carreira.scoreCarreira += TUT_REW.score;
       carreira.scoreTemporada += TUT_REW.score;
       renderCarreira();
-      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · Bloco 1 concluído');
+      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · Introdução concluída');
       blocoIntroMarca(true);
       $('tqLayer').style.display = 'none';
       if (tutOn) {
@@ -4098,7 +4097,7 @@
         $('tutLayer').classList.add('on');
         tutEvent('missao');
       } else {
-        toast('Bloco 1 · Introdução no Quad concluído!');
+        toast('Introdução no Quad concluída!');
       }
     });
   }
@@ -4117,7 +4116,7 @@
     carreira.estado = 'acumulando'; renderCarreira();
     tutResetBoina();
     tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
-    blocoIntroMarca(false);   /* o Bloco 1 · Introdução volta a ficar disponível */
+    blocoIntroMarca(false);   /* a Introdução no Quad volta a ficar disponível */
     $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';   /* preencher também */
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
@@ -4188,7 +4187,8 @@
   ];
   var avatarThumbs = [], avatarZoom = [], avatarIdx = 0;
   /* segurar para ampliar a foto do personagem */
-  var zoomHold = { t: null, on: false };
+  var zoomHold = { t: null, on: false, el: null };
+  var zoomSupTs = 0;   /* após soltar o zoom, cliques ficam suprimidos por instantes */
   function zoomShow(src, nome) {
     $('zoomImg').src = src;
     $('zoomNome').textContent = nome || '';
@@ -4201,23 +4201,38 @@
     zoomHold.on = false;
     if (tutOn && (tutExpect === 'zoom-foto' || tutExpect === 'zoom-final')) tutEvent(tutExpect);
   }
-  function bindHold(el, getDados) {
-    el.addEventListener('pointerdown', function () {
-      clearTimeout(zoomHold.t);
-      zoomHold.t = setTimeout(function () { var d = getDados(); zoomShow(d.src, d.nome); }, 350);
-    });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
-      el.addEventListener(ev, function () {
+  /* segurar para ampliar — registrado por SELETOR e delegado no documento,
+     para funcionar também nas cópias da rolagem infinita do Início */
+  var HOLD_SELS = [];
+  function bindHold(sel, getDados) { HOLD_SELS.push({ sel: sel, dados: getDados }); }
+  document.addEventListener('pointerdown', function (e) {
+    for (var i = 0; i < HOLD_SELS.length; i++) {
+      var alvo = e.target.closest(HOLD_SELS[i].sel);
+      if (alvo) {
         clearTimeout(zoomHold.t);
-        if (zoomHold.on) {
-          zoomHide();
-          el.dataset.zoomed = '1';   /* soltar depois de ampliar não conta como clique */
-          setTimeout(function () { delete el.dataset.zoomed; }, 260);
-        }
-      });
-    });
-    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        (function (h, el) {
+          zoomHold.el = el;
+          zoomHold.t = setTimeout(function () { var d = h.dados(el); zoomShow(d.src, d.nome); }, 350);
+        })(HOLD_SELS[i], alvo);
+        return;
+      }
+    }
+  }, true);
+  function holdSolta() {
+    clearTimeout(zoomHold.t);
+    if (zoomHold.on) {
+      zoomHide();
+      zoomSupTs = Date.now() + 300;   /* clique do mesmo gesto não navega/escolhe */
+      if (zoomHold.el) {
+        (function (el) { el.dataset.zoomed = '1'; setTimeout(function () { delete el.dataset.zoomed; }, 260); })(zoomHold.el);
+      }
+    }
+    zoomHold.el = null;
   }
+  ['pointerup', 'pointercancel'].forEach(function (ev) { document.addEventListener(ev, holdSolta, true); });
+  document.addEventListener('contextmenu', function (e) {
+    if (HOLD_SELS.some(function (h) { return !!e.target.closest(h.sel); })) e.preventDefault();
+  });
   function aplicarAvatar() {
     if (!avatarThumbs.length) return;
     var src = avatarThumbs[avatarIdx];
@@ -4248,7 +4263,6 @@
         b.className = 'avatar-opt' + (i === avatarIdx ? ' sel' : '');
         b.setAttribute('aria-label', AV_LABELS[i]);
         b.innerHTML = '<img src="' + src + '" alt="">';
-        bindHold(b, function () { return { src: avatarZoom[i] || src, nome: AV_LABELS[i] }; });
         b.addEventListener('click', function () {
           if (b.dataset.zoomed) return;   /* soltou depois de ampliar: não escolhe */
           grid.querySelectorAll('.avatar-opt').forEach(function (x2) { x2.classList.remove('sel'); });
@@ -4262,8 +4276,15 @@
         grid.appendChild(b);
       });
       aplicarAvatar();
-      bindHold($('avPreview'), function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: AV_LABELS[avatarIdx] }; });
-      bindHold($('btnAvatarPerfil'), function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: AV_LABELS[avatarIdx] }; });
+      /* inspeção na escolha: rótulo do catálogo (índice pela posição na grade) */
+      bindHold('.avatar-opt', function (el) {
+        var i2 = [].indexOf.call(el.parentElement.children, el);
+        return { src: avatarZoom[i2] || avatarThumbs[i2], nome: AV_LABELS[i2] };
+      });
+      /* foto já escolhida: o zoom identifica o militar (ex.: AL SD QUAD MOURA) */
+      var zoomIdent = function () { return carreira.nomeGuerra ? nomeCurto() : AV_LABELS[avatarIdx]; };
+      bindHold('#avPreview', function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: zoomIdent() }; });
+      bindHold('#btnAvatarPerfil', function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: zoomIdent() }; });
     };
     img.src = AVATAR_SPRITE;
   }

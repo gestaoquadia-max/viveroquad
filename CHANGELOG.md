@@ -1,5 +1,22 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — instrução fora da conta · zoom com nome de guerra
+- **"Introdução no Quad" saiu da conta do Bloco da noite** (é instrução,
+  não missão): o cartão agora marca 0/8; concluída, ela só desaparece
+  da lista — e os blocos do dia **renumeram a partir do 1**
+  (Bloco 1 · Dir. Constitucional, Bloco 2 · Matemática)
+- **"Continuar missão" abre direto a 1ª missão pendente da noite**,
+  mesmo com a Introdução ainda na lista
+- **Zoom da foto (clicar e segurar) mostra o nome de guerra** — ex.:
+  AL SD QUAD MOURA — na foto do Início e na do Perfil; durante a
+  **escolha** do personagem o rótulo do catálogo continua
+  ("Homem · cabelo loiro")
+- Segurar-para-ampliar refeito por **delegação**: passa a funcionar
+  também sobre as cópias da rolagem infinita do Início (antes só o
+  original respondia)
+- Suíte `vhero` atualizada (6 cenários, agora com login real e o gesto
+  de segurar de verdade); tutorial, treinamento, acesso e promoção verdes
+
 ## 20/07/2026 — Bloco da noite refeito: só as missões da noite
 - **"Missão principal" → "Missão de hoje"**; o cartão herói agora é o
   espelho exclusivo das **missões daquela noite** (nunca atrasadas nem
