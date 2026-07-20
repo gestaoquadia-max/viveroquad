@@ -864,7 +864,7 @@
   .hexi.soft { background: linear-gradient(160deg, #E7F1FF, #CFE2FF); color: var(--p-gold); box-shadow: 0 4px 10px rgba(25,118,255,0.18); }
   .hexi.soft svg { stroke: var(--p-gold); }
 
-  /* ---------- cartão herói: missão principal ---------- */
+  /* ---------- cartão herói: missão de hoje (Bloco da noite) ---------- */
   /* placa técnica chanfrada — fundo da arte de referência */
   .hero-mission { padding: 2px; border: none; border-radius: 0; color: #EAF3FF;
     background: linear-gradient(140deg, #A9D6FF 0%, #4E8FE0 30%, #1B4C9E 70%, #0E2E6B 100%);
@@ -885,18 +885,34 @@
     box-shadow: inset 0 0 0 2.5px rgba(126,190,255,0.75), inset 0 0 14px rgba(24,110,240,0.5); }
   .hm-plaque svg { width: 27px; height: 27px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
   .hero-mission .k-label { color: #57A8FF; font: 700 12.5px var(--ui); letter-spacing: .2em; }
-  .hm-expira { display: inline-flex; align-items: center; gap: 6px; flex: none;
-    background: rgba(8,20,52,0.8); border: 2px solid #C99B2F; color: #F2C94C;
-    border-radius: 999px; padding: 7px 13px; font: 700 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; }
-  .hm-expira svg { width: 14px; height: 14px; stroke: #F2C94C; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+  /* grade técnica sutil sobre a placa */
+  .hm-inner::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(rgba(120,180,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,180,255,0.05) 1px, transparent 1px);
+    background-size: 26px 26px; }
+  /* status vivo (sem prazo — a expiração é individual, por missão) */
+  .hm-status { display: inline-flex; align-items: center; gap: 7px; flex: none;
+    background: rgba(8,20,52,0.82); border: 1.5px solid rgba(86,160,255,0.55); color: #8FC4FF;
+    border-radius: 999px; padding: 7px 13px; font: 700 11px var(--ui); letter-spacing: .07em; text-transform: uppercase;
+    box-shadow: inset 0 0 12px rgba(30,110,240,0.22); }
+  .hm-status .dot { width: 7px; height: 7px; border-radius: 50%; background: #43D67C;
+    box-shadow: 0 0 8px rgba(67,214,124,0.9); animation: hmPulse 1.6s ease-in-out infinite; }
+  @keyframes hmPulse { 50% { opacity: .3; } }
   .hero-title { font-size: 36px; line-height: .96; margin: 10px 0 10px; color: #fff; letter-spacing: .015em; }
   .hero-sub { font-size: 13px; line-height: 1.5; color: #C3D6F5; margin: 0 0 16px; max-width: 34ch; }
   .hero-prog { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-  .hero-prog .bar-track { flex: 1; height: 17px; border-radius: 99px; background: #071838;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 0 2px rgba(10,30,70,0.9), 0 1px 0 rgba(90,150,240,0.25); }
-  .hero-prog .bar-fill { border-radius: 99px; background: linear-gradient(180deg, #6FD0FF 0%, #2496FF 60%, #1976FF 100%);
-    box-shadow: 0 0 16px rgba(47,166,255,0.95), inset 0 1px 0 rgba(255,255,255,0.55); }
-  .hero-count { font: 800 26px var(--num); color: #fff; }
+  /* trilha segmentada: 1 célula por missão da noite; concluiu, acende */
+  .hseg-track { flex: 1; display: flex; gap: 5px; padding: 6px 8px; border-radius: 10px; background: #071838;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(50,120,235,0.35), 0 1px 0 rgba(90,150,240,0.2); }
+  .hseg { flex: 1; height: 13px; border-radius: 3px; transform: skewX(-14deg);
+    background: rgba(28,66,140,0.45); box-shadow: inset 0 0 0 1px rgba(70,140,255,0.2);
+    transition: background .25s ease, box-shadow .25s ease; }
+  .hseg.on { background: linear-gradient(180deg, #7FD8FF 0%, #2496FF 62%, #1976FF 100%);
+    box-shadow: 0 0 10px rgba(47,166,255,0.9), inset 0 1px 0 rgba(255,255,255,0.6); }
+  .hero-count-wrap { display: flex; flex-direction: column; align-items: center; line-height: 1; flex: none; }
+  .hero-count { font: 800 25px var(--num); color: #fff; text-shadow: 0 0 14px rgba(64,150,255,0.65); }
+  .hero-count-lbl { font: 700 9px var(--ui); letter-spacing: .18em; color: #6FA8E8; text-transform: uppercase; margin-top: 3px; }
   .hero-btn-wrap { padding: 2px;
     background: linear-gradient(180deg, #BBDCFF, #5D9EEC 45%, #2F6CC8);
     clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 30%, 100% 70%, calc(100% - 18px) 100%, 18px 100%, 0 70%, 0 30%);
@@ -1200,14 +1216,14 @@
               <svg class="hm-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#emblemaQuad"/></svg>
               <div class="card-head">
                 <div class="hm-plaque" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.2v3.4M12 18.4v3.4M2.2 12h3.4M18.4 12h3.4"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
-                <div class="k-label grow">Missão principal</div>
-                <span class="hm-expira"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg><span id="missExpira">EXPIRA EM 2H12</span></span>
+                <div class="k-label grow">Missão de hoje</div>
+                <span class="hm-status"><i class="dot" aria-hidden="true"></i><span id="missRestam">FALTAM 9</span></span>
               </div>
               <h2 class="mil hero-title">Bloco da noite</h2>
-              <p class="hero-sub">Complete as questões de hoje antes das 23h59 para ganhar score e Quadcoins. Avante!</p>
+              <p class="hero-sub">Complete as missões desta noite para ganhar score e Quad Coins. Avante!</p>
               <div class="hero-prog">
-                <div class="bar-track"><div class="bar-fill" id="missBar" style="width:50%"></div></div>
-                <span class="hero-count" id="missCount">10/20</span>
+                <div class="hseg-track" id="missSegs" aria-hidden="true"></div>
+                <div class="hero-count-wrap"><span class="hero-count" id="missCount">0/9</span><span class="hero-count-lbl">missões</span></div>
               </div>
               <div class="hero-btn-wrap">
                 <button class="btn hero-btn" id="btnMissaoHome">Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
@@ -2227,7 +2243,6 @@
 <script>
 (function () {
   var score = 1240;   // Quad Coins (moeda da Loja — NÃO é o score de carreira)
-  var missDone = 10;
 
   /* ==================================================================
      MÓDULO GAMIFICAÇÃO · configuração central (o admin ajustará no
@@ -2749,24 +2764,7 @@
   $('btnProxima').addEventListener('click', function () {
     if (quiz.idx === 'done') {
       $('quizLayer').classList.remove('on');
-      if (quiz.source === 'missao') {
-        missDone = 20;
-        $('missBar').style.width = '100%';
-        $('missCount').textContent = '20/20';
-        $('missExpira').textContent = 'CONCLUÍDO';
-        $('btnMissaoHome').disabled = true; $('btnMissaoHome').textContent = 'Missão do dia concluída';
-        addScore(30, '+30 Quad Coins · missão do dia completa');
-        addPontos(10); // bônus de score por concluir o bloco de missão
-        if (!online) {
-          // offline: o progresso fica salvo no dispositivo, aguardando sincronização
-          pendingAnswers += QUESTIONS.length;
-          lsSet(LS.pend, String(pendingAnswers));
-          updatePending();
-          toast(QUESTIONS.length + ' respostas salvas · aguardando envio');
-        }
-      } else {
-        addScore(20, '+20 Quad Coins · quiz da aula');
-      }
+      addScore(20, '+20 Quad Coins · quiz da aula');
       $('telemetry').textContent = 'origem: OPEN_ORGANIC · eventos: ' + (14 + QUESTIONS.length * 2) + ' · linha de base: ativa';
       return;
     }
@@ -2786,8 +2784,14 @@
   });
 
   $('btnTreinoRapido').addEventListener('click', function () { trAbrir(); });
+  /* "Continuar missão" leva só às missões DAQUELA NOITE (nunca atrasadas/simulados):
+     abre direto a próxima missão da noite ainda pendente */
   $('btnMissaoHome').addEventListener('click', function () {
     showView('v-missoes', 'navAluno');
+    if (typeof tutOn !== 'undefined' && tutOn) { return; }  /* no tutorial, o QUAD guia o Bloco 1 */
+    if (!blocoIntroFeito) { return; }                       /* 1ª missão da noite é o Bloco 1, já em destaque */
+    var pend = missoesDaNoite().filter(function (x) { return !x.b.feito; });
+    if (pend.length) { trAbrirBloco(pend[0].i); }
   });
 
   /* ---------- aula de hoje · cronograma presencial ----------
@@ -3816,6 +3820,33 @@
       });
     });
   }
+  /* missões da noite = blocos vigentes do "Hoje" (nada de atrasadas/simulados) */
+  function missoesDaNoite() {
+    var agora = Date.now();
+    return DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
+    });
+  }
+  /* cartão herói "Bloco da noite": concluídas/total da NOITE; cada missão
+     registrada como concluída acende mais um segmento da trilha */
+  function heroSync() {
+    var noite = missoesDaNoite();
+    var total = noite.length + 1;   /* +1 = Bloco 1 · Introdução */
+    var feitas = noite.filter(function (x) { return x.b.feito; }).length + (blocoIntroFeito ? 1 : 0);
+    $('missCount').textContent = feitas + '/' + total;
+    var segs = '';
+    for (var s = 0; s < total; s++) { segs += '<span class="hseg' + (s < feitas ? ' on' : '') + '"></span>'; }
+    $('missSegs').innerHTML = segs;
+    $('missRestam').textContent = feitas >= total ? 'COMPLETO' : 'FALTAM ' + (total - feitas);
+    var btn = $('btnMissaoHome');
+    if (feitas >= total) {
+      btn.disabled = true;
+      btn.textContent = 'Missões da noite concluídas';
+    } else if (btn.disabled) {
+      btn.disabled = false;
+      btn.innerHTML = 'Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>';
+    }
+  }
   function renderDia() {
     var agora = Date.now();
     var vivos = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
@@ -3829,6 +3860,7 @@
     $('diaList').querySelectorAll('[data-dia]').forEach(function (bt) {
       bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
     });
+    heroSync();   /* o cartão herói acompanha as missões da noite */
   }
 
   /* ---------- motor do treinamento ---------- */
@@ -3960,8 +3992,6 @@
         trFila.gerais = trMontarFila('gerais');
       }
       renderDia();
-  renderAtrasadas();
-  renderSimulados();
       renderAtrasadas();
     }
     var h = '<div class="q-card" style="text-align:center">' +
@@ -4006,6 +4036,7 @@
   function blocoIntroMarca(feito) {
     blocoIntroFeito = feito;
     $('blocoIntroRow').style.display = feito ? 'none' : '';   /* concluído, some da lista */
+    heroSync();   /* o Bloco 1 também conta como missão da noite */
   }
   $('btnBlocoIntro').addEventListener('click', function () {
     if (blocoIntroFeito) return;

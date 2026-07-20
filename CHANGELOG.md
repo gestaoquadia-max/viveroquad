@@ -1,5 +1,24 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — Bloco da noite refeito: só as missões da noite
+- **"Missão principal" → "Missão de hoje"**; o cartão herói agora é o
+  espelho exclusivo das **missões daquela noite** (nunca atrasadas nem
+  simulados)
+- **"Continuar missão" vai só às missões da noite**: com o Bloco 1
+  pendente mostra a lista; depois, **abre direto o próximo bloco** ainda
+  não resolvido; tudo concluído → botão vira "Missões da noite concluídas"
+- **Prazo removido do cartão** (a expiração é individual, por missão);
+  no lugar, status vivo "FALTAM N" / "COMPLETO"
+- **Contador refeito**: missões concluídas / total da noite (ex.: 2/9);
+  cada missão registrada como concluída acende **mais um segmento** da
+  nova trilha
+- **Design mais tecnológico**: trilha segmentada chanfrada com brilho,
+  grade técnica sutil na placa, contagem com glow — tudo na paleta azul
+- Limpeza: removido o código morto do quiz antigo de missão (barra
+  10/20 fixa, "EXPIRA EM 2H12", ramo `source: missao`)
+- Nova suíte `vhero` (6 cenários) verde; tutorial, treinamento e acesso
+  sem regressões
+
 ## 19/07/2026 — turma do cadastro sincroniza o app inteiro
 - O cadastro automático agora preenche **TURMA PATAMO (N)** (antes vinha
   "PC-BA Noite · PATAMO", um formato que não existia no app)
