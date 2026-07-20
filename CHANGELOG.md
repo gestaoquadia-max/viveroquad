@@ -1,5 +1,13 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — gandola feminina completa · sem selos sobre a foto
+- Entrou a "negra, cabelo curto" (10) — **gandola feminina completa**
+- **Selo azul de equipado removido** da foto do painel (a boina aparece
+  na própria arte, o selo virou ruído) — mesma reclamação da borda,
+  resolvida na raiz
+- O **anel colorido por skin virou reserva**: só aparece quando a
+  variante ainda não tem foto oficial; com arte no lugar, nenhuma moldura
+
 ## 20/07/2026 — gandola: fotos femininas + esteira multivariante
 - Lote **mulheres com boina e gandola**: preto liso (6), loira (7),
   ruiva (8), castanho curto (9) e tranças (11) — comprar a **Gandola**
