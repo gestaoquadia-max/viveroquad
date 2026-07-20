@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — moeda oficial do Quad Coin
+- A arte oficial da moeda (dourada, "QUAD CONCURSOS" com o Q da marca)
+  **substitui o desenho provisório em SVG** nos três pontos do app:
+  card Quad Coins do Início, saldo da Loja e regras de coins das
+  páginas de evento
+- Ativos novos: `quad-coin.png` (arte master) e `quad-coin.webp`
+  (256px, embutido no build via token `__QUAD_COIN__` — build.ps1
+  atualizado); símbolo SVG antigo e gradientes exclusivos removidos
+- Loja, eventos, tutorial (compra da boina) e herói sem regressões
+
 ## 20/07/2026 — "Precisa de ajuda?" temporizado
 - O balão do robô **aparece quando o aluno loga e some sozinho em 10
   segundos** (antes ficava fixo na tela); vale para o login normal, a

@@ -967,7 +967,7 @@
   .ev-rule .r-nm { flex: 1; font-size: 12.5px; }
   .ev-rule .r-pts { font: 700 12.5px Consolas, monospace; color: var(--p-gold); white-space: nowrap; }
   .ev-rule .r-pts.coin { display: inline-flex; align-items: center; gap: 4px; color: #9A7414; }
-  .ev-rule .r-pts svg { width: 15px; height: 15px; }
+  .ev-rule .r-pts svg, .ev-rule .r-pts img { width: 15px; height: 15px; }
 
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
@@ -986,7 +986,7 @@
   .loja-saldo { display: inline-flex; align-items: center; gap: 5px; flex: none;
     background: linear-gradient(180deg, #FFFDF4, #FFF3D6); border: 1px solid #EED9A2; border-radius: 999px;
     padding: 5px 10px; font: 700 12px var(--ui); color: #9A7414; }
-  .loja-saldo svg { width: 18px; height: 18px; }
+  .loja-saldo svg, .loja-saldo img { width: 18px; height: 18px; }
   .loja-saldo b { color: var(--p-text); font-size: 13px; }
   .loja-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .loja-item { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
@@ -1152,7 +1152,7 @@
               <div class="turma-line" id="cardTurma"></div>
             </div>
             <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
-              <svg class="coin-art" viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>
+              <img class="coin-art" src="__QUAD_COIN__" alt="" aria-hidden="true">
               <span class="coins-txt">
                 <span class="coins-lbl">Quad Coins</span>
                 <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
@@ -1359,7 +1359,7 @@
                 <div class="card-eyebrow">Intendência Quad</div>
                 <h3 class="aula-title" style="margin:2px 0 0">Loja</h3>
               </div>
-              <span class="loja-saldo"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg><b id="lojaSaldo">1.240</b>&nbsp;QdC</span>
+              <span class="loja-saldo"><img src="__QUAD_COIN__" alt="" aria-hidden="true"><b id="lojaSaldo">1.240</b>&nbsp;QdC</span>
             </div>
             <p class="sub">Itens reais e digitais, comprados <strong>exclusivamente com Quad Coins</strong>. Aqui dinheiro não entra — vale o seu esforço.</p>
           </div>
@@ -1862,9 +1862,6 @@
           <defs>
             <linearGradient id="insOut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4FAFF"/><stop offset="1" stop-color="#8FC1F2"/></linearGradient>
             <linearGradient id="insIn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E55B2"/><stop offset="1" stop-color="#0A2A66"/></linearGradient>
-            <radialGradient id="cgOuter" cx="0.38" cy="0.3" r="0.9"><stop offset="0" stop-color="#FFEBA8"/><stop offset="0.55" stop-color="#F6BE45"/><stop offset="1" stop-color="#C8860D"/></radialGradient>
-            <radialGradient id="cgBlue" cx="0.38" cy="0.32" r="0.85"><stop offset="0" stop-color="#3B79F2"/><stop offset="0.7" stop-color="#16368F"/><stop offset="1" stop-color="#0B2455"/></radialGradient>
-            <linearGradient id="cgStar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE596"/><stop offset="1" stop-color="#E09415"/></linearGradient>
 
             <symbol id="emblemaQuad" viewBox="0 0 100 100">
               <path d="M50 4 89 27 89 73 50 96 11 73 11 27Z" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round"/>
@@ -1887,17 +1884,6 @@
               <g color="#EAF4FF"><use href="#emblemaQuad" x="0" y="0" width="100" height="100" transform="translate(28,30) scale(0.45)"/></g>
             </symbol>
 
-            <symbol id="quadCoinSvg" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="48" fill="url(#cgOuter)" stroke="#9A6606" stroke-width="1"/>
-              <circle cx="50" cy="50" r="40.5" fill="none" stroke="#FFE9A0" stroke-opacity="0.55" stroke-width="1"/>
-              <circle cx="50" cy="50" r="39" fill="none" stroke="#8A5E08" stroke-opacity="0.3" stroke-width="1.5"/>
-              <path d="M50 4.5 51.7 8.6 56 8.9 52.7 11.6 53.9 15.8 50 13.4 46.1 15.8 47.3 11.6 44 8.9 48.3 8.6Z" fill="#8A5C06"/>
-              <path d="M5 36 13 36M5 64 13 64M87 36 95 36M87 64 95 64" stroke="#B87A0E" stroke-width="2"/>
-              <circle cx="50" cy="50" r="31" fill="url(#cgBlue)" stroke="#E8B23A" stroke-width="3"/>
-              <path d="M50 26 70.8 38 70.8 62 50 74 29.2 62 29.2 38Z" fill="none" stroke="#F2B93E" stroke-width="4.5" stroke-linejoin="round"/>
-              <path d="M50 31 53.9 41.6 65.2 42.1 56.4 49.1 59.4 59.9 50 53.7 40.6 59.9 43.6 49.1 34.8 42.1 46.1 41.6Z" fill="url(#cgStar)" stroke="#B0730A" stroke-width="1.2" stroke-linejoin="round"/>
-              <path d="M27 62 50 72.5 73 62 73 70 50 80.5 27 70Z" fill="url(#cgStar)" stroke="#B0730A" stroke-width="1" stroke-linejoin="round"/>
-            </symbol>
           </defs>
         </svg>
 
@@ -2627,7 +2613,8 @@
     if (evDrag.moved) { evDrag.moved = false; return; }   /* arrasto não é clique */
     openEvento(tile.dataset.ev);
   });
-  function coinSvg() { return '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#quadCoinSvg"/></svg>'; }
+  function coinSvg() { return '<img class="coin-img" src="' + QUAD_COIN_SRC + '" alt="" aria-hidden="true">'; }
+  var QUAD_COIN_SRC = '__QUAD_COIN__';
   function openEvento(id) {
     var ev = null;
     EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
