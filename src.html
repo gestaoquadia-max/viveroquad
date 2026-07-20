@@ -4457,7 +4457,7 @@
      colete, fuzil, cipe, patamo, bope) mapeia o índice do avatar → recorte.
      Os PDFs do gestor (6 imagens + classificação cada) preenchem este mapa;
      a troca da foto na compra/equipar JÁ está ligada — é só popular. */
-  var AVATAR_VARIANTES = { boina: {} };
+  var AVATAR_VARIANTES = { boina: __FOTOS_BOINA__ };   /* fotos oficiais com boina (por índice do avatar) */
   window.AVATAR_VARIANTES = AVATAR_VARIANTES;   /* suíte de testes injeta variantes */
   function fotoPersonagem() {
     if (typeof skinAtual !== 'undefined' && skinAtual &&

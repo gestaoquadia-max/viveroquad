@@ -12,7 +12,19 @@ $avs = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir 
 $ins = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "insignias.jpg")))
 $coin = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "quad-coin.webp")))
 $fonts = [System.IO.File]::ReadAllText((Join-Path $dir "fonts.css"), [System.Text.Encoding]::UTF8)
-$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin)
+# fotos por variante do personagem (fotos/<variante>-<índice>.webp)
+function Fotos-Variante($prefixo) {
+  $itens = @()
+  Get-ChildItem (Join-Path $dir "fotos") -Filter "$prefixo-*.webp" | Sort-Object Name | ForEach-Object {
+    if ($_.BaseName -match "^$prefixo-(\d+)$") {
+      $b64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($_.FullName))
+      $itens += ('{0}: "data:image/webp;base64,{1}"' -f $Matches[1], $b64)
+    }
+  }
+  return '{ ' + ($itens -join ', ') + ' }'
+}
+$fotosBoina = Fotos-Variante "boina"
+$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__FOTOS_BOINA__", $fotosBoina)
 $enc = New-Object System.Text.UTF8Encoding $false
 # artifact.html: conteúdo sem esqueleto (o Artifact adiciona doctype/head/body ao publicar)
 [System.IO.File]::WriteAllText((Join-Path $dir "artifact.html"), $out, $enc)
