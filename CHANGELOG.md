@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — guarda-roupa COMPLETO: todas as skins com foto oficial
+- Processados os 9 lotes finais do gestor (54 fotos): **capa de colete,
+  fuzil e fardas CIPE, PATAMO e BOPE — homens e mulheres, 12 personagens
+  em cada traje**
+- Com boina e gandola já publicadas, o guarda-roupa fecha em
+  **7 variantes × 12 personagens = 84 fotos oficiais**: cada compra na
+  cadeia da Loja veste a foto correspondente em todas as representações
+  (card do Início, painel do Perfil e zoom)
+- Farda escolhida veste a foto da unidade (CIPE/PATAMO/BOPE) e as
+  outras duas fecham; recorte do miolo e mapeamento por rosto aplicados
+  a todos os lotes
+- Suíte `vroupa` (guarda-roupa completo + cadeia de ponta a ponta)
+  verde; skins, gandola e tutorial sem regressões
+
 ## 20/07/2026 — capa de colete: fotos femininas (5 de 6)
 - Lote mulheres com boina + gandola + colete **completo** (6–11) —
   comprar a **Capa de colete** veste a foto oficial; falta o lote
