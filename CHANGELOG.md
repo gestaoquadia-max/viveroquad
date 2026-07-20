@@ -1,5 +1,22 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — mochila de combate (Storage de itens)
+- **Área de escolha de personagem removida do Perfil** — o personagem já
+  foi escolhido no onboard e não muda com o tempo; o card passa a se
+  chamar **"Seu personagem"** (só a foto e os equipamentos vestidos)
+- **Nova mochila de combate**: um ícone de mochila no Perfil abre uma
+  **Storage** onde ficam os itens comprados. A mochila mostra a quantidade
+  guardada e um grid de compartimentos (cheios/vazios)
+- **Loja ganhou "Itens de combate"**: itens comprados com Quad Coin que
+  **não** são skin/farda vão direto para a mochila — Faca tática (40),
+  Lanterna tática (35), Bússola de campanha (30), Broche de mérito (25),
+  Cantil (20) e Corda de rapel (45). Comprar debita o saldo e marca
+  **"NA MOCHILA"**; recomprar não debita
+- Preparada para os **eventos de quest** futuros (reunir itens da mochila
+  para formar um item novo) — a Storage já traz o aviso "Quests em breve"
+- Nova suíte `vmochila` verde; sem regressões em skin, guarda-roupa,
+  loja e tutorial
+
 ## 20/07/2026 — ajustes da prova + atalho de teste de carreira
 - Removido o texto "Seu score e sua patente estão preservados…" da tela
   de reprovação da prova

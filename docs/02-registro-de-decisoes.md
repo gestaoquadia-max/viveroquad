@@ -28,6 +28,7 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 21 | 20/07 | **Cadastro no site (checkout), não no app**: o app só faz login (e-mail+senha) + "Criar conta" → site; a matrícula ativa libera o acesso | Removidos código por e-mail, ativação, cadastro interno e autorização de dispositivo |
 | 22 | 20/07 | **Dados do aluno vêm do banco geral**: o tutorial confirma nome/turma ("Vi que você é…") em vez de pedir; só o nome de guerra é digitado; foto mostra "AL SD QUAD ______" até a escolha | Nome+telefone pré-preenchidos |
 | 23 | 20/07 | **Prova de promoção automática (sem fiscal)**: 20 questões que o aluno já classificou como difíceis (Errei/Difícil), sem revelar; 80% promove, senão nova tentativa em 24h | Substitui a prova supervisionada por humano |
+| 24 | 20/07 | **Escolha de personagem sai do Perfil** (o personagem é definitivo, escolhido no onboard) e entra a **mochila de combate**: ícone abre uma Storage de itens comprados na Loja que não são skin/farda (armas, broches etc.) | Base para os futuros eventos de quest (reunir itens → item novo); itens iniciais: faca 40, lanterna 35, bússola 30, broche 25, cantil 20, corda 45 |
 
 ## Regras de trabalho vigentes
 
