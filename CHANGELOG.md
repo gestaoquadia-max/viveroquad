@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — acesso pelo site, dados do banco e prova automática
+- **Login do app = e-mail + senha + "Ainda não tem conta? Criar conta"**.
+  A conta é criada no **checkout do site** (junto da matrícula); com a
+  matrícula ativa, o banco de dados geral libera o acesso ao app.
+  Removidos os passos de código por e-mail, ativação, cadastro interno e
+  autorização de dispositivo
+- **Todo 1º acesso roda o tutorial obrigatório** — o personagem termina
+  o onboard **já com a boina**; depois ganha Quad Coins e compra o resto
+- **Dados vêm do banco**: no tutorial, em vez de pedir "conte quem você
+  é", o QUAD confirma — "Vi que você é **Fulano**, da **Turma X**, né?".
+  Nome e telefone chegam pré-preenchidos; só o **nome de guerra** é
+  digitado. Antes disso, a foto mostra **AL SD QUAD ______** (a lacuna),
+  já que o nome ainda não foi escolhido
+- **Prova de promoção sem fiscal humano**: ao clicar em "Realizar prova",
+  entram **20 questões que o aluno já respondeu e classificou como
+  difíceis** (Errei/Difícil) ao longo da jornada — sem revelar isso a
+  ele, no mesmo formato das questões do tutorial. **80% (16/20) promove
+  na hora**; abaixo disso, **nova tentativa em 24 horas**
+- **Offline**: removido o carregamento automático de missões offline (e a
+  fila "respostas aguardando envio"); offline agora é só indicador
+- Novas suítes `vacesso` e `vprova` verdes; tutorial (`vtut`),
+  promoção (`vgami`) e todo o restante sem regressões
+
 ## 20/07/2026 — guarda-roupa COMPLETO: todas as skins com foto oficial
 - Processados os 9 lotes finais do gestor (54 fotos): **capa de colete,
   fuzil e fardas CIPE, PATAMO e BOPE — homens e mulheres, 12 personagens

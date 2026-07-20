@@ -1212,7 +1212,7 @@
         <!-- ============ BANNER MODO OFFLINE (nível do app) ============ -->
         <div class="offline-banner" id="offlineBanner">
           <span class="oi" aria-hidden="true">▽</span>
-          <span id="offlineBannerText">Modo offline. Novas missões e informações serão carregadas quando a conexão retornar.</span>
+          <span id="offlineBannerText">Você está offline. Alguns conteúdos podem não aparecer até a conexão voltar.</span>
           <span class="sync-chip" id="syncChip" style="display:none">0 respostas aguardando envio</span>
         </div>
 
@@ -1496,7 +1496,7 @@
               <button class="btn" id="btnProva" style="width:100%">Realizar prova de promoção</button>
             </div>
             <button class="btn ghost small" id="btnDiaEstudo" style="width:100%; margin-top:12px">Registrar dia de estudo (simulação · +275 pts)</button>
-            <p class="sub" style="margin-top:8px">O score representa esforço — <strong>não é moeda e não promove sozinho</strong>. Ao atingir a meta, você ganha o direito à <strong>prova de promoção</strong> supervisionada por um fiscal Quad.</p>
+            <p class="sub" style="margin-top:8px">O score representa esforço — <strong>não é moeda e não promove sozinho</strong>. Ao atingir a meta, você ganha o direito à <strong>prova de promoção</strong>: acertando <strong>80%</strong> você sobe de patente na hora.</p>
           </div>
 
           <div class="p-card">
@@ -1948,8 +1948,8 @@
         <div class="quiz-layer" id="provaLayer">
           <div class="quiz-head">
             <div class="k-label" id="provaKicker">Prova de promoção</div>
-            <h3 style="margin:0; font-size:15px" id="provaProgress">Fiscalização</h3>
-            <p class="sub" style="margin-top:4px" id="provaSub">Avaliação supervisionada por fiscal credenciado do Quad.</p>
+            <h3 style="margin:0; font-size:15px" id="provaProgress">Prova de promoção</h3>
+            <p class="sub" style="margin-top:4px" id="provaSub">20 questões · você sobe de patente acertando 80%.</p>
           </div>
           <div class="quiz-body" id="provaBody"></div>
           <div class="quiz-foot">
@@ -2140,105 +2140,13 @@
             <p class="q-loader-txt">Verificando o cadastro de<br><strong id="verifyEmail">voce@exemplo.com</strong></p>
           </div>
 
-          <!-- cenário 1: aluno com cadastro ativo → código por e-mail -->
-          <div class="gate-step" id="gateCode" style="display:none">
-            <h2>Verificação por e-mail</h2>
-            <p class="login-sub">Enviamos um código de acesso para</p>
-            <div class="gate-email-chip" id="codeEmail">voce@exemplo.com</div>
-            <div class="gate-warn" id="codeTrouble" style="display:none">
-              Com dificuldade para receber o código? Você pode reenviá-lo ou entrar com a sua senha.
-            </div>
-            <div class="login-field" style="width:100%">
-              <label for="codeInput">Código de acesso</label>
-              <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="______">
-            </div>
-            <button class="btn" id="btnEntrarCode" style="width:100%">Entrar</button>
-            <div class="gate-alts-row">
-              <button class="btn ghost small" id="btnReenviarCode">Reenviar código</button>
-              <button class="btn ghost small" id="btnUsarSenha">Entrar com senha</button>
-            </div>
-            <div class="gate-alts">
-              <button class="gate-link" id="btnCriarConta">Ainda não tem conta? <strong>Criar conta</strong></button>
-              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
-            </div>
-          </div>
-
-          <!-- entrada alternativa por senha (apenas online) -->
-          <div class="gate-step" id="gatePassword" style="display:none">
-            <h2>Entrar com senha</h2>
-            <p class="login-sub">Use a senha da sua conta Quad.</p>
-            <div class="gate-email-chip" id="pwEmail">voce@exemplo.com</div>
-            <div class="login-field" style="width:100%">
-              <label for="pwInput">Senha</label>
-              <input id="pwInput" type="password" placeholder="••••••••">
-            </div>
-            <button class="btn" id="btnEntrarSenha" style="width:100%">Acessar o portal</button>
-            <div class="gate-alts-row">
-              <button class="btn ghost small" id="btnEsqueciSenha">Esqueci a senha</button>
-              <button class="btn ghost small" id="btnUsarCodigo">Código por e-mail</button>
-            </div>
-            <div class="gate-alts">
-              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
-            </div>
-            <p class="login-note">A senha é usada apenas no acesso online.</p>
-          </div>
-
-          <!-- cenário 3: cadastrado, mas conta ainda não ativada -->
-          <div class="gate-step" id="gateActivate" style="display:none">
+          <!-- criar conta: o cadastro completo é feito no site (checkout geral) -->
+          <div class="gate-step" id="gateCriar" style="display:none">
             <div class="gate-icon" aria-hidden="true">✦</div>
-            <h2>Cadastro localizado</h2>
-            <p class="login-sub">Encontramos seu cadastro na plataforma, mas sua conta do Viver o Quad ainda não foi ativada.</p>
-            <div class="gate-email-chip" id="activateEmail">voce@exemplo.com</div>
-            <button class="btn" id="btnAtivarConta" style="width:100%">Ativar minha conta</button>
-            <div class="gate-alts">
-              <button class="gate-link dim" data-trocar-email>Trocar e-mail</button>
-            </div>
-          </div>
-
-          <div class="gate-step" id="gateCadastro" style="display:none">
-            <h2>Primeiro acesso</h2>
-            <p class="login-sub">Informe seu e-mail. Na próxima tela, buscamos seus dados na plataforma-base.</p>
-            <div class="login-field">
-              <label for="cadEmail">E-mail</label>
-              <input id="cadEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off">
-            </div>
-            <button class="btn" id="btnBuscar" style="width:100%">Continuar</button>
-            <button class="btn ghost small" data-gate-back style="width:100%; margin-top:10px">Voltar</button>
-          </div>
-
-          <div class="gate-step" id="gateCadastroDados" style="display:none">
-            <h2>Confira seus dados</h2>
-            <p class="login-sub" id="cadStatus">Consultando a plataforma-base…</p>
-            <div class="cad-progress"><div class="fill" id="cadBar"></div></div>
-            <div class="login-field"><label for="cadNome">Nome completo</label><input id="cadNome"></div>
-            <div class="login-field"><label for="cadCpf">CPF</label><input id="cadCpf"></div>
-            <div class="login-field"><label for="cadFone">Telefone</label><input id="cadFone"></div>
-            <div class="login-field"><label for="cadTurma">Turma</label><input id="cadTurma"></div>
-            <div class="login-field"><label for="cadMatricula">Matrícula</label><input id="cadMatricula"></div>
-            <button class="btn" id="btnConcluir" style="width:100%" disabled>Concluir cadastro</button>
-            <button class="btn ghost small" id="btnCadVoltar" style="width:100%; margin-top:10px">Voltar</button>
-          </div>
-        </div>
-
-        <!-- ============ PRIMEIRO ACESSO CONCLUÍDO: DISPOSITIVO AUTORIZADO ============ -->
-        <div class="gate-layer" id="authLayer">
-          <div class="gate-step gate-centered">
-            <div class="gate-badge ok" aria-hidden="true">✓</div>
-            <h2>Dispositivo autorizado</h2>
-            <p class="login-sub" style="max-width:260px">Seu acesso está pronto.</p>
-            <button class="btn" id="btnAuthContinuar" style="width:100%; margin-top:8px">Continuar</button>
-          </div>
-        </div>
-
-        <!-- ============ ABERTURA SEM INTERNET (dispositivo já autorizado) ============ -->
-        <div class="gate-layer" id="offlineLayer">
-          <div class="gate-step gate-centered">
-            <div class="gate-badge warn" aria-hidden="true">▽</div>
-            <h2>Você está offline</h2>
-            <p class="login-sub" style="max-width:300px">Somente os conteúdos já carregados neste dispositivo estarão disponíveis. Novas missões e o quiz ao vivo voltam quando a conexão retornar.</p>
-            <div class="gate-info" id="offlineLastSync">Última sincronização: —</div>
-            <button class="btn" id="btnEntrarOffline" style="width:100%">Entrar no modo offline</button>
-            <button class="btn ghost small" id="btnTentarNovamente" style="width:100%; margin-top:10px">Tentar novamente</button>
+            <h2>Cadastro no site do Quad</h2>
+            <p class="login-sub" style="max-width:300px">A conta é criada no <strong>checkout do site</strong>, junto com a sua matrícula. Assim que a matrícula é confirmada, seu acesso ao app é liberado automaticamente.</p>
+            <button class="btn" id="btnIrCheckout" style="width:100%">Ir para o cadastro no site</button>
+            <button class="btn ghost small" id="btnCriarVoltar" style="width:100%; margin-top:10px">Voltar ao login</button>
           </div>
         </div>
 
@@ -2328,12 +2236,17 @@
             <img class="login-logo" src="__QUAD_SIMBOLO__" alt="Símbolo Quad Concursos">
           </div>
           <h2 class="login-title">VIVER O QUAD</h2>
-          <p class="login-sub">Da matrícula ao primeiro dia do curso de formação.</p>
+          <p class="login-sub">Entre com a conta que você criou no site do Quad.</p>
           <div class="login-field">
-            <label for="loginEmail">E-mail</label>
+            <label for="loginEmail">Login (e-mail)</label>
             <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
           </div>
-          <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Acessar o portal</button>
+          <div class="login-field">
+            <label for="loginSenha">Senha</label>
+            <input id="loginSenha" type="password" placeholder="••••••••" autocomplete="off" />
+          </div>
+          <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Entrar</button>
+          <button class="gate-link" id="btnCriarConta" style="margin-top:16px">Ainda não tem conta? <strong>Criar conta</strong></button>
         </div>
 
         <div class="toast" id="toast"></div>
@@ -2473,7 +2386,10 @@
   function patenteAtual() { return GAMI.patentes[carreira.patenteIdx]; }
   function proximaPatente() { return GAMI.patentes[carreira.patenteIdx + 1] || null; }
   function tituloCompleto() { return patenteAtual().nome + ' ' + carreira.nomeGuerra; }
-  function nomeCurto() { return (patenteAtual().abrev + ' QUAD ' + carreira.nomeGuerra).toUpperCase(); }
+  function nomeCurto() {
+    var g = carreira.nomeGuerra ? carreira.nomeGuerra : '______';   /* sem nome de guerra ainda → lacuna */
+    return (patenteAtual().abrev + ' QUAD ' + g).toUpperCase();
+  }
 
   // ---- estado de acesso e conectividade (SIMULADO no front-end) ----
   // [INTEGRAÇÃO REAL] trocar por: verificação no servidor, envio de e-mail,
@@ -2546,6 +2462,10 @@
       if (p !== 'aluno') { $('daniloHint').style.display = 'none'; }
     });
   });
+
+  /* dados que chegam do banco de dados geral (o aluno se cadastrou no site).
+     [INTEGRAÇÃO REAL] preenchidos a partir da matrícula ativa do aluno. */
+  var DB_ALUNO = { nome: 'Danilo de Almeida Moura', fone: '(71) 9 8877-2301' };
 
   /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
   var LOOP_VIEWS = ['v-inicio']; // rolagem infinita apenas no Início
@@ -3142,15 +3062,12 @@
   /* ============================================================
      CONECTIVIDADE + ACESSO (simulado no front-end)
      Organizado para plugar a integração real depois:
-       detectarCenario(email) → [INTEGRAÇÃO REAL: consulta à plataforma-base]
-       código/senha           → [INTEGRAÇÃO REAL: verificação no servidor]
-       deviceAuthorized/sync  → [INTEGRAÇÃO REAL: biometria + fila de sync]
+       login (e-mail+senha)   → [INTEGRAÇÃO REAL: verificação no servidor]
+       matrícula ativa        → [INTEGRAÇÃO REAL: banco de dados geral libera o app]
      ============================================================ */
 
   function isInApp() {
     return !$('gateLayer').classList.contains('on') &&
-           !$('offlineLayer').classList.contains('on') &&
-           !$('authLayer').classList.contains('on') &&
            $('loginLayer').classList.contains('off');
   }
   function fmtSync(ts) {
@@ -3159,13 +3076,7 @@
     var p = function (n) { return (n < 10 ? '0' : '') + n; };
     return p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' às ' + p(d.getHours()) + 'h' + p(d.getMinutes());
   }
-  function updatePending() {
-    var chip = $('syncChip');
-    if (pendingAnswers > 0) {
-      chip.style.display = 'inline-block';
-      chip.textContent = pendingAnswers + (pendingAnswers === 1 ? ' resposta aguardando envio' : ' respostas aguardando envio');
-    } else { chip.style.display = 'none'; }
-  }
+  function updatePending() { var chip = $('syncChip'); if (chip) chip.style.display = 'none'; }
   function refreshSalaLock() {
     var btn = $('btnEntrarQuiz');
     if (!btn) return;
@@ -3180,7 +3091,7 @@
     if (!sub) return;
     sub.textContent = online
       ? 'Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.'
-      : 'Você está offline: o treino roda local e o progresso sincroniza quando a conexão voltar.';
+      : 'Você está offline: o treino usa o que já está no aparelho.';
   }
   function applyConnUI() {
     var t = $('connToggle');
@@ -3191,226 +3102,78 @@
     refreshNovaMissao();
     queueSync();
   }
-  function sincronizar() {
-    var b = $('offlineBanner');
-    var had = pendingAnswers;
-    b.classList.add('on', 'syncing');
-    $('offlineBannerText').textContent = 'Sincronizando…';
-    $('syncChip').style.display = 'none';
-    setTimeout(function () {
-      pendingAnswers = 0; lsSet(LS.pend, '0'); lsSet(LS.sync, String(Date.now()));
-      b.classList.remove('syncing');
-      $('offlineBannerText').textContent = 'Modo offline. Novas missões e informações serão carregadas quando a conexão retornar.';
-      updatePending();
-      applyConnUI(); // esconde o banner (agora online) e destrava o app
-      toast(had > 0 ? 'Sincronização concluída · ' + had + (had === 1 ? ' resposta enviada' : ' respostas enviadas') : 'Sincronização concluída.');
-    }, 1300);
-  }
   function setOnline(v) {
-    var was = online;
     online = v;
+    lsSet(LS.sync, String(Date.now()));
     applyConnUI();
-    if (v && !was && isInApp()) sincronizar();
   }
   $('connToggle').addEventListener('click', function () { setOnline(!online); });
 
-  /* ---------- passos do portão ---------- */
+  /* ---------- passos do portão (só o carregamento) ---------- */
   function gateStep(id) {
     $('gateLayer').classList.toggle('so-simbolo', id === 'gateVerify');
-    ['gateVerify', 'gateCode', 'gatePassword', 'gateActivate', 'gateCadastro', 'gateCadastroDados'].forEach(function (s) {
+    ['gateVerify', 'gateCriar'].forEach(function (s) {
       $(s).style.display = (s === id) ? 'flex' : 'none';
     });
   }
   function abrirGate(id) { gateStep(id || 'gateVerify'); $('gateLayer').classList.add('on'); }
   function fecharGate() { $('gateLayer').classList.remove('on'); }
 
-  /* ---------- tela inicial: acessar o portal ---------- */
-  function detectarCenario(email) {
-    // [INTEGRAÇÃO REAL] substituir por consulta ao cadastro do aluno
-    var e = (email || '').toLowerCase();
-    if (e.indexOf('novo') >= 0 || e.indexOf('ativar') >= 0) return 'nao_ativado';
-    if (e.indexOf('codigo') >= 0 || e.indexOf('suporte') >= 0 || e.indexOf('ajuda') >= 0) return 'dificuldade';
-    return 'ativo';
-  }
+  /* ---------- login do app: e-mail + senha ----------
+     A conta é criada no site (checkout, junto da matrícula). Aqui o app só
+     autentica; o banco de dados geral confirma que o e-mail tem matrícula
+     ativa e libera o acesso. [INTEGRAÇÃO REAL] validar no servidor. */
   function acessarPortal() {
     var em = $('loginEmail').value.trim();
-    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
+    var pw = $('loginSenha').value;
+    if (!em || em.indexOf('@') < 0) { toast('Informe seu login (e-mail).'); return; }
+    if (!pw) { toast('Digite sua senha.'); return; }
+    if (!online) { toast('O login precisa de conexão com a internet.'); return; }
     currentEmail = em;
-    if (!online) {
-      if (deviceAuthorized) { showOfflineEntry(); }
-      else { toast('O primeiro acesso precisa de internet.'); }
-      return;
-    }
-    // online: verifica o e-mail (loading) e roteia pelo cenário
+    $('contaEmail').textContent = em;
+    $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
     $('loginLayer').classList.add('off');
     $('verifyEmail').textContent = em;
     abrirGate('gateVerify');
     setTimeout(function () {
-      scenario = detectarCenario(em);
-      if (scenario === 'nao_ativado') {
-        $('activateEmail').textContent = em;
-        gateStep('gateActivate');
-      } else {
-        $('codeEmail').textContent = em;
-        $('codeTrouble').style.display = (scenario === 'dificuldade') ? 'block' : 'none';
-        $('codeInput').value = '';
-        gateStep('gateCode');
-        toast('Simulação do e-mail — código: ' + CODE_OK);
-      }
-    }, 1500);
+      // primeiro acesso deste aluno → onboard obrigatório (tutorial guiado)
+      var primeiro = lsGet(TUT_LS.done) !== '1';
+      entrarApp(primeiro);
+    }, 1400);
   }
   $('btnAcessar').addEventListener('click', acessarPortal);
-  $('loginEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') acessarPortal(); });
+  $('loginEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('loginSenha').focus(); });
+  $('loginSenha').addEventListener('keydown', function (e) { if (e.key === 'Enter') acessarPortal(); });
 
-  function voltarInicio() {
-    fecharGate();
-    $('offlineLayer').classList.remove('on');
-    $('authLayer').classList.remove('on');
-    $('loginLayer').classList.remove('off');
-    applyConnUI();
-  }
-  document.querySelectorAll('[data-trocar-email]').forEach(function (b) {
-    b.addEventListener('click', voltarInicio);
-  });
-
-  /* ---------- cenário 1: código por e-mail ---------- */
-  $('btnEntrarCode').addEventListener('click', function () {
-    if ($('codeInput').value.trim() === CODE_OK) { concederAcesso(false); }
-    else { toast('Código incorreto — confira seu e-mail (demo: ' + CODE_OK + ')'); }
-  });
-  $('btnReenviarCode').addEventListener('click', function () { toast('Novo código enviado — demo: ' + CODE_OK); });
-  $('btnUsarSenha').addEventListener('click', function () {
-    $('pwEmail').textContent = currentEmail; $('pwInput').value = '';
-    gateStep('gatePassword');
-  });
-
-  /* ---------- entrada alternativa por senha ---------- */
-  $('btnEntrarSenha').addEventListener('click', function () {
-    if ($('pwInput').value) { concederAcesso(false); } else { toast('Digite sua senha'); }
-  });
-  $('btnEsqueciSenha').addEventListener('click', function () { toast('Enviamos as instruções de recuperação (simulação).'); });
-  $('btnUsarCodigo').addEventListener('click', function () {
-    $('codeEmail').textContent = currentEmail;
-    $('codeTrouble').style.display = (scenario === 'dificuldade') ? 'block' : 'none';
-    $('codeInput').value = '';
-    gateStep('gateCode');
-    toast('Simulação do e-mail — código: ' + CODE_OK);
-  });
-
-  /* ---------- cenário 3: ativar conta → fluxo de cadastro existente ---------- */
-  var cadOrigem = 'gateActivate'; // de onde o aluno entrou no cadastro (para o Voltar)
-  $('btnAtivarConta').addEventListener('click', function () {
-    cadOrigem = 'gateActivate';
-    $('cadEmail').value = currentEmail;
-    gateStep('gateCadastro'); // reaproveita o fluxo de criação de conta já existente
-  });
-
-  /* ---------- criar conta a partir da validação por e-mail ----------
-     é a criação da conta que dispara o onboard obrigatório (tutorial) */
+  /* ---------- "Ainda não tem conta?" → cadastro no site (checkout geral) ---------- */
   $('btnCriarConta').addEventListener('click', function () {
-    cadOrigem = 'gateCode';
-    $('cadEmail').value = currentEmail;
-    gateStep('gateCadastro');
+    $('loginLayer').classList.add('off');
+    abrirGate('gateCriar');
+  });
+  $('btnIrCheckout').addEventListener('click', function () {
+    // [INTEGRAÇÃO REAL] abrir o checkout do site do Quad (nova aba)
+    toast('Redirecionando para o cadastro no site do Quad… (demo)');
+  });
+  $('btnCriarVoltar').addEventListener('click', function () {
+    fecharGate();
+    $('loginLayer').classList.remove('off');
   });
 
-  /* ---------- conceder acesso / dispositivo autorizado ---------- */
-  function concederAcesso(runTour) {
-    pendingRunTour = !!runTour;
-    $('contaEmail').textContent = currentEmail;
-    $('telemetry').textContent = 'login: ' + currentEmail + ' · origem: OPEN_ORGANIC · linha de base: ativa';
-    if (!deviceAuthorized) {
-      fecharGate();
-      $('authLayer').classList.add('on'); // 1º acesso: autoriza o dispositivo
-    } else {
-      entrarApp(runTour);
-    }
-  }
-  $('btnAuthContinuar').addEventListener('click', function () {
-    deviceAuthorized = true; lsSet(LS.auth, '1'); lsSet(LS.sync, String(Date.now()));
-    $('authLayer').classList.remove('on');
-    entrarApp(pendingRunTour);
-  });
+  /* ---------- entra no app; 1º acesso dispara o tutorial obrigatório ---------- */
   function entrarApp(runTour) {
     fecharGate();
-    $('authLayer').classList.remove('on');
-    $('offlineLayer').classList.remove('on');
     $('loginLayer').classList.add('off');
-    lsSet(LS.sync, String(Date.now()));
+    lsSet(LS.auth, '1'); lsSet(LS.sync, String(Date.now()));
+    deviceAuthorized = true;
     playSplash(function () {
       applyConnUI();
-      daniloWave(); // o QUAD recebe o aluno acenando
+      daniloWave();       // o QUAD recebe o aluno acenando
       daniloHintMostra(); // "Precisa de ajuda?" fica 10s na tela
       var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
       if (runTour || tutAberta) iniciarTutorial();   /* V0: instrução interrompida recomeça do início */
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
     });
   }
-
-  /* ---------- abertura sem internet (dispositivo já autorizado) ---------- */
-  function showOfflineEntry() {
-    $('loginLayer').classList.add('off');
-    $('offlineLastSync').textContent = 'Última sincronização: ' + fmtSync(lsGet(LS.sync));
-    $('offlineLayer').classList.add('on');
-  }
-  $('btnEntrarOffline').addEventListener('click', function () {
-    $('offlineLayer').classList.remove('on');
-    $('loginLayer').classList.add('off');
-    applyConnUI();   // mostra o banner de modo offline dentro do app
-    updatePending();
-    daniloHintMostra();
-    toast('Modo offline — conteúdos já carregados disponíveis.');
-  });
-  $('btnTentarNovamente').addEventListener('click', function () {
-    if (online) { $('offlineLayer').classList.remove('on'); acessarPortal(); }
-    else { toast('Ainda sem conexão — tente novamente.'); }
-  });
-  // preenchimento automático: a tela seguinte abre já carregando; os dados
-  // chegam da plataforma-base campo a campo (V0 é público interno — o aluno existe no banco)
-  var cadTimers = [];
-  function carregarCadastro() {
-    var campos = [
-      ['cadNome', 'Vitor Santos de Almeida'],
-      ['cadCpf', '***.482.915-**'],
-      ['cadFone', '(71) 9 8877-2301'],
-      ['cadTurma', 'TURMA PATAMO (N)'],
-      ['cadMatricula', 'QD-2026-0341']
-    ];
-    cadTimers.forEach(clearTimeout); cadTimers = [];
-    campos.forEach(function (par) { $(par[0]).value = ''; $(par[0]).placeholder = 'carregando…'; });
-    $('btnConcluir').disabled = true;
-    $('cadStatus').textContent = 'Consultando a plataforma-base…';
-    $('cadBar').style.width = '12%';
-    campos.forEach(function (par, i) {
-      cadTimers.push(setTimeout(function () {
-        $(par[0]).value = par[1];
-        $('cadBar').style.width = (12 + (i + 1) * 17.6) + '%';
-        if (i === campos.length - 1) {
-          $('cadBar').style.width = '100%';
-          $('cadStatus').textContent = 'Dados encontrados na plataforma-base ✓';
-          $('btnConcluir').disabled = false;
-        }
-      }, 600 + i * 450));
-    });
-  }
-  $('btnBuscar').addEventListener('click', function () {
-    var em = $('cadEmail').value.trim();
-    if (!em || em.indexOf('@') < 0) { toast('Informe um e-mail válido'); return; }
-    gateStep('gateCadastroDados');
-    carregarCadastro();
-  });
-  $('btnCadVoltar').addEventListener('click', function () {
-    cadTimers.forEach(clearTimeout);
-    gateStep('gateCadastro');
-  });
-  document.querySelectorAll('[data-gate-back]').forEach(function (b) {
-    b.addEventListener('click', function () { gateStep(cadOrigem); }); // volta para onde o aluno estava
-  });
-  $('btnConcluir').addEventListener('click', function () {
-    currentEmail = $('cadEmail').value.trim() || currentEmail;
-    sincronizarTurma($('cadTurma').value); // a turma cadastrada passa a valer no app todo
-    // primeiro acesso: autoriza o dispositivo e, ao continuar, roda o tour obrigatório
-    concederAcesso(true);
-  });
 
   /* ==================================================================
      TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) — roteiro em etapas
@@ -3507,9 +3270,15 @@
       ] },
     { sel: function () { return document.querySelector('.avatar-preview'); }, mood: 'cheer', bot: 'br',
       txt: '<b>Boa escolha!</b> Combinou com você.' },
-    { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'bob', bot: 'bl',
-      onEnter: function () { if (tutDadosOk()) return 'skip'; },
-      txt: 'Agora me conta quem você é: preenche o seu <b>nome completo</b> e o seu <b>telefone</b>.' },
+    { sel: function () { return $('nomeCompleto').closest('.p-card'); }, expect: 'dados', mood: 'talk', bot: 'bl',
+      txt: function () {
+        var nm = ($('nomeCompleto').value.trim() || DB_ALUNO.nome);
+        return 'Deixa eu ver aqui no sistema… Vi que você é o <b>' + nm + '</b>, lá da <b>' + turmaLabel() + '</b>, né? Confirma?';
+      },
+      opts: [
+        { rotulo: 'Sou eu, sim!', cls: 'sim', acao: function () { tutEvent('dados'); } },
+        { rotulo: 'Corrigir no site', cls: 'nao', acao: function () { toast('No app real, a correção do cadastro é feita no site do Quad.'); } }
+      ] },
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, mood: 'talk', bot: 'br',
       txt: 'Agora vem a parte que eu mais gosto: o <b>nome de guerra</b>.' },
     { sel: function () { return $('nomeGuerra').closest('.p-card'); }, expect: 'guerra', mood: 'bob', bot: 'br',
@@ -3820,13 +3589,9 @@
     clearTimeout(tutTypeT);
     tutTypeT = setTimeout(function () {
       if (!tutOn) return;
-      if (kind === 'dados' && tutExpect === 'dados' && tutDadosOk()) tutEvent('dados');
       if (kind === 'guerra' && tutExpect === 'guerra' && tutGuerraOk()) tutEvent('guerra');
     }, 900);
   }
-  ['nomeCompleto', 'foneAluno'].forEach(function (id) {
-    $(id).addEventListener('input', function () { tutTypeCheck('dados'); });
-  });
   $('nomeGuerra').addEventListener('input', function () { tutTypeCheck('guerra'); });
 
   /* ==================================================================
@@ -4330,7 +4095,10 @@
     tutResetBoina();
     tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
     blocoIntroMarca(false);   /* a Introdução no Quad volta a ficar disponível */
-    $('nomeCompleto').value = ''; $('foneAluno').value = ''; $('nomeGuerra').value = '';   /* preencher também */
+    /* nome e telefone JÁ vêm do banco de dados geral (o aluno se cadastrou no site);
+       o tutorial só confirma. O nome de guerra ainda não existe → card mostra "______". */
+    $('nomeCompleto').value = DB_ALUNO.nome; $('foneAluno').value = DB_ALUNO.fone;
+    $('nomeGuerra').value = ''; carreira.nomeGuerra = ''; syncNametag();
     showView('v-inicio', 'navAluno');
     $('v-inicio').scrollTop = 0;
     $('tutLayer').classList.add('on');
@@ -4352,12 +4120,9 @@
     $('loginEmail').value = '';
     var w = $('logoWrap');
     w.innerHTML = w.innerHTML; // recria os nós para reiniciar a animação da logo
+    $('loginSenha').value = '';
     $('loginLayer').classList.remove('off');
     fecharGate();
-    $('offlineLayer').classList.remove('on');
-    $('authLayer').classList.remove('on');
-    ['codeInput', 'pwInput', 'cadEmail', 'cadNome', 'cadCpf', 'cadFone', 'cadTurma', 'cadMatricula'].forEach(function (id) { if ($(id)) $(id).value = ''; });
-    $('btnConcluir').disabled = true;
     applyConnUI();
     document.querySelector('[data-persona="aluno"]').click();
   }
@@ -4531,7 +4296,7 @@
     var bruto = $('nomeGuerra').value.trim();
     carreira.nomeGuerra = bruto
       ? bruto.split(/\s+/).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ')
-      : 'Moura';
+      : '';   /* vazio → o card mostra a lacuna "______" até o aluno escolher */
     $('avNametag').textContent = nomeCurto();
     $('gwPreview').textContent = tituloCompleto();
     $('homeNome').textContent = nomeCurto();   /* o nome principal muda ao vivo */
@@ -4557,7 +4322,7 @@
 
   function estadoLabel() {
     return { 'acumulando': 'Acumulando score', 'disponivel': 'Promoção disponível',
-             'aguardando-fiscal': 'Aguardando fiscalização', 'prova': 'Prova em andamento',
+             'prova': 'Prova em andamento',
              'bloqueada': 'Nova tentativa em ' + GAMI.tentativaHoras + 'h' }[carreira.estado] || carreira.estado;
   }
   function renderCarreira() {
@@ -4699,90 +4464,75 @@
   });
   $('promoChip').addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
 
-  /* ---------- prova de promoção (20 questões, fiscal, correção automática) ---------- */
-  var PROVA_BANK = [
-    { t: 'O poder de polícia permite à Administração:', a: ['Condicionar direitos individuais em favor do interesse público.', 'Punir servidores hierarquicamente subordinados.', 'Editar leis em sentido estrito.', 'Julgar litígios entre particulares.'], r: 0 },
-    { t: 'O ato administrativo discricionário caracteriza-se por:', a: ['Ausência de qualquer limite legal.', 'Margem de escolha quanto ao motivo e ao objeto, dentro da lei.', 'Vinculação total de seus elementos.', 'Impossibilidade de revogação.'], r: 1 },
-    { t: 'Pelo poder hierárquico, a autoridade pode:', a: ['Aplicar multas a particulares.', 'Legislar sobre matéria administrativa.', 'Dar ordens, fiscalizar e rever atos de subordinados.', 'Desapropriar bens privados.'], r: 2 },
-    { t: 'O princípio da impessoalidade impõe que a atuação administrativa:', a: ['Priorize aliados políticos.', 'Seja sigilosa por padrão.', 'Dependa de aprovação judicial.', 'Vise ao interesse público, sem favorecimentos.'], r: 3 },
-    { t: 'Assinale a frase com uso correto da crase:', a: ['Refiro-me à aluna aprovada.', 'Vou à pé para o quartel.', 'Entreguei o material à ele.', 'Cheguei à um acordo.'], r: 0 },
-    { t: 'Assinale a opção correta quanto à concordância:', a: ['Fazem dois anos que estudo.', 'Faz dois anos que estudo.', 'Houveram muitos aprovados.', 'Existe muitos candidatos.'], r: 1 },
-    { t: 'A autotutela administrativa permite à Administração:', a: ['Punir juízes.', 'Recusar-se a cumprir a lei.', 'Anular seus próprios atos ilegais.', 'Alterar contratos privados alheios.'], r: 2 },
-    { t: 'Na sequência 2, 4, 8, 16, o próximo termo é:', a: ['24', '28', '30', '32'], r: 3 },
-    { t: 'Se 3 apostilas custam R$ 12, o valor de 5 apostilas é:', a: ['R$ 20', 'R$ 18', 'R$ 24', 'R$ 15'], r: 0 },
-    { t: 'É fundamento da República Federativa do Brasil:', a: ['O direito de propriedade absoluto.', 'A dignidade da pessoa humana.', 'A pena de caráter perpétuo.', 'O unitarismo estatal.'], r: 1 },
-    { t: 'São direitos sociais previstos na Constituição:', a: ['Herança e propriedade.', 'Voto censitário.', 'Saúde, educação e trabalho.', 'Anonimato e censura.'], r: 2 },
-    { t: 'A licitação pública busca, em regra:', a: ['Contratar sempre o menor preço, sem critérios.', 'Dispensar publicidade dos atos.', 'Favorecer empresas locais.', 'Selecionar a proposta mais vantajosa para a Administração.'], r: 3 },
-    { t: 'No ato vinculado, o administrador:', a: ['Não possui margem de escolha: cumpre o que a lei determina.', 'Escolhe livremente o conteúdo do ato.', 'Pode ignorar a forma legal.', 'Atua sem competência definida.'], r: 0 },
-    { t: 'Assinale a palavra grafada corretamente:', a: ['Excessão', 'Exceção', 'Esceção', 'Excesão'], r: 1 },
-    { t: '"Vossa Excelência" exige verbos e pronomes em:', a: ['2ª pessoa do singular.', '1ª pessoa do plural.', '3ª pessoa do singular.', '2ª pessoa do plural.'], r: 2 },
-    { t: '20% de 150 é igual a:', a: ['25', '20', '35', '30'], r: 3 },
-    { t: 'A vírgula está corretamente empregada em:', a: ['Soldado, apresente-se ao comando.', 'O aluno, estudou a matéria.', 'Chegou, o edital hoje.', 'Todos os candidatos, foram aprovados.'], r: 0 },
-    { t: 'Se "toda missão concluída gera ponto" e Moura concluiu uma missão, então:', a: ['Moura perdeu pontos.', 'Moura gerou ponto.', 'Nada se pode concluir.', 'A missão não valeu.'], r: 1 },
-    { t: 'O regime disciplinar militar fundamenta-se em:', a: ['Informalidade e improviso.', 'Autonomia absoluta do subordinado.', 'Hierarquia e disciplina.', 'Eleição dos comandantes.'], r: 2 },
-    { t: 'Um simulado com 140 questões, resolvido à razão de 20 por hora, dura:', a: ['5 horas', '6 horas', '8 horas', '7 horas'], r: 3 }
-  ];
-  var prova = { qs: [], idx: 0, sel: null, hits: 0, code: '' };
+  /* ---------- prova de promoção (automática, sem fiscal) ----------
+     20 questões que o aluno JÁ fez e classificou como difíceis ao longo da
+     jornada (Errei/Difícil nos flashcards). O aluno não sabe que são as
+     difíceis — vê só as questões, no mesmo formato das do tutorial.
+     Acertou 80% (16/20): sobe de patente na hora. Abaixo disso: nova
+     tentativa em 24h. */
+  var PROVA_APROV = 0.80;   /* aproveitamento mínimo para promover */
+  var prova = { qs: [], idx: 0, sel: null, hits: 0 };
+  window.__prova = prova;   /* exposto para a suíte de testes */
   function embaralhar(arr) { return arr.map(function (x) { return [Math.random(), x]; }).sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; }); }
-  function abrirProva() {
-    carreira.estado = 'aguardando-fiscal';
-    renderCarreira();
-    prova.code = String(Math.floor(1000 + Math.random() * 9000));
-    $('provaLayer').classList.add('on');
-    $('provaProgress').textContent = 'Fiscalização';
-    $('provaSub').textContent = 'A prova só inicia após autorização de um fiscal credenciado do Quad.';
-    var body = $('provaBody');
-    body.innerHTML = '<div class="p-card"><div class="k-label">Fiscal do Quad</div>' +
-      '<p class="sub" style="margin-bottom:10px">O fiscal confirma sua identidade e libera um código temporário, de uso único, vinculado a esta tentativa.</p>' +
-      '<div class="login-field"><label for="fiscalCode">Código do fiscal</label><input id="fiscalCode" class="fld" inputmode="numeric" maxlength="4" placeholder="____"></div>' +
-      '<p class="sub">Prova: ' + GAMI.provaQuestoes + ' questões objetivas · nota mínima ' + Math.round(GAMI.fases[patenteAtual().fase].notaMin * 100) + '% (' + Math.ceil(GAMI.provaQuestoes * GAMI.fases[patenteAtual().fase].notaMin) + ' acertos).</p></div>';
-    $('btnProvaNext').textContent = 'Iniciar prova';
-    $('btnProvaNext').disabled = false;
-    toast('Simulação do fiscal — código: ' + prova.code);
+  function provaNorm(c) { return { t: c.t, c: c.c, o: c.o }; }
+  function provaColeta() {
+    // 1) as que o aluno marcou como Errei (0) ou Difícil (1)
+    var dificeis = embaralhar(TR_BANK.filter(function (c) { return c.nota === 0 || c.nota === 1; }).map(provaNorm));
+    var pool = dificeis.slice(0, GAMI.provaQuestoes);
+    // 2) completa (sem repetir enunciado) para sempre fechar as 20 na demo
+    if (pool.length < GAMI.provaQuestoes) {
+      var vistos = {}; pool.forEach(function (q) { vistos[q.t] = 1; });
+      var reserva = embaralhar(TR_BANK.map(provaNorm).concat(
+        AULA_DEMO.cards.map(function (r) { return { t: r[1], c: r[0] === 'C', o: r[2] }; })));
+      for (var i = 0; i < reserva.length && pool.length < GAMI.provaQuestoes; i++) {
+        if (!vistos[reserva[i].t]) { vistos[reserva[i].t] = 1; pool.push(reserva[i]); }
+      }
+    }
+    return pool;
   }
-  function iniciarQuestoesProva() {
-    // sorteio: ordem e alternativas embaralhadas
-    prova.qs = embaralhar(PROVA_BANK).slice(0, GAMI.provaQuestoes).map(function (q) {
-      var alts = q.a.map(function (txt, i) { return { txt: txt, ok: i === q.r }; });
-      return { t: q.t, alts: embaralhar(alts) };
-    });
+  function abrirProva() {
+    if (carreira.estado === 'bloqueada') { toast('Nova tentativa disponível em ' + GAMI.tentativaHoras + 'h.'); return; }
+    if (carreira.estado !== 'disponivel') { toast('A prova abre quando você atinge a meta de score.'); return; }
+    prova.qs = provaColeta();
     prova.idx = 0; prova.sel = null; prova.hits = 0;
     carreira.estado = 'prova'; renderCarreira();
+    $('provaLayer').classList.add('on');
+    $('provaKicker').textContent = 'Prova de promoção';
     renderQuestaoProva();
   }
   function renderQuestaoProva() {
     var q = prova.qs[prova.idx];
     $('provaProgress').textContent = 'Questão ' + (prova.idx + 1) + ' de ' + prova.qs.length;
-    $('provaSub').textContent = 'Sem feedback durante a prova — o resultado sai no fim.';
+    $('provaSub').textContent = 'Responda com calma — o resultado sai no fim.';
     $('btnProvaNext').textContent = prova.idx === prova.qs.length - 1 ? 'Finalizar' : 'Responder';
     $('btnProvaNext').disabled = true;
     prova.sel = null;
     var body = $('provaBody');
     body.innerHTML = '';
     var pEl = document.createElement('p');
-    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 14px;font-weight:600';
+    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 16px;font-weight:600';
     pEl.textContent = q.t;
     body.appendChild(pEl);
-    q.alts.forEach(function (alt, i) {
+    [['CERTO', true], ['ERRADO', false]].forEach(function (par, i) {
       var b = document.createElement('button');
       b.className = 'q-alt';
-      b.innerHTML = '<span class="letter">' + 'ABCD'[i] + '</span><span></span>';
-      b.querySelector('span:last-child').textContent = alt.txt;
+      b.innerHTML = '<span class="letter">' + (i === 0 ? 'C' : 'E') + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = par[0];
       b.addEventListener('click', function () {
         body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
         b.classList.add('sel');
-        prova.sel = i;
+        prova.sel = par[1];
         $('btnProvaNext').disabled = false;
       });
       body.appendChild(b);
     });
   }
   function resultadoProva() {
-    var fase = GAMI.fases[patenteAtual().fase];
-    var minAcertos = Math.ceil(GAMI.provaQuestoes * fase.notaMin);
+    var minAcertos = Math.ceil(GAMI.provaQuestoes * PROVA_APROV);
     var aprovado = prova.hits >= minAcertos;
     var prox = proximaPatente();
     $('provaProgress').textContent = 'Resultado';
+    $('provaSub').textContent = '';
     var body = $('provaBody');
     if (aprovado) {
       var req = patenteAtual().pontos;
@@ -4790,26 +4540,27 @@
       carreira.patenteIdx++;
       carreira.scorePatente = excedente;
       carreira.estado = 'acumulando';
-      carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes, obs: 'fiscal Souza' });
+      carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes });
       body.innerHTML = '<div class="p-card" style="text-align:center">' +
         '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
         '<span class="insig-img xl" style="display:block;margin:0 auto 12px;background-position:' + insigPos(carreira.patenteIdx) + '"></span>' +
         '<h3 class="mil" style="font-size:22px">Promoção confirmada</h3>' +
-        '<p class="sub" style="margin-top:8px">Parabéns, ' + carreira.nomeGuerra + '. Você concluiu os requisitos e foi promovido a <strong>' + prox.nome + '</strong>.</p>' +
-        '<p class="sub" style="margin-top:6px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos · ' + (excedente ? fmt(excedente) + ' pts excedentes transferidos para a próxima etapa' : 'nova etapa iniciada') + '.</p></div>';
+        '<p class="sub" style="margin-top:8px">Parabéns, ' + (carreira.nomeGuerra || 'aluno') + '. Você foi promovido a <strong>' + prox.nome + '</strong>.</p>' +
+        '<p class="sub" style="margin-top:6px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (' + Math.round(prova.hits / GAMI.provaQuestoes * 100) + '%)' + (excedente ? ' · ' + fmt(excedente) + ' pts transferidos para a próxima etapa' : '') + '.</p></div>';
       renderCarreira();
       toast('PROMOÇÃO CONFIRMADA — ' + tituloCompleto());
     } else {
       carreira.estado = 'bloqueada';
+      carreira.provaBloqueadaAte = Date.now() + GAMI.tentativaHoras * 3600e3;
       renderCarreira();
       body.innerHTML = '<div class="p-card" style="text-align:center">' +
         '<div class="gate-badge warn" style="margin:0 auto 12px">!</div>' +
         '<h3 class="mil" style="font-size:20px">Ainda não foi desta vez</h3>' +
-        '<p class="sub" style="margin-top:8px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (mínimo: ' + minAcertos + '). Você ainda não atingiu o aproveitamento necessário para esta promoção. Uma nova tentativa estará disponível em ' + GAMI.tentativaHoras + ' horas.</p>' +
-        '<p class="sub" style="margin-top:6px">Seu score e sua patente estão preservados — continue estudando e acumulando pontos.</p>' +
+        '<p class="sub" style="margin-top:8px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (' + Math.round(prova.hits / GAMI.provaQuestoes * 100) + '%). O mínimo é ' + Math.round(PROVA_APROV * 100) + '% (' + minAcertos + ' acertos). Uma nova tentativa fica disponível em ' + GAMI.tentativaHoras + ' horas.</p>' +
+        '<p class="sub" style="margin-top:6px">Seu score e sua patente estão preservados — continue treinando as questões que você marcou como difíceis.</p>' +
         '<button class="btn ghost small" id="btnLiberarTentativa" style="margin-top:10px">Liberar nova tentativa (simulação)</button></div>';
       var bl = document.getElementById('btnLiberarTentativa');
-      if (bl) bl.addEventListener('click', function () { carreira.estado = 'disponivel'; renderCarreira(); toast('Nova tentativa liberada (simulação).'); });
+      if (bl) bl.addEventListener('click', function () { carreira.estado = 'disponivel'; carreira.provaBloqueadaAte = null; renderCarreira(); toast('Nova tentativa liberada (simulação).'); });
     }
     $('btnProvaNext').textContent = 'Concluir';
     $('btnProvaNext').disabled = false;
@@ -4818,19 +4569,13 @@
   $('btnProva').addEventListener('click', abrirProva);
   $('btnProvaNext').addEventListener('click', function () {
     if (prova.idx === 'done') { $('provaLayer').classList.remove('on'); return; }
-    if (carreira.estado === 'aguardando-fiscal') {
-      var v = (document.getElementById('fiscalCode') || {}).value || '';
-      if (v.trim() === prova.code) { iniciarQuestoesProva(); }
-      else { toast('Código do fiscal incorreto.'); }
-      return;
-    }
-    if (prova.qs[prova.idx].alts[prova.sel].ok) prova.hits++;
+    if (prova.sel === prova.qs[prova.idx].c) prova.hits++;
     if (prova.idx < prova.qs.length - 1) { prova.idx++; renderQuestaoProva(); }
     else { resultadoProva(); }
   });
   $('btnSairProva').addEventListener('click', function () {
     $('provaLayer').classList.remove('on');
-    if (carreira.estado === 'prova' || carreira.estado === 'aguardando-fiscal') {
+    if (carreira.estado === 'prova') {
       carreira.estado = 'disponivel';
       renderCarreira();
       toast('Prova interrompida — você pode tentar novamente.');

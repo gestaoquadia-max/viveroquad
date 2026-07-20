@@ -25,6 +25,9 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 18 | 19/07 | Na identificação militar, a partícula fixa segue **"QUAD"** (o roteiro citava "QD" como alternativa a padronizar) | Mantida a decisão anterior do nome de guerra composto; mudar para "QD" exige só ajustar `GAMI`/`nomeCurto` |
 | 19 | 20/07 | **Cadeia de skins**: Gandola → Capa de colete → Fuzil → fardas finais (CIPE 500 · PATAMO 750 · BOPE 1300); **farda é escolha única** — comprou uma, as demais ficam indisponíveis; cada compra troca a foto do personagem | Artes chegarão em PDF do gestor; até lá, placeholder visual (anel da foto + chip). Elos: 60/120/200 |
 | 20 | 20/07 | **Área do administrador (N.P.P.)** com acesso por chave da direção; módulos: Avisos gerais (card do aluno renomeado), cronograma por turma, eventos/regras, liberações (retirada de produtos, simulados presenciais via QdC com liberação de entrada, simulados digitais), visão de alunos/dificuldades e governança da Loja | Tudo conectado ao app do aluno em tempo real; chave demo NPP-2026 · `[INTEGRAÇÃO REAL]` marcado nos pontos de sistema |
+| 21 | 20/07 | **Cadastro no site (checkout), não no app**: o app só faz login (e-mail+senha) + "Criar conta" → site; a matrícula ativa libera o acesso | Removidos código por e-mail, ativação, cadastro interno e autorização de dispositivo |
+| 22 | 20/07 | **Dados do aluno vêm do banco geral**: o tutorial confirma nome/turma ("Vi que você é…") em vez de pedir; só o nome de guerra é digitado; foto mostra "AL SD QUAD ______" até a escolha | Nome+telefone pré-preenchidos |
+| 23 | 20/07 | **Prova de promoção automática (sem fiscal)**: 20 questões que o aluno já classificou como difíceis (Errei/Difícil), sem revelar; 80% promove, senão nova tentativa em 24h | Substitui a prova supervisionada por humano |
 
 ## Regras de trabalho vigentes
 
