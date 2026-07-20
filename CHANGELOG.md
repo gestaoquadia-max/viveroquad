@@ -1,5 +1,10 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — gandola masculina (5 de 6)
+- Lote homens com boina + gandola: corte militar (5), loiro (0), pardo
+  raspado (1), ruivo (2) e careca (3) — **gandola em 11 dos 12
+  personagens**; falta só o homem negro de corte fade (4)
+
 ## 20/07/2026 — gandola feminina completa · sem selos sobre a foto
 - Entrou a "negra, cabelo curto" (10) — **gandola feminina completa**
 - **Selo azul de equipado removido** da foto do painel (a boina aparece
