@@ -4,8 +4,10 @@
 - As artes do gestor entraram no app: **comprar a boina troca a foto do
   personagem de verdade** — card do Início, preview do Perfil e zoom
 - Lote masculino **completo**: loiro (0), pardo raspado (1), ruivo (2),
-  careca (3), negro corte fade (4) e corte militar (5); pendente o lote
-  das mulheres (reenvio solicitado)
+  careca (3), negro corte fade (4) e corte militar (5)
+- Lote feminino: preto liso (6), loira (7), ruiva (8), castanho curto
+  (9) e negra com tranças (11) — **pendente só a "Mulher negra, cabelo
+  curto" (10)**, que segue na foto base até a arte chegar
 - Ativos em `fotos/boina-<índice>.webp` (320px); token `__FOTOS_BOINA__`
   no build (python e build.ps1); avatar sem variante segue na foto base
 - Suíte `vfoto2` (4 checagens com as fotos reais) verde; tutorial, herói
