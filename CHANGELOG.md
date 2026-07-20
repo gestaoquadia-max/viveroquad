@@ -3,6 +3,9 @@
 ## 20/07/2026 — robô de ajuda só na área do aluno
 - O QUAD (boneco de ajuda) **não aparece mais na área do administrador**;
   segue normal na área do aluno (balão de 10s incluído)
+- Correção do caso que escapava: **logar com o perfil Administrador já
+  selecionado** disparava o balão "Precisa de ajuda?" — agora o balão
+  só nasce com o perfil do aluno ativo
 
 ## 20/07/2026 — área do administrador (N.P.P.), conectada ao app inteiro
 - **Acesso com liberação**: entrar como Administrador exige e-mail

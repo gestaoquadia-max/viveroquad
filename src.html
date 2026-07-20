@@ -2522,6 +2522,7 @@
   }
 
   /* ---------- personas ---------- */
+  var personaAtiva = 'aluno';
   var personaViews = {
     aluno: { nav: 'navAluno', home: 'v-inicio' },
     professor: { nav: 'navProfessor', home: 'v-sala' },
@@ -2534,6 +2535,7 @@
       });
       b.classList.add('active'); b.setAttribute('aria-selected', 'true');
       var p = b.dataset.persona;
+      personaAtiva = p;
       document.querySelectorAll('.app-top').forEach(function (t) {
         t.style.display = (t.dataset.scope === p) ? 'flex' : 'none';
       });
@@ -5389,6 +5391,7 @@
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;
   function daniloHintMostra() {
+    if (personaAtiva !== 'aluno') { return; }   /* o balão de ajuda é só do aluno */
     var h = $('daniloHint');
     h.style.display = '';
     clearTimeout(daniloHintT);
