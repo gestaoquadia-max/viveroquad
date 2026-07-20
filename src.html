@@ -1038,6 +1038,7 @@
   .loja-saldo svg, .loja-saldo img { width: 18px; height: 18px; }
   .loja-saldo b { color: var(--p-text); font-size: 13px; }
   .loja-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .k-label.sub-k { font-size: 11px; opacity: 0.72; }
   .loja-item { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
     background: linear-gradient(180deg, #FFFFFF, #F4F9FF); border: 1px solid var(--p-line); border-radius: 16px;
     padding: 13px 10px 11px; cursor: pointer; font: inherit; color: var(--p-text); position: relative;
@@ -1433,7 +1434,7 @@
 
           <div class="p-card">
             <div class="k-label">Turmas e aulas</div>
-            <div class="loja-grid">
+            <div class="loja-grid" id="lojaTurmas">
               <button class="loja-item" data-nome="Turma presencial" data-preco="300">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                 <span class="li-nome">Turma presencial</span>
@@ -1464,12 +1465,13 @@
                 <span class="li-desc">no app, hora marcada</span>
                 <span class="li-preco">60 QdC</span>
               </button>
+              <span id="lojaExtras-turmas" style="display:contents"></span>
             </div>
           </div>
 
           <div class="p-card">
             <div class="k-label">Eventos</div>
-            <div class="loja-grid">
+            <div class="loja-grid" id="lojaEventos">
               <button class="loja-item" data-nome="Evento online" data-preco="50">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span>
                 <span class="li-nome">Evento online</span>
@@ -1482,11 +1484,12 @@
                 <span class="li-desc">na unidade Quad</span>
                 <span class="li-preco">150 QdC</span>
               </button>
+              <span id="lojaExtras-eventos" style="display:contents"></span>
             </div>
           </div>
 
           <div class="p-card">
-            <div class="k-label">Seu personagem</div>
+            <div class="k-label">Itens do personagem</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Boina exclusiva" data-preco="20">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg></span>
@@ -1496,13 +1499,56 @@
               </button>
               <!-- cadeia de skins: gandola → capa de colete → fuzil → fardas CIPE · PATAMO · BOPE -->
               <span id="skinChain" style="display:contents"></span>
+              <span id="lojaExtras-personagem" style="display:contents"></span>
             </div>
+            <!-- sub-área: itens de combate, comprados aqui mas guardados na mochila -->
+            <div class="k-label sub-k" style="margin-top:14px">Itens de combate · vão para a mochila</div>
+            <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
+            <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
           </div>
 
           <div class="p-card">
-            <div class="k-label">Itens de combate · vão para a mochila</div>
-            <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
-            <p class="sub" style="margin-top:8px">Armas, broches e utilitários comprados aqui ficam guardados na sua <strong>mochila de combate</strong>. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
+            <div class="k-label">Itens presenciais · retirada na recepção</div>
+            <div class="loja-grid" id="lojaPresencial">
+              <button class="loja-item" data-nome="Garrafinha Quad" data-preco="90" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M10 2h4v2.5l1 2V9H9V6.5l1-2Z"/><rect x="8.5" y="9" width="7" height="12" rx="2.5"/><path d="M8.5 13h7"/></svg></span>
+                <span class="li-nome">Garrafinha Quad</span>
+                <span class="li-desc">squeeze da tropa</span>
+                <span class="li-preco">90 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Simulado físico" data-preco="120" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>
+                <span class="li-nome">Simulado físico</span>
+                <span class="li-desc">caderno impresso</span>
+                <span class="li-preco">120 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Chaveiro Quad" data-preco="40" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="5"/><path d="M11.5 11.5 20 20M17 17l2-2M15 15l2-2"/></svg></span>
+                <span class="li-nome">Chaveiro Quad</span>
+                <span class="li-desc">brinde da marca</span>
+                <span class="li-preco">40 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Vade Mecum" data-preco="200" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2Z"/><path d="M19 20H6a2 2 0 0 1-2-2"/><path d="M8 6h7M8 9h7"/></svg></span>
+                <span class="li-nome">Vade Mecum</span>
+                <span class="li-desc">legislação da carreira</span>
+                <span class="li-preco">200 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Módulo impresso" data-preco="150" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="17" rx="1.5"/><path d="M17 7h4v14H7"/><path d="M6 8h8M6 11h8M6 14h5"/></svg></span>
+                <span class="li-nome">Módulo impresso</span>
+                <span class="li-desc">apostila da matéria</span>
+                <span class="li-preco">150 QdC</span>
+              </button>
+              <button class="loja-item" data-nome="Camiseta Quad" data-preco="180" data-presencial="1">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg></span>
+                <span class="li-nome">Camiseta Quad</span>
+                <span class="li-desc">uniforme de treino</span>
+                <span class="li-preco">180 QdC</span>
+              </button>
+              <span id="lojaExtras-presencial" style="display:contents"></span>
+            </div>
+            <p class="sub" style="margin-top:8px">Produtos físicos comprados com Quad Coins geram um <strong>pedido de retirada</strong> — a administração confirma a entrega na recepção.</p>
           </div>
 
           <div class="p-card" style="opacity:0.85">
@@ -1910,9 +1956,13 @@
               </div>
               <div class="adm-row">
                 <input class="fld" id="admEvNovoNome" placeholder="Novo evento (nome)">
-                <input class="fld" id="admEvNovoQuando" placeholder="QUA · 29/07 · 19H" style="max-width:150px">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admEvNovoData" type="date" aria-label="Data do evento" style="max-width:150px">
+                <input class="fld" id="admEvNovoHora" type="time" value="19:00" aria-label="Horário do evento" style="max-width:110px">
                 <button class="btn ghost small" id="btnAdmEvNovo">Criar</button>
               </div>
+              <p class="sub" id="admEvNovoPrev" style="margin-top:6px">Escolha a data e o horário na agenda.</p>
             </div>
             <p class="sub" style="margin-top:8px">Alimenta diretamente o carrossel <strong>Eventos da semana</strong> e as páginas de cada evento no app do aluno.</p>
           </div>
@@ -1982,6 +2032,29 @@
 
         <!-- ============ ADMIN · LOJA (governança) ============ -->
         <div class="view" id="v-adm-loja">
+          <div class="p-card">
+            <div class="k-label">Cadastrar produto ou serviço</div>
+            <div class="adm-form">
+              <input class="fld" id="admProdNome" placeholder="Nome (ex.: Caneca Quad)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admProdDesc" placeholder="Descrição curta (ex.: brinde da tropa)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admProdCat">
+                  <option value="turmas">Turmas e aulas</option>
+                  <option value="eventos">Eventos</option>
+                  <option value="personagem">Itens do personagem</option>
+                  <option value="presencial">Itens presenciais (retirada)</option>
+                </select>
+                <input class="fld" id="admProdPreco" placeholder="Preço" inputmode="numeric" style="max-width:90px">
+                <span class="pct">QdC</span>
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
+            </div>
+            <div id="admProdList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. Itens presenciais geram <strong>pedido de retirada</strong> na recepção.</p>
+          </div>
+
           <div class="p-card">
             <div class="k-label">Preços da Loja · atualizar</div>
             <div id="admPrecosList"></div>
@@ -3326,7 +3399,7 @@
       txt: 'Tá vendo a <b>sua foto</b> ali em cima? Vamos começar <b>tocando nela</b>!' },
     { view: 'v-aluno', sel: function () { return document.querySelector('.avatar-preview'); }, expect: 'zoom-foto', mood: 'point', bot: 'br',
       txt: 'Esta é a <b>foto do seu personagem</b>. <b>Clica nela e segura</b> pra ver os detalhes de pertinho.' },
-    { sel: function () { return $('avGrid').closest('.p-card'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
+    { sel: function () { return $('avGrid'); }, arrow: '#avGrid', expect: 'avatar', mood: 'point', bot: 'br',
       onEnter: function () { $('avGrid').style.display = 'grid'; if (tutAvatarOk) return 'skip'; },
       txt: 'Escolhe aí: <b>qual desses é a sua cara?</b> Dica: <b>segura</b> em um personagem pra ampliar antes de decidir.' },
     { sel: function () { return document.querySelector('.avatar-preview'); }, expect: 'confirma-avatar', mood: 'talk', bot: 'br',
@@ -4866,7 +4939,7 @@
 
   /* ---------- Loja: compra exclusiva em Quad Coins (simulada) ---------- */
   var lojaOwned = {};
-  document.querySelectorAll('.loja-item').forEach(function (it) {
+  function bindLojaItem(it) {
     it.addEventListener('click', function () {
       if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
       var preco = parseInt(it.dataset.preco, 10), nome = it.dataset.nome;
@@ -4877,12 +4950,65 @@
       if (typeof refreshChips === 'function') refreshChips();
       addScore(-preco, nome + ' adquirido · −' + preco + ' QdC');
       lojaCompraLog(nome, preco);                                 /* governança da Loja */
-      if (PRESENCIAIS.indexOf(nome) >= 0) pedidoNovo(nome);       /* retirada na recepção */
+      var presencial = it.dataset.presencial === '1' || PRESENCIAIS.indexOf(nome) >= 0;
+      if (presencial) pedidoNovo(nome);                           /* retirada na recepção */
       if (LINKS_ONLINE[nome]) {                                   /* atividade online: link junto */
         setTimeout(function () { toast('Acesso liberado — ' + LINKS_ONLINE[nome]); }, 1500);
       }
     });
+  }
+  document.querySelectorAll('.loja-item').forEach(bindLojaItem);
+
+  /* ---------- produtos/serviços cadastrados pela administração ----------
+     Entram nas categorias da Loja do aluno em tempo real. Presenciais
+     geram pedido de retirada na recepção.                                 */
+  var LOJA_ICO = {
+    turmas:     '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+    eventos:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
+    personagem: '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg>',
+    presencial: '<svg viewBox="0 0 24 24"><path d="m3 8 9-5 9 5-9 5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>'
+  };
+  var LOJA_CAT_NOME = { turmas: 'Turmas e aulas', eventos: 'Eventos', personagem: 'Itens do personagem', presencial: 'Itens presenciais' };
+  var LOJA_EXTRAS = [];
+  function renderLojaExtras() {
+    ['turmas', 'eventos', 'personagem', 'presencial'].forEach(function (cat) {
+      var host = document.getElementById('lojaExtras-' + cat);
+      if (!host) return;
+      host.innerHTML = LOJA_EXTRAS.filter(function (p) { return p.cat === cat; }).map(function (p) {
+        var comprado = lojaOwned[p.nome];
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '"' + (cat === 'presencial' ? ' data-presencial="1"' : '') + '>' +
+          '<span class="li-ico">' + LOJA_ICO[cat] + '</span>' +
+          '<span class="li-nome">' + p.nome + '</span>' +
+          '<span class="li-desc">' + (p.desc || 'novidade') + '</span>' +
+          '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : p.preco + ' QdC') + '</span></button>';
+      }).join('');
+      host.querySelectorAll('.loja-item').forEach(bindLojaItem);
+    });
+  }
+  function renderAdmProdList() {
+    var el = document.getElementById('admProdList'); if (!el) return;
+    el.innerHTML = LOJA_EXTRAS.map(function (p) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + '</small></span><span class="pct">' + p.preco + ' QdC</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum produto cadastrado por aqui ainda.</p>';
+  }
+  var btnAdmProdEl = $('btnAdmProd');
+  if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
+    var nome = $('admProdNome').value.trim(), desc = $('admProdDesc').value.trim();
+    var cat = $('admProdCat').value, preco = parseInt($('admProdPreco').value, 10);
+    if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto.'); return; }
+    if (!preco || preco < 1) { toast('Informe um preço em Quad Coins.'); return; }
+    if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+      toast('Já existe um item com esse nome na Loja.'); return;
+    }
+    LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: cat, preco: preco });
+    $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = '';
+    renderLojaExtras();
+    renderAdmProdList();
+    if (typeof renderPrecos === 'function') renderPrecos();   /* entra também no editor de preços */
+    toast('Produto publicado na Loja — categoria ' + LOJA_CAT_NOME[cat] + '.');
   });
+  renderLojaExtras();
+  renderAdmProdList();
 
   /* ==================================================================
      MOCHILA DE COMBATE (storage de itens)
@@ -4924,6 +5050,7 @@
     if (typeof queueSync === 'function') queueSync();
   }
   function mochilaComprar(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
     if (MOCHILA.indexOf(id) >= 0) { toast('Este item já está na sua mochila.'); return; }
     var it = itemDe(id);
     if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
@@ -4953,7 +5080,10 @@
     }
     grid.innerHTML = html;
   }
-  $('btnMochila').addEventListener('click', function () { renderMochila(); $('storageLayer').classList.add('on'); });
+  $('btnMochila').addEventListener('click', function () {
+    if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, a mochila não abre — foco na escolha do personagem */
+    renderMochila(); $('storageLayer').classList.add('on');
+  });
   $('btnStorageFechar').addEventListener('click', function () { $('storageLayer').classList.remove('on'); });
   renderLojaCombate();
   renderMochila();
@@ -5158,13 +5288,33 @@
     $('admEvRegra').value = ''; $('admEvValor').value = '';
     renderAdmEventos();
   });
+  /* monta "QUA · 29/07 · 19H" a partir dos seletores de data e hora */
+  var DIA_SEM = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  function admEvQuando() {
+    var d = $('admEvNovoData').value, h = $('admEvNovoHora').value;
+    if (!d) return '';
+    var p = d.split('-');
+    var dt = new Date(+p[0], +p[1] - 1, +p[2]);   /* local, sem escorregar de fuso */
+    var quando = DIA_SEM[dt.getDay()] + ' · ' + p[2] + '/' + p[1];
+    if (h) { var hp = h.split(':'); quando += ' · ' + (+hp[0]) + 'H' + (hp[1] !== '00' ? hp[1] : ''); }
+    return quando;
+  }
+  function admEvPreview() {
+    var q = admEvQuando();
+    $('admEvNovoPrev').textContent = q ? 'Agendado para: ' + q : 'Escolha a data e o horário na agenda.';
+  }
+  ['admEvNovoData', 'admEvNovoHora'].forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('change', admEvPreview);
+  });
   $('btnAdmEvNovo').addEventListener('click', function () {
-    var nome = $('admEvNovoNome').value.trim(), quando = $('admEvNovoQuando').value.trim();
-    if (!nome || !quando) { toast('Preencha nome e data do evento.'); return; }
-    EVENTOS.push({ id: 'adm' + EVENTOS.length, nome: nome, tipo: 'EVENTO', quando: quando.toUpperCase(),
+    var nome = $('admEvNovoNome').value.trim(), quando = admEvQuando();
+    if (!nome) { toast('Dê um nome ao evento.'); return; }
+    if (!quando) { toast('Escolha a data do evento na agenda.'); return; }
+    EVENTOS.push({ id: 'adm' + EVENTOS.length, nome: nome, tipo: 'EVENTO', quando: quando,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5], meta: 'novidade da semana',
       desc: 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
-    $('admEvNovoNome').value = ''; $('admEvNovoQuando').value = '';
+    $('admEvNovoNome').value = ''; $('admEvNovoData').value = ''; $('admEvNovoHora').value = '19:00';
+    admEvPreview();
     renderAdmEventos();
     renderEvStrip();   /* o carrossel do aluno ganha o tile na hora */
     toast('Evento criado — já gira no carrossel da semana.');

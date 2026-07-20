@@ -1,5 +1,27 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — Loja reconstruída, agenda de eventos e cadastro de produtos
+- **Bug do tutorial corrigido**: na etapa de escolher o personagem, dava
+  para abrir a mochila (e travar o fluxo). Agora a área clicável do passo
+  é **só a grade de personagens**, e a mochila (e os itens de combate) ficam
+  **bloqueados durante o tutorial** — foco total na escolha
+- **Loja reconstruída em 4 categorias**: (1) *Turmas e aulas*, (2) *Eventos*,
+  (3) *Itens do personagem* — com a **sub-área "Itens de combate · vão para a
+  mochila"** dentro dela — e (4) *Itens presenciais · retirada na recepção*:
+  Garrafinha, Simulado físico, Chaveiro, Vade Mecum, Módulo impresso e
+  Camiseta. Produtos físicos geram **pedido de retirada** para a recepção dar
+  baixa
+- **Agenda de eventos (admin)**: o campo de data do novo evento deixou de ser
+  texto livre e virou **calendário + relógio** (clica na data e no horário);
+  a prévia mostra "QUA · 29/07 · 19H30" antes de criar
+- **Cadastro de produtos/serviços (admin)**: novo formulário na Loja do
+  administrador — nome, descrição, **categoria** e preço em Quad Coins. O
+  produto entra **na hora** na categoria certa da Loja do aluno (e no editor
+  de preços); presenciais já saem com pedido de retirada
+- Nova suíte `vloja2` (21 checagens) verde; `vloja`, `vskin`, `vgand`,
+  `vroupa`, `vhero`, `vmochila`, `vev`, `vbonus` e o tutorial (`vtut`) sem
+  regressões
+
 ## 20/07/2026 — recompensa da noite + limpeza do Perfil + Aula de hoje
 - **"Itens do personagem" (chips de boina/skin) removido do Perfil**: era
   redundante — a boina e as skins/fardas conquistadas **já aparecem

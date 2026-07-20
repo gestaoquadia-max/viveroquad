@@ -32,6 +32,10 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 25 | 20/07 | **Chips "Itens do personagem" removidos** (redundantes com a foto + mochila): boina e skins **quem possui, veste** — sem equipar/desequipar manual | A foto já mostra o que está vestido; o resto vai para a mochila |
 | 26 | 20/07 | **Recompensa da noite concluída**: o botão do "Bloco da noite", ao fechar todas as missões, vira **"Retire aqui seus benefícios"** (dourado) e paga **+1 de Score por bloco (8/noite) + 1 Quad Coin**, com efeito visual de moeda | Botão dourado é acento pontual de recompensa — não muda o padrão azul/branco da marca. Regra: 1 bloco = +1 Score |
 | 27 | 20/07 | **"Aula de hoje" re-renderiza ao abrir o Início** (além da sincronização com a planilha da coordenação) | Reflete cronograma da turma + horário atual a cada visita |
+| 28 | 20/07 | **No tutorial, a área clicável do passo do personagem é só a grade** (`#avGrid`); mochila e itens de combate ficam bloqueados durante o tutorial | Corrige o bug de abrir a mochila no meio da escolha |
+| 29 | 20/07 | **Loja em 4 categorias**: Turmas e aulas · Eventos · Itens do personagem (com sub-área "Itens de combate → mochila") · Itens presenciais (retirada na recepção) | Presenciais: garrafinha, simulado físico, chaveiro, vade mecum, módulo, camiseta — geram pedido de retirada |
+| 30 | 20/07 | **Agenda de eventos**: data/horário do novo evento por seletores nativos (calendário + relógio), com prévia "QUA · 29/07 · 19H30" | Substitui a digitação manual da data |
+| 31 | 20/07 | **Admin cadastra produtos/serviços na Loja**: nome, descrição, categoria e preço; entram na hora na Loja do aluno e no editor de preços | Presenciais saem com pedido de retirada; base para catálogo governável |
 
 ## Regras de trabalho vigentes
 
