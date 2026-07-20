@@ -934,6 +934,31 @@
     background: linear-gradient(180deg, #54A4FF 0%, #1E7DFF 55%, #135FE0 100%);
     box-shadow: inset 0 2px 0 rgba(255,255,255,0.55), inset 0 -4px 8px rgba(9,40,120,0.4); }
   .hb-chev { width: 18px; height: 18px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  /* botão-recompensa dourado: aparece quando a noite é concluída */
+  .hero-btn-wrap.reward { background: linear-gradient(180deg, #FFE9A8, #E7B24C 45%, #B8801E);
+    filter: drop-shadow(0 10px 20px rgba(190,140,20,0.55)); animation: rewardPulse 1.5s ease-in-out infinite; }
+  .hero-btn-wrap.reward .hero-btn { color: #5A3B00;
+    background: linear-gradient(180deg, #FFE7A0 0%, #F5C85B 52%, #D99B2A 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -4px 8px rgba(120,80,0,0.35); }
+  .hero-btn-wrap.reward .hb-coin { width: 22px; height: 22px; flex: none; filter: drop-shadow(0 1px 2px rgba(120,80,0,0.4)); }
+  .hero-btn-wrap.claimed { background: linear-gradient(180deg, #DCE6D8, #B8CBAE 45%, #8FA981);
+    filter: drop-shadow(0 6px 12px rgba(80,120,60,0.3)); animation: none; }
+  .hero-btn-wrap.claimed .hero-btn { color: #2C5E1F;
+    background: linear-gradient(180deg, #EAF3E4 0%, #CFE0C4 55%, #AEC79E 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,0.6); }
+  @keyframes rewardPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.028); } }
+  /* moeda que voa do botão até o contador de Quad Coins */
+  .coin-fly { position: fixed; z-index: 90; width: 40px; height: 40px; pointer-events: none;
+    filter: drop-shadow(0 6px 12px rgba(190,140,20,0.6)); will-change: transform, opacity; }
+  @keyframes coinRise { 0% { transform: translate(-50%,-50%) scale(0.3) rotate(0deg); opacity: 0; }
+    18% { opacity: 1; } 55% { transform: translate(-50%,-50%) scale(1.35) rotate(200deg); opacity: 1; }
+    100% { opacity: 1; } }
+  /* estrelinhas de reforço positivo ao redor do botão */
+  .reward-sparks { position: fixed; z-index: 89; pointer-events: none; }
+  .reward-sparks i { position: absolute; width: 9px; height: 9px; border-radius: 2px;
+    background: radial-gradient(circle, #FFF6D8, #F4C95B 60%, #D99B2A);
+    animation: sparkOut 0.8s ease-out forwards; }
+  @keyframes sparkOut { 0% { transform: translate(0,0) scale(0.4); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; } }
 
   /* ---------- avisos ---------- */
   .mission-row .m-dot { width: 34px; height: 34px; border-radius: 12px; background: linear-gradient(160deg, #E7F1FF, #CFE2FF); border: none; color: var(--p-gold); }
@@ -1543,18 +1568,14 @@
             </div>
             <!-- a escolha do personagem acontece uma única vez, no tutorial; depois fica travada -->
             <div class="avatar-grid" id="avGrid" style="display:none"></div>
-            <div class="k-label" style="margin-top:14px">Itens do personagem</div>
-            <div class="equip-row">
-              <button class="equip-chip locked" id="chipBoina"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>Boina</button>
-              <button class="equip-chip locked" id="chipSkin"><svg viewBox="0 0 24 24"><path d="M20.4 6.5 17 4l-2 2h-6L7 4 3.6 6.5 5 10l2-1v11h10V9l2 1 1.4-3.5Z"/></svg><span id="chipSkinNome">Skin</span></button>
-            </div>
+            <p class="sub" style="margin-top:10px">A <strong>boina</strong> e as <strong>skins/fardas</strong> que você conquista já aparecem vestidas na foto acima — não há o que gerenciar aqui.</p>
             <div class="k-label" style="margin-top:16px">Mochila de combate</div>
             <button class="mochila-btn" id="btnMochila">
               <span class="m-ico"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M6 13h12"/><path d="M10 13v3h4v-3"/></svg></span>
               <span class="m-txt"><b>Abrir mochila</b><small id="mochilaQtd">0 itens guardados</small></span>
               <span class="m-chev">›</span>
             </button>
-            <p class="sub" style="margin-top:8px">A boina e as skins ficam no personagem; <strong>armas, broches e utilitários</strong> comprados na Loja ficam guardados na sua mochila de combate.</p>
+            <p class="sub" style="margin-top:8px"><strong>Armas, broches e utilitários</strong> comprados na Loja ficam guardados aqui na sua mochila de combate.</p>
           </div>
 
           <div class="p-card">
@@ -2614,6 +2635,8 @@
       });
     }
     if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
+    /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
+    if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
     spotlight($(id));
   }
   initLoop($('v-inicio'));
@@ -2951,7 +2974,9 @@
   $('btnTreinoRapido').addEventListener('click', function () { trAbrir(); });
   /* "Continuar missão" leva só às missões DAQUELA NOITE (nunca atrasadas/simulados):
      abre direto a próxima missão da noite ainda pendente */
-  $('btnMissaoHome').addEventListener('click', function () {
+  $('btnMissaoHome').addEventListener('click', function (ev) {
+    /* noite concluída: o botão vira "Retire aqui seus benefícios" */
+    if ($('btnMissaoHome').dataset.reward === '1') { resgatarBeneficios(ev); return; }
     showView('v-missoes', 'navAluno');
     if (typeof tutOn !== 'undefined' && tutOn) { return; }  /* no tutorial, o QUAD guia a Introdução */
     var pend = missoesDaNoite().filter(function (x) { return !x.b.feito; });
@@ -3871,13 +3896,84 @@
     $('missSegs').innerHTML = segs;
     $('missRestam').textContent = feitas >= total ? 'COMPLETO' : 'FALTAM ' + (total - feitas);
     var btn = $('btnMissaoHome');
-    if (feitas >= total) {
-      btn.disabled = true;
-      btn.textContent = 'Missões da noite concluídas';
-    } else if (btn.disabled) {
+    var wrap = btn.closest('.hero-btn-wrap');
+    wrap.classList.remove('reward', 'claimed');
+    btn.dataset.reward = '';
+    if (total > 0 && feitas >= total) {
+      btn.disabled = false;
+      if (noiteBonusResgatado) {
+        /* já retirou: estado calmo, sem nova recompensa */
+        wrap.classList.add('claimed');
+        btn.innerHTML = 'Benefícios retirados <svg class="hb-chev" viewBox="0 0 24 24" style="stroke:#2C5E1F"><path d="m5 12 5 5L20 7"/></svg>';
+        btn.disabled = true;
+      } else {
+        /* noite completa: botão dourado convida a retirar o prêmio */
+        wrap.classList.add('reward');
+        btn.dataset.reward = '1';
+        btn.innerHTML = coinSvg().replace('coin-img', 'hb-coin') + ' Retire aqui seus benefícios';
+      }
+    } else if (btn.disabled || wrap.classList.contains('reward') || wrap.classList.contains('claimed')) {
       btn.disabled = false;
       btn.innerHTML = 'Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>';
     }
+  }
+  /* ---------- recompensa da noite concluída ----------
+     Cada bloco de questões da noite vale +1 de Score de carreira; a noite
+     inteira concluída ainda rende +1 Quad Coin. Um efeito de moeda voa até
+     o contador para reforçar positivamente a conquista.                    */
+  var noiteBonusResgatado = false;
+  function resgatarBeneficios(ev) {
+    if (noiteBonusResgatado) { return; }
+    var total = missoesDaNoite().length;
+    if (total <= 0 || missoesDaNoite().filter(function (x) { return x.b.feito; }).length < total) { return; }
+    noiteBonusResgatado = true;
+    var scoreBonus = total;   /* +1 de Score por bloco concluído na noite */
+    carreira.scorePatente += scoreBonus;
+    carreira.scoreCarreira += scoreBonus;
+    carreira.scoreTemporada += scoreBonus;
+    if (typeof renderCarreira === 'function') renderCarreira();
+    /* efeito visual + a moeda entra no saldo ao "aterrissar" */
+    var origem = ev && ev.currentTarget ? ev.currentTarget : $('btnMissaoHome');
+    animarMoedaConquista(origem, function () {
+      addScore(1, 'Noite concluída! +1 Quad Coin · +' + scoreBonus + ' de Score');
+    });
+    heroSync();
+  }
+  function animarMoedaConquista(origem, aoChegar) {
+    var alvo = $('coinsCard') || $('scoreVal');
+    if (!origem || !alvo) { if (aoChegar) aoChegar(); return; }
+    var ro = origem.getBoundingClientRect(), ra = alvo.getBoundingClientRect();
+    var x0 = ro.left + ro.width / 2, y0 = ro.top + ro.height / 2;
+    var x1 = ra.left + ra.width / 2, y1 = ra.top + ra.height / 2;
+    /* faíscas de reforço positivo ao redor do botão */
+    var sp = document.createElement('div');
+    sp.className = 'reward-sparks'; sp.style.left = x0 + 'px'; sp.style.top = y0 + 'px';
+    for (var k = 0; k < 10; k++) {
+      var ang = (Math.PI * 2 * k) / 10, dist = 34 + (k % 3) * 10, i = document.createElement('i');
+      i.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+      i.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+      i.style.animationDelay = (k * 12) + 'ms'; sp.appendChild(i);
+    }
+    document.body.appendChild(sp);
+    setTimeout(function () { sp.remove(); }, 950);
+    /* a moeda dourada sobe, gira e voa até o contador de Quad Coins */
+    var coin = document.createElement('img');
+    coin.className = 'coin-fly'; coin.src = QUAD_COIN_SRC; coin.alt = '';
+    coin.style.left = x0 + 'px'; coin.style.top = y0 + 'px';
+    coin.style.transition = 'none';
+    coin.style.animation = 'coinRise 0.62s ease-out forwards';
+    document.body.appendChild(coin);
+    setTimeout(function () {
+      coin.style.animation = 'none';
+      coin.style.transition = 'left 0.55s cubic-bezier(.5,-0.2,.7,1), top 0.55s cubic-bezier(.5,-0.2,.7,1), transform 0.55s ease-in, opacity 0.5s ease-in 0.25s';
+      coin.style.left = x1 + 'px'; coin.style.top = y1 + 'px';
+      coin.style.transform = 'translate(-50%,-50%) scale(0.35)'; coin.style.opacity = '0';
+    }, 640);
+    setTimeout(function () {
+      coin.remove();
+      if (alvo.animate) { try { alvo.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 420 }); } catch (e) {} }
+      if (aoChegar) aoChegar();
+    }, 1220);
   }
   function renderDia() {
     var agora = Date.now();
@@ -4528,6 +4624,12 @@
   var PROVA_APROV = 0.80;   /* aproveitamento mínimo para promover */
   var prova = { qs: [], idx: 0, sel: null, hits: 0 };
   window.__prova = prova;   /* exposto para a suíte de testes */
+  /* internos da "Bloco da noite" expostos para a suíte de testes */
+  window.__noite = {
+    blocos: DIA_BLOCOS, missoes: missoesDaNoite, heroSync: heroSync, renderDia: renderDia,
+    concluirTudo: function () { missoesDaNoite().forEach(function (x) { x.b.feito = true; }); renderDia(); heroSync(); },
+    resgatado: function () { return noiteBonusResgatado; }
+  };
   function embaralhar(arr) { return arr.map(function (x) { return [Math.random(), x]; }).sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; }); }
   function provaNorm(c) { return { t: c.t, c: c.c, o: c.o }; }
   function provaColeta() {
@@ -4656,22 +4758,12 @@
   if (btnDemoP) btnDemoP.addEventListener('click', demoSobePatente);
   /* =============== fim do bloco provisório =============== */
 
-  /* itens do personagem: comprados na Loja, equipados aqui */
+  /* itens do personagem: conquistados na jornada, já vestidos na foto
+     (a boina e as skins não têm gestão manual — quem possui, veste) */
   var boinaEquipada = false;
   function refreshChips() {
-    var ch = $('chipBoina');
-    if (lojaOwned['Boina exclusiva']) ch.classList.remove('locked');
+    if (lojaOwned['Boina exclusiva']) { boinaEquipada = true; aplicarAvatar(); }
   }
-  $('chipBoina').addEventListener('click', function () {
-    if (!lojaOwned['Boina exclusiva']) { toast('Boina exclusiva — compre na Loja por 20 QdC'); return; }
-    boinaEquipada = !boinaEquipada;
-    $('chipBoina').classList.toggle('on', boinaEquipada);
-    aplicarAvatar();   /* a foto acompanha (com/sem boina) quando houver arte */
-    toast(boinaEquipada ? 'Boina equipada no personagem!' : 'Boina guardada no armário.');
-  });
-  document.querySelectorAll('.equip-chip[data-lock]').forEach(function (ch) {
-    ch.addEventListener('click', function () { toast(ch.dataset.lock); });
-  });
   $('btnSenha').addEventListener('click', function () {
     if (!$('novaSenha').value) { toast('Digite a nova senha'); return; }
     $('novaSenha').value = '';
@@ -4946,16 +5038,9 @@
     });
     var prev = document.querySelector('.avatar-preview');
     if (prev) prev.className = prev.className.replace(/\s*skin-[a-z]+/g, '') + marca;
-    var ch = $('chipSkin');
-    ch.classList.remove('locked'); ch.classList.add('on');
-    $('chipSkinNome').textContent = sk.nome;
     toast('Foto do personagem atualizada — ' + sk.nome + '.');
     queueSync();
   }
-  $('chipSkin').addEventListener('click', function () {
-    toast(skinAtual ? 'Skin vestida: ' + skinAtual.nome
-                    : 'Cadeia de skins — comece pela Gandola, na Loja.');
-  });
   renderSkins();
 
   /* ---------- foto do personagem abre o Perfil do aluno ---------- */

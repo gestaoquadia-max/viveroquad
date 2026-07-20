@@ -1,5 +1,25 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — recompensa da noite + limpeza do Perfil + Aula de hoje
+- **"Itens do personagem" (chips de boina/skin) removido do Perfil**: era
+  redundante — a boina e as skins/fardas conquistadas **já aparecem
+  vestidas** na foto do personagem, e o que se guarda vai para a **mochila
+  de combate**. Não há mais equipar/desequipar manual: **quem possui,
+  veste** (comprar a boina/skin já troca a foto na hora)
+- **Botão-recompensa da "Bloco da noite"**: ao concluir todas as missões
+  da noite, o antigo "Missões da noite concluídas" (inerte) vira um
+  **botão dourado "Retire aqui seus benefícios"** com ícone de moeda.
+  Ao tocar: **+1 de Score por bloco da noite** (8 blocos → +8 de Score de
+  carreira) **e +1 Quad Coin**, com um **efeito de moeda** que sobe, gira
+  e voa até o contador (reforço positivo). Depois vira "Benefícios
+  retirados" e não paga de novo
+- **"Aula de hoje" atualiza ao abrir o Início**: o card se re-renderiza a
+  cada visita ao Início, refletindo o cronograma da turma e o horário
+  atual (além de já sincronizar quando a coordenação atualiza a planilha)
+- Nova suíte `vbonus` verde; `vhero`, `vskin`, `vfoto2`, `vgand`,
+  `vroupa`, `vmochila`, `vturma`, `vloja` e o tutorial (`vtut`) sem
+  regressões
+
 ## 20/07/2026 — mochila de combate (Storage de itens)
 - **Área de escolha de personagem removida do Perfil** — o personagem já
   foi escolhido no onboard e não muda com o tempo; o card passa a se

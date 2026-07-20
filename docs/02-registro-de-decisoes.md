@@ -29,6 +29,9 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 22 | 20/07 | **Dados do aluno vêm do banco geral**: o tutorial confirma nome/turma ("Vi que você é…") em vez de pedir; só o nome de guerra é digitado; foto mostra "AL SD QUAD ______" até a escolha | Nome+telefone pré-preenchidos |
 | 23 | 20/07 | **Prova de promoção automática (sem fiscal)**: 20 questões que o aluno já classificou como difíceis (Errei/Difícil), sem revelar; 80% promove, senão nova tentativa em 24h | Substitui a prova supervisionada por humano |
 | 24 | 20/07 | **Escolha de personagem sai do Perfil** (o personagem é definitivo, escolhido no onboard) e entra a **mochila de combate**: ícone abre uma Storage de itens comprados na Loja que não são skin/farda (armas, broches etc.) | Base para os futuros eventos de quest (reunir itens → item novo); itens iniciais: faca 40, lanterna 35, bússola 30, broche 25, cantil 20, corda 45 |
+| 25 | 20/07 | **Chips "Itens do personagem" removidos** (redundantes com a foto + mochila): boina e skins **quem possui, veste** — sem equipar/desequipar manual | A foto já mostra o que está vestido; o resto vai para a mochila |
+| 26 | 20/07 | **Recompensa da noite concluída**: o botão do "Bloco da noite", ao fechar todas as missões, vira **"Retire aqui seus benefícios"** (dourado) e paga **+1 de Score por bloco (8/noite) + 1 Quad Coin**, com efeito visual de moeda | Botão dourado é acento pontual de recompensa — não muda o padrão azul/branco da marca. Regra: 1 bloco = +1 Score |
+| 27 | 20/07 | **"Aula de hoje" re-renderiza ao abrir o Início** (além da sincronização com a planilha da coordenação) | Reflete cronograma da turma + horário atual a cada visita |
 
 ## Regras de trabalho vigentes
 
