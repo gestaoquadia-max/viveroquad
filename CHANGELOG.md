@@ -1,5 +1,9 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — robô de ajuda só na área do aluno
+- O QUAD (boneco de ajuda) **não aparece mais na área do administrador**;
+  segue normal na área do aluno (balão de 10s incluído)
+
 ## 20/07/2026 — área do administrador (N.P.P.), conectada ao app inteiro
 - **Acesso com liberação**: entrar como Administrador exige e-mail
   funcional + chave emitida pela direção (demo: NPP-2026) — cadastro

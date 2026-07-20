@@ -2544,6 +2544,9 @@
       /* cadastro específico do administrador: exige liberação da direção */
       var ag = $('admGate');
       if (ag) ag.classList.toggle('on', p === 'admin' && !admLiberado);
+      /* o robô de ajuda é do aluno — na área do administrador ele some */
+      $('daniloFab').style.display = (p === 'admin' || (typeof tutOn !== 'undefined' && tutOn)) ? 'none' : '';
+      if (p !== 'aluno') { $('daniloHint').style.display = 'none'; }
     });
   });
 
