@@ -3501,7 +3501,7 @@
             tutEvent('confirma-avatar');
           } },
         { rotulo: 'Ver outros', cls: 'nao', acao: function () {
-            $('avPreview').src = avatarThumbs[avatarIdx];   /* volta a prévia atual */
+            $('avPreview').src = fotoPersonagem();   /* volta a prévia atual (com o que estiver vestido) */
             tutGo(tutIdx - 1);
           } }
       ] },

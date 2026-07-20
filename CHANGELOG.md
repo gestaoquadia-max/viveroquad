@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — gandola completa (12/12) · troca em todas as representações
+- Entrou o homem negro de corte fade (4): **boina e gandola completos
+  para os 12 personagens**
+- Regra confirmada e testada: **comprar uma skin troca a foto do
+  personagem em todas as representações do jogo** — card do Início,
+  painel do Perfil e zoom trocam juntos; a prévia da escolha também
+  volta para "o que estiver vestido" (corrigido)
+- Toda skin futura (colete, fuzil, fardas e novos itens) segue a mesma
+  regra automaticamente
+
 ## 20/07/2026 — gandola masculina (5 de 6)
 - Lote homens com boina + gandola: corte militar (5), loiro (0), pardo
   raspado (1), ruivo (2) e careca (3) — **gandola em 11 dos 12
