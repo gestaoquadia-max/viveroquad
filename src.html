@@ -833,7 +833,7 @@
     filter: drop-shadow(0 2px 4px rgba(170,110,15,0.45)) drop-shadow(0 0 9px rgba(244,182,58,0.5)); }
   .rank-badge { width: 22px; height: 24px; flex: none; filter: drop-shadow(0 0 5px rgba(90,170,255,0.75)); }
   /* [ARTE PDF] placeholder visual: cada skin vestida colore o anel da foto
-     até as artes do PDF do gestor entrarem em SKIN_FOTOS */
+     até as artes do PDF do gestor entrarem em AVATAR_VARIANTES */
   .skin-gandola { --skin-cor: #6B8F3E; }
   .skin-colete  { --skin-cor: #63788C; }
   .skin-fuzil   { --skin-cor: #39434E; }
@@ -3437,7 +3437,9 @@
   }
   function tutEquiparBoina() {
     $('equipBoina').style.display = 'flex';
-    var ch = $('chipBoina'); if (ch) ch.classList.remove('locked');
+    var ch = $('chipBoina'); if (ch) { ch.classList.remove('locked'); ch.classList.add('on'); }
+    boinaEquipada = true;
+    aplicarAvatar();   /* com a arte do PDF no lugar, a foto já troca aqui */
   }
   function tutResetBoina() {
     var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
@@ -3446,6 +3448,8 @@
       it.querySelector('.li-preco').textContent = '20 QdC';
     }
     lojaOwned['Boina exclusiva'] = false;
+    boinaEquipada = false;
+    aplicarAvatar();
     $('equipBoina').style.display = 'none';
     var ch = $('chipBoina'); if (ch) ch.classList.add('locked');
   }
@@ -4449,11 +4453,28 @@
   document.addEventListener('contextmenu', function (e) {
     if (HOLD_SELS.some(function (h) { return !!e.target.closest(h.sel); })) e.preventDefault();
   });
+  /* [FOTOS PDF] guarda-roupa do personagem: cada variante (boina, gandola,
+     colete, fuzil, cipe, patamo, bope) mapeia o índice do avatar → recorte.
+     Os PDFs do gestor (6 imagens + classificação cada) preenchem este mapa;
+     a troca da foto na compra/equipar JÁ está ligada — é só popular. */
+  var AVATAR_VARIANTES = { boina: {} };
+  window.AVATAR_VARIANTES = AVATAR_VARIANTES;   /* suíte de testes injeta variantes */
+  function fotoPersonagem() {
+    if (typeof skinAtual !== 'undefined' && skinAtual &&
+        AVATAR_VARIANTES[skinAtual.id] && AVATAR_VARIANTES[skinAtual.id][avatarIdx]) {
+      return AVATAR_VARIANTES[skinAtual.id][avatarIdx];   /* skin vestida tem prioridade */
+    }
+    if (typeof boinaEquipada !== 'undefined' && boinaEquipada && AVATAR_VARIANTES.boina[avatarIdx]) {
+      return AVATAR_VARIANTES.boina[avatarIdx];           /* personagem com a boina */
+    }
+    return avatarThumbs[avatarIdx];
+  }
   function aplicarAvatar() {
     if (!avatarThumbs.length) return;
-    var src = avatarThumbs[avatarIdx];
+    var src = fotoPersonagem();
     $('homeAvatar').innerHTML = '<img src="' + src + '" alt="">';
     $('avPreview').src = src;
+    if (typeof queueSync === 'function') queueSync();
   }
   function montarAvatares() {
     var img = new Image();
@@ -4499,8 +4520,12 @@
       });
       /* foto já escolhida: o zoom identifica o militar (ex.: AL SD QUAD MOURA) */
       var zoomIdent = function () { return carreira.nomeGuerra ? nomeCurto() : AV_LABELS[avatarIdx]; };
-      bindHold('#avPreview', function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: zoomIdent() }; });
-      bindHold('#btnAvatarPerfil', function () { return { src: avatarZoom[avatarIdx] || avatarThumbs[avatarIdx], nome: zoomIdent() }; });
+      var zoomFoto = function () {
+        var base = avatarZoom[avatarIdx] || avatarThumbs[avatarIdx];
+        return fotoPersonagem() === avatarThumbs[avatarIdx] ? base : fotoPersonagem();
+      };
+      bindHold('#avPreview', function () { return { src: zoomFoto(), nome: zoomIdent() }; });
+      bindHold('#btnAvatarPerfil', function () { return { src: zoomFoto(), nome: zoomIdent() }; });
     };
     img.src = AVATAR_SPRITE;
   }
@@ -4830,6 +4855,7 @@
     boinaEquipada = !boinaEquipada;
     $('chipBoina').classList.toggle('on', boinaEquipada);
     $('equipBoina').style.display = boinaEquipada ? 'grid' : 'none';
+    aplicarAvatar();   /* a foto acompanha (com/sem boina) quando houver arte */
     toast(boinaEquipada ? 'Boina equipada no personagem!' : 'Boina guardada no armário.');
   });
   document.querySelectorAll('.equip-chip[data-lock]').forEach(function (ch) {
@@ -4961,8 +4987,8 @@
      · comprou um elo: ele some e o próximo aparece no lugar
      · nas fardas finais o aluno escolhe qualquer uma (e pode juntar as três)
      · cada compra TROCA A FOTO do personagem — o gestor está preparando o
-       PDF com todas as artes; [ARTE PDF] basta preencher SKIN_FOTOS com os
-       recortes (id → data URI) que a troca real da foto já acontece.
+       PDF com todas as artes; [FOTOS PDF] basta preencher AVATAR_VARIANTES
+       (variante → índice do avatar → recorte) que a troca já acontece.
        Até lá, o anel da foto muda de cor e o chip do Perfil mostra a skin.
      ================================================================== */
   var SKIN_ICO = {
@@ -4981,7 +5007,6 @@
     { id: 'patamo', nome: 'Farda PATAMO', desc: 'Patrulhamento Tático Móvel', preco: 750, ico: SKIN_ICO.farda },
     { id: 'bope', nome: 'Farda BOPE', desc: 'Operações Especiais', preco: 1300, ico: SKIN_ICO.farda }
   ];
-  var SKIN_FOTOS = {};        /* [ARTE PDF] id da skin → recorte da foto */
   var skinEtapa = 0;          /* elos da cadeia já comprados (0 = gandola à venda) */
   var skinAtual = null;
   var fardaEscolhida = null;  /* escolha ÚNICA: comprou uma farda, as outras fecham */
@@ -5026,11 +5051,7 @@
   }
   function skinVestir(sk) {
     skinAtual = sk;
-    if (SKIN_FOTOS[sk.id]) {
-      /* [ARTE PDF] com as artes no lugar, a foto troca de verdade */
-      $('homeAvatar').innerHTML = '<img src="' + SKIN_FOTOS[sk.id] + '" alt="">';
-      $('avPreview').src = SKIN_FOTOS[sk.id];
-    }
+    aplicarAvatar();   /* [FOTOS PDF] variante da skin em AVATAR_VARIANTES → foto troca */
     ['btnAvatarPerfil'].forEach(function (id) {
       var el = $(id);
       el.className = el.className.replace(/\s*skin-[a-z]+/g, '') + ' skin-' + sk.id;

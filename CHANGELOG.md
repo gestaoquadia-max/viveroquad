@@ -1,5 +1,17 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — guarda-roupa do personagem pronto para as fotos
+- Estrutura unificada `AVATAR_VARIANTES` (variante → avatar → recorte):
+  **comprar a boina no tutorial, equipar/guardar pelo chip do Perfil e
+  vestir skins agora trocam a foto do personagem** pela mesma engrenagem
+  (card do Início, preview do Perfil e zoom)
+- Falta só a arte: os 4 PDFs/imagens do gestor (6 personagens base +
+  versões com boina) preenchem o mapa e a troca passa a ser visual;
+  a mesma lógica servirá para as skins futuras
+- Prioridade da foto: skin vestida > boina equipada > personagem base
+- Suíte `vfoto` (variantes injetadas) prova a troca de ponta a ponta;
+  tutorial, skins, Loja e herói sem regressões
+
 ## 20/07/2026 — robô de ajuda só na área do aluno
 - O QUAD (boneco de ajuda) **não aparece mais na área do administrador**;
   segue normal na área do aluno (balão de 10s incluído)
