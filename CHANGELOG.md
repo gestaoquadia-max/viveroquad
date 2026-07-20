@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — área do administrador (N.P.P.), conectada ao app inteiro
+- **Acesso com liberação**: entrar como Administrador exige e-mail
+  funcional + chave emitida pela direção (demo: NPP-2026) — cadastro
+  específico de quem dá suporte ao aluno que opera o sistema
+- **Hoje (operação do dia)**: envia **Avisos gerais** com escopo por
+  turno (M·T·N) e modalidade (RONDESP nivelamento · PATAMO regular ·
+  BOPE questões) — o card do aluno foi renomeado de "Avisos do
+  professor" para **"Avisos gerais"** e filtra pela turma dele;
+  **atualiza o cronograma** por turma/dia/tempo (a "Aula de hoje" do
+  aluno muda na hora); **cria eventos e regras de score/Coins** que
+  alimentam o carrossel e as páginas de evento
+- **Liberar**: produtos presenciais comprados com QdC viram **pedidos de
+  retirada** (baixa na entrega); **simulado presencial da semana** é
+  lançado à venda por QdC, a inscrição do aluno debita e o coloca na
+  **lista de compradores**, onde a administração **libera a entrada**;
+  **simulados digitais** lançados aparecem na área do aluno
+- **Alunos**: maiores dificuldades **reais** — top sub-assuntos,
+  assuntos e matérias calculados da mesma árvore de Domínio do aluno
+  (o Treinamento Rápido move os números) + lista de apoio
+- **Loja (governança)**: editor de **preços** (vale na hora, inclusive
+  skins), **log de compradores** (alimentado por cada compra real) e
+  **links de atividades online** entregues junto da compra
+- Estrutura (Turmas · Edital · Questões) preservada na 5ª aba
+- Suíte `vadmin` (9 cenários de ponta a ponta) verde; treinamento,
+  Loja, skins, eventos, tutorial, herói e acesso sem regressões
+
 ## 20/07/2026 — fardas finais: preços oficiais e escolha única
 - **CIPE 500 · PATAMO 750 · BOPE 1300 QdC**
 - **Comprou uma, fechou**: a escolhida fica ADQUIRIDO e as outras duas

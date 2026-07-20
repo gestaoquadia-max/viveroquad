@@ -979,6 +979,20 @@
   .ev-rule .r-pts.coin { display: inline-flex; align-items: center; gap: 4px; color: #9A7414; }
   .ev-rule .r-pts svg, .ev-rule .r-pts img { width: 15px; height: 15px; }
 
+  /* ---------- área do administrador ---------- */
+  .adm-form { display: flex; flex-direction: column; gap: 8px; }
+  .adm-row { display: flex; gap: 8px; align-items: center; }
+  .adm-row .fld { flex: 1; min-width: 0; }
+  .adm-row .btn { flex: none; }
+  .tag.ok { background: #E9FAF1; color: #1E874F; }
+  .adm-bar { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--p-line); font-size: 12.5px; }
+  .adm-bar:last-child { border-bottom: none; }
+  .adm-bar .nm { flex: 1; min-width: 0; }
+  .adm-bar .nm small { display: block; color: var(--p-dim); font-size: 10.5px; }
+  .adm-bar .pct { font: 700 12px Consolas, monospace; flex: none; }
+  .adm-bar .mini-track { flex: none; width: 76px; height: 8px; border-radius: 99px; background: #E8EFF9; overflow: hidden; }
+  .adm-bar .mini-track i { display: block; height: 100%; border-radius: 99px; }
+
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
@@ -1244,22 +1258,13 @@
             </div>
           </div>
 
-          <!-- avisos do professor -->
+          <!-- avisos gerais (enviados pela administração) -->
           <div class="p-card">
             <div class="card-head slim">
               <div class="hexi soft" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
-              <div class="k-label">Avisos do professor</div>
+              <div class="k-label">Avisos gerais</div>
             </div>
-            <div class="mission-row">
-              <div class="m-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="2.2"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg></div>
-              <div class="grow"><div class="t">Simulado presencial — sábado 8h</div><div class="d">Inscrição pelo link. Presença pontua em Quad Coins.</div></div>
-              <span class="chev">›</span>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h5"/></svg></div>
-              <div class="grow"><div class="t">Material de Poderes liberado</div><div class="d">Leia antes do quiz de quinta.</div></div>
-              <span class="chev">›</span>
-            </div>
+            <div id="avisosList"></div>
           </div>
 
           <!-- eventos da semana -->
@@ -1712,7 +1717,11 @@
                 <tr><td>CFO Base</td><td>CFO 2024</td><td><span class="tag">RONDESP</span></td></tr>
               </tbody>
             </table>
-            <div style="margin-top:12px"><button class="btn small" id="btnNovaTurma">Abrir nova turma</button></div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn small" id="btnNovaTurma">Abrir nova turma</button>
+              <button class="btn ghost small" id="btnIrEdital">Árvore do edital</button>
+              <button class="btn ghost small" id="btnIrQuestoes">Banco de questões</button>
+            </div>
           </div>
           <div class="p-card" style="opacity:0.85">
             <h3>Modalidades ≠ concursos</h3>
@@ -1775,6 +1784,168 @@
           <div class="p-card" style="opacity:0.85">
             <h3>Ajustável ao vivo</h3>
             <p class="sub">Questão com erro detectado em sala pode ser corrigida na hora, sem parar o quiz. Cada questão carrega dificuldade e campo de uso (aula / missão).</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · HOJE (operação do dia) ============ -->
+        <div class="view" id="v-adm-hoje">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · operação do dia</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Central do administrador</h3>
+              </div>
+            </div>
+            <p class="sub">O que o time envia daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e Loja.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Avisos gerais · enviar</div>
+            <div class="adm-form">
+              <input class="fld" id="admAvTitulo" placeholder="Título (ex.: Aulão de véspera confirmado)">
+              <input class="fld" id="admAvDet" placeholder="Detalhe (ex.: quinta 19h · traga o material impresso)">
+              <div class="adm-row">
+                <select class="fld" id="admAvEsc">
+                  <option>Todas</option><option>Manhã</option><option>Tarde</option><option>Noite</option>
+                  <option>RONDESP</option><option>PATAMO</option><option>BOPE</option>
+                </select>
+                <button class="btn small" id="btnAdmAviso">Enviar</button>
+              </div>
+            </div>
+            <div id="admAvisosList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">Mensagens dos professores e do time entram por aqui e aparecem em <strong>Avisos gerais</strong> no Início do aluno, filtradas pelo turno (M · T · N) e pela modalidade (RONDESP nivelamento · PATAMO regular · BOPE questões).</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Cronograma semanal · atualizar</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCrTurma"></select>
+                <select class="fld" id="admCrDia"></select>
+              </div>
+              <div class="adm-row">
+                <select class="fld" id="admCrTempo"><option value="0">1º tempo · 19h–20h30</option><option value="1">2º tempo · 20h30–22h</option></select>
+                <input class="fld" id="admCrMat" placeholder="Matéria">
+              </div>
+              <div class="adm-row">
+                <input class="fld" id="admCrProf" placeholder="Professor">
+                <button class="btn small" id="btnAdmCrono">Atualizar</button>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:8px">Sincroniza com a estrutura de cada turma — o card "Aula de hoje" do aluno muda na hora. Turnos manhã e tarde entram quando a planilha da coordenação trouxer as grades. <span class="ref">[INTEGRAÇÃO REAL] planilha da coordenação</span></p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Eventos da semana · regras de score e Coins</div>
+            <div id="admEvList"></div>
+            <div class="adm-form" style="margin-top:10px">
+              <div class="adm-row">
+                <select class="fld" id="admEvSel"></select>
+                <select class="fld" id="admEvTipo"><option value="score">Regra de score</option><option value="coins">Regra de Quad Coins</option></select>
+              </div>
+              <div class="adm-row">
+                <input class="fld" id="admEvRegra" placeholder="Regra (ex.: Check-in no evento)">
+                <input class="fld" id="admEvValor" placeholder="+10" style="max-width:90px">
+                <button class="btn small" id="btnAdmEvRegra">Adicionar</button>
+              </div>
+              <div class="adm-row">
+                <input class="fld" id="admEvNovoNome" placeholder="Novo evento (nome)">
+                <input class="fld" id="admEvNovoQuando" placeholder="QUA · 29/07 · 19H" style="max-width:150px">
+                <button class="btn ghost small" id="btnAdmEvNovo">Criar</button>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:8px">Alimenta diretamente o carrossel <strong>Eventos da semana</strong> e as páginas de cada evento no app do aluno.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · LIBERAÇÕES ============ -->
+        <div class="view" id="v-adm-liber">
+          <div class="p-card">
+            <div class="k-label">Produtos presenciais · retirada na recepção</div>
+            <div id="admPedidosList"></div>
+            <p class="sub" style="margin-top:8px">Compra com Quad Coins na Loja gera o pedido aqui. Na retirada, a administração confirma a entrega e dá baixa.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Simulado presencial da semana</div>
+            <div class="adm-form">
+              <input class="fld" id="admSpNome" placeholder="Nome (ex.: Simulado 64 · SD PMBA)">
+              <div class="adm-row">
+                <input class="fld" id="admSpQuando" placeholder="domingo · 8h">
+                <input class="fld" id="admSpPreco" placeholder="QdC" inputmode="numeric" style="max-width:90px">
+                <button class="btn small" id="btnAdmSpLancar">Lançar venda</button>
+              </div>
+            </div>
+            <div class="k-label" style="margin-top:12px">Compradores da semana · <span id="admSpTitulo"></span></div>
+            <div id="admSpLista"></div>
+            <p class="sub" style="margin-top:8px">O aluno compra com Quad Coins na área Simulados; no domingo, a administração confere a lista e <strong>libera a entrada</strong>.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Simulados digitais · lançar</div>
+            <div class="adm-row">
+              <input class="fld" id="admSdNome" placeholder="Nome (ex.: Simulado digital · CFO 2ª fase)">
+              <input class="fld" id="admSdQuando" placeholder="quinta · 20h" style="max-width:130px">
+              <button class="btn small" id="btnAdmSdLancar">Lançar</button>
+            </div>
+            <div id="admSdList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">Aplicados pela própria plataforma — aparecem na hora na área Simulados do aluno.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · ALUNOS ============ -->
+        <div class="view" id="v-adm-alunos">
+          <div class="p-card">
+            <div class="k-label">Visão geral da base</div>
+            <table class="mini"><tbody>
+              <tr><td>Alunos ativos na plataforma</td><td><strong>412</strong></td></tr>
+              <tr><td>Missões da noite em dia</td><td><strong>76%</strong></td></tr>
+              <tr><td>Turnos ativos</td><td><strong>Noite</strong> · manhã e tarde na V1</td></tr>
+            </tbody></table>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Maiores dificuldades · sub-assuntos</div>
+            <div id="admDifSubs"></div>
+            <div class="k-label" style="margin-top:12px">Assuntos que mais pesam</div>
+            <div id="admDifAss"></div>
+            <div class="k-label" style="margin-top:12px">Matérias · domínio médio da base</div>
+            <div id="admDifMat"></div>
+            <p class="sub" style="margin-top:8px">Calculado da mesma árvore de Domínio que o aluno vê — o Treinamento Rápido move estes números ao vivo.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Alunos que precisam de apoio</div>
+            <div id="admApoioList"></div>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · LOJA (governança) ============ -->
+        <div class="view" id="v-adm-loja">
+          <div class="p-card">
+            <div class="k-label">Preços da Loja · atualizar</div>
+            <div id="admPrecosList"></div>
+            <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecos">Aplicar preços</button></div>
+            <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Compradores · últimas compras</div>
+            <div id="admComprasList"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Atividades online · links de acesso</div>
+            <div class="adm-row">
+              <select class="fld" id="admLinkItem"><option>Evento online</option><option>Simulado digital</option><option>Aulão online</option></select>
+            </div>
+            <div class="adm-row" style="margin-top:8px">
+              <input class="fld" id="admLinkUrl" placeholder="https://…">
+              <button class="btn small" id="btnAdmLink">Salvar link</button>
+            </div>
+            <div id="admLinksList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">Quando o aluno compra a atividade, o link de acesso chega junto da confirmação.</p>
           </div>
         </div>
 
@@ -2076,6 +2247,25 @@
           </div>
         </div>
 
+        <!-- ============ ACESSO RESTRITO DO ADMINISTRADOR (cadastro com liberação) ============ -->
+        <div class="gate-layer" id="admGate">
+          <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
+          <div class="gate-step">
+            <h2>Acesso restrito · N.P.P.</h2>
+            <p class="login-sub">Área da administração — suporte ao aluno que opera o sistema. Informe seu e-mail funcional e a chave de liberação emitida pela direção.</p>
+            <div class="login-field" style="width:100%">
+              <label for="admEmail">E-mail funcional</label>
+              <input id="admEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
+            </div>
+            <div class="login-field" style="width:100%">
+              <label for="admChave">Chave de liberação</label>
+              <input id="admChave" placeholder="NPP-____" autocomplete="off">
+            </div>
+            <button class="btn" id="btnAdmEntrar" style="width:100%">Liberar acesso</button>
+            <p class="login-note">demo: chave NPP-2026 · no sistema real o cadastro de administrador é aprovado pela direção</p>
+          </div>
+        </div>
+
         <!-- ============ TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) ============ -->
         <div class="tut-layer" id="tutLayer">
           <div class="tut-shade" id="tutShT"></div>
@@ -2165,9 +2355,11 @@
           <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
         </nav>
         <nav class="navbar" id="navAdmin" style="display:none">
-          <button class="nav-btn active" data-view="v-turmas"><span class="ico">⬒</span>Turmas</button>
-          <button class="nav-btn" data-view="v-edital"><span class="ico">⌗</span>Edital</button>
-          <button class="nav-btn" data-view="v-questoes"><span class="ico">✎</span>Questões</button>
+          <button class="nav-btn active" data-view="v-adm-hoje"><span class="ico">◈</span>Hoje</button>
+          <button class="nav-btn" data-view="v-adm-liber"><span class="ico">✓</span>Liberar</button>
+          <button class="nav-btn" data-view="v-adm-alunos"><span class="ico">◉</span>Alunos</button>
+          <button class="nav-btn" data-view="v-adm-loja"><span class="ico">⬒</span>Loja</button>
+          <button class="nav-btn" data-view="v-turmas"><span class="ico">⌗</span>Estrutura</button>
         </nav>
       </div>
     </div>
@@ -2333,7 +2525,7 @@
   var personaViews = {
     aluno: { nav: 'navAluno', home: 'v-inicio' },
     professor: { nav: 'navProfessor', home: 'v-sala' },
-    admin: { nav: 'navAdmin', home: 'v-turmas' }
+    admin: { nav: 'navAdmin', home: 'v-adm-hoje' }
   };
   document.querySelectorAll('.persona-btn').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -2349,6 +2541,9 @@
         $(n).style.display = (n === personaViews[p].nav) ? 'flex' : 'none';
       });
       showView(personaViews[p].home, personaViews[p].nav);
+      /* cadastro específico do administrador: exige liberação da direção */
+      var ag = $('admGate');
+      if (ag) ag.classList.toggle('on', p === 'admin' && !admLiberado);
     });
   });
 
@@ -3803,17 +3998,36 @@
   }
   function renderSimulados() {
     $('simuladosList').innerHTML = SIMULADOS.map(function (sm, i) {
+      var acao = sm.tag === 'DIGITAL' ? 'Abrir' : (sm.insc ? 'Inscrito' : 'Inscrever');
       return '<div class="mission-row"><div class="m-dot">◈</div>' +
-        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + sm.det + '</div></div>' +
-        '<span class="tag">' + sm.tag + '</span>' +
-        '<button class="btn ghost small" data-sim="' + i + '">' + (sm.tag === 'DIGITAL' ? 'Abrir' : 'Inscrever') + '</button></div>';
+        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + sm.det +
+        (sm.preco && !sm.insc ? ' · ' + sm.preco + ' QdC' : '') + '</div></div>' +
+        '<span class="tag' + (sm.insc ? ' ok' : '') + '">' + (sm.insc ? 'INSCRITO' : sm.tag) + '</span>' +
+        '<button class="btn ghost small" data-sim="' + i + '"' + (sm.insc ? ' disabled' : '') + '>' + acao + '</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado enviado ainda.</p>';
     $('simuladosList').querySelectorAll('[data-sim]').forEach(function (bt) {
       bt.addEventListener('click', function () {
         var sm = SIMULADOS[parseInt(bt.dataset.sim, 10)];
-        toast(sm.tag === 'DIGITAL'
-          ? 'Simulado digital: a aplicação completa chega na V1.'
-          : 'Inscrição confirmada — ' + sm.rot + ' no seu calendário.');
+        if (sm.tag === 'DIGITAL') {
+          toast(LINKS_ONLINE['Simulado digital']
+            ? 'Acesso ao simulado digital — ' + LINKS_ONLINE['Simulado digital']
+            : 'Simulado digital: a aplicação completa chega na V1.');
+          return;
+        }
+        if (sm.preco) {   /* venda via Quad Coins lançada pela administração */
+          if (sm.insc) { toast('Inscrição já confirmada — boa prova!'); return; }
+          if (score < sm.preco) { toast('Quad Coins insuficientes para este simulado.'); return; }
+          addScore(-sm.preco, sm.rot + ' · inscrição confirmada · −' + sm.preco + ' QdC');
+          sm.insc = true;
+          lojaCompraLog(sm.rot, sm.preco);
+          if (SIM_PRES && SIM_PRES.nome === sm.rot) {
+            SIM_PRES.compradores.push({ nome: nomeCurto(), liberado: false });
+            renderSimPres();   /* a administração vê o comprador na lista da semana */
+          }
+          renderSimulados();
+          return;
+        }
+        toast('Inscrição confirmada — ' + sm.rot + ' no seu calendário.');
       });
     });
   }
@@ -4688,6 +4902,7 @@
   $('daniloFab').addEventListener('click', helpOpen);
   $('helpLayer').addEventListener('click', function (e) { if (e.target === $('helpLayer')) helpClose(); });
 
+
   /* ---------- admin ---------- */
   $('btnNovaTurma').addEventListener('click', function () { toast('Nova turma: escolha o edital e a modalidade'); });
   $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
@@ -4727,6 +4942,11 @@
       lojaOwned[nome] = true;
       if (typeof refreshChips === 'function') refreshChips();
       addScore(-preco, nome + ' adquirido · −' + preco + ' QdC');
+      lojaCompraLog(nome, preco);                                 /* governança da Loja */
+      if (PRESENCIAIS.indexOf(nome) >= 0) pedidoNovo(nome);       /* retirada na recepção */
+      if (LINKS_ONLINE[nome]) {                                   /* atividade online: link junto */
+        setTimeout(function () { toast('Acesso liberado — ' + LINKS_ONLINE[nome]); }, 1500);
+      }
     });
   });
 
@@ -4789,6 +5009,7 @@
     if (bt.classList.contains('indisponivel')) { toast('Indisponível — você já escolheu a sua farda.'); return; }
     if (score < sk.preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
     addScore(-sk.preco, sk.nome + ' adquirido · −' + sk.preco + ' QdC');
+    lojaCompraLog(sk.nome, sk.preco);
     lojaOwned[sk.nome] = true;
     if (skinEtapa < SKIN_CADEIA.length && SKIN_CADEIA[skinEtapa].id === sk.id) {
       skinEtapa++;              /* o elo comprado desaparece; entra o próximo */
@@ -4829,6 +5050,338 @@
     if (btnAvatarEl.dataset.zoomed) return;   /* soltar do zoom não navega */
     showView('v-aluno', 'navAluno');
   });
+
+  /* ==================================================================
+     ÁREA DO ADMINISTRADOR (N.P.P.) — totalmente conectada ao app do aluno
+     · acesso: cadastro específico com liberação da direção (chave)
+     · avisos gerais · cronograma · eventos · liberações · alunos · Loja
+     ================================================================== */
+  var admLiberado = false;
+  $('btnAdmEntrar').addEventListener('click', function () {
+    var em = $('admEmail').value.trim(), ch = $('admChave').value.trim().toUpperCase();
+    if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
+    // [INTEGRAÇÃO REAL] a chave é emitida e revogada pela direção, por pessoa
+    if (ch !== 'NPP-2026') { toast('Chave inválida — solicite a liberação à direção.'); return; }
+    admLiberado = true;
+    $('admGate').classList.remove('on');
+    toast('Acesso do administrador liberado — bom serviço!');
+  });
+
+  /* ---------- avisos gerais (professores e time → aluno) ---------- */
+  var AVISOS = [
+    { t: 'Simulado presencial — domingo 8h', d: 'Inscrição pela área de Simulados. Presença pontua em Quad Coins.', esc: 'Todas' },
+    { t: 'Material de Poderes liberado', d: 'Leia antes do quiz de quinta.', esc: 'PATAMO' }
+  ];
+  function avisoVisivel(av) {
+    if (av.esc === 'Todas') return true;
+    return (ALUNO_TURMA || '').toUpperCase().indexOf(av.esc.toUpperCase()) >= 0;
+  }
+  function renderAvisos() {
+    /* card do aluno (filtrado pela turma dele: turno + modalidade) */
+    $('avisosList').innerHTML = AVISOS.filter(avisoVisivel).map(function (av) {
+      return '<div class="mission-row"><div class="m-dot">›</div>' +
+        '<div class="grow"><div class="t">' + av.t + '</div><div class="d">' + av.d + '</div></div></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Sem avisos por enquanto.</p>';
+    /* lista do administrador (todos, com escopo e remoção) */
+    var al = $('admAvisosList');
+    if (al) {
+      al.innerHTML = AVISOS.map(function (av, i) {
+        return '<div class="mission-row"><div class="grow"><div class="t">' + av.t + '</div><div class="d">' + av.d + '</div></div>' +
+          '<span class="tag">' + av.esc.toUpperCase() + '</span>' +
+          '<button class="btn ghost small" data-av="' + i + '">Remover</button></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum aviso ativo.</p>';
+      al.querySelectorAll('[data-av]').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          AVISOS.splice(parseInt(bt.dataset.av, 10), 1);
+          renderAvisos();
+          toast('Aviso removido do app dos alunos.');
+        });
+      });
+    }
+    if (typeof queueSync === 'function') queueSync();
+  }
+  $('btnAdmAviso').addEventListener('click', function () {
+    var t = $('admAvTitulo').value.trim(), d = $('admAvDet').value.trim();
+    if (!t) { toast('Escreva o título do aviso.'); return; }
+    AVISOS.unshift({ t: t, d: d || '—', esc: $('admAvEsc').value });
+    $('admAvTitulo').value = ''; $('admAvDet').value = '';
+    renderAvisos();
+    toast('Aviso enviado — já está no Início dos alunos (' + $('admAvEsc').value + ').');
+  });
+
+  /* ---------- cronograma: admin atualiza, turma sincroniza ---------- */
+  function admCronoPrefill() {
+    var t = CRONO.turmas[$('admCrTurma').value];
+    var a = t && t.aulas[+$('admCrDia').value] && t.aulas[+$('admCrDia').value][+$('admCrTempo').value];
+    $('admCrMat').value = a ? a.m : '';
+    $('admCrProf').value = a ? a.p : '';
+  }
+  function admCronoInit() {
+    $('admCrTurma').innerHTML = Object.keys(CRONO.turmas).map(function (t) {
+      return '<option>' + t + '</option>';
+    }).join('');
+    $('admCrDia').innerHTML = CRONO.dias.map(function (d, i) {
+      return '<option value="' + i + '">' + d + ' · ' + CRONO.datas[i] + '</option>';
+    }).join('');
+    ['admCrTurma', 'admCrDia', 'admCrTempo'].forEach(function (id) {
+      $(id).addEventListener('change', admCronoPrefill);
+    });
+    admCronoPrefill();
+  }
+  $('btnAdmCrono').addEventListener('click', function () {
+    var t = $('admCrTurma').value, d = +$('admCrDia').value, tp = +$('admCrTempo').value;
+    var m = $('admCrMat').value.trim(), pr = $('admCrProf').value.trim();
+    if (!m || !pr) { toast('Preencha matéria e professor.'); return; }
+    var aula = CRONO.turmas[t].aulas[d][tp];
+    aula.m = m.toUpperCase(); aula.p = pr;
+    renderAulaHoje();   /* o card "Aula de hoje" do aluno muda na hora */
+    toast('Cronograma atualizado — sincronizado com a turma ' + t + '.');
+  });
+
+  /* ---------- eventos da semana: regras e novos eventos ---------- */
+  function renderAdmEventos() {
+    $('admEvList').innerHTML = EVENTOS.map(function (ev) {
+      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + '</small></span>' +
+        '<span class="tag">' + (ev.score.length + ev.coins.length) + ' regras</span></div>';
+    }).join('');
+    $('admEvSel').innerHTML = EVENTOS.map(function (ev) {
+      return '<option value="' + ev.id + '">' + ev.nome + '</option>';
+    }).join('');
+  }
+  $('btnAdmEvRegra').addEventListener('click', function () {
+    var id = $('admEvSel').value, regra = $('admEvRegra').value.trim(), val = $('admEvValor').value.trim();
+    if (!regra || !val) { toast('Preencha a regra e o valor.'); return; }
+    EVENTOS.forEach(function (ev) {
+      if (ev.id !== id) return;
+      ev[$('admEvTipo').value].push([regra, val]);
+      toast('Regra publicada na página do evento "' + ev.nome + '".');
+    });
+    $('admEvRegra').value = ''; $('admEvValor').value = '';
+    renderAdmEventos();
+  });
+  $('btnAdmEvNovo').addEventListener('click', function () {
+    var nome = $('admEvNovoNome').value.trim(), quando = $('admEvNovoQuando').value.trim();
+    if (!nome || !quando) { toast('Preencha nome e data do evento.'); return; }
+    EVENTOS.push({ id: 'adm' + EVENTOS.length, nome: nome, tipo: 'EVENTO', quando: quando.toUpperCase(),
+      cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5], meta: 'novidade da semana',
+      desc: 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
+    $('admEvNovoNome').value = ''; $('admEvNovoQuando').value = '';
+    renderAdmEventos();
+    renderEvStrip();   /* o carrossel do aluno ganha o tile na hora */
+    toast('Evento criado — já gira no carrossel da semana.');
+  });
+
+  /* ---------- liberações: produtos presenciais (dar baixa) ---------- */
+  var PRESENCIAIS = ['Turma presencial', 'Aula isolada', 'Aulão especial', 'Evento presencial'];
+  var PEDIDOS = [
+    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Aulão especial', quando: 'ontem · 19h40', status: 'aguardando' },
+    { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', quando: 'hoje · 9h12', status: 'aguardando' },
+    { aluno: 'AL CB QUAD NASCIMENTO', item: 'Turma presencial', quando: 'sexta · 20h05', status: 'entregue' }
+  ];
+  function pedidoNovo(item) {
+    PEDIDOS.unshift({ aluno: nomeCurto(), item: item, quando: 'agora', status: 'aguardando' });
+    renderPedidos();
+  }
+  function renderPedidos() {
+    var el = $('admPedidosList'); if (!el) return;
+    el.innerHTML = PEDIDOS.map(function (pd, i) {
+      return '<div class="mission-row"><div class="grow"><div class="t">' + pd.item + '</div>' +
+        '<div class="d">' + pd.aluno + ' · ' + pd.quando + '</div></div>' +
+        (pd.status === 'entregue'
+          ? '<span class="tag ok">ENTREGUE</span>'
+          : '<button class="btn small" data-ped="' + i + '">Confirmar entrega</button>') + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma retirada pendente.</p>';
+    el.querySelectorAll('[data-ped]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        PEDIDOS[parseInt(bt.dataset.ped, 10)].status = 'entregue';
+        renderPedidos();
+        toast('Entrega confirmada — baixa registrada no sistema.');
+      });
+    });
+  }
+
+  /* ---------- simulado presencial da semana (vender e liberar entrada) ---------- */
+  var SIM_PRES = {
+    nome: 'Simulado 63 · SD PMBA', quando: 'domingo · 8h', preco: 120,
+    compradores: [
+      { nome: 'AL SGT QUAD SANTIAGO', liberado: true },
+      { nome: 'SD QUAD BRANDÃO', liberado: false },
+      { nome: 'AL CB QUAD NASCIMENTO', liberado: false }
+    ]
+  };
+  function renderSimPres() {
+    $('admSpTitulo').textContent = SIM_PRES.nome + ' · ' + SIM_PRES.quando + ' · ' + SIM_PRES.preco + ' QdC';
+    $('admSpLista').innerHTML = SIM_PRES.compradores.map(function (cp, i) {
+      return '<div class="mission-row"><div class="grow"><div class="t">' + cp.nome + '</div>' +
+        '<div class="d">pago via Quad Coins</div></div>' +
+        (cp.liberado
+          ? '<span class="tag ok">ENTRADA LIBERADA</span>'
+          : '<button class="btn small" data-cp="' + i + '">Liberar entrada</button>') + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum comprador ainda.</p>';
+    $('admSpLista').querySelectorAll('[data-cp]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        SIM_PRES.compradores[parseInt(bt.dataset.cp, 10)].liberado = true;
+        renderSimPres();
+        toast('Entrada liberada — bom simulado!');
+      });
+    });
+  }
+  $('btnAdmSpLancar').addEventListener('click', function () {
+    var nome = $('admSpNome').value.trim(), quando = $('admSpQuando').value.trim();
+    var preco = parseInt($('admSpPreco').value, 10);
+    if (!nome || !quando || !preco) { toast('Preencha nome, data e preço em QdC.'); return; }
+    SIM_PRES = { nome: nome, quando: quando, preco: preco, compradores: [] };
+    SIMULADOS.unshift({ rot: nome, det: quando, tag: 'PRESENCIAL', preco: preco });
+    renderSimulados();   /* à venda na área Simulados do aluno */
+    renderSimPres();
+    $('admSpNome').value = ''; $('admSpQuando').value = ''; $('admSpPreco').value = '';
+    toast('Simulado lançado — à venda por ' + preco + ' QdC na área do aluno.');
+  });
+
+  /* ---------- simulados digitais (aplicados pela plataforma) ---------- */
+  function renderSdList() {
+    $('admSdList').innerHTML = SIMULADOS.filter(function (sm) { return sm.tag === 'DIGITAL'; })
+      .map(function (sm) {
+        return '<div class="adm-bar"><span class="nm">' + sm.rot + '<small>' + sm.det + '</small></span>' +
+          '<span class="tag">NO APP</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado digital ativo.</p>';
+  }
+  $('btnAdmSdLancar').addEventListener('click', function () {
+    var nome = $('admSdNome').value.trim(), quando = $('admSdQuando').value.trim();
+    if (!nome) { toast('Dê um nome ao simulado digital.'); return; }
+    SIMULADOS.unshift({ rot: nome, det: (quando || 'dentro do app'), tag: 'DIGITAL' });
+    renderSimulados();
+    renderSdList();
+    $('admSdNome').value = ''; $('admSdQuando').value = '';
+    toast('Simulado digital lançado — visível para os alunos agora.');
+  });
+
+  /* ---------- alunos: dificuldades reais, da mesma árvore do Domínio ---------- */
+  function admBarRow(nome, detalhe, pct) {
+    return '<div class="adm-bar"><span class="nm">' + nome + (detalhe ? '<small>' + detalhe + '</small>' : '') + '</span>' +
+      '<span class="mini-track"><i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i></span>' +
+      '<span class="pct" style="color:' + edPcColor(pct) + '">' + Math.round(pct) + '%</span></div>';
+  }
+  function renderDificuldades() {
+    var subs = [], assMap = [], matMap = [];
+    EDITAL_CFO.forEach(function (mat, mi) {
+      var matPcts = [];
+      mat[1].forEach(function (ass) {
+        var pcts = ass[1].map(function (sub) {
+          var pc = edSubPct(mi, mat[0], ass[0], sub);
+          subs.push({ n: sub, det: mat[0] + ' · ' + ass[0], pct: pc });
+          return pc;
+        });
+        var m = edAvg(pcts);
+        assMap.push({ n: ass[0], det: mat[0], pct: m });
+        matPcts.push(m);
+      });
+      matMap.push({ n: mat[0], det: mat[1].length + ' assuntos', pct: edAvg(matPcts) });
+    });
+    var asc = function (a, b) { return a.pct - b.pct; };
+    subs.sort(asc); assMap.sort(asc); matMap.sort(asc);
+    $('admDifSubs').innerHTML = subs.slice(0, 5).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    $('admDifAss').innerHTML = assMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    $('admDifMat').innerHTML = matMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    /* apoio: casos comuns + o aluno desta sessão, com a matéria real mais fraca */
+    $('admApoioList').innerHTML = [
+      { nome: nomeCurto(), turma: turmaLabel(), dif: 'mais fraco em ' + matMap[0].n },
+      { nome: 'SD QUAD BRANDÃO', turma: 'Turma PATAMO (N)', dif: '3 blocos atrasados na semana' },
+      { nome: 'AL SD QUAD FERRAZ', turma: 'Turma RONDESP (N)', dif: 'sem login há 6 dias' },
+      { nome: 'AL CB QUAD NASCIMENTO', turma: 'Turma BOPE (N)', dif: 'aproveitamento < 50% em Matemática' }
+    ].map(function (a) {
+      return '<div class="mission-row"><div class="grow"><div class="t">' + a.nome + '</div>' +
+        '<div class="d">' + a.turma + ' · ' + a.dif + '</div></div>' +
+        '<button class="btn ghost small" data-apoio="' + a.nome + '">Acionar</button></div>';
+    }).join('');
+    $('admApoioList').querySelectorAll('[data-apoio]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        toast('Suporte acionado para ' + bt.dataset.apoio + ' — contato pela coordenação.');
+      });
+    });
+  }
+  var navAlunosBtn = document.querySelector('#navAdmin .nav-btn[data-view="v-adm-alunos"]');
+  if (navAlunosBtn) navAlunosBtn.addEventListener('click', renderDificuldades);
+
+  /* ---------- governança da Loja: preços, compradores, links ---------- */
+  function lojaPrecosLista() {
+    var itens = [];
+    document.querySelectorAll('.loja-item[data-nome]:not([data-skin])').forEach(function (it) {
+      itens.push({ nome: it.dataset.nome, preco: +it.dataset.preco });
+    });
+    SKIN_CADEIA.concat(SKIN_FARDAS).forEach(function (sk) {
+      if (!itens.some(function (x) { return x.nome === sk.nome; })) itens.push({ nome: sk.nome, preco: sk.preco });
+    });
+    return itens;
+  }
+  function renderPrecos() {
+    $('admPrecosList').innerHTML = lojaPrecosLista().map(function (x) {
+      return '<div class="adm-bar"><span class="nm">' + x.nome + '</span>' +
+        '<input class="fld" data-preco-item="' + x.nome + '" value="' + x.preco + '" inputmode="numeric" style="max-width:90px;text-align:right"> <span class="pct">QdC</span></div>';
+    }).join('');
+  }
+  $('btnAdmPrecos').addEventListener('click', function () {
+    var mudados = 0;
+    $('admPrecosList').querySelectorAll('[data-preco-item]').forEach(function (inp) {
+      var nome = inp.dataset.precoItem, preco = parseInt(inp.value, 10);
+      if (!preco || preco < 1) return;
+      document.querySelectorAll('.loja-item[data-nome="' + nome + '"]').forEach(function (it) {
+        if (+it.dataset.preco !== preco) mudados++;
+        it.dataset.preco = preco;
+        var pr = it.querySelector('.li-preco');
+        if (pr && pr.textContent.indexOf('QdC') >= 0) pr.textContent = preco + ' QdC';
+      });
+      SKIN_CADEIA.concat(SKIN_FARDAS).forEach(function (sk) {
+        if (sk.nome === nome && sk.preco !== preco) { sk.preco = preco; mudados++; }
+      });
+    });
+    renderSkins();   /* a vitrine da cadeia reflete o preço novo */
+    if (typeof queueSync === 'function') queueSync();
+    toast(mudados ? 'Preços atualizados na Loja dos alunos.' : 'Nenhum preço alterado.');
+  });
+  var COMPRAS = [
+    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Aulão especial', valor: 80, quando: 'ontem' },
+    { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', valor: 40, quando: 'hoje' }
+  ];
+  function lojaCompraLog(item, valor) {
+    COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, quando: 'agora' });
+    renderCompras();
+  }
+  function renderCompras() {
+    var el = $('admComprasList'); if (!el) return;
+    el.innerHTML = COMPRAS.slice(0, 8).map(function (cp) {
+      return '<div class="adm-bar"><span class="nm">' + cp.item + '<small>' + cp.aluno + ' · ' + cp.quando + '</small></span>' +
+        '<span class="pct">−' + cp.valor + ' QdC</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma compra ainda.</p>';
+  }
+  var LINKS_ONLINE = {};
+  function renderLinks() {
+    var el = $('admLinksList'); if (!el) return;
+    var ks = Object.keys(LINKS_ONLINE);
+    el.innerHTML = ks.map(function (k) {
+      return '<div class="adm-bar"><span class="nm">' + k + '<small>' + LINKS_ONLINE[k] + '</small></span><span class="tag ok">ATIVO</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum link cadastrado.</p>';
+  }
+  $('btnAdmLink').addEventListener('click', function () {
+    var url = $('admLinkUrl').value.trim();
+    if (!url || url.indexOf('http') !== 0) { toast('Cole um link válido (https://…).'); return; }
+    LINKS_ONLINE[$('admLinkItem').value] = url;
+    $('admLinkUrl').value = '';
+    renderLinks();
+    toast('Link salvo — entregue ao aluno na compra de ' + $('admLinkItem').value + '.');
+  });
+
+  /* estrutura (edital e questões saíram da nav, entram pela Estrutura) */
+  $('btnIrEdital').addEventListener('click', function () { showView('v-edital', 'navAdmin'); });
+  $('btnIrQuestoes').addEventListener('click', function () { showView('v-questoes', 'navAdmin'); });
+
+  /* venda semeada da semana já aparece para o aluno com preço */
+  SIMULADOS[0].preco = SIM_PRES.preco;
+
+  renderAvisos(); admCronoInit(); renderAdmEventos();
+  renderPedidos(); renderSimPres(); renderSdList();
+  renderDificuldades(); renderPrecos(); renderCompras(); renderLinks();
+  renderSimulados();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;
