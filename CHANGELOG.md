@@ -1,5 +1,11 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — capa de colete: fotos femininas (5 de 6)
+- Lote mulheres com boina + gandola + colete: negra cabelo curto (10),
+  preto liso (6), loira (7), ruiva (8) e tranças (11) — comprar a
+  **Capa de colete** veste a foto oficial; falta a "castanho curto" (9)
+  e o lote masculino
+
 ## 20/07/2026 — gandola completa (12/12) · troca em todas as representações
 - Entrou o homem negro de corte fade (4): **boina e gandola completos
   para os 12 personagens**
