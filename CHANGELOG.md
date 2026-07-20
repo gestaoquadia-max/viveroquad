@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — cadeia de skins do personagem
+- Ao lado da boina (que o tutorial já faz comprar), o slot de skin virou
+  uma **cadeia progressiva**: **Gandola (60 QdC) → comprada, some e entra
+  a Capa de colete (120) → Fuzil (200) → fardas finais à escolha:
+  CIPE · PATAMO · BOPE (300 cada)** — o aluno pode comprar qualquer uma
+  (e juntar as três)
+- **Cada compra troca a foto do personagem**: a estrutura está pronta —
+  o gestor está preparando o PDF com as artes; até lá o anel da foto
+  muda de cor por skin e o chip "Itens do personagem" mostra a skin
+  vestida (`SKIN_FOTOS` marcado com `[ARTE PDF]` no código: preencher
+  id → recorte e a troca real acontece)
+- Chips-teaser do perfil (Colete/Quepe "em breve") substituídos pelo
+  chip real da skin
+- Suíte `vskin` (6 cenários) verde; tutorial (bronca do item caro agora
+  na Gandola), Loja e herói sem regressões
+
 ## 20/07/2026 — moeda oficial do Quad Coin
 - A arte oficial da moeda (dourada, "QUAD CONCURSOS" com o Q da marca)
   **substitui o desenho provisório em SVG** nos três pontos do app:
