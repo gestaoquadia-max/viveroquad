@@ -1,5 +1,11 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 20/07/2026 — fardas finais: preços oficiais e escolha única
+- **CIPE 500 · PATAMO 750 · BOPE 1300 QdC**
+- **Comprou uma, fechou**: a escolhida fica ADQUIRIDO e as outras duas
+  viram INDISPONÍVEL (acinzentadas, sem compra, sem débito)
+- Suíte `vskin` ajustada à regra; tutorial e Loja sem regressões
+
 ## 20/07/2026 — cadeia de skins do personagem
 - Ao lado da boina (que o tutorial já faz comprar), o slot de skin virou
   uma **cadeia progressiva**: **Gandola (60 QdC) → comprada, some e entra

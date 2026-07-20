@@ -1017,6 +1017,9 @@
     background: radial-gradient(circle at 35% 30%, #FFE7A0, #F4B63A 60%, #C8860D);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
   .loja-item.comprado { opacity: 0.6; }
+  .loja-item.indisponivel { opacity: 0.45; filter: grayscale(0.9); cursor: not-allowed; }
+  .loja-item.indisponivel .li-preco { background: #EEF1F5; border-color: #D4DAE3; color: #7A8698; }
+  .loja-item.indisponivel .li-preco::before { background: #9AA6B5; box-shadow: none; }
   .loja-item.comprado .li-preco { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
   .loja-item.comprado .li-preco::before { background: #28A96B; box-shadow: none; }
 
@@ -4749,20 +4752,22 @@
     { id: 'fuzil', nome: 'Fuzil', desc: 'equipamento de dotação', preco: 200, ico: SKIN_ICO.fuzil }
   ];
   var SKIN_FARDAS = [
-    { id: 'cipe', nome: 'Farda CIPE', desc: 'Cia. Indep. de Pol. Especializado', preco: 300, ico: SKIN_ICO.farda },
-    { id: 'patamo', nome: 'Farda PATAMO', desc: 'Patrulhamento Tático Móvel', preco: 300, ico: SKIN_ICO.farda },
-    { id: 'bope', nome: 'Farda BOPE', desc: 'Operações Especiais', preco: 300, ico: SKIN_ICO.farda }
+    { id: 'cipe', nome: 'Farda CIPE', desc: 'Cia. Indep. de Pol. Especializado', preco: 500, ico: SKIN_ICO.farda },
+    { id: 'patamo', nome: 'Farda PATAMO', desc: 'Patrulhamento Tático Móvel', preco: 750, ico: SKIN_ICO.farda },
+    { id: 'bope', nome: 'Farda BOPE', desc: 'Operações Especiais', preco: 1300, ico: SKIN_ICO.farda }
   ];
   var SKIN_FOTOS = {};        /* [ARTE PDF] id da skin → recorte da foto */
   var skinEtapa = 0;          /* elos da cadeia já comprados (0 = gandola à venda) */
   var skinAtual = null;
-  var skinFardasOk = {};      /* fardas finais já adquiridas */
+  var fardaEscolhida = null;  /* escolha ÚNICA: comprou uma farda, as outras fecham */
   function skinItemHtml(sk) {
-    return '<button class="loja-item' + (skinFardasOk[sk.id] ? ' comprado' : '') + '" data-skin="' + sk.id + '" data-nome="' + sk.nome + '" data-preco="' + sk.preco + '">' +
+    var comprada = fardaEscolhida === sk.id;
+    var fechada = fardaEscolhida && !comprada;   /* outra foi escolhida */
+    return '<button class="loja-item' + (comprada ? ' comprado' : '') + (fechada ? ' indisponivel' : '') + '" data-skin="' + sk.id + '" data-nome="' + sk.nome + '" data-preco="' + sk.preco + '">' +
       '<span class="li-ico">' + sk.ico + '</span>' +
       '<span class="li-nome">' + sk.nome + '</span>' +
       '<span class="li-desc">' + sk.desc + '</span>' +
-      '<span class="li-preco">' + (skinFardasOk[sk.id] ? 'ADQUIRIDO' : sk.preco + ' QdC') + '</span></button>';
+      '<span class="li-preco">' + (comprada ? 'ADQUIRIDO' : fechada ? 'INDISPONÍVEL' : sk.preco + ' QdC') + '</span></button>';
   }
   function renderSkins() {
     var alvo = $('skinChain');
@@ -4781,13 +4786,14 @@
     if (tutOn) return;   /* no tutorial, o clique vira a orientação do QUAD */
     var sk = skinDados(bt.dataset.skin);
     if (bt.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
+    if (bt.classList.contains('indisponivel')) { toast('Indisponível — você já escolheu a sua farda.'); return; }
     if (score < sk.preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
     addScore(-sk.preco, sk.nome + ' adquirido · −' + sk.preco + ' QdC');
     lojaOwned[sk.nome] = true;
     if (skinEtapa < SKIN_CADEIA.length && SKIN_CADEIA[skinEtapa].id === sk.id) {
       skinEtapa++;              /* o elo comprado desaparece; entra o próximo */
     } else {
-      skinFardasOk[sk.id] = true;
+      fardaEscolhida = sk.id;   /* escolha única: as outras fardas fecham */
     }
     skinVestir(sk);
     renderSkins();

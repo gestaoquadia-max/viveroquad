@@ -23,7 +23,7 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 16 | 19/07 | **Aluno Oficial Quad usa a insígnia do Aspirante** (sem arte própria) | Confirmado pelo gestor em 19/07 |
 | 17 | 19/07 | **Mascote renomeado para "QUAD"** (antes "Danilo"); tutorial obrigatório de 19 etapas substitui o tour de 9 passos | Roteiro completo definido pelo fundador em 19/07 |
 | 18 | 19/07 | Na identificação militar, a partícula fixa segue **"QUAD"** (o roteiro citava "QD" como alternativa a padronizar) | Mantida a decisão anterior do nome de guerra composto; mudar para "QD" exige só ajustar `GAMI`/`nomeCurto` |
-| 19 | 20/07 | **Cadeia de skins**: Gandola → Capa de colete → Fuzil → fardas finais à escolha (CIPE · PATAMO · BOPE); cada compra troca a foto do personagem | Artes chegarão em PDF do gestor; até lá, placeholder visual (anel da foto + chip). Preços do protótipo: 60/120/200/300 |
+| 19 | 20/07 | **Cadeia de skins**: Gandola → Capa de colete → Fuzil → fardas finais (CIPE 500 · PATAMO 750 · BOPE 1300); **farda é escolha única** — comprou uma, as demais ficam indisponíveis; cada compra troca a foto do personagem | Artes chegarão em PDF do gestor; até lá, placeholder visual (anel da foto + chip). Elos: 60/120/200 |
 
 ## Regras de trabalho vigentes
 
