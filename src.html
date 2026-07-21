@@ -238,6 +238,15 @@
     display: none; flex-direction: column; border-radius: 26px;
   }
   .quiz-layer.on { display: flex; }
+  .sd-head-row { display: flex; align-items: center; justify-content: space-between; }
+  .sd-timer { font: 800 15px Consolas, monospace; color: var(--p-gold); background: #EAF2FF;
+    border: 1px solid #CFE0FF; border-radius: 999px; padding: 3px 11px; font-variant-numeric: tabular-nums; }
+  .sd-timer.urgente { color: #C0392B; background: #FBE9E9; border-color: #F3C6C6; animation: sdPulse 1s ease-in-out infinite; }
+  @keyframes sdPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  .sd-file { display: flex; align-items: center; gap: 9px; margin-top: 8px; padding: 10px 12px; cursor: pointer;
+    border: 1.5px dashed var(--p-line); border-radius: 12px; background: #F7FAFF; font: 600 12px var(--ui); color: var(--p-dim); }
+  .sd-file.ok { border-style: solid; border-color: #BFE0C6; background: #F0F9F2; color: #2C6E3F; }
+  .sd-file-ico svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .quiz-head { padding: 18px 18px 10px; border-bottom: 1px solid var(--p-line); flex: none; }
   .quiz-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
   .q-alt {
@@ -1946,6 +1955,23 @@
             </div>
             <p class="sub" style="margin-top:8px"><strong>Online/presencial</strong> é a modalidade do evento (não o nome). <strong>Gratuito</strong> entra direto no Início e dá recompensa ao participar; <strong>pago</strong> vai para a Loja e, ao ser comprado, migra para os Eventos do Início. Toque no ✕ para <strong>cancelar</strong> um evento.</p>
           </div>
+
+          <div class="p-card">
+            <div class="k-label">Simulado digital · aplicar pela plataforma</div>
+            <div class="adm-form">
+              <input class="fld" id="admSdNome" placeholder="Nome (ex.: Simulado digital · CFO 2ª fase)">
+              <label class="sd-file" for="admSdPdf"><span class="sd-file-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span><span id="admSdPdfNome">Anexar PDF do simulado</span><input type="file" id="admSdPdf" accept="application/pdf" hidden></label>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admSdDia" type="date" aria-label="Dia de disponibilização" style="max-width:150px" title="Dia em que fica disponível">
+                <input class="fld" id="admSdMin" type="number" min="1" placeholder="min" inputmode="numeric" style="max-width:80px" title="Tempo em minutos">
+                <span class="pct">min</span>
+                <input class="fld" id="admSdNq" type="number" min="1" placeholder="questões" inputmode="numeric" style="max-width:90px" title="Nº de questões">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmSdLancar">Programar simulado</button></div>
+            </div>
+            <div id="admSdList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">O sistema transforma o <strong>PDF</strong> em um <strong>quiz cronometrado</strong> <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Ele abre na área <strong>Simulados</strong> do aluno no dia programado, com o <strong>tempo</strong> definido, e gera <strong>score e Quad Coins</strong>.</p>
+          </div>
         </div>
 
         <!-- ============ ADMIN · LIBERAÇÕES ============ -->
@@ -1979,17 +2005,6 @@
             <div class="k-label" style="margin-top:12px">Inscritos · liberar entrada e pontuar presença</div>
             <div id="admSpLista"></div>
             <p class="sub" style="margin-top:8px">Todo inscrito (pago <strong>ou grátis</strong>) aparece aqui. A administração <strong>libera a entrada</strong>; nos simulados que geram QdC, a liberação <strong>pontua quem compareceu</strong>.</p>
-          </div>
-
-          <div class="p-card">
-            <div class="k-label">Simulados digitais · lançar</div>
-            <div class="adm-row">
-              <input class="fld" id="admSdNome" placeholder="Nome (ex.: Simulado digital · CFO 2ª fase)">
-              <input class="fld" id="admSdQuando" placeholder="quinta · 20h" style="max-width:130px">
-              <button class="btn small" id="btnAdmSdLancar">Lançar</button>
-            </div>
-            <div id="admSdList" style="margin-top:10px"></div>
-            <p class="sub" style="margin-top:8px">Aplicados pela própria plataforma — aparecem na hora na área Simulados do aluno.</p>
           </div>
         </div>
 
@@ -2071,6 +2086,23 @@
           <div class="quiz-foot">
             <button class="btn ghost small" id="btnSairProva">Sair</button>
             <button class="btn" id="btnProvaNext" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ SIMULADO DIGITAL (quiz cronometrado) ============ -->
+        <div class="quiz-layer" id="simDigLayer">
+          <div class="quiz-head">
+            <div class="sd-head-row">
+              <div class="k-label" id="simDigKicker">Simulado digital</div>
+              <span class="sd-timer" id="simDigTimer">--:--</span>
+            </div>
+            <h3 style="margin:0; font-size:15px" id="simDigProgress">Questão 1</h3>
+            <p class="sub" style="margin-top:4px" id="simDigSub">Cronômetro rodando — responda antes do tempo acabar.</p>
+          </div>
+          <div class="quiz-body" id="simDigBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairSimDig">Sair</button>
+            <button class="btn" id="btnSimDigNext" disabled>Responder</button>
           </div>
         </div>
 
@@ -3975,7 +4007,7 @@
   var SIMULADOS = [
     { id: 's63', rot: 'Simulado 63 · SD PMBA', det: 'domingo · 8h', tag: 'PRESENCIAL', pago: true,  valor: 120, score: 120, insc: false },
     { id: 'sq',  rot: 'Simuladão Quad',        det: 'sábado · 8h',  tag: 'PRESENCIAL', pago: false, valor: 20,  score: 100, insc: false },
-    { id: 'sd1', rot: 'Simulado digital · CFO 1ª fase', det: 'dentro do app', tag: 'DIGITAL', insc: false }
+    { id: 'sd1', rot: 'Simulado digital · CFO 1ª fase', tag: 'DIGITAL', pdf: 'cfo-1fase.pdf', minutos: 30, nq: 10, dia: '', feito: false }
   ];
   /* inscritos presenciais que aguardam liberação (feed da recepção) */
   var SIM_INSC = [
@@ -3997,21 +4029,32 @@
       bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
     });
   }
+  function hojeISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function diaBR(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1]; }
+  function simDigDisponivel(sm) { return !sm.dia || sm.dia <= hojeISO(); }
   function simHint(sm) {
-    if (sm.tag === 'DIGITAL') return 'aplicado no app';
+    if (sm.tag === 'DIGITAL') {
+      if (sm.feito) return 'realizado';
+      return simDigDisponivel(sm) ? sm.minutos + ' min · ' + sm.nq + ' questões · score + QdC'
+                                  : 'disponível em ' + diaBR(sm.dia);
+    }
     return sm.pago ? 'presencial · custa ' + sm.valor + ' QdC'
                    : 'presencial · grátis · +' + sm.valor + ' QdC ao participar';
   }
   function renderSimulados() {
     var el = $('simuladosList'); if (!el) return;
     el.innerHTML = SIMULADOS.map(function (sm, i) {
-      var acao, tagTxt, dis = '';
-      if (sm.tag === 'DIGITAL') { acao = 'Responder'; tagTxt = 'DIGITAL'; }
-      else if (sm.insc) { acao = 'Inscrito'; tagTxt = 'INSCRITO'; dis = ' disabled'; }
+      var acao, tagTxt, dis = '', ok = false;
+      if (sm.tag === 'DIGITAL') {
+        tagTxt = 'DIGITAL';
+        if (sm.feito) { acao = 'Feito'; dis = ' disabled'; tagTxt = 'REALIZADO'; ok = true; }
+        else if (simDigDisponivel(sm)) { acao = 'Responder o simulado'; }
+        else { acao = 'Em breve'; dis = ' disabled'; }
+      } else if (sm.insc) { acao = 'Inscrito'; tagTxt = 'INSCRITO'; dis = ' disabled'; ok = true; }
       else { acao = 'Inscrever'; tagTxt = 'PRESENCIAL'; }
       return '<div class="mission-row"><div class="m-dot">◈</div>' +
-        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + sm.det + ' · ' + simHint(sm) + '</div></div>' +
-        '<span class="tag' + (sm.insc ? ' ok' : '') + '">' + tagTxt + '</span>' +
+        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + (sm.det ? sm.det + ' · ' : '') + simHint(sm) + '</div></div>' +
+        '<span class="tag' + (ok ? ' ok' : '') + '">' + tagTxt + '</span>' +
         '<button class="btn ghost small" data-sim="' + i + '"' + dis + '>' + acao + '</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado enviado ainda.</p>';
     el.querySelectorAll('[data-sim]').forEach(function (bt) {
@@ -4021,7 +4064,9 @@
   function simClick(i) {
     var sm = SIMULADOS[i]; if (!sm) return;
     if (sm.tag === 'DIGITAL') {
-      toast('Simulado digital: a aplicação cronometrada (PDF → quiz) chega na próxima etapa.');
+      if (sm.feito) { toast('Você já realizou este simulado digital.'); return; }
+      if (!simDigDisponivel(sm)) { toast('Este simulado abre em ' + diaBR(sm.dia) + '.'); return; }
+      abrirSimDig(sm);
       return;
     }
     if (sm.insc) { toast('Inscrição já confirmada — apareça na recepção para liberarem sua entrada.'); return; }
@@ -4900,6 +4945,102 @@
     }
   });
 
+  /* ============ SIMULADO DIGITAL: quiz cronometrado ============
+     O PDF vira um quiz padrão [INTEGRAÇÃO REAL: extração do PDF]; na demo
+     as questões saem do banco. O cronômetro é o que o admin definiu; ao
+     terminar (ou zerar o tempo), pontua score + Quad Coins.               */
+  var simDig = { sm: null, qs: [], idx: 0, sel: null, hits: 0, restante: 0, timer: null };
+  function simDigColeta(nq) {
+    var pool = embaralhar(TR_BANK.map(provaNorm).concat(
+      AULA_DEMO.cards.map(function (r) { return { t: r[1], c: r[0] === 'C', o: r[2] }; })));
+    var vistos = {}, out = [];
+    for (var i = 0; i < pool.length && out.length < nq; i++) {
+      if (!vistos[pool[i].t]) { vistos[pool[i].t] = 1; out.push(pool[i]); }
+    }
+    return out;
+  }
+  function simDigFmtTempo(s) { var m = Math.floor(s / 60), ss = s % 60; return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0'); }
+  function simDigTick() {
+    simDig.restante--;
+    var t = $('simDigTimer');
+    t.textContent = simDigFmtTempo(Math.max(0, simDig.restante));
+    t.classList.toggle('urgente', simDig.restante <= 30);
+    if (simDig.restante <= 0) { clearInterval(simDig.timer); simDig.timer = null; simDigResultado(true); }
+  }
+  function abrirSimDig(sm) {
+    simDig.sm = sm;
+    simDig.qs = simDigColeta(sm.nq || 10);
+    simDig.idx = 0; simDig.sel = null; simDig.hits = 0;
+    simDig.restante = (sm.minutos || 30) * 60;
+    $('simDigLayer').classList.add('on');
+    $('simDigKicker').textContent = sm.rot;
+    $('simDigTimer').textContent = simDigFmtTempo(simDig.restante);
+    $('simDigTimer').classList.remove('urgente');
+    clearInterval(simDig.timer);
+    simDig.timer = setInterval(simDigTick, 1000);
+    renderQuestaoSimDig();
+  }
+  function renderQuestaoSimDig() {
+    var q = simDig.qs[simDig.idx];
+    $('simDigProgress').textContent = 'Questão ' + (simDig.idx + 1) + ' de ' + simDig.qs.length;
+    $('simDigSub').textContent = 'Cronômetro rodando — o resultado sai no fim.';
+    $('btnSimDigNext').textContent = simDig.idx === simDig.qs.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnSimDigNext').disabled = true;
+    simDig.sel = null;
+    var body = $('simDigBody'); body.innerHTML = '';
+    var pEl = document.createElement('p');
+    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 16px;font-weight:600';
+    pEl.textContent = q.t;
+    body.appendChild(pEl);
+    [['CERTO', true], ['ERRADO', false]].forEach(function (par, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + (i === 0 ? 'C' : 'E') + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = par[0];
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel'); simDig.sel = par[1]; $('btnSimDigNext').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+  function simDigResultado(porTempo) {
+    clearInterval(simDig.timer); simDig.timer = null;
+    var sm = simDig.sm, total = simDig.qs.length, hits = simDig.hits;
+    var scoreG = hits * 10;             /* +10 score por acerto */
+    var coinsG = hits * 2;              /* +2 Quad Coins por acerto */
+    if (sm) sm.feito = true;
+    carreira.scorePatente += scoreG; carreira.scoreCarreira += scoreG; carreira.scoreTemporada += scoreG;
+    if (typeof renderCarreira === 'function') renderCarreira();
+    addScore(coinsG, 'Simulado digital · +' + coinsG + ' QdC');
+    var body = $('simDigBody');
+    $('simDigProgress').textContent = 'Resultado';
+    $('simDigSub').textContent = porTempo ? 'O tempo acabou — veja como foi.' : '';
+    $('simDigTimer').classList.remove('urgente');
+    body.innerHTML = '<div class="p-card" style="text-align:center">' +
+      '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
+      '<h3 class="mil" style="font-size:20px">Simulado concluído</h3>' +
+      '<p class="sub" style="margin-top:8px">Você acertou <strong>' + hits + ' de ' + total + '</strong> (' + (total ? Math.round(hits / total * 100) : 0) + '%)' + (porTempo ? ' antes do tempo esgotar' : '') + '.</p>' +
+      '<p class="sub" style="margin-top:6px"><strong>+' + scoreG + ' score</strong> · <strong>+' + coinsG + ' Quad Coins</strong></p></div>';
+    $('btnSimDigNext').textContent = 'Concluir';
+    $('btnSimDigNext').disabled = false;
+    simDig.idx = 'done';
+    renderSimulados();
+    toast('Simulado digital concluído — +' + scoreG + ' score · +' + coinsG + ' QdC.');
+  }
+  $('btnSimDigNext').addEventListener('click', function () {
+    if (simDig.idx === 'done') { $('simDigLayer').classList.remove('on'); return; }
+    if (simDig.sel === simDig.qs[simDig.idx].c) simDig.hits++;
+    if (simDig.idx < simDig.qs.length - 1) { simDig.idx++; renderQuestaoSimDig(); }
+    else { simDigResultado(false); }
+  });
+  $('btnSairSimDig').addEventListener('click', function () {
+    clearInterval(simDig.timer); simDig.timer = null;
+    $('simDigLayer').classList.remove('on');
+    toast('Simulado interrompido — você pode retomar depois.');
+  });
+  window.__simDig = simDig;   /* exposto para a suíte de testes */
+
   /* ================= [DEMO PROVISÓRIO — REMOVER] =================
      Atalho de teste: sobe uma patente por clique (como se a prova de
      promoção tivesse sido aprovada pelo gabarito). Serve só para o gestor
@@ -5707,22 +5848,40 @@
                : 'Simulado grátis lançado — a presença rende ' + valor + ' QdC.');
   });
 
-  /* ---------- simulados digitais (aplicados pela plataforma) ---------- */
+  /* ---------- simulados digitais (PDF → quiz cronometrado) ---------- */
+  var admSdPdfNome = '';
+  var admSdPdfEl = $('admSdPdf');
+  if (admSdPdfEl) admSdPdfEl.addEventListener('change', function () {
+    admSdPdfNome = (this.files && this.files[0]) ? this.files[0].name : '';
+    var lbl = this.closest('.sd-file');
+    $('admSdPdfNome').textContent = admSdPdfNome || 'Anexar PDF do simulado';
+    if (lbl) lbl.classList.toggle('ok', !!admSdPdfNome);
+  });
   function renderSdList() {
-    $('admSdList').innerHTML = SIMULADOS.filter(function (sm) { return sm.tag === 'DIGITAL'; })
+    var el = $('admSdList'); if (!el) return;
+    el.innerHTML = SIMULADOS.filter(function (sm) { return sm.tag === 'DIGITAL'; })
       .map(function (sm) {
-        return '<div class="adm-bar"><span class="nm">' + sm.rot + '<small>' + sm.det + '</small></span>' +
-          '<span class="tag">NO APP</span></div>';
-      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado digital ativo.</p>';
+        var quando = sm.dia ? 'a partir de ' + diaBR(sm.dia) : 'disponível agora';
+        return '<div class="adm-bar"><span class="nm">' + sm.rot + '<small>' + (sm.pdf || 'PDF') + ' · ' + sm.minutos + ' min · ' + sm.nq + ' questões · ' + quando + '</small></span>' +
+          '<span class="tag">' + (sm.feito ? 'REALIZADO' : 'NO APP') + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado digital programado.</p>';
   }
   $('btnAdmSdLancar').addEventListener('click', function () {
-    var nome = $('admSdNome').value.trim(), quando = $('admSdQuando').value.trim();
+    var nome = $('admSdNome').value.trim();
+    var dia = $('admSdDia').value;
+    var minutos = parseInt($('admSdMin').value, 10);
+    var nq = parseInt($('admSdNq').value, 10);
     if (!nome) { toast('Dê um nome ao simulado digital.'); return; }
-    SIMULADOS.unshift({ rot: nome, det: (quando || 'dentro do app'), tag: 'DIGITAL' });
+    if (!admSdPdfNome) { toast('Anexe o PDF do simulado.'); return; }
+    if (!minutos || minutos < 1) { toast('Defina o tempo do simulado (min).'); return; }
+    if (!nq || nq < 1) { toast('Informe o número de questões.'); return; }
+    SIMULADOS.unshift({ id: 'sd' + Date.now(), rot: nome, tag: 'DIGITAL', pdf: admSdPdfNome, minutos: minutos, nq: nq, dia: dia, feito: false });
     renderSimulados();
     renderSdList();
-    $('admSdNome').value = ''; $('admSdQuando').value = '';
-    toast('Simulado digital lançado — visível para os alunos agora.');
+    $('admSdNome').value = ''; $('admSdDia').value = ''; $('admSdMin').value = ''; $('admSdNq').value = '';
+    admSdPdfNome = ''; $('admSdPdfNome').textContent = 'Anexar PDF do simulado';
+    var lbl = admSdPdfEl && admSdPdfEl.closest('.sd-file'); if (lbl) lbl.classList.remove('ok');
+    toast('Simulado digital programado — vira quiz cronometrado na área do aluno.');
   });
 
   /* ---------- alunos: dificuldades reais, da mesma árvore do Domínio ---------- */

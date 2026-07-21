@@ -49,7 +49,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 42 | 21/07 | **Simulados presenciais no modelo dos eventos**: admin lança pela agenda (data+início+término), grátis (gera QdC) ou pago (custa QdC); inscrição corrigida (grátis também registra) | Simulado presencial = evento com liberação na entrada; o botão do Simuladão estava inerte |
 | 43 | 21/07 | **Liberações**: todo inscrito (pago ou grátis) aparece agrupado por simulado; liberar a entrada pontua (QdC+score) quem participa de simulado que gera QdC | Fecha o ciclo inscrição→recepção→pontuação |
 | 44 | 21/07 | **Removidos** o indicador "Online" do topo e o bloco "Atividades online · links" da Loja do admin | Offline aposentado; links agora vêm do próprio evento/simulado online |
-| — | 21/07 | **Pendências acordadas**: simulado digital (PDF→quiz cronometrado) e área de Estrutura (turmas/modalidades/editais→Domínio) ficam para as próximas fases | Faseamento combinado com o fundador |
+| 45 | 21/07 | **Simulado digital = PDF → quiz cronometrado**: admin anexa PDF, define tempo (min), nº de questões e o dia; vira quiz com cronômetro na Missões; ao concluir/zerar o tempo, dá +10 score e +2 QdC por acerto e fica REALIZADO | Lançamento movido de Liberações para o hub "Hoje"; extração do PDF marcada `[INTEGRAÇÃO REAL]` (na demo, questões do banco) |
+| — | 21/07 | **Pendência acordada**: área de Estrutura (turmas/modalidades/editais→Domínio) fica para a próxima fase | Faseamento combinado com o fundador |
 
 ## Regras de trabalho vigentes
 

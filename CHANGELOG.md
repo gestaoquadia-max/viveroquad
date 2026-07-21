@@ -1,5 +1,24 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — simulado digital: PDF → quiz cronometrado
+- **Lançamento no lugar certo**: o "Simulado digital" saiu de **Liberações**
+  (que é para liberar) e foi para o hub **"Hoje"** do administrador
+- **Fluxo do admin**: **anexa o PDF** → define o **tempo** (min) e o **nº de
+  questões** → programa o **dia** de disponibilização. O sistema transforma
+  o PDF em um **quiz padrão** <span>(`[INTEGRAÇÃO REAL]` a extração do PDF; na
+  demo as questões saem do banco)</span>
+- **Na Missões do aluno** (bloco "Simulados"): o digital aparece com o tempo
+  e o nº de questões e o botão **"Responder o simulado"** quando chega o dia
+  (antes disso, **"Em breve · disponível em DD/MM"**)
+- **Quiz cronometrado**: abre com **cronômetro** regressivo (fica vermelho e
+  pulsa nos 30s finais); ao **concluir** ou **zerar o tempo**, corrige e
+  gera **+10 score e +2 Quad Coins por acerto**; depois fica **REALIZADO** e
+  não repete
+- Nova suíte `vsimdig` (17 checagens) verde; `vadmin` atualizada; tutorial
+  (`vtut`), `vsim`, `vprova`, `vgami`, `vhero` e demais sem regressões
+- **A construir (próxima fase)**: área de **Estrutura**
+  (turmas/modalidades/editais → Domínio)
+
 ## 21/07/2026 — simulados presenciais + liberações; limpezas de UI
 - **Bug corrigido**: o botão de inscrição do "Simuladão Quad" (e de todo
   simulado presencial **gratuito**) não funcionava — só dava um toast e
