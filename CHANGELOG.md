@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — simulados unificados: lançamento único e fluxo por modalidade
+- **Lançamento de simulados** agora é **um bloco só, na aba "Hoje"** (absorveu
+  o antigo "Simulado presencial · lançar"): escolhe-se **modalidade**
+  (presencial/digital) e **tipo** (gratuito/pago) num único formulário. A aba
+  **Liberar** mantém apenas a **lista de inscritos** presenciais a liberar
+- **Fluxos por combinação**:
+  - **Presencial pago** → vai para a **Loja**. No bloco Simulados (Missões),
+    "Inscrever" **conduz à Loja**; comprado, o status vira **INSCRITO** e a
+    liberação entra na aba **Liberar**. Liberado na sede, o simulado vai para
+    o **histórico de realizados**
+  - **Presencial grátis** → inscreve direto; a liberação **pontua a presença**
+    e envia ao histórico
+  - **Digital pago** → aparece **na Loja**; comprado, abre em **Missões** para
+    ser respondido (quiz cronometrado)
+  - **Digital grátis** → aparece direto em **Missões**
+- **Histórico de simulados realizados** (aluno) reúne presenciais liberados e
+  digitais concluídos — base pedagógica de todos os simulados
+- **Revisão dos vínculos** dos simulados com Loja, Missões, Liberar e
+  cronômetro; removidos os formulários antigos (sem ids órfãos)
+- Suíte `vsim` reescrita (25 checagens, 4 combinações) verde; `vadmin`
+  atualizada; tutorial (`vtut`), `vloja`/`vloja2`/`vloja3`, `vestrutura`,
+  `vmochila` sem regressões
+
 ## 21/07/2026 — Estrutura: concursos, modalidades, editais e Domínio
 - **Concursos & editais**: a Estrutura lista os concursos do Quad — PM-BA
   (CFO e Soldado), PMs de fronteira (Soldado), Polícia Penal BA, Polícia
