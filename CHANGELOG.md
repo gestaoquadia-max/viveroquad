@@ -1,5 +1,30 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — estoque/entrega na Loja, ícones, evento online e calendário
+- **Tutorial destravado na compra da boina**: com o card "Itens do
+  personagem" mais alto (boina + skins + combate), a boina saía da tela. O
+  passo agora aponta **direto para a boina**, que fica sempre visível e
+  clicável — o onboard segue sem travar
+- **Calendário do aluno reflete as inscrições**: ao se inscrever em um
+  evento, ele **entra de fato no calendário** (antes só dizia que entrava)
+- **Fluxo de entrega dos itens presenciais**: comprou → **ADQUIRIDO**; a
+  administração confirma a retirada → o aluno passa a ver **ENTREGUE ✓** e o
+  item **volta a ficar disponível** para comprar de novo
+- **Quantidade e estoque (3.1)**: itens presenciais abrem um seletor de
+  **quantidade** (ex.: 2 garrafinhas) com total ao vivo; a administração
+  define o **estoque**, que aparece no item e some quando **esgota**
+- **Seletor de ícones (3.2)**: ao cadastrar um produto, a administração
+  escolhe o **ícone** numa paleta pronta (turma, simulado, garrafinha,
+  módulo, aulão, evento, chaveiro, camiseta…)
+- **Evento online (3.3)**: criar um evento com **link** o marca como online;
+  ele entra no carrossel com **resumo**, e o **inscrito** ganha o botão
+  "Entrar no evento online" com o link
+- **Cancelar/remover (3.4)**: a administração remove um produto ou cancela
+  um evento pelo ✕ — sai da Loja / do carrossel / dos calendários na hora
+- Novas suítes `vloja3` (19 checagens) e ajustes em `vloja2`/`vtut` verdes;
+  `vloja`, `vev`, `vskin`, `vhero`, `vgand`, `vroupa`, `vmochila`, `vbonus`
+  sem regressões
+
 ## 20/07/2026 — Loja reconstruída, agenda de eventos e cadastro de produtos
 - **Bug do tutorial corrigido**: na etapa de escolher o personagem, dava
   para abrir a mochila (e travar o fluxo). Agora a área clicável do passo

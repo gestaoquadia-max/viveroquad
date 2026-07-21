@@ -1015,6 +1015,9 @@
   .adm-bar .nm { flex: 1; min-width: 0; }
   .adm-bar .nm small { display: block; color: var(--p-dim); font-size: 10.5px; }
   .adm-bar .pct { font: 700 12px Consolas, monospace; flex: none; }
+  .adm-bar .adm-x { flex: none; width: 24px; height: 24px; border-radius: 8px; border: none; cursor: pointer;
+    background: #FBE9E9; color: #C0392B; font-size: 13px; line-height: 1; }
+  .adm-bar .adm-x:hover { background: #F5D6D6; }
   .adm-bar .mini-track { flex: none; width: 76px; height: 8px; border-radius: 99px; background: #E8EFF9; overflow: hidden; }
   .adm-bar .mini-track i { display: block; height: 100%; border-radius: 99px; }
 
@@ -1129,6 +1132,38 @@
   .uso-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
     border-bottom: 1px solid var(--p-line); font-size: 13px; color: var(--p-dim); }
   .uso-row:last-of-type { border-bottom: none; }
+  /* estados do item presencial na Loja */
+  .li-preco.entregue { color: #1E7A3B; }
+  .li-preco.esgotado { color: #B23B3B; }
+  .li-estoque { position: absolute; top: 8px; right: 8px; font: 700 9px var(--ui); color: var(--p-dim);
+    background: #EEF4FF; border-radius: 999px; padding: 2px 6px; }
+  .li-estoque.baixo { color: #A15A00; background: #FFF3DC; }
+  .loja-item.esgotado { opacity: 0.6; }
+  /* overlay de compra com quantidade */
+  .compra-layer { position: absolute; inset: 0; z-index: 47; display: none; align-items: center; justify-content: center;
+    background: rgba(4, 16, 38, 0.82); border-radius: 26px; padding: 22px; }
+  .compra-layer.on { display: flex; }
+  .compra-box { position: relative; width: 100%; max-width: 300px; background: #fff; border-radius: 20px; padding: 22px 20px 20px; text-align: center;
+    box-shadow: 0 20px 50px rgba(4,16,38,0.5); }
+  .compra-box .storage-close { position: absolute; top: 12px; right: 12px; background: #EEF3FA; color: var(--p-dim); }
+  .compra-ico { display: inline-grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; margin-bottom: 8px;
+    background: linear-gradient(160deg, #E7F1FF, #CFE2FF); }
+  .compra-ico svg { width: 30px; height: 30px; stroke: var(--p-gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .compra-nome { margin: 0; font: 800 17px var(--ui); color: var(--p-text); }
+  .compra-desc { margin: 2px 0 8px; }
+  .compra-estoque { font: 700 11px var(--ui); color: var(--p-dim); margin-bottom: 12px; }
+  .qtd-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 16px; }
+  .qtd-btn { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--p-line); background: #F4F9FF;
+    font: 800 22px var(--ui); color: var(--p-gold); cursor: pointer; line-height: 1; }
+  .qtd-btn:disabled { opacity: 0.4; cursor: default; }
+  .qtd-val { font: 800 24px var(--ui); color: var(--p-text); min-width: 40px; font-variant-numeric: tabular-nums; }
+  /* seletor de ícones no cadastro de produto (admin) */
+  .ico-pick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .ico-opt { width: 40px; height: 40px; border-radius: 11px; border: 1px solid var(--p-line); background: #F7FAFF;
+    display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .ico-opt svg { width: 22px; height: 22px; stroke: var(--p-dim); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ico-opt.sel { border-color: var(--p-gold); background: #E6F3FC; }
+  .ico-opt.sel svg { stroke: var(--p-gold); }
   .uso-row b { font: 700 14px var(--ui); color: var(--p-text); }
   select.fld { appearance: none; -webkit-appearance: none;
     background-image: linear-gradient(45deg, transparent 50%, var(--p-dim) 50%), linear-gradient(135deg, var(--p-dim) 50%, transparent 50%);
@@ -1509,46 +1544,8 @@
 
           <div class="p-card">
             <div class="k-label">Itens presenciais · retirada na recepção</div>
-            <div class="loja-grid" id="lojaPresencial">
-              <button class="loja-item" data-nome="Garrafinha Quad" data-preco="90" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M10 2h4v2.5l1 2V9H9V6.5l1-2Z"/><rect x="8.5" y="9" width="7" height="12" rx="2.5"/><path d="M8.5 13h7"/></svg></span>
-                <span class="li-nome">Garrafinha Quad</span>
-                <span class="li-desc">squeeze da tropa</span>
-                <span class="li-preco">90 QdC</span>
-              </button>
-              <button class="loja-item" data-nome="Simulado físico" data-preco="120" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg></span>
-                <span class="li-nome">Simulado físico</span>
-                <span class="li-desc">caderno impresso</span>
-                <span class="li-preco">120 QdC</span>
-              </button>
-              <button class="loja-item" data-nome="Chaveiro Quad" data-preco="40" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="5"/><path d="M11.5 11.5 20 20M17 17l2-2M15 15l2-2"/></svg></span>
-                <span class="li-nome">Chaveiro Quad</span>
-                <span class="li-desc">brinde da marca</span>
-                <span class="li-preco">40 QdC</span>
-              </button>
-              <button class="loja-item" data-nome="Vade Mecum" data-preco="200" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2Z"/><path d="M19 20H6a2 2 0 0 1-2-2"/><path d="M8 6h7M8 9h7"/></svg></span>
-                <span class="li-nome">Vade Mecum</span>
-                <span class="li-desc">legislação da carreira</span>
-                <span class="li-preco">200 QdC</span>
-              </button>
-              <button class="loja-item" data-nome="Módulo impresso" data-preco="150" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="17" rx="1.5"/><path d="M17 7h4v14H7"/><path d="M6 8h8M6 11h8M6 14h5"/></svg></span>
-                <span class="li-nome">Módulo impresso</span>
-                <span class="li-desc">apostila da matéria</span>
-                <span class="li-preco">150 QdC</span>
-              </button>
-              <button class="loja-item" data-nome="Camiseta Quad" data-preco="180" data-presencial="1">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg></span>
-                <span class="li-nome">Camiseta Quad</span>
-                <span class="li-desc">uniforme de treino</span>
-                <span class="li-preco">180 QdC</span>
-              </button>
-              <span id="lojaExtras-presencial" style="display:contents"></span>
-            </div>
-            <p class="sub" style="margin-top:8px">Produtos físicos comprados com Quad Coins geram um <strong>pedido de retirada</strong> — a administração confirma a entrega na recepção.</p>
+            <div class="loja-grid" id="lojaPresencial"></div>
+            <p class="sub" style="margin-top:8px">Produtos físicos comprados com Quad Coins geram um <strong>pedido de retirada</strong> — a administração confirma a entrega na recepção. Você escolhe a <strong>quantidade</strong>, e o estoque é definido pela administração.</p>
           </div>
 
           <div class="p-card" style="opacity:0.85">
@@ -1706,31 +1703,7 @@
         <div class="view" id="v-calendario">
           <div class="p-card">
             <div class="k-label">Calendário · agendamentos e momentos importantes</div>
-            <div class="mission-row">
-              <div class="cal-date">HOJE<small>TER</small></div>
-              <div class="grow"><div class="t">Aula · Dir. Administrativo — Poderes</div><div class="d">19h–22h · presencial · quiz ao vivo</div></div>
-              <span class="tag">AULA</span>
-            </div>
-            <div class="mission-row">
-              <div class="cal-date">17<small>SEX</small></div>
-              <div class="grow"><div class="t">Aulão de véspera — RONDESP</div><div class="d">19h · evento com Quad Coins para garimpar</div></div>
-              <span class="tag gold">EVENTO</span>
-            </div>
-            <div class="mission-row">
-              <div class="cal-date">18<small>SÁB</small></div>
-              <div class="grow"><div class="t">Simulado presencial</div><div class="d">8h · inscrição pelo link do aviso</div></div>
-              <span class="tag live">INSCRITO</span>
-            </div>
-            <div class="mission-row">
-              <div class="cal-date">18<small>SÁB</small></div>
-              <div class="grow"><div class="t">Corte das missões da semana</div><div class="d">23h59 · recupere as atrasadas antes</div></div>
-              <span class="tag warn">PRAZO</span>
-            </div>
-            <div class="mission-row">
-              <div class="cal-date">28<small>TER</small></div>
-              <div class="grow"><div class="t">Pré-TAF · teste de corrida 12 min</div><div class="d">6h30 · pista do quartel · atualiza suas marcas</div></div>
-              <span class="tag">TAF</span>
-            </div>
+            <div id="calList"></div>
           </div>
           <div class="p-card" style="opacity:0.85">
             <h3>Sincronizado com a plataforma</h3>
@@ -1958,13 +1931,19 @@
                 <input class="fld" id="admEvNovoNome" placeholder="Novo evento (nome)">
               </div>
               <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admEvNovoResumo" placeholder="Breve resumo do evento">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admEvNovoLink" placeholder="Link do evento online (opcional)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admEvNovoData" type="date" aria-label="Data do evento" style="max-width:150px">
                 <input class="fld" id="admEvNovoHora" type="time" value="19:00" aria-label="Horário do evento" style="max-width:110px">
                 <button class="btn ghost small" id="btnAdmEvNovo">Criar</button>
               </div>
               <p class="sub" id="admEvNovoPrev" style="margin-top:6px">Escolha a data e o horário na agenda.</p>
             </div>
-            <p class="sub" style="margin-top:8px">Alimenta diretamente o carrossel <strong>Eventos da semana</strong> e as páginas de cada evento no app do aluno.</p>
+            <p class="sub" style="margin-top:8px">Alimenta o carrossel <strong>Eventos da semana</strong> e a página de cada evento. Com <strong>link</strong>, vira <strong>evento online</strong>: o inscrito recebe o botão de acesso. Toque no ✕ para <strong>cancelar</strong> um evento.</p>
           </div>
         </div>
 
@@ -2046,13 +2025,15 @@
                   <option value="personagem">Itens do personagem</option>
                   <option value="presencial">Itens presenciais (retirada)</option>
                 </select>
-                <input class="fld" id="admProdPreco" placeholder="Preço" inputmode="numeric" style="max-width:90px">
-                <span class="pct">QdC</span>
+                <input class="fld" id="admProdPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px">
+                <input class="fld" id="admProdQtd" placeholder="Qtd." inputmode="numeric" style="max-width:70px" title="Estoque (itens presenciais)">
               </div>
+              <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
+              <div class="ico-pick" id="admProdIcones"></div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
             </div>
             <div id="admProdList" style="margin-top:10px"></div>
-            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. Itens presenciais geram <strong>pedido de retirada</strong> na recepção.</p>
+            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. Itens presenciais usam a <strong>quantidade</strong> como estoque e geram <strong>pedido de retirada</strong> na recepção. Toque no ✕ para remover.</p>
           </div>
 
           <div class="p-card">
@@ -2338,6 +2319,23 @@
           </div>
           <div class="storage-grid" id="storageGrid"></div>
           <div class="storage-quest">🎯 <strong>Quests em breve:</strong> reúna itens da sua mochila para forjar novos equipamentos.</div>
+        </div>
+
+        <!-- ============ COMPRA COM QUANTIDADE (itens presenciais) ============ -->
+        <div class="compra-layer" id="compraLayer">
+          <div class="compra-box">
+            <button class="storage-close" id="btnCompraFechar" aria-label="Fechar">✕</button>
+            <span class="compra-ico" id="compraIco"></span>
+            <h3 class="compra-nome" id="compraNome">Item</h3>
+            <p class="sub compra-desc" id="compraDesc"></p>
+            <div class="compra-estoque" id="compraEstoque"></div>
+            <div class="qtd-row">
+              <button class="qtd-btn" id="qtdMenos" aria-label="Menos">−</button>
+              <span class="qtd-val" id="qtdVal">1</span>
+              <button class="qtd-btn" id="qtdMais" aria-label="Mais">+</button>
+            </div>
+            <button class="btn" id="btnCompraOk" style="width:100%">Comprar · <span id="compraTotal">0</span> QdC</button>
+          </div>
         </div>
 
         <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
@@ -2710,6 +2708,7 @@
     if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
     /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
+    if (id === 'v-calendario' && typeof renderCalendario === 'function') renderCalendario();
     spotlight($(id));
   }
   initLoop($('v-inicio'));
@@ -2906,17 +2905,31 @@
     h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
     h += '<button class="btn" id="btnEvInscrever"' + (st.inscrito ? ' disabled' : '') + '>' +
       (st.inscrito ? 'Inscrito ✓ · no seu calendário' : 'Confirmar inscrição') + '</button>';
+    /* evento online: o link de acesso aparece para quem está inscrito */
+    if (ev.online && ev.link) {
+      h += '<button class="btn ghost" id="btnEvLink"' + (st.inscrito ? '' : ' disabled') + '>' +
+        (st.inscrito ? 'Entrar no evento online ↗' : 'Inscreva-se para receber o link') + '</button>';
+    }
     if (ev.garimpo) {
       h += '<button class="btn ghost" id="btnEvGarimpo"' + (st.garimpado ? ' disabled' : '') + '>' +
         (st.garimpado ? 'Garimpado ✓ · +15 Quad Coins' : 'Garimpar Quad Coins escondidos') + '</button>';
     }
     h += '</div>';
-    h += '<p class="sub" style="margin-top:12px; font-size:11px">Evento criado pela administração do Quad — regras de score e de Quad Coins são definidas por evento e podem mudar a cada edição.</p>';
+    h += '<p class="sub" style="margin-top:12px; font-size:11px">Evento criado pela administração do Quad — regras de score e de Quad Coins são definidas por evento e podem mudar a cada edição.' +
+      (ev.online ? ' <strong>Evento online</strong>: o link de acesso fica liberado aqui após a inscrição.' : '') + '</p>';
     $('evBody').innerHTML = h;
+    function evAplicaLink() {
+      var lb = $('btnEvLink'); if (!lb) return;
+      lb.disabled = false; lb.textContent = 'Entrar no evento online ↗';
+      lb.onclick = function () { toast('Abrindo o evento online — ' + ev.link); };
+    }
+    if (st.inscrito) evAplicaLink();
     $('btnEvInscrever').onclick = function () {
       st.inscrito = true;
       this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
-      toast('Inscrição confirmada — o evento entrou no seu calendário.');
+      evAplicaLink();
+      if (typeof renderCalendario === 'function') renderCalendario();   /* entra no calendário do aluno */
+      toast(ev.online ? 'Inscrição confirmada — link do evento liberado abaixo.' : 'Inscrição confirmada — o evento entrou no seu calendário.');
     };
     var g = $('btnEvGarimpo');
     if (g) g.onclick = function () {
@@ -2928,6 +2941,32 @@
     $('evLayer').style.display = 'flex';
   }
   $('btnEvVoltar').addEventListener('click', function () { $('evLayer').style.display = 'none'; });
+  /* ---------- calendário do aluno: base + eventos inscritos ---------- */
+  var CAL_BASE = [
+    { dia: 'HOJE', dsem: 'TER', t: 'Aula · Dir. Administrativo — Poderes', d: '19h–22h · presencial · quiz ao vivo', tag: 'AULA', cls: '' },
+    { dia: '18', dsem: 'SÁB', t: 'Corte das missões da semana', d: '23h59 · recupere as atrasadas antes', tag: 'PRAZO', cls: 'warn' },
+    { dia: '28', dsem: 'TER', t: 'Pré-TAF · teste de corrida 12 min', d: '6h30 · pista do quartel · atualiza suas marcas', tag: 'TAF', cls: '' }
+  ];
+  function calRow(dia, dsem, t, d, tag, cls) {
+    return '<div class="mission-row"><div class="cal-date">' + dia + '<small>' + dsem + '</small></div>' +
+      '<div class="grow"><div class="t">' + t + '</div><div class="d">' + d + '</div></div>' +
+      '<span class="tag ' + (cls || '') + '">' + tag + '</span></div>';
+  }
+  function renderCalendario() {
+    var el = $('calList'); if (!el) return;
+    var rows = CAL_BASE.map(function (c) { return calRow(c.dia, c.dsem, c.t, c.d, c.tag, c.cls); });
+    EVENTOS.forEach(function (ev) {
+      var st = evState[ev.id];
+      if (!st || !st.inscrito) return;
+      var partes = ev.quando.split(' · ');   /* ['QUA','22/07','19H'] */
+      var dsem = partes[0] || '', dm = partes[1] || '', hora = partes[2] || '';
+      var dia = (dm.split('/')[0]) || dm || '·';
+      var det = (hora ? hora + ' · ' : '') + (ev.online ? 'evento online · link na página do evento' : 'inscrição confirmada');
+      rows.push(calRow(dia, dsem, ev.nome, det, 'INSCRITO', 'live'));
+    });
+    el.innerHTML = rows.join('') || '<p class="sub" style="padding:8px 0">Nada agendado ainda.</p>';
+  }
+  renderCalendario();
   renderEvStrip();
   queueSync();   /* leva a esteira para as cópias da rolagem infinita vertical */
 
@@ -3476,7 +3515,7 @@
     { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens', mood: 'talk', bot: 'br',
       onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
       txt: 'Essa é a área de <b>itens do seu personagem</b>. Toca pra dar uma olhada.' },
-    { sel: function () { return document.getElementById('tutLojaCard'); }, arrow: '.loja-item[data-nome="Boina exclusiva"]', expect: 'boina', mood: 'point', bot: 'bl',
+    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, arrow: '.loja-item[data-nome="Boina exclusiva"]', expect: 'boina', mood: 'point', bot: 'bl',
       onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
       txt: 'Escolhe o seu primeiro item! Dica: a <b>boina</b> custa 20 Coins — e você tem 25.' },
     { sel: '#coinsCard', mood: 'cheer', bot: 'bl',
@@ -4959,25 +4998,39 @@
   }
   document.querySelectorAll('.loja-item').forEach(bindLojaItem);
 
-  /* ---------- produtos/serviços cadastrados pela administração ----------
-     Entram nas categorias da Loja do aluno em tempo real. Presenciais
-     geram pedido de retirada na recepção.                                 */
-  var LOJA_ICO = {
-    turmas:     '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
-    eventos:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
-    personagem: '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg>',
-    presencial: '<svg viewBox="0 0 24 24"><path d="m3 8 9-5 9 5-9 5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>'
+  /* ---------- catálogo de ícones (seletor do admin + render da Loja) ---------- */
+  var ICON_CAT = {
+    turma:      '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+    aula:       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg>',
+    aulao:      '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>',
+    evento:     '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
+    presencial: '<svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    simulado:   '<svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg>',
+    garrafinha: '<svg viewBox="0 0 24 24"><path d="M10 2h4v2.5l1 2V9H9V6.5l1-2Z"/><rect x="8.5" y="9" width="7" height="12" rx="2.5"/><path d="M8.5 13h7"/></svg>',
+    modulo:     '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="17" rx="1.5"/><path d="M17 7h4v14H7"/><path d="M6 8h8M6 11h8M6 14h5"/></svg>',
+    vademecum:  '<svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2Z"/><path d="M19 20H6a2 2 0 0 1-2-2"/><path d="M8 6h7M8 9h7"/></svg>',
+    chaveiro:   '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="5"/><path d="M11.5 11.5 20 20M17 17l2-2M15 15l2-2"/></svg>',
+    camiseta:   '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg>',
+    caneca:     '<svg viewBox="0 0 24 24"><path d="M4 5h12v11a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M16 8h2a3 3 0 0 1 0 6h-2"/></svg>',
+    medalha:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="6"/><path d="m9 8.5-3-6M15 8.5l3-6M12 11.5l1 2 2 .2-1.5 1.4.4 2.1L12 17l-1.9 -.9.4-2.1L9 12.7l2-.2Z"/></svg>',
+    boina:      '<svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>'
   };
+  var ICON_POR_CAT = { turmas: 'turma', eventos: 'evento', personagem: 'camiseta', presencial: 'presencial' };
+  function icoDe(chave, cat) { return ICON_CAT[chave] || ICON_CAT[ICON_POR_CAT[cat]] || ICON_CAT.presencial; }
+
+  /* ---------- produtos/serviços cadastrados pela administração ----------
+     Entram nas categorias da Loja do aluno em tempo real. Presenciais têm
+     estoque, compra por quantidade e pedido de retirada.                  */
   var LOJA_CAT_NOME = { turmas: 'Turmas e aulas', eventos: 'Eventos', personagem: 'Itens do personagem', presencial: 'Itens presenciais' };
   var LOJA_EXTRAS = [];
   function renderLojaExtras() {
-    ['turmas', 'eventos', 'personagem', 'presencial'].forEach(function (cat) {
+    ['turmas', 'eventos', 'personagem'].forEach(function (cat) {
       var host = document.getElementById('lojaExtras-' + cat);
       if (!host) return;
       host.innerHTML = LOJA_EXTRAS.filter(function (p) { return p.cat === cat; }).map(function (p) {
         var comprado = lojaOwned[p.nome];
-        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '"' + (cat === 'presencial' ? ' data-presencial="1"' : '') + '>' +
-          '<span class="li-ico">' + LOJA_ICO[cat] + '</span>' +
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '">' +
+          '<span class="li-ico">' + icoDe(p.icone, cat) + '</span>' +
           '<span class="li-nome">' + p.nome + '</span>' +
           '<span class="li-desc">' + (p.desc || 'novidade') + '</span>' +
           '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : p.preco + ' QdC') + '</span></button>';
@@ -4985,29 +5038,155 @@
       host.querySelectorAll('.loja-item').forEach(bindLojaItem);
     });
   }
+
+  /* ---------- itens presenciais: estoque, quantidade e entrega ---------- */
+  var ITENS_PRESENCIAIS = [
+    { id: 'garrafinha', nome: 'Garrafinha Quad', desc: 'squeeze da tropa',      preco: 90,  icone: 'garrafinha', estoque: 12, estado: 'disp' },
+    { id: 'simufis',    nome: 'Simulado físico',  desc: 'caderno impresso',      preco: 120, icone: 'simulado',   estoque: 30, estado: 'disp' },
+    { id: 'chaveiro',   nome: 'Chaveiro Quad',    desc: 'brinde da marca',       preco: 40,  icone: 'chaveiro',   estoque: 25, estado: 'disp' },
+    { id: 'vademecum',  nome: 'Vade Mecum',       desc: 'legislação da carreira',preco: 200, icone: 'vademecum',  estoque: 8,  estado: 'disp' },
+    { id: 'modulo',     nome: 'Módulo impresso',  desc: 'apostila da matéria',   preco: 150, icone: 'modulo',     estoque: 15, estado: 'disp' },
+    { id: 'camiseta',   nome: 'Camiseta Quad',    desc: 'uniforme de treino',    preco: 180, icone: 'camiseta',   estoque: 20, estado: 'disp' }
+  ];
+  function presDe(id) { return ITENS_PRESENCIAIS.filter(function (x) { return x.id === id; })[0]; }
+  function renderPresenciais() {
+    var g = document.getElementById('lojaPresencial'); if (!g) return;
+    g.innerHTML = ITENS_PRESENCIAIS.map(function (p) {
+      var esgotado = p.estoque <= 0 && p.estado !== 'aguardando';
+      var precoTxt, precoCls = '';
+      if (p.estado === 'aguardando') { precoTxt = 'ADQUIRIDO'; }
+      else if (esgotado) { precoTxt = 'FORA DE ESTOQUE'; precoCls = ' esgotado'; }
+      else if (p.estado === 'entregue') { precoTxt = 'ENTREGUE ✓'; precoCls = ' entregue'; }
+      else { precoTxt = p.preco + ' QdC'; }
+      var badge = (p.estado !== 'aguardando' && p.estoque > 0) ? '<span class="li-estoque' + (p.estoque <= 5 ? ' baixo' : '') + '">' + p.estoque + ' em estoque</span>' : '';
+      return '<button class="loja-item' + (esgotado ? ' esgotado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '" data-presencial="1" data-pres-id="' + p.id + '">' +
+        badge +
+        '<span class="li-ico">' + icoDe(p.icone, 'presencial') + '</span>' +
+        '<span class="li-nome">' + p.nome + '</span>' +
+        '<span class="li-desc">' + p.desc + '</span>' +
+        '<span class="li-preco' + precoCls + '">' + precoTxt + '</span></button>';
+    }).join('');
+    g.querySelectorAll('[data-pres-id]').forEach(function (bt) {
+      bt.addEventListener('click', function () { presClick(bt.dataset.presId); });
+    });
+  }
+  function presClick(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var p = presDe(id); if (!p) return;
+    if (p.estado === 'aguardando') { toast('Pedido em aberto — aguarde a retirada na recepção.'); return; }
+    if (p.estoque <= 0) { toast('Item fora de estoque no momento.'); return; }
+    abrirCompra(p);
+  }
+  /* overlay de compra com quantidade */
+  var compraAtual = null, compraQtd = 1;
+  function compraMax() { return Math.min(compraAtual ? compraAtual.estoque : 1, 10); }
+  function compraAtualiza() {
+    $('qtdVal').textContent = compraQtd;
+    $('compraTotal').textContent = fmt(compraQtd * compraAtual.preco);
+    $('qtdMenos').disabled = compraQtd <= 1;
+    $('qtdMais').disabled = compraQtd >= compraMax();
+  }
+  function abrirCompra(p) {
+    compraAtual = p; compraQtd = 1;
+    $('compraIco').innerHTML = icoDe(p.icone, 'presencial');
+    $('compraNome').textContent = p.nome;
+    $('compraDesc').textContent = p.desc;
+    $('compraEstoque').textContent = p.estoque + ' em estoque · ' + p.preco + ' QdC cada';
+    compraAtualiza();
+    $('compraLayer').classList.add('on');
+  }
+  function fecharCompra() { $('compraLayer').classList.remove('on'); compraAtual = null; }
+  $('qtdMenos').addEventListener('click', function () { if (compraQtd > 1) { compraQtd--; compraAtualiza(); } });
+  $('qtdMais').addEventListener('click', function () { if (compraQtd < compraMax()) { compraQtd++; compraAtualiza(); } });
+  $('btnCompraFechar').addEventListener('click', fecharCompra);
+  $('compraLayer').addEventListener('click', function (e) { if (e.target === $('compraLayer')) fecharCompra(); });
+  $('btnCompraOk').addEventListener('click', function () {
+    var p = compraAtual; if (!p) return;
+    var total = compraQtd * p.preco;
+    if (compraQtd > p.estoque) { toast('Estoque insuficiente.'); return; }
+    if (score < total) { toast('Quad Coins insuficientes para essa quantidade.'); return; }
+    addScore(-total, compraQtd + '× ' + p.nome + ' · −' + total + ' QdC');
+    p.estoque -= compraQtd;
+    p.estado = 'aguardando';
+    lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total);
+    pedidoPresencial(p, compraQtd);
+    var q = compraQtd;
+    fecharCompra();
+    renderPresenciais();
+    toast(q + '× ' + p.nome + ' — pedido gerado para retirada na recepção.');
+  });
+
   function renderAdmProdList() {
     var el = document.getElementById('admProdList'); if (!el) return;
-    el.innerHTML = LOJA_EXTRAS.map(function (p) {
-      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + '</small></span><span class="pct">' + p.preco + ' QdC</span></div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum produto cadastrado por aqui ainda.</p>';
+    var linhas = LOJA_EXTRAS.map(function (p, i) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + '</small></span>' +
+        '<button class="adm-x" data-rm-extra="' + i + '" aria-label="Remover">✕</button></div>';
+    }).concat(ITENS_PRESENCIAIS.map(function (p) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>Itens presenciais · ' + p.estoque + ' em estoque</small></span>' +
+        '<button class="adm-x" data-rm-pres="' + p.id + '" aria-label="Remover">✕</button></div>';
+    }));
+    el.innerHTML = linhas.join('');
+    el.querySelectorAll('[data-rm-extra]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var p = LOJA_EXTRAS[+bt.dataset.rmExtra]; if (!p) return;
+        LOJA_EXTRAS.splice(+bt.dataset.rmExtra, 1);
+        renderLojaExtras(); renderAdmProdList();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('“' + p.nome + '” removido da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-rm-pres]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var id = bt.dataset.rmPres, p = presDe(id); if (!p) return;
+        ITENS_PRESENCIAIS = ITENS_PRESENCIAIS.filter(function (x) { return x.id !== id; });
+        renderPresenciais(); renderAdmProdList();
+        toast('“' + p.nome + '” removido da Loja.');
+      });
+    });
   }
   var btnAdmProdEl = $('btnAdmProd');
   if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
     var nome = $('admProdNome').value.trim(), desc = $('admProdDesc').value.trim();
     var cat = $('admProdCat').value, preco = parseInt($('admProdPreco').value, 10);
+    var qtd = parseInt($('admProdQtd').value, 10);
+    var icone = admProdIcone;
     if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto.'); return; }
     if (!preco || preco < 1) { toast('Informe um preço em Quad Coins.'); return; }
-    if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+    if (ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
       toast('Já existe um item com esse nome na Loja.'); return;
     }
-    LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: cat, preco: preco });
-    $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = '';
-    renderLojaExtras();
+    if (cat === 'presencial') {
+      if (!qtd || qtd < 1) { toast('Informe a quantidade em estoque.'); return; }
+      ITENS_PRESENCIAIS.push({ id: 'p' + Date.now(), nome: nome, desc: desc, preco: preco, icone: icone, estoque: qtd, estado: 'disp' });
+      renderPresenciais();
+    } else {
+      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: cat, preco: preco, icone: icone });
+      renderLojaExtras();
+    }
+    $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
     renderAdmProdList();
     if (typeof renderPrecos === 'function') renderPrecos();   /* entra também no editor de preços */
     toast('Produto publicado na Loja — categoria ' + LOJA_CAT_NOME[cat] + '.');
   });
+  /* seletor de ícones do formulário de produto */
+  var admProdIcone = 'presencial';
+  (function () {
+    var host = $('admProdIcones'); if (!host) return;
+    var ordem = ['turma', 'aula', 'aulao', 'evento', 'simulado', 'garrafinha', 'modulo', 'vademecum', 'chaveiro', 'camiseta', 'caneca', 'medalha'];
+    host.innerHTML = ordem.map(function (k, i) {
+      return '<button type="button" class="ico-opt' + (k === admProdIcone ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
+    }).join('');
+    if (ordem.indexOf(admProdIcone) < 0) { host.querySelector('.ico-opt').classList.add('sel'); admProdIcone = ordem[0]; }
+    host.querySelectorAll('.ico-opt').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        admProdIcone = bt.dataset.ico;
+        host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+      });
+    });
+  })();
   renderLojaExtras();
+  renderPresenciais();
   renderAdmProdList();
 
   /* ==================================================================
@@ -5270,12 +5449,27 @@
   /* ---------- eventos da semana: regras e novos eventos ---------- */
   function renderAdmEventos() {
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
-      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + '</small></span>' +
-        '<span class="tag">' + (ev.score.length + ev.coins.length) + ' regras</span></div>';
+      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + (ev.online ? ' · ONLINE' : '') + '</small></span>' +
+        '<span class="tag">' + (ev.score.length + ev.coins.length) + ' regras</span>' +
+        '<button class="adm-x" data-cancel-ev="' + ev.id + '" aria-label="Cancelar evento">✕</button></div>';
     }).join('');
     $('admEvSel').innerHTML = EVENTOS.map(function (ev) {
       return '<option value="' + ev.id + '">' + ev.nome + '</option>';
     }).join('');
+    $('admEvList').querySelectorAll('[data-cancel-ev]').forEach(function (bt) {
+      bt.addEventListener('click', function () { cancelarEvento(bt.dataset.cancelEv); });
+    });
+  }
+  function cancelarEvento(id) {
+    var ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    EVENTOS = EVENTOS.filter(function (x) { return x.id !== id; });
+    delete evState[id];
+    renderAdmEventos();
+    renderEvStrip();                                   /* sai do carrossel da semana */
+    if (typeof renderCalendario === 'function') renderCalendario();   /* e do calendário do aluno */
+    toast('Evento “' + ev.nome + '” cancelado — saiu do carrossel e dos calendários.');
   }
   $('btnAdmEvRegra').addEventListener('click', function () {
     var id = $('admEvSel').value, regra = $('admEvRegra').value.trim(), val = $('admEvValor').value.trim();
@@ -5308,16 +5502,21 @@
   });
   $('btnAdmEvNovo').addEventListener('click', function () {
     var nome = $('admEvNovoNome').value.trim(), quando = admEvQuando();
+    var resumo = $('admEvNovoResumo').value.trim(), link = $('admEvNovoLink').value.trim();
     if (!nome) { toast('Dê um nome ao evento.'); return; }
     if (!quando) { toast('Escolha a data do evento na agenda.'); return; }
-    EVENTOS.push({ id: 'adm' + EVENTOS.length, nome: nome, tipo: 'EVENTO', quando: quando,
-      cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5], meta: 'novidade da semana',
-      desc: 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
-    $('admEvNovoNome').value = ''; $('admEvNovoData').value = ''; $('admEvNovoHora').value = '19:00';
+    if (link && link.indexOf('http') !== 0) { toast('O link do evento deve começar com http.'); return; }
+    var online = !!link;
+    EVENTOS.push({ id: 'adm' + Date.now(), nome: nome, tipo: online ? 'EVENTO ONLINE' : 'EVENTO', quando: quando,
+      cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5], meta: online ? 'evento online' : 'novidade da semana',
+      online: online, link: link,
+      desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
+    $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = '';
+    $('admEvNovoData').value = ''; $('admEvNovoHora').value = '19:00';
     admEvPreview();
     renderAdmEventos();
     renderEvStrip();   /* o carrossel do aluno ganha o tile na hora */
-    toast('Evento criado — já gira no carrossel da semana.');
+    toast(online ? 'Evento online criado — o inscrito recebe o link de acesso.' : 'Evento criado — já gira no carrossel da semana.');
   });
 
   /* ---------- liberações: produtos presenciais (dar baixa) ---------- */
@@ -5331,10 +5530,17 @@
     PEDIDOS.unshift({ aluno: nomeCurto(), item: item, quando: 'agora', status: 'aguardando' });
     renderPedidos();
   }
+  /* pedido de item presencial: guarda o id e a quantidade para dar baixa e
+     devolver o item à Loja quando a entrega for confirmada */
+  function pedidoPresencial(p, qtd) {
+    PEDIDOS.unshift({ aluno: nomeCurto(), item: p.nome, presId: p.id, qtd: qtd, quando: 'agora', status: 'aguardando' });
+    renderPedidos();
+  }
   function renderPedidos() {
     var el = $('admPedidosList'); if (!el) return;
     el.innerHTML = PEDIDOS.map(function (pd, i) {
-      return '<div class="mission-row"><div class="grow"><div class="t">' + pd.item + '</div>' +
+      var qt = pd.qtd && pd.qtd > 1 ? ' <span class="tag">×' + pd.qtd + '</span>' : '';
+      return '<div class="mission-row"><div class="grow"><div class="t">' + pd.item + qt + '</div>' +
         '<div class="d">' + pd.aluno + ' · ' + pd.quando + '</div></div>' +
         (pd.status === 'entregue'
           ? '<span class="tag ok">ENTREGUE</span>'
@@ -5342,9 +5548,15 @@
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma retirada pendente.</p>';
     el.querySelectorAll('[data-ped]').forEach(function (bt) {
       bt.addEventListener('click', function () {
-        PEDIDOS[parseInt(bt.dataset.ped, 10)].status = 'entregue';
+        var pd = PEDIDOS[parseInt(bt.dataset.ped, 10)];
+        pd.status = 'entregue';
+        /* o item presencial volta a ficar disponível na Loja do aluno, marcado como ENTREGUE */
+        if (pd.presId && typeof presDe === 'function') {
+          var p = presDe(pd.presId);
+          if (p) { p.estado = 'entregue'; if (typeof renderPresenciais === 'function') renderPresenciais(); }
+        }
         renderPedidos();
-        toast('Entrega confirmada — baixa registrada no sistema.');
+        toast('Entrega confirmada — baixa registrada e item liberado na Loja.');
       });
     });
   }

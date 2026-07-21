@@ -36,6 +36,12 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 29 | 20/07 | **Loja em 4 categorias**: Turmas e aulas · Eventos · Itens do personagem (com sub-área "Itens de combate → mochila") · Itens presenciais (retirada na recepção) | Presenciais: garrafinha, simulado físico, chaveiro, vade mecum, módulo, camiseta — geram pedido de retirada |
 | 30 | 20/07 | **Agenda de eventos**: data/horário do novo evento por seletores nativos (calendário + relógio), com prévia "QUA · 29/07 · 19H30" | Substitui a digitação manual da data |
 | 31 | 20/07 | **Admin cadastra produtos/serviços na Loja**: nome, descrição, categoria e preço; entram na hora na Loja do aluno e no editor de preços | Presenciais saem com pedido de retirada; base para catálogo governável |
+| 32 | 21/07 | **Tutorial**: o passo da boina aponta direto para o item (não para o card), que ficou alto com combate/skins e escondia a boina | Corrige o travamento do onboard na compra da boina |
+| 33 | 21/07 | **Calendário do aluno é data-driven**: base fixa + eventos inscritos entram de fato no calendário | Antes o botão dizia "no seu calendário" sem refletir lá |
+| 34 | 21/07 | **Itens presenciais com estoque, quantidade e entrega**: aluno escolhe a quantidade; admin define estoque (esgota→fora de estoque); compra=ADQUIRIDO → baixa do admin=ENTREGUE → volta a ficar disponível | Pedido guarda id+quantidade; entrega libera o item de novo |
+| 35 | 21/07 | **Ícone do produto escolhido numa paleta** no cadastro (turma, simulado, garrafinha, módulo, aulão, evento, chaveiro, camiseta, caneca, medalha…) | Catálogo `ICON_CAT` compartilhado |
+| 36 | 21/07 | **Evento online = evento com link**: entra no carrossel com resumo; o inscrito recebe o botão de acesso ao link | Une criação do evento, link e disposição para o comprador/inscrito |
+| 37 | 21/07 | **Cancelar evento / remover produto** pelo ✕ na administração | Sai da Loja, do carrossel e dos calendários na hora |
 
 ## Regras de trabalho vigentes
 
