@@ -3553,12 +3553,9 @@
       txt: 'Coin é a nossa <b>moeda</b>. Com ela você compra itens e vantagens na <b>Loja</b>.' },
     { sel: function () { return document.querySelector('#navAluno .nav-btn[data-view="v-loja"]'); }, expect: 'loja', mood: 'point', bot: 'tr',
       txt: 'Bora gastar? <b>Toca em “Loja”</b>, ali embaixo.' },
-    { view: 'v-loja', sel: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); return it && it.closest('.p-card'); }, expect: 'ver-itens', mood: 'talk', bot: 'br',
-      onEnter: function () { var it = document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); if (it) it.closest('.p-card').id = 'tutLojaCard'; },
-      txt: 'Essa é a área de <b>itens do seu personagem</b>. Toca pra dar uma olhada.' },
-    { sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, arrow: '.loja-item[data-nome="Boina exclusiva"]', expect: 'boina', mood: 'point', bot: 'bl',
+    { view: 'v-loja', sel: function () { return document.querySelector('.loja-item[data-nome="Boina exclusiva"]'); }, arrow: '.loja-item[data-nome="Boina exclusiva"]', expect: 'boina', mood: 'point', bot: 'bl',
       onEnter: function () { if (lojaOwned['Boina exclusiva']) { tutEquiparBoina(); return 'skip'; } },
-      txt: 'Escolhe o seu primeiro item! Dica: a <b>boina</b> custa 20 Coins — e você tem 25.' },
+      txt: 'Aqui na <b>Loja</b> você equipa o seu personagem. Vamos começar pela <b>boina</b>: ela custa 20 Coins e você tem 25. <b>Toca nela!</b>' },
     { sel: '#coinsCard', mood: 'cheer', bot: 'bl',
       txt: function () { return '<b>Comprou!</b> Olha o saldo ali em cima: tinha 25, ficou com <b>' + fmt(score) + ' Quad Coins</b>.'; } },
     { sel: '#coinsCard', mood: 'talk', bot: 'br',
@@ -3799,10 +3796,6 @@
     }
     else if (tutExpect === 'bloco' && e.target.closest('#btnMissaoHome')) { setTimeout(function () { tutEvent('bloco'); }, 300); }
     else if (tutExpect === 'loja') { var nb = e.target.closest('.nav-btn'); if (nb && nb.dataset.view === 'v-loja') setTimeout(function () { tutEvent('loja'); }, 300); }
-    else if (tutExpect === 'ver-itens' && e.target.closest('#tutLojaCard')) {
-      e.stopPropagation(); e.preventDefault();   /* nesta etapa é só olhar — compra é na próxima */
-      tutEvent('ver-itens');
-    }
     else if (tutExpect === 'boina') {
       var caro = e.target.closest('.loja-item:not([data-nome="Boina exclusiva"])');
       if (caro) {

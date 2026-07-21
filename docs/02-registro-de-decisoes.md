@@ -45,6 +45,7 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 38 | 21/07 | **Evento tem data + horário de início + término** | Ex.: "QUA · 29/07 · 19H–21H30" |
 | 39 | 21/07 | **Online/Presencial é modalidade (tópico) do evento, não nome de produto** | Removidos os "produtos" Evento online/presencial da Loja |
 | 40 | 21/07 | **Evento gratuito × pago**: gratuito entra no Início e dá recompensa ao participar; pago é vendido na Loja (aba Eventos) e, ao ser comprado, migra para o Início e sai da Loja; online libera o link ao comprador | Corrige a lógica do evento online (antes desconectada); catálogo de eventos separado do cadastro genérico de produto |
+| 41 | 21/07 | **Tutorial aponta a boina diretamente**: removido o passo que destacava o card inteiro de itens ("área geral") após ganhar os 25 Coins | O card ficou grande (boina + skins + combate) e o passo "toca pra olhar" confundia — qualquer toque levava à boina |
 
 ## Regras de trabalho vigentes
 

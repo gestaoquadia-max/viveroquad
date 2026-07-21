@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — tutorial: aponta a boina direto (sem "área geral de itens")
+- No tutorial, depois de ganhar os 25 Quad Coins, havia um passo que
+  destacava o **card inteiro** de itens do personagem (boina + skins +
+  combate) e mandava "tocar pra dar uma olhada" — e qualquer toque ali
+  levava à boina. Essa **"área geral"** confundia
+- Removido esse passo intermediário: o QUAD agora **aponta a boina
+  diretamente** ("Aqui na Loja você equipa o seu personagem. Vamos começar
+  pela boina… Toca nela!"), sem a área geral no meio
+- `vtut` atualizada (checa que não há mais o passo da área geral e que a
+  boina fica visível/clicável); tutorial completo verde
+
 ## 21/07/2026 — modelo de eventos: modalidade, gratuito/pago e horário fim
 - **Evento agora tem data, horário de início E de término** (ex.: "QUA ·
   29/07 · 19H–21H30") — antes só a data e um horário
