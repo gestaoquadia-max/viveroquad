@@ -1,5 +1,25 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — Estrutura: concursos, modalidades, editais e Domínio
+- **Concursos & editais**: a Estrutura lista os concursos do Quad — PM-BA
+  (CFO e Soldado), PMs de fronteira (Soldado), Polícia Penal BA, Polícia
+  Civil BA e PRF — cada um com a **sua árvore de edital** e a **situação**
+  (Edital aberto · Proposta de edital para este ano · Reta final pós-edital),
+  editável
+- **Domínio conectado**: "Definir Domínio" troca a **árvore que o aluno vê**
+  em Domínio (matérias/assuntos/sub-assuntos) e o cabeçalho, na hora. A
+  árvore real de cada concurso entra pelo lançamento do edital
+  <span>(`[INTEGRAÇÃO REAL]`; na V0, árvores-exemplo compactas para os não-CFO)</span>
+- **Modalidades**: RONDESP (nivelamento), PATAMO (regular) e BOPE (questões)
+  com a régua **teoria × questões** — 70/30, 50/50 e 20/80: quanto mais
+  evoluída a turma, **menos teoria e mais questões**
+- **Turmas**: abrir turma = **concurso × modalidade × período** (início e
+  **término provável**); lista e remoção por ✕
+- Nova suíte `vestrutura` (19 checagens) verde; tutorial (`vtut`), `vadmin`,
+  `vprova`, `vgami`, `vturma`, `vsimdig` e demais sem regressões
+- Com isso, **fecham as fases combinadas** (simulados presenciais, simulado
+  digital e Estrutura)
+
 ## 21/07/2026 — simulado digital: PDF → quiz cronometrado
 - **Lançamento no lugar certo**: o "Simulado digital" saiu de **Liberações**
   (que é para liberar) e foi para o hub **"Hoje"** do administrador

@@ -1030,6 +1030,23 @@
   .adm-bar .adm-x { flex: none; width: 24px; height: 24px; border-radius: 8px; border: none; cursor: pointer;
     background: #FBE9E9; color: #C0392B; font-size: 13px; line-height: 1; }
   .adm-bar .adm-x:hover { background: #F5D6D6; }
+  /* Estrutura: concursos */
+  .conc-row { padding: 10px 0; border-bottom: 1px solid var(--p-line); }
+  .conc-row:last-child { border-bottom: none; }
+  .conc-top { display: flex; align-items: center; gap: 8px; }
+  .conc-nome { flex: 1; font: 700 13px var(--ui); color: var(--p-text); }
+  .conc-meta { font-size: 10.5px; color: var(--p-dim); margin: 3px 0 7px; }
+  .conc-sit { width: 100%; font-size: 11.5px; padding: 6px 8px; }
+  /* Estrutura: modalidades */
+  .mod-row { padding: 9px 0; border-bottom: 1px solid var(--p-line); }
+  .mod-row:last-child { border-bottom: none; }
+  .mod-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .mod-nome { font: 700 12.5px var(--ui); color: var(--p-text); }
+  .mod-desc { font-size: 10.5px; color: var(--p-dim); }
+  .mod-bar { display: flex; height: 22px; border-radius: 7px; overflow: hidden; border: 1px solid var(--p-line); }
+  .mod-bar span { display: flex; align-items: center; justify-content: center; font: 700 9.5px var(--ui); white-space: nowrap; overflow: hidden; }
+  .mod-teo { background: linear-gradient(180deg, #E7F1FF, #CFE2FF); color: #1D55B0; }
+  .mod-que { background: linear-gradient(180deg, #1E7DFF, #135FE0); color: #fff; }
   .adm-bar .mini-track { flex: none; width: 76px; height: 8px; border-radius: 99px; background: #E8EFF9; overflow: hidden; }
   .adm-bar .mini-track i { display: block; height: 100%; border-radius: 99px; }
 
@@ -1412,10 +1429,10 @@
         <div class="view" id="v-dominio">
           <div class="p-card" style="border-color:#BAE6FD">
             <h3>Painel de Domínio <span class="tag v1">PRÉVIA · V1</span></h3>
-            <p class="sub">Edital do <strong>CFO — Curso de Formação de Oficiais da PM-BA</strong>. Cada barra é calculada de baixo para cima: sub-assuntos alimentam o assunto, assuntos alimentam a matéria. Na V0 o sistema loga o cru; a metodologia calibrada entra na V1.</p>
+            <p class="sub">Edital do <strong id="domConcurso">CFO — PM-BA</strong>. Cada barra é calculada de baixo para cima: sub-assuntos alimentam o assunto, assuntos alimentam a matéria. Na V0 o sistema loga o cru; a metodologia calibrada entra na V1.</p>
           </div>
           <div class="p-card">
-            <div class="k-label">Árvore do edital · CFO · Polícia Militar da Bahia</div>
+            <div class="k-label" id="domTreeLabel">Árvore do edital · CFO · Polícia Militar da Bahia</div>
             <div id="editalTree" class="ed-tree"></div>
           </div>
           <div class="p-card" style="opacity:0.85">
@@ -1780,27 +1797,44 @@
           </div>
         </div>
 
-        <!-- ============ ADMIN · TURMAS ============ -->
+        <!-- ============ ADMIN · ESTRUTURA (turmas, modalidades, editais) ============ -->
         <div class="view" id="v-turmas">
           <div class="p-card">
-            <div class="k-label">Turma = Edital × Modalidade</div>
-            <table class="mini">
-              <thead><tr><th>Turma</th><th>Edital</th><th>Modalidade</th></tr></thead>
-              <tbody>
-                <tr><td>PC-BA Noite</td><td>PC-BA 2025</td><td><span class="tag">PATAMO</span></td></tr>
-                <tr><td>PC-BA Intensivo</td><td>PC-BA 2025</td><td><span class="tag">BOPE</span></td></tr>
-                <tr><td>CFO Base</td><td>CFO 2024</td><td><span class="tag">RONDESP</span></td></tr>
-              </tbody>
-            </table>
-            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
-              <button class="btn small" id="btnNovaTurma">Abrir nova turma</button>
-              <button class="btn ghost small" id="btnIrEdital">Árvore do edital</button>
+            <div class="k-label">Concursos &amp; editais · situação e Domínio</div>
+            <div id="admConcList"></div>
+            <p class="sub" style="margin-top:8px">Cada concurso carrega a <strong>sua árvore de edital</strong>. <strong>Definir Domínio</strong> troca a árvore que o aluno vê em Domínio. Lançar um edital novo é <span class="ref">[INTEGRAÇÃO REAL] upload do edital</span>.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Modalidades · teoria × questões</div>
+            <div id="admModList"></div>
+            <p class="sub" style="margin-top:8px">Quanto mais evoluída a turma, <strong>menos teoria e mais questões</strong>. O mesmo edital roda em qualquer modalidade.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Turmas · concurso × modalidade × período</div>
+            <div id="admTurmaList"></div>
+            <div class="adm-form" style="margin-top:10px">
+              <input class="fld" id="admTurmaNome" placeholder="Nome da turma (ex.: PATAMO Manhã)">
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admTurmaConc"></select>
+                <select class="fld" id="admTurmaMod"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admTurmaIni" type="date" aria-label="Início" title="Início" style="max-width:150px">
+                <span class="pct">até</span>
+                <input class="fld" id="admTurmaFim" type="date" aria-label="Término" title="Término provável" style="max-width:150px">
+                <button class="btn small" id="btnAdmTurma">Abrir turma</button>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:8px">A turma referencia o <strong>edital</strong> (concurso) e a <strong>modalidade</strong>, com <strong>início e término provável</strong>. Toque no ✕ para remover.</p>
+          </div>
+
+          <div class="p-card" style="opacity:0.9">
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn ghost small" id="btnIrEdital">Ver árvore do edital</button>
               <button class="btn ghost small" id="btnIrQuestoes">Banco de questões</button>
             </div>
-          </div>
-          <div class="p-card" style="opacity:0.85">
-            <h3>Modalidades ≠ concursos</h3>
-            <p class="sub">RONDESP (nivelamento) · PATAMO (regular) · BOPE (blocos de questões). O mesmo edital roda em qualquer uma. A turma não é filha do assunto — referencia o edital.</p>
           </div>
         </div>
 
@@ -2756,6 +2790,58 @@
        barra da matéria  = média das barras dos assuntos                    */
   var EDITAL_CFO = [["Língua Portuguesa",[["Interpretação de textos",["Textos verbais","Textos não verbais","Textos mistos","Textos publicitários"]],["Classes de palavras",["Nomes","Verbos","Flexões nominais","Flexões verbais","Advérbios","Preposições","Conjunções"]],["Estrutura da oração",["Frase","Oração","Período","Termos essenciais","Termos integrantes","Termos acessórios"]],["Relações entre orações",["Coordenação","Subordinação"]],["Sintaxe",["Colocação pronominal","Concordância","Regência","Crase"]],["Formas de discurso",["Discurso direto","Discurso indireto","Discurso indireto livre"]],["Semântica",["Sinonímia","Antonímia","Heteronímia"]],["Escrita correta",["Pontuação","Acentuação","Ortografia"]],["Redação oficial",["Redação técnica","Redação estilística","Correspondência oficial","Tipos de documentos","Ofício","Memorando"]]]],["Língua Inglesa",[["Interpretação de textos",["Textos verbais","Textos não verbais"]],["Substantivos",["Formação do plural","Plural regular","Plural irregular","Casos especiais","Gênero","Contáveis","Não contáveis","Formas possessivas"]],["Artigos e demonstrativos",["Artigos definidos","Artigos indefinidos","Demonstrativos","Singular e plural","Posição dos demonstrativos"]],["Adjetivos",["Grau comparativo","Grau superlativo","Formas regulares","Formas irregulares","Adjetivos indefinidos"]],["Numerais",["Cardinais","Ordinais"]],["Pronomes",["Pessoais","Sujeito","Objeto","Possessivos","Reflexivos","Indefinidos","Interrogativos","Relativos"]],["Verbos",["Verbos regulares","Verbos irregulares","Modos e tempos","Verbos auxiliares","Verbos impessoais","Verbos modais","Phrasal verbs","Voz ativa","Voz passiva","Gerúndio"]],["Estrutura das frases",["Discurso direto","Discurso indireto","Sentenças condicionais"]],["Advérbios",["Frequência","Modo","Lugar","Tempo","Intensidade","Dúvida","Afirmação","Expressões adverbiais"]],["Palavras de ligação",["Preposições","Conjunções"]],["Formação e significado das palavras",["Prefixação","Sufixação","Sinonímia","Antonímia"]]]],["Informática",[["Editores de texto",["Microsoft Word","LibreOffice Writer"]],["Planilhas eletrônicas",["Microsoft Excel","LibreOffice Calc"]],["Apresentações",["Microsoft PowerPoint","LibreOffice Impress"]],["Sistemas operacionais",["Windows 7","Windows 10","Linux"]],["Arquivos e programas",["Arquivos","Pastas","Programas","Organização de informações","Gerenciamento de informações"]],["Interface e atalhos",["Atalhos de teclado","Ícones","Área de trabalho","Lixeira"]],["Internet",["Internet","Intranet","Ferramentas de navegação","Aplicativos","Procedimentos de uso"]],["Comunicação digital",["Correio eletrônico","Computação em nuvem"]],["Segurança digital",["Certificação digital","Assinatura digital","Segurança da informação"]],["Hardware",["Componentes do computador","Processadores","Memórias","Dispositivos de armazenamento","Periféricos"]]]],["Matemática",[["Conjuntos numéricos",["Números naturais","Números inteiros","Números racionais","Números reais","Números complexos","Operações","Propriedades","Aplicações"]],["Sequências",["Sequências numéricas","Progressão aritmética","Progressão geométrica"]],["Álgebra",["Expressões algébricas","Polinômios","Operações com polinômios","Equações polinomiais","Inequações"]],["Funções",["Conceitos gerais","Função do 1º grau","Função do 2º grau","Função modular","Função exponencial","Função logarítmica","Gráficos","Propriedades"]],["Matrizes e sistemas",["Sistemas lineares","Matrizes","Determinantes","Propriedades","Aplicações"]],["Análise combinatória",["Arranjos","Permutações","Combinações","Binômio de Newton"]],["Probabilidade",["Espaço amostral","Probabilidade em conjuntos finitos"]],["Geometria plana",["Figuras geométricas","Congruência","Semelhança","Perímetro","Área"]],["Geometria espacial",["Retas e planos","Paralelismo","Perpendicularismo","Prismas","Pirâmides","Cilindros","Cones","Esferas","Áreas","Volumes"]],["Geometria analítica",["Retas","Circunferência","Distâncias"]],["Trigonometria",["Razões trigonométricas","Funções trigonométricas","Transformações","Equações","Triângulos"]],["Proporcionalidade",["Razão","Proporção","Porcentagem","Acréscimos","Descontos"]],["Matemática financeira",["Juros simples","Juros compostos"]],["Estatística",["Estatística descritiva","Tabelas","Gráficos","Tendência central","Dispersão"]],["Resolução de problemas",["Frações","Conjuntos","Porcentagens","Sequências numéricas","Sequências com figuras","Sequências com palavras"]]]],["História",[["História Geral",["Antiguidade","Mundo Medieval","Mundo Moderno","Mundo Contemporâneo"]],["História do Brasil",["Brasil Colônia","Brasil Império","Brasil República","Desenvolvimento cultural","Desenvolvimento científico"]],["Mundo atual",["Globalização","Questões ambientais","Atualidades"]],["História da Bahia",["Independência da Bahia","Revolta de Canudos","Revolta dos Malês","Conjuração Baiana","Sabinada"]]]],["Geografia",[["Sociedade e natureza",["Mecanismos da natureza","Recursos naturais","Sobrevivência humana","Distribuição dos recursos","Uso dos recursos","Preservação ambiental"]],["Espaço mundial",["Capitalismo","Industrialização","Transnacionalização do capital","Economias industriais","Economias não industriais","Desigualdades econômicas","Relação cidade-campo","Desenvolvimento tecnológico","Atuação do Estado","Organizações político-econômicas"]],["População mundial",["Mobilidade espacial","Crescimento demográfico","Divisão internacional do trabalho","Divisão territorial do trabalho"]],["Ordem mundial",["Guerra Fria","Fim da União Soviética","Nova ordem econômica mundial"]],["Espaço brasileiro",["Formação territorial","Relação com a natureza","Industrialização","Internacionalização do capital"]],["Urbanização brasileira",["Urbanização","Metropolização","Qualidade de vida"]],["Espaço agrário",["Estrutura agrária","Produção agrária","Impactos ambientais"]],["População brasileira",["Crescimento populacional","Estrutura populacional","Migrações","Condições de vida","Condições de trabalho"]],["Organização territorial do Brasil",["Atuação do Estado","Políticas territoriais","Regionalização","Desigualdades regionais"]]]],["Direito Constitucional",[["Princípios fundamentais",["Fundamentos da República","Objetivos fundamentais","Princípios constitucionais"]],["Direitos e garantias fundamentais",["Direitos individuais","Direitos coletivos","Deveres individuais","Deveres coletivos","Nacionalidade","Direitos políticos"]],["Organização do Estado",["Administração Pública","Militares dos Estados","Militares do Distrito Federal","Militares dos Territórios"]],["Defesa do Estado",["Instituições democráticas","Forças Armadas","Segurança pública"]],["Constituição do Estado da Bahia",["Servidores públicos militares","Poder Executivo","Disposições gerais","Atribuições do governador","Justiça Militar","Segurança pública"]],["Proteção constitucional",["Família","Direitos da mulher","Criança e adolescente","Pessoa idosa","Pessoa com deficiência","População negra","Povos indígenas"]]]],["Direitos Humanos",[["Sistema global de Direitos Humanos",["Declaração Universal dos Direitos Humanos","Direitos econômicos, sociais e culturais","Direitos civis e políticos"]],["Sistema Interamericano",["Convenção Americana de Direitos Humanos","Pacto de São José da Costa Rica"]],["Combate à discriminação",["Discriminação racial","Discriminação contra a mulher","Igualdade racial","Intolerância religiosa"]],["Tratados e normas",["Convenção contra a discriminação racial","Convenção contra a discriminação da mulher","Estatuto da Igualdade Racial da Bahia"]]]],["Direito Administrativo",[["Princípios administrativos",["Princípios da Administração Pública"]],["Poderes administrativos",["Poder vinculado","Poder discricionário","Poder hierárquico","Poder disciplinar","Poder regulamentar","Poder de polícia","Uso do poder","Abuso de poder"]],["Atos administrativos",["Conceito","Atributos","Requisitos","Classificação","Extinção"]],["Organização administrativa",["Órgãos públicos","Conceito de órgão","Classificação dos órgãos","Entidades administrativas","Conceito de entidade","Espécies de entidades"]],["Agentes públicos",["Conceito","Classificação"]],["Improbidade administrativa",["Lei de Improbidade Administrativa"]],["Regime dos militares estaduais",["Estatuto dos Policiais Militares da Bahia","Artigos 1º ao 92"]]]],["Direito Penal",[["Aplicação da lei penal",["Lei penal no tempo","Lei penal no espaço"]],["Teoria do crime",["Elementos do crime","Consumação","Tentativa","Desistência voluntária","Arrependimento eficaz","Arrependimento posterior","Crime impossível","Exclusão da ilicitude","Exclusão da culpabilidade"]],["Crimes contra a pessoa",["Homicídio","Lesão corporal","Rixa","Injúria"]],["Crimes contra a liberdade pessoal",["Constrangimento ilegal","Ameaça","Sequestro","Cárcere privado"]],["Crimes contra o patrimônio",["Furto","Roubo","Extorsão","Apropriação indébita","Receptação"]],["Crimes contra a dignidade sexual",["Estupro","Importunação sexual","Assédio sexual","Estupro de vulnerável","Corrupção de menores"]],["Crimes contra a paz pública",["Incitação ao crime","Apologia de crime","Apologia de criminoso"]],["Crimes contra a Administração Pública",["Peculato","Concussão","Corrupção passiva","Prevaricação","Condescendência criminosa","Resistência","Desobediência","Desacato","Corrupção ativa","Contrabando"]]]],["Direito Processual Penal",[["Princípios processuais",["Princípios do Processo Penal"]],["Inquérito policial",["Conceito","Finalidade","Procedimento"]],["Provas",["Conceito","Finalidade","Obrigatoriedade","Exame de corpo de delito"]],["Prisão",["Prisão no Código de Processo Penal","Artigos 283 a 309"]],["Contravenções penais",["Lei das Contravenções Penais","Contravenções relacionadas ao preconceito"]],["Abuso de autoridade",["Sanções civis","Sanções administrativas","Crimes","Penas"]],["Proteção da criança e do adolescente",["Estatuto da Criança e do Adolescente","Artigos indicados no edital"]],["Crimes de preconceito",["Preconceito de raça","Preconceito de cor"]],["Proteção da pessoa com deficiência",["Estatuto da Pessoa com Deficiência","Crimes previstos no estatuto"]],["Leis penais especiais",["Crimes de tortura","Estatuto da Pessoa Idosa","Lei Maria da Penha","Lei de Drogas"]]]],["Direito Penal Militar",[["Crimes militares",["Crimes militares em tempo de paz"]],["Crimes contra a autoridade e a disciplina",["Motim","Revolta","Aliciação","Incitamento","Violência contra superior","Violência contra militar de serviço","Desrespeito a superior","Desrespeito a símbolo nacional","Desrespeito à farda","Insubordinação","Resistência"]],["Crimes contra o serviço e o dever militar",["Insubmissão","Simulação de incapacidade","Criação de incapacidade física","Deserção","Abandono de posto","Descumprimento de missão","Embriaguez em serviço","Dormir em serviço"]],["Crimes contra a Administração Militar",["Desacato","Desobediência"]]]],["Direito Processual Penal Militar",[["Inquérito Policial Militar",["Instauração","Investigação militar"]],["Prisão militar",["Prisão em flagrante"]],["Processo de deserção",["Deserção em geral","Deserção de oficial","Deserção de praça","Deserção de praça graduada","Deserção de praça especial"]]]]];
   var ED_BASE = [72, 48, 60, 55, 42, 46, 64, 52, 58, 38, 33, 28, 24];
+  /* ---------- Estrutura: concursos, editais, modalidades e turmas ----------
+     Cada concurso tem a sua árvore de edital. O CFO usa a árvore completa
+     acima; os demais trazem árvores-exemplo compactas na V0 (a árvore real
+     entra pelo lançamento do edital — [INTEGRAÇÃO REAL]). Definir o edital de
+     um concurso para a turma troca o Domínio que o aluno vê.               */
+  var EDITAL_SOLDADO = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Textos não verbais']], ['Sintaxe', ['Concordância', 'Regência', 'Crase']]]],
+    ['Matemática e Raciocínio Lógico', [['Raciocínio lógico', ['Proposições', 'Sequências']], ['Proporcionalidade', ['Razão', 'Porcentagem']]]],
+    ['Noções de Direito', [['Direito Constitucional', ['Direitos fundamentais', 'Segurança pública']], ['Direito Penal', ['Crimes contra a pessoa', 'Crimes contra o patrimônio']]]],
+    ['Atualidades e História da Bahia', [['Atualidades', ['Segurança', 'Sociedade']], ['História da Bahia', ['Independência da Bahia', 'Canudos']]]]
+  ];
+  var EDITAL_PPBA = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Coesão']], ['Gramática', ['Concordância', 'Crase']]]],
+    ['Legislação Penal', [['Execução penal', ['Lei de Execução Penal', 'Regimes']], ['Direito Penal', ['Teoria do crime', 'Penas']]]],
+    ['Direitos Humanos', [['Sistema global', ['Declaração Universal', 'Tratados']], ['Sistema penitenciário', ['Regras de Mandela', 'Ressocialização']]]]
+  ];
+  var EDITAL_PCBA = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Coesão']], ['Sintaxe', ['Concordância', 'Regência']]]],
+    ['Direito Administrativo', [['Poderes administrativos', ['Poder de polícia', 'Poder disciplinar']], ['Atos administrativos', ['Requisitos', 'Atributos']]]],
+    ['Direito Penal', [['Teoria do crime', ['Elementos', 'Tentativa']], ['Crimes contra a Administração', ['Peculato', 'Corrupção']]]],
+    ['Investigação Criminal', [['Inquérito policial', ['Instauração', 'Procedimento']], ['Cadeia de custódia', ['Coleta', 'Preservação']]]]
+  ];
+  var EDITAL_PRF = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Argumentação']], ['Gramática', ['Concordância', 'Regência']]]],
+    ['Legislação de Trânsito', [['Código de Trânsito', ['Normas gerais', 'Infrações']], ['Habilitação', ['Categorias', 'Penalidades']]]],
+    ['Direito Administrativo', [['Princípios', ['Legalidade', 'Moralidade']], ['Poderes', ['Poder de polícia', 'Hierárquico']]]],
+    ['Física aplicada', [['Cinemática', ['Velocidade', 'Aceleração']], ['Dinâmica', ['Forças', 'Atrito']]]]
+  ];
+  var CONCURSOS = [
+    { id: 'cfo',     nome: 'PM-BA · CFO (Oficiais)',     edital: 'CFO 2024',   situacao: 'reta-final', arvore: EDITAL_CFO },
+    { id: 'sdba',    nome: 'PM-BA · Soldado',            edital: 'CFSd 2025',  situacao: 'aberto',     arvore: EDITAL_SOLDADO },
+    { id: 'sdfront', nome: 'PM Fronteiras · Soldado',    edital: '—',          situacao: 'proposta',   arvore: EDITAL_SOLDADO },
+    { id: 'ppba',    nome: 'Polícia Penal · BA',         edital: '—',          situacao: 'proposta',   arvore: EDITAL_PPBA },
+    { id: 'pcba',    nome: 'Polícia Civil · BA',         edital: 'PC-BA 2025', situacao: 'aberto',     arvore: EDITAL_PCBA },
+    { id: 'prf',     nome: 'Polícia Rodoviária Federal', edital: 'PRF 2025',   situacao: 'reta-final', arvore: EDITAL_PRF }
+  ];
+  var SITUACOES = [['aberto', 'Edital aberto'], ['proposta', 'Proposta de edital para este ano'], ['reta-final', 'Reta final · pós-edital']];
+  function situacaoNome(s) { for (var i = 0; i < SITUACOES.length; i++) if (SITUACOES[i][0] === s) return SITUACOES[i][1]; return s; }
+  var MODALIDADES = [
+    { id: 'RONDESP', nome: 'Nivelamento · RONDESP', teoria: 70, questoes: 30, desc: 'mais teoria — base do conteúdo' },
+    { id: 'PATAMO',  nome: 'Regular · PATAMO',      teoria: 50, questoes: 50, desc: 'teoria e questões equilibradas' },
+    { id: 'BOPE',    nome: 'Questões · BOPE',       teoria: 20, questoes: 80, desc: 'mais questões — alta intensidade' }
+  ];
+  function modalidadeDe(id) { for (var i = 0; i < MODALIDADES.length; i++) if (MODALIDADES[i].id === id) return MODALIDADES[i]; return null; }
+  var TURMAS_ADM = [
+    { nome: 'PATAMO Noite', concurso: 'cfo',  modalidade: 'PATAMO',  inicio: '2026-06-01', fim: '2026-12-15' },
+    { nome: 'RONDESP Noite', concurso: 'sdba', modalidade: 'RONDESP', inicio: '2026-07-01', fim: '2027-01-30' },
+    { nome: 'BOPE Intensivo', concurso: 'pcba', modalidade: 'BOPE',   inicio: '2026-05-15', fim: '2026-11-20' }
+  ];
+  var EDITAL_ATUAL = EDITAL_CFO;     /* árvore que o Domínio do aluno mostra */
+  var CONCURSO_ATUAL_ID = 'cfo';
+  function concursoDe(id) { for (var i = 0; i < CONCURSOS.length; i++) if (CONCURSOS[i].id === id) return CONCURSOS[i]; return null; }
   function edHash(str) {
     var h = 0;
     for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
@@ -2763,7 +2849,8 @@
   }
   var trAj = {};   /* 'matéria|assunto' → deslocamento vindo do Treinamento Rápido */
   function edSubPct(mi, mat, ass, sub) {
-    var v = ED_BASE[mi] + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[mat + '|' + ass] || 0);
+    var base = (ED_BASE[mi] != null) ? ED_BASE[mi] : (40 + (edHash(mat) % 40));
+    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[mat + '|' + ass] || 0);
     return Math.max(0, Math.min(100, v));
   }
   function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
@@ -2782,7 +2869,7 @@
     var box = $('editalTree');
     if (!box) { return; }
     var html = '';
-    EDITAL_CFO.forEach(function (mat, mi) {
+    EDITAL_ATUAL.forEach(function (mat, mi) {
       var matNm = mat[0], assuntos = mat[1];
       var assPcts = assuntos.map(function (ass) {
         return edAvg(ass[1].map(function (sub) { return edSubPct(mi, matNm, ass[0], sub); }));
@@ -5140,8 +5227,80 @@
   $('helpLayer').addEventListener('click', function (e) { if (e.target === $('helpLayer')) helpClose(); });
 
 
+  /* ---------- Estrutura: concursos, modalidades, turmas e Domínio ---------- */
+  function contaArvore(arv) {
+    var mat = arv.length, ass = 0, sub = 0;
+    arv.forEach(function (m) { m[1].forEach(function (a) { ass++; sub += a[1].length; }); });
+    return mat + ' matérias · ' + ass + ' assuntos · ' + sub + ' sub-assuntos';
+  }
+  function definirDominio(id) {
+    var c = concursoDe(id); if (!c) return;
+    CONCURSO_ATUAL_ID = id;
+    EDITAL_ATUAL = c.arvore;
+    var dc = $('domConcurso'); if (dc) dc.textContent = c.nome + (c.edital && c.edital !== '—' ? ' · ' + c.edital : '');
+    var dl = $('domTreeLabel'); if (dl) dl.textContent = 'Árvore do edital · ' + c.nome;
+    renderEdital();
+    renderConcursos();
+    toast('Domínio do aluno agora segue o edital de ' + c.nome + '.');
+  }
+  function renderConcursos() {
+    var el = $('admConcList'); if (!el) return;
+    el.innerHTML = CONCURSOS.map(function (c) {
+      var atual = c.id === CONCURSO_ATUAL_ID;
+      var opts = SITUACOES.map(function (s) { return '<option value="' + s[0] + '"' + (c.situacao === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('');
+      return '<div class="conc-row"><div class="conc-top">' +
+        '<span class="conc-nome">' + c.nome + '</span>' +
+        (atual ? '<span class="tag ok">DOMÍNIO ATUAL</span>' : '<button class="btn ghost small" data-dom="' + c.id + '">Definir Domínio</button>') + '</div>' +
+        '<div class="conc-meta">Edital: <strong>' + c.edital + '</strong> · ' + contaArvore(c.arvore) + '</div>' +
+        '<select class="fld conc-sit" data-sit="' + c.id + '">' + opts + '</select></div>';
+    }).join('');
+    el.querySelectorAll('[data-dom]').forEach(function (b) { b.addEventListener('click', function () { definirDominio(b.dataset.dom); }); });
+    el.querySelectorAll('[data-sit]').forEach(function (s) {
+      s.addEventListener('change', function () { var c = concursoDe(s.dataset.sit); if (c) { c.situacao = s.value; toast('Situação de ' + c.nome + ': ' + situacaoNome(s.value) + '.'); } });
+    });
+  }
+  function renderModalidades() {
+    var el = $('admModList'); if (!el) return;
+    el.innerHTML = MODALIDADES.map(function (m) {
+      return '<div class="mod-row"><div class="mod-top"><span class="mod-nome">' + m.nome + '</span><span class="mod-desc">' + m.desc + '</span></div>' +
+        '<div class="mod-bar"><span class="mod-teo" style="width:' + m.teoria + '%">' + m.teoria + '% teoria</span>' +
+        '<span class="mod-que" style="width:' + m.questoes + '%">' + m.questoes + '% questões</span></div></div>';
+    }).join('');
+  }
+  var DIA_SEM_TURMA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  function dataBRcompleta(iso) { if (!iso) return '—'; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function renderTurmasAdm() {
+    var el = $('admTurmaList'); if (!el) return;
+    el.innerHTML = TURMAS_ADM.map(function (t, i) {
+      var c = concursoDe(t.concurso), m = modalidadeDe(t.modalidade);
+      return '<div class="adm-bar"><span class="nm">' + t.nome +
+        '<small>' + (c ? c.nome : '?') + ' · ' + (m ? m.nome : t.modalidade) + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) + '</small></span>' +
+        '<button class="adm-x" data-rm-turma="' + i + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma cadastrada.</p>';
+    el.querySelectorAll('[data-rm-turma]').forEach(function (b) {
+      b.addEventListener('click', function () { var t = TURMAS_ADM[+b.dataset.rmTurma]; TURMAS_ADM.splice(+b.dataset.rmTurma, 1); renderTurmasAdm(); toast('Turma “' + t.nome + '” removida.'); });
+    });
+  }
+  function admEstruturaInit() {
+    $('admTurmaConc').innerHTML = CONCURSOS.map(function (c) { return '<option value="' + c.id + '">' + c.nome + '</option>'; }).join('');
+    $('admTurmaMod').innerHTML = MODALIDADES.map(function (m) { return '<option value="' + m.id + '">' + m.nome + '</option>'; }).join('');
+    renderConcursos(); renderModalidades(); renderTurmasAdm();
+  }
+  $('btnAdmTurma').addEventListener('click', function () {
+    var nome = $('admTurmaNome').value.trim();
+    var conc = $('admTurmaConc').value, mod = $('admTurmaMod').value;
+    var ini = $('admTurmaIni').value, fim = $('admTurmaFim').value;
+    if (!nome) { toast('Dê um nome à turma.'); return; }
+    if (!ini || !fim) { toast('Informe o início e o término provável.'); return; }
+    if (fim < ini) { toast('O término deve ser depois do início.'); return; }
+    TURMAS_ADM.unshift({ nome: nome, concurso: conc, modalidade: mod, inicio: ini, fim: fim });
+    renderTurmasAdm();
+    $('admTurmaNome').value = ''; $('admTurmaIni').value = ''; $('admTurmaFim').value = '';
+    var c = concursoDe(conc);
+    toast('Turma “' + nome + '” aberta — ' + (c ? c.nome : '') + ' · ' + (modalidadeDe(mod) || {}).nome + '.');
+  });
+
   /* ---------- admin ---------- */
-  $('btnNovaTurma').addEventListener('click', function () { toast('Nova turma: escolha o edital e a modalidade'); });
   $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
   $('btnReconciliar').addEventListener('click', function () {
     var c = $('reconCard');
@@ -5993,7 +6152,7 @@
   renderAvisos(); admCronoInit(); renderAdmEventos();
   renderPedidos(); renderSimPres(); renderSdList();
   renderDificuldades(); renderPrecos(); renderCompras();
-  renderSimulados();
+  renderSimulados(); admEstruturaInit();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;
