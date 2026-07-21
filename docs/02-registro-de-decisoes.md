@@ -42,6 +42,9 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 35 | 21/07 | **Ícone do produto escolhido numa paleta** no cadastro (turma, simulado, garrafinha, módulo, aulão, evento, chaveiro, camiseta, caneca, medalha…) | Catálogo `ICON_CAT` compartilhado |
 | 36 | 21/07 | **Evento online = evento com link**: entra no carrossel com resumo; o inscrito recebe o botão de acesso ao link | Une criação do evento, link e disposição para o comprador/inscrito |
 | 37 | 21/07 | **Cancelar evento / remover produto** pelo ✕ na administração | Sai da Loja, do carrossel e dos calendários na hora |
+| 38 | 21/07 | **Evento tem data + horário de início + término** | Ex.: "QUA · 29/07 · 19H–21H30" |
+| 39 | 21/07 | **Online/Presencial é modalidade (tópico) do evento, não nome de produto** | Removidos os "produtos" Evento online/presencial da Loja |
+| 40 | 21/07 | **Evento gratuito × pago**: gratuito entra no Início e dá recompensa ao participar; pago é vendido na Loja (aba Eventos) e, ao ser comprado, migra para o Início e sai da Loja; online libera o link ao comprador | Corrige a lógica do evento online (antes desconectada); catálogo de eventos separado do cadastro genérico de produto |
 
 ## Regras de trabalho vigentes
 

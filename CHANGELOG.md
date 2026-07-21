@@ -1,5 +1,22 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — modelo de eventos: modalidade, gratuito/pago e horário fim
+- **Evento agora tem data, horário de início E de término** (ex.: "QUA ·
+  29/07 · 19H–21H30") — antes só a data e um horário
+- **"Online/Presencial" virou modalidade (tópico), não nome de produto**:
+  saíram da Loja os "produtos" *Evento online* e *Evento presencial*
+- **Dois tipos de evento** (regra de negócio):
+  - **Gratuito** — entra direto nos *Eventos da semana* do Início; ao
+    participar, o aluno ganha **score e Quad Coins**
+  - **Pago** — vai para a aba **Eventos da Loja**; ao ser comprado com Quad
+    Coins, **migra para os Eventos do Início** e **sai da Loja** (já foi
+    comprado). Evento online libera o **link** de acesso ao comprador
+- O cadastro genérico de produto **não oferece mais "Eventos"** — evento se
+  cria pelo fluxo de eventos (com modalidade, data/início/término, tipo e
+  preço); cancelar um evento pelo ✕ também o remove da Loja
+- Nova suíte `vevento` (21 checagens) verde; `vloja2`/`vloja3` ajustadas;
+  `vev`, `vloja`, `vmochila`, `vbonus` e o tutorial (`vtut`) sem regressões
+
 ## 21/07/2026 — estoque/entrega na Loja, ícones, evento online e calendário
 - **Tutorial destravado na compra da boina**: com o card "Itens do
   personagem" mais alto (boina + skins + combate), a boina saía da tela. O
