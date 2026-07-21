@@ -46,6 +46,10 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 39 | 21/07 | **Online/Presencial é modalidade (tópico) do evento, não nome de produto** | Removidos os "produtos" Evento online/presencial da Loja |
 | 40 | 21/07 | **Evento gratuito × pago**: gratuito entra no Início e dá recompensa ao participar; pago é vendido na Loja (aba Eventos) e, ao ser comprado, migra para o Início e sai da Loja; online libera o link ao comprador | Corrige a lógica do evento online (antes desconectada); catálogo de eventos separado do cadastro genérico de produto |
 | 41 | 21/07 | **Tutorial aponta a boina diretamente**: removido o passo que destacava o card inteiro de itens ("área geral") após ganhar os 25 Coins | O card ficou grande (boina + skins + combate) e o passo "toca pra olhar" confundia — qualquer toque levava à boina |
+| 42 | 21/07 | **Simulados presenciais no modelo dos eventos**: admin lança pela agenda (data+início+término), grátis (gera QdC) ou pago (custa QdC); inscrição corrigida (grátis também registra) | Simulado presencial = evento com liberação na entrada; o botão do Simuladão estava inerte |
+| 43 | 21/07 | **Liberações**: todo inscrito (pago ou grátis) aparece agrupado por simulado; liberar a entrada pontua (QdC+score) quem participa de simulado que gera QdC | Fecha o ciclo inscrição→recepção→pontuação |
+| 44 | 21/07 | **Removidos** o indicador "Online" do topo e o bloco "Atividades online · links" da Loja do admin | Offline aposentado; links agora vêm do próprio evento/simulado online |
+| — | 21/07 | **Pendências acordadas**: simulado digital (PDF→quiz cronometrado) e área de Estrutura (turmas/modalidades/editais→Domínio) ficam para as próximas fases | Faseamento combinado com o fundador |
 
 ## Regras de trabalho vigentes
 

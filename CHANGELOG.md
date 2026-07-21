@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 21/07/2026 — simulados presenciais + liberações; limpezas de UI
+- **Bug corrigido**: o botão de inscrição do "Simuladão Quad" (e de todo
+  simulado presencial **gratuito**) não funcionava — só dava um toast e
+  nunca marcava inscrição. Agora inscreve de verdade e alimenta as
+  Liberações
+- **Simulados no modelo dos eventos**: a administração lança simulado
+  presencial pela **agenda** (data + início + término) escolhendo
+  **grátis (gera QdC)** ou **pago (custa QdC)**
+- **Liberações reconstruídas**: todo inscrito (pago **ou grátis**) aparece
+  agrupado por simulado; a administração **libera a entrada** e, nos
+  simulados que geram QdC, a liberação **pontua quem compareceu** (credita
+  QdC + score ao participante)
+- **Limpeza 1**: removido o indicador **"Online"** do topo (o acesso
+  offline já tinha sido aposentado)
+- **Limpeza 2**: removido o bloco obsoleto **"Atividades online · links de
+  acesso"** da Loja do administrador (eventos/simulados online já carregam
+  o próprio link)
+- Nova suíte `vsim` (14 checagens) verde; `vacesso` e `vadmin` atualizadas;
+  demais suítes sem regressões
+- **A construir (próxima fase)**: motor do **simulado digital** (PDF → quiz
+  cronometrado que gera score/QdC) e a área de **Estrutura**
+  (turmas/modalidades/editais → Domínio)
+
 ## 21/07/2026 — tutorial: aponta a boina direto (sem "área geral de itens")
 - No tutorial, depois de ganhar os 25 Quad Coins, havia um passo que
   destacava o **card inteiro** de itens do personagem (boina + skins +
