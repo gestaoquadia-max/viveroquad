@@ -1,5 +1,32 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Relatórios com gráficos (Fase 3)
+- **Aba Relatórios reconstruída** com sub-navegação em 4 painéis
+  (**Individuais · Turmas · Gerais · Loja**) e gráficos no tema da marca
+  (colunas e rosca em CSS/HTML, sem bibliotecas externas):
+  - **Individuais**: seletor de aluno; **uso do app** (logins por semana,
+    colunas) com resumo; **compras QdC × Dmn** em rosca + legenda +
+    histórico com datas; **pedagógico** (pontos fracos no Domínio);
+    **reclamações** como placeholder. Trocar de aluno muda os gráficos
+  - **Turmas**: seletor de turma; **dificuldades** reais (sub-assuntos,
+    assuntos, matérias, da árvore de Domínio); **uso da sala** (colunas
+    por dia); **alunos que precisam de apoio**; **presença** e
+    **feedbacks** como placeholders
+  - **Gerais**: **perfil médio** da base; **dificuldade pedagógica** por
+    matéria (barras); **satisfação** como placeholder
+  - **Loja**: **vendas por período** (colunas); **mais vendidos**
+    (barras); **faturamento QdC × Dmn** (rosca); **entradas × saídas** de
+    Quad Coins (colunas); **Compradores · últimas compras** (movido para
+    cá, da aba Loja de governança)
+- **Regra “ver completo”** aplicada aos Compradores (abre além das 5
+  primeiras linhas), no padrão do ranking da sala
+- Correção: cálculo por aluno usava deslocamento de bits com sinal
+  (`>>`) sobre hash uint32, gerando colunas negativas — trocado por
+  deslocamento sem sinal (`>>>`)
+- Nova suíte `vrelatorios` (29 checagens) verde; `vcontrole`, `vinterno`,
+  `vadmin`, `vestrutura`, `vdmn`, `vsim`, `vloja2/3` e o tutorial
+  completo sem regressões
+
 ## 24/07/2026 — Painel interno completo (Fase 2)
 - **Criação de turmas** no Painel interno: nome **pré-configurado pelo
   tipo** (RONDESP · Nivelamento, PATAMO · Regular, BOPE · Questões) +

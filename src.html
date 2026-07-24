@@ -1077,6 +1077,35 @@
   .adm-bar .mini-track { flex: none; width: 76px; height: 8px; border-radius: 99px; background: #E8EFF9; overflow: hidden; }
   .adm-bar .mini-track i { display: block; height: 100%; border-radius: 99px; }
 
+  /* ---------- Relatórios (Fase 3): sub-navegação e gráficos ---------- */
+  .rel-tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .rel-tab { flex: 1 1 0; min-width: 72px; border: 1px solid var(--p-line); background: var(--p-surface);
+    color: var(--p-dim); border-radius: 10px; padding: 7px 4px; font: 700 11.5px system-ui; cursor: pointer; transition: .15s; }
+  .rel-tab.on { background: var(--p-blue); border-color: var(--p-blue); color: #fff; }
+  .rel-panel { display: none; }
+  .rel-panel.on { display: block; }
+  .rchart { display: flex; align-items: flex-end; gap: 6px; height: 118px; padding-top: 6px; }
+  .rchart .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .rchart .col i { width: 100%; max-width: 26px; min-height: 3px; border-radius: 6px 6px 0 0;
+    background: linear-gradient(180deg, var(--p-blue), var(--p-gold)); display: block; }
+  .rchart .col i.alt { background: linear-gradient(180deg, #34D6D8, #16A6B4); }
+  .rchart .col b { font: 700 10px Consolas, monospace; color: var(--p-text); }
+  .rchart .col span { font: 600 9.5px system-ui; color: var(--p-dim); text-align: center; line-height: 1.1; }
+  .rdonut-wrap { display: flex; align-items: center; gap: 16px; }
+  .rdonut { width: 116px; height: 116px; border-radius: 50%; flex: none; position: relative;
+    background: conic-gradient(var(--p-gold) 0 var(--a, 50%), #16A6B4 var(--a, 50%) 100%); }
+  .rdonut::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; background: var(--p-card); }
+  .rlegend { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+  .rlegend div { display: flex; align-items: center; gap: 7px; color: var(--p-text); }
+  .rlegend .dot { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .rlegend .dot.qdc { background: var(--p-gold); }
+  .rlegend .dot.dmn { background: #16A6B4; }
+  .rlegend b { font: 700 12px Consolas, monospace; }
+  .rlegend small { color: var(--p-dim); display: block; font-size: 10.5px; }
+  .rel-ph { border: 1px dashed var(--p-line); border-radius: 12px; padding: 12px; background: #F7FBFF;
+    color: var(--p-dim); font-size: 12px; display: flex; align-items: center; gap: 9px; }
+  .rel-ph .tag { flex: none; }
+
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
@@ -2338,27 +2367,134 @@
         <!-- ============ ADMIN · ALUNOS ============ -->
         <div class="view" id="v-adm-alunos">
           <div class="p-card">
-            <div class="k-label">Visão geral da base</div>
-            <table class="mini"><tbody>
-              <tr><td>Alunos ativos na plataforma</td><td><strong>412</strong></td></tr>
-              <tr><td>Missões da noite em dia</td><td><strong>76%</strong></td></tr>
-              <tr><td>Turnos ativos</td><td><strong>Noite</strong> · manhã e tarde na V1</td></tr>
-            </tbody></table>
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 3 3 4-6"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · leitura de dados</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Relatórios</h3>
+              </div>
+            </div>
+            <p class="sub">Painéis com gráficos para decisão: por aluno, por turma, gerais e da Loja. Blocos grandes abrem com <strong>“ver completo”</strong>.</p>
+            <div class="rel-tabs" id="relTabs">
+              <button class="rel-tab on" data-rel="ind">Individuais</button>
+              <button class="rel-tab" data-rel="turma">Turmas</button>
+              <button class="rel-tab" data-rel="geral">Gerais</button>
+              <button class="rel-tab" data-rel="loja">Loja</button>
+            </div>
           </div>
 
-          <div class="p-card">
-            <div class="k-label">Maiores dificuldades · sub-assuntos</div>
-            <div id="admDifSubs"></div>
-            <div class="k-label" style="margin-top:12px">Assuntos que mais pesam</div>
-            <div id="admDifAss"></div>
-            <div class="k-label" style="margin-top:12px">Matérias · domínio médio da base</div>
-            <div id="admDifMat"></div>
-            <p class="sub" style="margin-top:8px">Calculado da mesma árvore de Domínio que o aluno vê — o Treinamento Rápido move estes números ao vivo.</p>
+          <!-- ===== INDIVIDUAIS ===== -->
+          <div class="rel-panel on" data-relpanel="ind">
+            <div class="p-card">
+              <div class="k-label">Aluno</div>
+              <select class="fld" id="relIndAluno" style="margin-top:6px"></select>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Uso do app · logins por semana</div>
+              <div class="rchart" id="relIndUso"></div>
+              <div id="relIndUsoResumo" class="sub" style="margin-top:8px"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Compras · Quad Coins × Diamantes</div>
+              <div class="rdonut-wrap" style="margin-top:8px">
+                <div class="rdonut" id="relIndDonut"></div>
+                <div class="rlegend" id="relIndLegenda"></div>
+              </div>
+              <div class="adm-sep"><span>Histórico de compras</span></div>
+              <div id="relIndCompras"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Pedagógico · pontos fracos no Domínio</div>
+              <div id="relIndPedag"></div>
+              <p class="sub" style="margin-top:8px">Vem da mesma árvore de Domínio e dos blocos de questões respondidos.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Reclamações e atendimentos</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Canal de reclamações do aluno — histórico e status entram aqui.</div>
+            </div>
           </div>
 
-          <div class="p-card">
-            <div class="k-label">Alunos que precisam de apoio</div>
-            <div id="admApoioList"></div>
+          <!-- ===== TURMAS ===== -->
+          <div class="rel-panel" data-relpanel="turma">
+            <div class="p-card">
+              <div class="k-label">Turma</div>
+              <select class="fld" id="relTurmaSel" style="margin-top:6px"></select>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Maiores dificuldades · sub-assuntos</div>
+              <div id="admDifSubs"></div>
+              <div class="k-label" style="margin-top:12px">Assuntos que mais pesam</div>
+              <div id="admDifAss"></div>
+              <div class="k-label" style="margin-top:12px">Matérias · domínio médio da sala</div>
+              <div id="admDifMat"></div>
+              <p class="sub" style="margin-top:8px">Calculado da mesma árvore de Domínio que o aluno vê — o Treinamento Rápido move estes números ao vivo.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Uso do app na sala · logins por dia</div>
+              <div class="rchart" id="relTurmaUso"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Alunos que precisam de apoio</div>
+              <div id="admApoioList"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Presença nas aulas</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Chamada por aula e frequência da turma entram aqui.</div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Feedbacks da turma</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Pesquisa de satisfação e comentários da sala.</div>
+            </div>
+          </div>
+
+          <!-- ===== GERAIS ===== -->
+          <div class="rel-panel" data-relpanel="geral">
+            <div class="p-card">
+              <div class="k-label">Perfil médio da base</div>
+              <table class="mini"><tbody>
+                <tr><td>Alunos ativos na plataforma</td><td><strong>412</strong></td></tr>
+                <tr><td>Missões da noite em dia</td><td><strong>76%</strong></td></tr>
+                <tr><td>Idade média · concurso-alvo</td><td><strong>24 anos · Soldado</strong></td></tr>
+                <tr><td>Turnos ativos</td><td><strong>Noite</strong> · manhã e tarde na V1</td></tr>
+              </tbody></table>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Dificuldade pedagógica · matérias da base</div>
+              <div id="relGeralMat"></div>
+              <p class="sub" style="margin-top:8px">Média de domínio por matéria em toda a base — quanto menor, mais atenção pedagógica.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Satisfação geral</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>NPS e pesquisa de satisfação da base entram aqui.</div>
+            </div>
+          </div>
+
+          <!-- ===== LOJA ===== -->
+          <div class="rel-panel" data-relpanel="loja">
+            <div class="p-card">
+              <div class="k-label">Vendas por período · últimas semanas</div>
+              <div class="rchart" id="relLojaVendas"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Mais vendidos</div>
+              <div id="relLojaTop"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Faturamento · Quad Coins × Diamantes</div>
+              <div class="rdonut-wrap" style="margin-top:8px">
+                <div class="rdonut" id="relLojaDonut"></div>
+                <div class="rlegend" id="relLojaLegenda"></div>
+              </div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Entradas × saídas de Quad Coins · base</div>
+              <div class="rchart" id="relLojaFluxo"></div>
+              <p class="sub" style="margin-top:8px">Entradas = QdC conquistados em missões/eventos; saídas = QdC gastos na Loja.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Compradores · últimas compras</div>
+              <div id="admComprasList"></div>
+            </div>
           </div>
         </div>
 
@@ -2399,12 +2535,7 @@
             <div class="k-label">Preços da Loja · atualizar</div>
             <div id="admPrecosList"></div>
             <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecos">Aplicar preços</button></div>
-            <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins.</p>
-          </div>
-
-          <div class="p-card">
-            <div class="k-label">Compradores · últimas compras</div>
-            <div id="admComprasList"></div>
+            <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins. O log de <strong>compradores</strong> agora fica em <strong>Relatórios · Loja</strong>.</p>
           </div>
 
         </div>
@@ -6880,7 +7011,7 @@
       '<span class="mini-track"><i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i></span>' +
       '<span class="pct" style="color:' + edPcColor(pct) + '">' + Math.round(pct) + '%</span></div>';
   }
-  function renderDificuldades() {
+  function relComputeDif() {
     var subs = [], assMap = [], matMap = [];
     EDITAL_CFO.forEach(function (mat, mi) {
       var matPcts = [];
@@ -6898,9 +7029,13 @@
     });
     var asc = function (a, b) { return a.pct - b.pct; };
     subs.sort(asc); assMap.sort(asc); matMap.sort(asc);
-    $('admDifSubs').innerHTML = subs.slice(0, 5).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
-    $('admDifAss').innerHTML = assMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
-    $('admDifMat').innerHTML = matMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    return { subs: subs, assMap: assMap, matMap: matMap };
+  }
+  function renderDificuldades() {
+    var d = relComputeDif(), subs = d.subs, assMap = d.assMap, matMap = d.matMap;
+    if ($('admDifSubs')) $('admDifSubs').innerHTML = subs.slice(0, 5).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    if ($('admDifAss')) $('admDifAss').innerHTML = assMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    if ($('admDifMat')) $('admDifMat').innerHTML = matMap.slice(0, 3).map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
     /* apoio: casos comuns + o aluno desta sessão, com a matéria real mais fraca */
     $('admApoioList').innerHTML = [
       { nome: nomeCurto(), turma: turmaLabel(), dif: 'mais fraco em ' + matMap[0].n },
@@ -6919,7 +7054,7 @@
     });
   }
   var navAlunosBtn = document.querySelector('#navAdmin .nav-btn[data-view="v-adm-alunos"]');
-  if (navAlunosBtn) navAlunosBtn.addEventListener('click', renderDificuldades);
+  if (navAlunosBtn) navAlunosBtn.addEventListener('click', function () { renderRelatorios(); });
 
   /* ---------- governança da Loja: preços, compradores, links ---------- */
   function lojaPrecosLista() {
@@ -6965,16 +7100,149 @@
     COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora' });
     renderCompras();
   }
+  var relOpen = { compras: false };
+  function compraRow(cp) {
+    return '<div class="adm-bar"><span class="nm">' + cp.item + '<small>' + cp.aluno + ' · ' + cp.quando + '</small></span>' +
+      '<span class="pct">−' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
+  }
   function renderCompras() {
     var el = $('admComprasList'); if (!el) return;
-    el.innerHTML = COMPRAS.slice(0, 8).map(function (cp) {
-      return '<div class="adm-bar"><span class="nm">' + cp.item + '<small>' + cp.aluno + ' · ' + cp.quando + '</small></span>' +
-        '<span class="pct">−' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma compra ainda.</p>';
+    if (!COMPRAS.length) { el.innerHTML = '<p class="sub" style="padding:8px 0">Nenhuma compra ainda.</p>'; return; }
+    var lista = relOpen.compras ? COMPRAS : COMPRAS.slice(0, 5);
+    var html = lista.map(compraRow).join('');
+    if (COMPRAS.length > 5) {
+      html += '<button class="btn ghost small rk-toggle" id="relComprasBtn">' +
+        (relOpen.compras ? 'Mostrar menos' : 'Ver completo · ' + COMPRAS.length + ' compras') + '</button>';
+    }
+    el.innerHTML = html;
+    if ($('relComprasBtn')) $('relComprasBtn').onclick = function () { relOpen.compras = !relOpen.compras; renderCompras(); };
   }
+
+  /* ==================================================================
+     RELATÓRIOS (Fase 3) — painéis com gráficos: individuais, turmas,
+     gerais e Loja. Sub-navegação por chips; blocos grandes com "ver
+     completo". Gráficos em CSS/HTML (colunas e rosca), tema da marca.
+     ================================================================== */
+  function relCols(id, data, alt) {
+    var el = $(id); if (!el) return;
+    var max = data.reduce(function (m, d) { return Math.max(m, d.v); }, 0) || 1;
+    el.innerHTML = data.map(function (d) {
+      var h = Math.max(3, Math.round(d.v / max * 100));
+      return '<div class="col"><b>' + d.v + '</b><i class="' + (alt ? 'alt' : '') + '" style="height:' + h + '%"></i><span>' + d.lab + '</span></div>';
+    }).join('');
+  }
+  function relDonut(donutId, legId, qdc, dmn) {
+    var tot = (qdc + dmn) || 1, pq = Math.round(qdc / tot * 100);
+    if ($(donutId)) $(donutId).style.setProperty('--a', pq + '%');
+    if ($(legId)) $(legId).innerHTML =
+      '<div><i class="dot qdc"></i><span class="txt">Quad Coins<small>' + fmt(qdc) + ' QdC · ' + pq + '%</small></span></div>' +
+      '<div><i class="dot dmn"></i><span class="txt">Diamantes<small>' + fmt(dmn) + ' Dmn · ' + (100 - pq) + '%</small></span></div>';
+  }
+  /* dados sintéticos por aluno, estáveis (derivados do nome) + os dados
+     reais da conta desta sessão ('eu'): compras e pontos fracos vivos.   */
+  var REL_SEM = ['S-1', 'S-2', 'S-3', 'S-4', 'S-5', 'S-6'];
+  function relDadosAluno(id) {
+    var c = contaDe(id); if (!c) return null;
+    var nome = contaNome(c).replace(' · esta conta', ''), h = edHash(nome);
+    var uso = REL_SEM.map(function (lab, i) { return { lab: lab, v: 2 + ((h >>> (i * 2)) % 5) + (i % 2) }; });
+    var compras, qdc = 0, dmn = 0;
+    if (!c.seed) {
+      compras = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto(); });
+      if (!compras.length) compras = COMPRAS.slice(0, 2);
+    } else {
+      var cat = ['Aula isolada', 'Módulo impresso', 'Aulão especial', 'Garrafinha Quad', 'Curso online'];
+      compras = [0, 1, 2].map(function (k) {
+        var md = ((h >>> k) % 3 === 0) ? 'dmn' : 'qdc';
+        return { aluno: nome, item: cat[(h + k) % cat.length], valor: 40 + ((h >>> (k + 1)) % 9) * 20, moeda: md, quando: ['hoje', 'ontem', 'esta semana'][k] };
+      });
+    }
+    compras.forEach(function (cp) { if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor; });
+    /* pontos fracos: árvore de Domínio com deslocamento por aluno */
+    var dd = relComputeDif();
+    var fracos = dd.subs.map(function (x) { return { n: x.n, det: x.det, pct: Math.max(4, Math.min(98, x.pct + ((h % 21) - 10))) }; })
+      .sort(function (a, b) { return a.pct - b.pct; }).slice(0, 5);
+    return { nome: nome, uso: uso, compras: compras, qdc: qdc, dmn: dmn, fracos: fracos };
+  }
+  function renderRelInd() {
+    var sel = $('relIndAluno'); if (!sel) return;
+    var d = relDadosAluno(sel.value || 'eu'); if (!d) return;
+    relCols('relIndUso', d.uso);
+    var total = d.uso.reduce(function (a, x) { return a + x.v; }, 0);
+    $('relIndUsoResumo').innerHTML = '<strong>' + total + '</strong> logins nas últimas ' + d.uso.length + ' semanas · média <strong>' + Math.round(total / d.uso.length) + '</strong>/semana.';
+    relDonut('relIndDonut', 'relIndLegenda', d.qdc, d.dmn);
+    $('relIndCompras').innerHTML = d.compras.length
+      ? d.compras.map(compraRow).join('')
+      : '<p class="sub" style="padding:8px 0">Sem compras registradas.</p>';
+    $('relIndPedag').innerHTML = d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+  }
+  function renderRelTurma() {
+    renderDificuldades();   /* dificuldades da sala + apoio (mesma árvore) */
+    var sel = $('relTurmaSel');
+    var h = sel ? edHash(sel.value || 'sala') : 7;
+    var dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    relCols('relTurmaUso', dias.map(function (lab, i) { return { lab: lab, v: 8 + ((h >>> i) % 14) + (i === 5 ? -4 : 0) }; }));
+  }
+  function renderRelGeral() {
+    var mm = relComputeDif().matMap;
+    if ($('relGeralMat')) $('relGeralMat').innerHTML = mm.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+  }
+  var REL_LOJA_TOP = [
+    { n: 'Aulão especial', det: 'evento presencial', v: 128 },
+    { n: 'Módulo impresso', det: 'itens presenciais', v: 96 },
+    { n: 'Curso online · Direito Penal', det: 'itens digitais', v: 74 },
+    { n: 'Garrafinha Quad', det: 'itens presenciais', v: 61 },
+    { n: 'Vade Mecum', det: 'itens presenciais', v: 43 }
+  ];
+  function renderRelLoja() {
+    relCols('relLojaVendas', [
+      { lab: 'S-1', v: 34 }, { lab: 'S-2', v: 41 }, { lab: 'S-3', v: 29 },
+      { lab: 'S-4', v: 52 }, { lab: 'S-5', v: 47 }, { lab: 'S-6', v: 63 }
+    ]);
+    var maxv = REL_LOJA_TOP[0].v;
+    if ($('relLojaTop')) $('relLojaTop').innerHTML = REL_LOJA_TOP.map(function (x) {
+      return '<div class="adm-bar"><span class="nm">' + x.n + '<small>' + x.det + '</small></span>' +
+        '<span class="mini-track"><i style="width:' + Math.round(x.v / maxv * 100) + '%;background:var(--p-blue)"></i></span>' +
+        '<span class="pct">' + x.v + '</span></div>';
+    }).join('');
+    /* faturamento QdC×Dmn: base da operação + compras vivas desta sessão */
+    var qdc = 18600, dmn = 9400;
+    COMPRAS.forEach(function (cp) { if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor; });
+    relDonut('relLojaDonut', 'relLojaLegenda', qdc, dmn);
+    relCols('relLojaFluxo', [
+      { lab: 'Entra', v: 42000 }, { lab: 'Sai', v: 18600 }
+    ]);
+    renderCompras();
+  }
+  function renderRelatorios() {
+    renderRelInd(); renderRelTurma(); renderRelGeral(); renderRelLoja();
+  }
+  (function () {
+    var tabs = $('relTabs'); if (!tabs) return;
+    /* seletores de aluno e turma */
+    var selA = $('relIndAluno');
+    if (selA) selA.innerHTML = CONTAS.map(function (c) {
+      return '<option value="' + c.id + '">' + contaNome(c) + '</option>';
+    }).join('');
+    var selT = $('relTurmaSel');
+    if (selT) selT.innerHTML = ['PATAMO (Noite)', 'RONDESP (Noite)', 'BOPE (Noite)'].map(function (t, i) {
+      return '<option value="t' + i + '">Turma ' + t + '</option>';
+    }).join('');
+    tabs.querySelectorAll('.rel-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        tabs.querySelectorAll('.rel-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        document.querySelectorAll('#v-adm-alunos .rel-panel').forEach(function (pn) {
+          pn.classList.toggle('on', pn.dataset.relpanel === bt.dataset.rel);
+        });
+      });
+    });
+    if (selA) selA.addEventListener('change', renderRelInd);
+    if (selT) selT.addEventListener('change', renderRelTurma);
+  })();
   /* eventos/simulados online carregam o próprio link (ev.link); o cadastro
      avulso de "links de acesso" saiu da governança da Loja por estar obsoleto */
   var LINKS_ONLINE = {};
+  window.lojaCompraLog = lojaCompraLog;   /* exposto para a suíte de testes */
 
   /* estrutura (edital e questões saíram da nav, entram pela Estrutura) */
   $('btnIrEdital').addEventListener('click', function () { showView('v-edital', 'navAdmin'); });
@@ -6982,7 +7250,7 @@
 
   renderAvisos(); admCronoInit(); renderAdmEventos();
   renderPedidos(); renderSimPres(); renderAdmSimList();
-  renderDificuldades(); renderPrecos(); renderCompras();
+  renderRelatorios(); renderPrecos();
   renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
