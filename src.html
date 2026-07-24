@@ -3770,15 +3770,21 @@
   function evTileHTML(ev) {
     var st = evState[ev.id] || {};
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
+    var etiqueta = insc ? '<span class="tag gold">INSCRITO</span>'
+      : (ev.pago ? '<span class="tag gold">NA LOJA</span>' : (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : ''));
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
       '<span class="ev-name">' + ev.nome + '</span>' +
-      '<span class="ev-meta">' + ev.meta + '</span>' +
-      (insc ? '<span class="tag gold">INSCRITO</span>' : (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : '')) + '</button>';
+      '<span class="ev-meta">' + ev.meta + '</span>' + etiqueta + '</button>';
   }
-  /* eventos que aparecem no Início: gratuitos + pagos já comprados */
+  /* eventos no Início: gratuitos + pagos ainda não vencidos.
+     Pago não comprado aparece com "Na Loja" (clique leva à Loja);
+     comprado vira "Inscrito"; vencido some do carrossel e da Loja. */
   function eventosInicio() {
-    return EVENTOS.filter(function (ev) { return !ev.pago || (evState[ev.id] && evState[ev.id].comprado); });
+    return EVENTOS.filter(function (ev) {
+      if (evAcabou(ev)) return false;
+      return true;
+    });
   }
   var evNoInicioLen = 0;
   function evPeriod(st) {
@@ -3824,11 +3830,11 @@
       });
     });
   }
+  function evHojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
   function evAcabou(ev) {
-    if (!ev.ate) return false;
-    var hoje = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; };
-    var iso = hoje.getFullYear() + '-' + p(hoje.getMonth() + 1) + '-' + p(hoje.getDate());
-    return iso > ev.ate;
+    var lim = ev.ate || ev.dataISO;   /* multi-dia usa 'ate'; pontual usa a própria data */
+    if (!lim) return false;
+    return evHojeISO() > lim;
   }
   function comprarEvento(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;
@@ -3842,6 +3848,7 @@
       debitar(mo, ev.preco, ev.nome + ' · −' + fmt(ev.preco) + ' ' + moedaTxt(mo));
       var st = evState[id] || (evState[id] = { garimpado: false, inscrito: false });
       st.comprado = true; st.inscrito = true;   /* comprou o acesso = já está dentro */
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();
       if (typeof lojaCompraLog === 'function') lojaCompraLog(ev.nome, ev.preco, mo);
       renderEventosLoja();
       renderEvStrip();                                  /* entra no carrossel do Início */
@@ -3888,7 +3895,21 @@
     var tile = e.target.closest('.ev-tile[data-ev]');
     if (!tile) return;
     if (evDrag.moved) { evDrag.moved = false; return; }   /* arrasto não é clique */
-    openEvento(tile.dataset.ev);
+    var id = tile.dataset.ev, ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    var st = evState[id] || {};
+    /* pago ainda não comprado: a inscrição é na Loja → leva o aluno pra lá */
+    if (ev && ev.pago && !(st.comprado || st.inscrito)) {
+      showView('v-loja', 'navAluno');
+      if (typeof renderEventosLoja === 'function') renderEventosLoja();
+      setTimeout(function () {
+        var alvo = $(ev.modalidade === 'online' ? 'lojaEventos-dig' : 'lojaEventos-pres');
+        if (alvo) alvo.scrollIntoView({ block: 'center' });
+      }, 60);
+      toast('Inscrição pela Loja — este evento é pago.');
+      return;
+    }
+    openEvento(id);
   });
   function coinSvg() { return '<img class="coin-img" src="' + QUAD_COIN_SRC + '" alt="" aria-hidden="true">'; }
   var QUAD_COIN_SRC = '__QUAD_COIN__';
@@ -3934,6 +3955,7 @@
     $('btnEvInscrever').onclick = function () {
       st.inscrito = true;
       if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();   /* contador de inscritos no admin */
       this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
       evAplicaLink();
       if (typeof renderCalendario === 'function') renderCalendario();   /* entra no calendário do aluno */
@@ -4164,9 +4186,37 @@
     var nome = letra ? partes.slice(0, -1).join(' ') : ALUNO_TURMA;
     return 'Turma ' + nome + (letra ? ' (' + letra + ')' : '');
   }
+  /* horários vêm da turma criada no Painel de controle (fica sincronizado
+     em todo lugar que usa o dado: Aula de hoje, editor de cronograma…) */
+  function horSlots(hor) {
+    if (!hor) return null;
+    var ps = hor.split(' e ').map(function (x) { return x.trim().replace('–', ' – '); });
+    return ps.length === 2 ? ps : null;
+  }
+  function turmaCronoSlots(cronoNome) {
+    if (!cronoNome || typeof TURMAS_LOJA === 'undefined') return null;
+    var partes = cronoNome.split(' ');
+    var tipo = partes[0];
+    var turno = ({ 'NOITE': 'noite', 'MANHÃ': 'manhã', 'MANHA': 'manhã', 'TARDE': 'tarde' })[partes[partes.length - 1]] || 'noite';
+    var ms = TURMAS_LOJA.filter(function (x) { return x.tipo === tipo && x.turno === turno && x.hor; });
+    var t = ms.filter(function (x) { return x.criada; })[0] || ms[0];   /* nova turma criada substitui o horário */
+    return t ? horSlots(t.hor) : null;
+  }
+  function slotMinutos(slot) {
+    var m = /(\d{1,2})h(?:\s*(\d{2}))?/.exec(slot || '');
+    return m ? (+m[1]) * 60 + (m[2] ? +m[2] : 0) : null;
+  }
+  function slotsFaixas(slots) {
+    return slots.map(function (s) {
+      var lados = s.split('–');
+      var ini = slotMinutos(lados[0]), fim = slotMinutos(lados[1]);
+      return (ini != null && fim != null) ? [ini, fim] : null;
+    });
+  }
   function renderAulaHoje() {
     var t = CRONO.turmas[ALUNO_TURMA];
     if (!t) { return; }
+    var slots = turmaCronoSlots(ALUNO_TURMA) || CRONO.slots;
     var agora = new Date();
     var idx = agora.getDay() - 1;              /* seg=0 … sex=4 */
     var temHoje = idx >= 0 && idx <= 4;
@@ -4177,14 +4227,15 @@
       CRONO.dias[showIdx] + ' · ' + CRONO.datas[showIdx] +
       ' · ' + CRONO.turno + ' · ' + t.tipo;
     var mins = agora.getHours() * 60 + agora.getMinutes();
-    var faixas = [[19 * 60, 20 * 60 + 30], [20 * 60 + 30, 22 * 60]];
+    var faixasDin = slotsFaixas(slots);
+    var faixas = [faixasDin[0] || [19 * 60, 20 * 60 + 30], faixasDin[1] || [20 * 60 + 30, 22 * 60]];
     $('aulaSlots').innerHTML = t.aulas[showIdx].map(function (a, i) {
       var cls = '', st = '';
       if (temHoje) {
         if (mins >= faixas[i][1]) { cls = ' done'; st = 'ENCERRADO'; }
         else if (mins >= faixas[i][0]) { cls = ' now'; st = 'AGORA'; }
       }
-      return '<div class="aula-slot' + cls + '"><span class="a-hr">' + CRONO.slots[i] + '</span>' +
+      return '<div class="aula-slot' + cls + '"><span class="a-hr">' + (slots[i] || CRONO.slots[i]) + '</span>' +
         '<div class="a-info"><b>' + a.m + '</b><span>Encontro ' + String(a.e).padStart(2, '0') +
         ' · Prof. ' + a.p + '</span></div>' +
         (st ? '<span class="a-st">' + st + '</span>' : '') + '</div>';
@@ -6653,7 +6704,8 @@
       var profs = {};
       var mats = ctMaterias();
       $('admCtProfs').querySelectorAll('[data-ct-prof]').forEach(function (sel, i) { profs[mats[i]] = sel.value; });
-      var hor = h1i.replace(':', 'h') + '–' + h1f.replace(':', 'h') + ' e ' + h1f.replace(':', 'h') + '–' + h2f.replace(':', 'h');
+      var hl = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
+      var hor = hl(h1i) + '–' + hl(h1f) + ' e ' + hl(h1f) + '–' + hl(h2f);
       var id = 'ct' + Date.now();
       var nome = 'Turma ' + tipo + (ape ? ' · ' + ape : '') + (turno !== 'noite' ? ' (' + turno + ')' : '');
       TURMAS_LOJA.push({ id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: (modalidadeDe(tipo) || {}).nome || tipo, turno: turno, hor: hor,
@@ -6662,6 +6714,8 @@
       TURMAS_ADM.unshift({ ctId: id, nome: nome, concurso: foco.id, focoNome: foco.nome, modalidade: tipo,
         inicio: ini, fim: fim, h1i: h1i, h1f: h1f, h2f: h2f, edital: arq });
       renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+      if (typeof renderAulaHoje === 'function') renderAulaHoje();   /* horário novo sincroniza a Aula de hoje */
+      if (typeof admCronoPrefill === 'function') admCronoPrefill();  /* e o editor de cronograma */
       $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
       $('admCtH1i').value = ''; $('admCtH1f').value = ''; $('admCtH2f').value = '';
       $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = ''; $('admCtArvore').value = '';
@@ -7675,21 +7729,44 @@
       al.innerHTML = AVISOS.map(function (av, i) {
         return '<div class="mission-row"><div class="grow"><div class="t">' + av.t + '</div><div class="d">' + av.d + '</div></div>' +
           '<span class="tag">' + av.esc.toUpperCase() + '</span>' +
+          '<button class="btn ghost small" data-av-ed="' + i + '">Editar</button>' +
           '<button class="btn ghost small" data-av="' + i + '">Remover</button></div>';
       }).join('') || '<p class="sub" style="padding:8px 0">Nenhum aviso ativo.</p>';
       al.querySelectorAll('[data-av]').forEach(function (bt) {
         bt.addEventListener('click', function () {
           AVISOS.splice(parseInt(bt.dataset.av, 10), 1);
+          if (avisoEdit === parseInt(bt.dataset.av, 10)) avisoEditReset();
           renderAvisos();
           toast('Aviso removido do app dos alunos.');
         });
       });
+      al.querySelectorAll('[data-av-ed]').forEach(function (bt) {
+        bt.addEventListener('click', function () { editarAviso(parseInt(bt.dataset.avEd, 10)); });
+      });
     }
     if (typeof queueSync === 'function') queueSync();
   }
+  var avisoEdit = null;
+  function editarAviso(i) {
+    var av = AVISOS[i]; if (!av) return;
+    avisoEdit = i;
+    $('admAvTitulo').value = av.t; $('admAvDet').value = av.d === '—' ? '' : av.d; $('admAvEsc').value = av.esc;
+    var btn = $('btnAdmAviso'); if (btn) btn.textContent = 'Salvar aviso';
+    $('admAvTitulo').focus();
+    toast('Editando o aviso — ele segue no ar até você salvar.');
+  }
+  function avisoEditReset() { avisoEdit = null; var btn = $('btnAdmAviso'); if (btn) btn.textContent = 'Enviar'; }
   $('btnAdmAviso').addEventListener('click', function () {
     var t = $('admAvTitulo').value.trim(), d = $('admAvDet').value.trim();
     if (!t) { toast('Escreva o título do aviso.'); return; }
+    if (avisoEdit !== null && AVISOS[avisoEdit]) {
+      AVISOS[avisoEdit] = { t: t, d: d || '—', esc: $('admAvEsc').value };
+      avisoEditReset();
+      $('admAvTitulo').value = ''; $('admAvDet').value = '';
+      renderAvisos();
+      toast('Aviso atualizado no app dos alunos.');
+      return;
+    }
     AVISOS.unshift({ t: t, d: d || '—', esc: $('admAvEsc').value });
     $('admAvTitulo').value = ''; $('admAvDet').value = '';
     renderAvisos();
@@ -7698,7 +7775,15 @@
 
   /* ---------- cronograma: admin atualiza, turma sincroniza ---------- */
   function admCronoPrefill() {
-    var t = CRONO.turmas[$('admCrTurma').value];
+    var nome = $('admCrTurma').value;
+    var t = CRONO.turmas[nome];
+    /* os rótulos dos tempos seguem o horário da turma (criação de turmas) */
+    var slots = turmaCronoSlots(nome) || CRONO.slots;
+    var sel = $('admCrTempo');
+    if (sel && sel.options.length >= 2) {
+      sel.options[0].textContent = '1º tempo · ' + slots[0];
+      sel.options[1].textContent = '2º tempo · ' + slots[1];
+    }
     var a = t && t.aulas[+$('admCrDia').value] && t.aulas[+$('admCrDia').value][+$('admCrTempo').value];
     $('admCrMat').value = a ? a.m : '';
     $('admCrProf').value = a ? a.p : '';
@@ -7728,18 +7813,46 @@
   /* ---------- eventos da semana: regras e novos eventos ---------- */
   function renderAdmEventos() {
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
-      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + ev.preco + ' QdC' : ' · GRÁTIS');
-      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + '</small></span>' +
-        '<span class="tag">' + (ev.score.length + ev.coins.length) + ' regras</span>' +
+      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS');
+      var insc = evInscritosCount(ev.id);
+      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
+        '<button class="btn ghost small" data-ed-ev="' + ev.id + '">Editar</button>' +
         '<button class="adm-x" data-cancel-ev="' + ev.id + '" aria-label="Cancelar evento">✕</button></div>';
-    }).join('');
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento criado.</p>';
     $('admEvSel').innerHTML = EVENTOS.map(function (ev) {
       return '<option value="' + ev.id + '">' + ev.nome + '</option>';
     }).join('');
     $('admEvList').querySelectorAll('[data-cancel-ev]').forEach(function (bt) {
       bt.addEventListener('click', function () { cancelarEvento(bt.dataset.cancelEv); });
     });
+    $('admEvList').querySelectorAll('[data-ed-ev]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarEvento(bt.dataset.edEv); });
+    });
   }
+  function evInscritosCount(id) {
+    var st = evState[id];
+    return (st && (st.comprado || st.inscrito)) ? 1 : 0;   /* demo: só o aluno desta sessão */
+  }
+  var evEdit = null;
+  function editarEvento(id) {
+    var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    evEdit = id;
+    $('admEvNovoNome').value = ev.nome;
+    $('admEvNovoResumo').value = ev.desc || '';
+    $('admEvNovoModal').value = ev.modalidade || 'presencial';
+    $('admEvNovoTipo').value = ev.pago ? 'pago' : 'gratuito';
+    $('admEvNovoLink').value = ev.link || '';
+    if ($('admEvNovoMoeda')) $('admEvNovoMoeda').value = ev.moeda || 'qdc';
+    $('admEvNovoPreco').value = ev.pago ? ev.preco : '';
+    if (ev.dataISO) $('admEvNovoData').value = ev.dataISO;
+    admEvCamposToggle();
+    var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Salvar alterações';
+    admEvPreview();
+    $('admEvNovoNome').scrollIntoView({ block: 'center' });
+    toast('Editando “' + ev.nome + '” — as mudanças valem para quem já está inscrito ao salvar.');
+  }
+  function evEditReset() { evEdit = null; var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Criar evento'; }
   function cancelarEvento(id) {
     var ev = null;
     EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
@@ -7810,9 +7923,27 @@
     if (pago && (!preco || preco < 1)) { toast('Informe o preço do evento pago.'); return; }
     var online = modalidade === 'online';
     var moedaEv = pago ? ($('admEvNovoMoeda') ? $('admEvNovoMoeda').value : 'qdc') : 'qdc';
+    var dataISO = $('admEvNovoData').value || '';
+    /* SALVAR EDIÇÃO: atualiza no lugar, preservando inscritos (evState) */
+    if (evEdit) {
+      var ev = null; EVENTOS.forEach(function (x) { if (x.id === evEdit) ev = x; });
+      if (ev) {
+        ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link;
+        ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
+        ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
+        ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
+      }
+      evEditReset();
+      $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
+      $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
+      admEvPreview(); renderAdmEventos(); renderEventosLoja(); renderEvStrip();
+      if (typeof renderCalendario === 'function') renderCalendario();
+      toast('Evento “' + nome + '” atualizado — vale para todos, inclusive quem já está inscrito.');
+      return;
+    }
     EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
       tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
-      quando: quando, modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv,
+      quando: quando, dataISO: dataISO, modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
       desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
@@ -7821,9 +7952,9 @@
     admEvPreview();
     renderAdmEventos();
     renderEventosLoja();   /* pago → vitrine da Loja */
-    renderEvStrip();       /* gratuito → carrossel do Início */
+    renderEvStrip();       /* aparece no carrossel: pago = "Na Loja", grátis = direto */
     toast(pago
-      ? 'Evento pago criado — está à venda na Loja em ' + (moedaEv === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'
+      ? 'Evento pago criado — na Loja e no carrossel do Início com a tag “Na Loja”.'
       : 'Evento gratuito criado — já gira no carrossel do Início.');
   });
 

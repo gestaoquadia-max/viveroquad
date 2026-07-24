@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Ajustes do administrador · Controle interno (item 2)
+- **Avisos · editar**: cada aviso enviado ganhou botão **Editar** (ao
+  lado de Remover), que o traz de volta ao formulário; o botão vira
+  "Salvar aviso" e a alteração vale **no lugar**, sem duplicar
+- **Cronograma sincronizado com a criação de turmas**: os horários do
+  Cronograma (e da "Aula de hoje" do aluno, e dos rótulos do editor)
+  passam a **seguir o horário definido na turma**. Criar/editar uma
+  turma com horário diferente **sincroniza** na hora — inclusive as
+  faixas de "AGORA/ENCERRADO" saem do horário real da turma
+- **Evento criado integra Loja + "Eventos da semana"**: evento pago da
+  semana aparece **no carrossel do Início com a tag "Na Loja"**; clicar
+  **leva o aluno à Loja** (a inscrição é lá); comprado, vira **"Inscrito"**
+  no carrossel; e o evento **some** do carrossel e da Loja **quando a
+  data passa** (pontual pela própria data, maratona pelo último dia)
+- **Editar eventos já criados**: cada evento na lista tem botão
+  **Editar** que o traz ao formulário (nome, resumo, modalidade, moeda,
+  preço, data); salvar **atualiza para todos, inclusive quem já está
+  inscrito** — o painel ainda mostra o **contador de inscritos** por
+  evento
+- Nova suíte `vfaseg` (15 checagens) verde; `vfasea` ajustada à nova
+  regra do carrossel; todas as demais suítes (incl. tutorial) sem
+  regressões
+
 ## 24/07/2026 — Ajustes do administrador · Controle/Relatórios/Loja (itens 1, 3 e 5)
 - **Gift cards · "ver completo"**: os QR do lote não cabiam na tela
   (mostrava 6 de 20). Agora abrem **6 e um botão "Ver todos os N QR
