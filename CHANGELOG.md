@@ -1,5 +1,42 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Diamante (nova moeda) + Loja Quad reconstruída (Fase A)
+- **Diamante**: nova moeda com a arte oficial do gestor, exibida **logo
+  abaixo do Quad Coin** no topo. Não é conquistado em missões — é
+  **comprado em dinheiro** (recarga no checkout do site
+  `[INTEGRAÇÃO REAL]`; demo inicia com 150 Dmn) ou por **gift card de
+  liberação única** (resgate na Loja; demo: QUAD-100 e QUAD-500, reuso
+  bloqueado)
+- **Loja Quad**: cabeçalho gráfico novo (herói azul com os dois saldos e o
+  resgate de gift card); removidos os blocos "Intendência Quad" e "Como
+  ganhar Quad Coins". Reorganizada em **dois macro-blocos**:
+  - **Itens presenciais** — Turmas (RONDESP 1.800 · PATAMO 2.200 · BOPE
+    2.600 Dmn com **170 vagas** + **10 vagas em QdC**), Isoladas (com
+    professor à frente), Simulados presenciais, Eventos (aulões…),
+    Excursões, Módulos (vade mecum/apostilas), Treinamento TAF e Outros
+    (retirada na recepção)
+  - **Itens digitais** — Cursos online, Simulados digitais, Mentoria,
+    Eventos online, Itens do personagem e Itens de combate (mochila)
+- **Confirmação em toda compra** (evita compra sem querer): itens de
+  unidade única confirmam num modal; itens com estoque mantêm o seletor
+  de quantidade — agora com a moeda certa no total
+- **Preços por moeda**: cada produto vende em **QdC ou Dmn** ("30 Dmn"),
+  com pílula azul e losango nos itens em Diamante; **estoque/vagas**
+  decrementam na compra e o item **some do sistema ao esgotar**
+- **Boina do tutorial** sai da vitrine assim que comprada
+- **Admin**: cadastro de produto com **moeda (QdC/Dmn)** e categoria
+  "Itens digitais" (sem estoque — disponível/indisponível); lançamento de
+  **simulados** e **eventos pagos** com escolha da moeda; **separações
+  visuais** (criar × já enviados) em Avisos gerais, Eventos da semana e
+  Lançamento de simulados
+- Nova suíte `vdmn` (35 checagens) verde; todas as demais atualizadas ao
+  fluxo de confirmação e **sem regressões** (tutorial completo incluído)
+- **Próximas fases combinadas**: 5 abas novas do admin (Painel de
+  controle, Painel interno, Relatórios, Liberações, Loja), Painel de
+  controle (crédito manual, bloqueio de conta, mensagens/chat no "+"),
+  criação de turmas completa, produtos digitais pré-configurados,
+  criador de skins, botão de Quests e Relatórios com gráficos
+
 ## 21/07/2026 — simulados unificados: lançamento único e fluxo por modalidade
 - **Lançamento de simulados** agora é **um bloco só, na aba "Hoje"** (absorveu
   o antigo "Simulado presencial · lançar"): escolhe-se **modalidade**

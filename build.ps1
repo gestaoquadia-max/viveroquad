@@ -11,6 +11,7 @@ $dspr = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir
 $avs = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "avatars.jpg")))
 $ins = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "insignias.jpg")))
 $coin = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "quad-coin.webp")))
+$dmn = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "diamante.webp")))
 $fonts = [System.IO.File]::ReadAllText((Join-Path $dir "fonts.css"), [System.Text.Encoding]::UTF8)
 # fotos por variante do personagem (fotos/<variante>-<índice>.webp)
 function Fotos-Variante($prefixo) {
@@ -25,7 +26,7 @@ function Fotos-Variante($prefixo) {
 }
 $variantes = @("boina", "gandola", "colete", "fuzil", "cipe", "patamo", "bope")
 $fotosVar = '{ ' + (($variantes | ForEach-Object { '{0}: {1}' -f $_, (Fotos-Variante $_) }) -join ', ') + ' }'
-$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__FOTOS_VARIANTES__", $fotosVar)
+$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__DIAMANTE__", "data:image/webp;base64," + $dmn).Replace("__FOTOS_VARIANTES__", $fotosVar)
 $enc = New-Object System.Text.UTF8Encoding $false
 # artifact.html: conteúdo sem esqueleto (o Artifact adiciona doctype/head/body ao publicar)
 [System.IO.File]::WriteAllText((Join-Path $dir "artifact.html"), $out, $enc)
