@@ -1106,6 +1106,30 @@
     color: var(--p-dim); font-size: 12px; display: flex; align-items: center; gap: 9px; }
   .rel-ph .tag { flex: none; }
 
+  /* ---------- vinheta: linha de verificação (login em UMA tela) ---------- */
+  .splash-verify { margin-top: 16px; font-size: 11.5px; color: #BFD8F5; position: relative;
+    opacity: 0; animation: svIn .4s ease .15s forwards, svOut .6s ease 2.1s forwards; }
+  .splash-verify strong { color: #FFFFFF; }
+  @keyframes svIn { to { opacity: 1; } }
+  @keyframes svOut { to { opacity: 0; } }
+
+  /* ---------- Missões: bloco de simulados em camadas ---------- */
+  .sim-row { padding: 11px 0; border-bottom: 1px solid var(--p-line); }
+  .sim-row:last-child { border-bottom: none; padding-bottom: 4px; }
+  .sim-top { display: flex; align-items: center; gap: 8px; }
+  .sim-top .t { flex: 1; min-width: 0; font: 800 13px var(--ui); color: var(--p-text); line-height: 1.2; }
+  .sim-top .tag { flex: none; }
+  .sim-row .d { color: var(--p-dim); font-size: 11.5px; line-height: 1.5; margin: 5px 0 9px 32px; }
+  .sim-act { display: flex; justify-content: flex-end; }
+
+  /* ---------- Quad Store: divisórias de seção com vida ---------- */
+  .loja-sec { display: flex; align-items: center; gap: 8px; margin-top: 16px;
+    font: 800 11px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: #1D55B0; }
+  .loja-sec::before { content: ''; width: 4px; height: 15px; border-radius: 3px; flex: none;
+    background: linear-gradient(180deg, #3B8BFF, #1976FF); box-shadow: 0 1px 4px rgba(25,118,255,0.45); }
+  .loja-sec::after { content: ''; flex: 1; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, #BFD8F5, rgba(191,216,245,0)); }
+
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
@@ -1481,8 +1505,13 @@
         <!-- ============ ALUNO · MISSÕES ============ -->
         <div class="view" id="v-missoes">
           <div class="p-card" id="trCard">
-            <div class="k-label">Treinamento Rápido · flashcards</div>
-            <h3>Questões rápidas para revisão!</h3>
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="7" r="3.2"/><circle cx="18.5" cy="7" r="0.6"/><path d="M17 12.5h3M18.5 12.5V20"/><circle cx="5.5" cy="7.5" r="1.9"/><path d="M5.5 9.4V14"/><path d="m5.5 14-2 5.4M5.5 14l2.2 5.4"/><path d="m5.8 10.4 4.4-.9 3.6-.9"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">Treinamento Rápido · flashcards</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Questões rápidas para revisão!</h3>
+              </div>
+            </div>
             <p class="sub" id="trCardSub">Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.</p>
             <div style="margin-top:10px"><button class="btn small" id="btnTreinoRapido">Abrir treinamento</button></div>
           </div>
@@ -1579,7 +1608,7 @@
         <div class="view" id="v-loja">
           <div class="p-card loja-hero">
             <div class="lh-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-            <h2 class="mil lh-title">Loja Quad</h2>
+            <h2 class="mil lh-title">Quad Store</h2>
             <p class="lh-sub">Todos os produtos do Quad, comprados aqui dentro — com <strong>Quad Coins</strong> (esforço) ou <strong>Diamantes</strong> (recarga do site / gift card).</p>
             <div class="lh-saldos">
               <span class="loja-saldo"><img src="__QUAD_COIN__" alt="" aria-hidden="true"><b id="lojaSaldo">1.240</b>&nbsp;QdC</span>
@@ -1593,9 +1622,9 @@
 
           <!-- ================= ITENS PRESENCIAIS ================= -->
           <div class="p-card">
-            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></svg></span>Itens presenciais</div>
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></svg></span>Atividades e itens · presenciais</div>
 
-            <div class="k-label sub-k">Turmas · modalidades do Quad</div>
+            <div class="loja-sec">Turmas · modalidades do Quad</div>
             <div class="loja-grid" id="lojaTurmas">
               <button class="loja-item" data-nome="Turma RONDESP · nivelamento" data-preco="1800" data-moeda="dmn" data-estoque="170">
                 <span class="li-estoque">170 vagas</span>
@@ -1628,7 +1657,7 @@
               <span id="lojaExtras-turmas" style="display:contents"></span>
             </div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Isoladas · um professor à frente</div>
+            <div class="loja-sec" style="margin-top:14px">Isoladas</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Isolada Dir. Administrativo" data-preco="350" data-moeda="dmn">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>
@@ -1644,10 +1673,10 @@
               </button>
             </div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Simulados presenciais · na sede</div>
+            <div class="loja-sec" style="margin-top:14px">Simulados presenciais · na sede</div>
             <div class="loja-grid"><span id="lojaSim-pres" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Eventos · aulões, corujões, semana insana…</div>
+            <div class="loja-sec" style="margin-top:14px">Eventos · aulões, corujões, semana insana…</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Aulão especial" data-preco="80">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></span>
@@ -1659,16 +1688,16 @@
               <span id="lojaExtras-eventos" style="display:contents"></span>
             </div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Excursões para concursos</div>
+            <div class="loja-sec" style="margin-top:14px">Excursões para concursos</div>
             <div class="loja-grid"><span id="lojaPres-excursao" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Módulos · vade mecum, apostilas e cadernos</div>
+            <div class="loja-sec" style="margin-top:14px">Módulos · vade mecum, apostilas e cadernos</div>
             <div class="loja-grid"><span id="lojaPres-modulos" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Treinamento para o TAF</div>
+            <div class="loja-sec" style="margin-top:14px">Treinamento para o TAF</div>
             <div class="loja-grid"><span id="lojaPres-taf" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Outros · retirada na recepção</div>
+            <div class="loja-sec" style="margin-top:14px">Outros · retirada na recepção</div>
             <div class="loja-grid"><span id="lojaPres-outros" style="display:contents"></span></div>
             <p class="sub" style="margin-top:8px">Produtos físicos geram <strong>pedido de retirada</strong> — a administração confirma a entrega na recepção. O <strong>estoque</strong> é definido pela administração e o item <strong>sai da Loja quando esgota</strong>.</p>
           </div>
@@ -1677,7 +1706,7 @@
           <div class="p-card">
             <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>Itens digitais</div>
 
-            <div class="k-label sub-k">Cursos online</div>
+            <div class="loja-sec">Cursos online</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Curso online · teoria completa" data-preco="1500" data-moeda="dmn">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m10 7 5 3.5-5 3.5Z"/></svg></span>
@@ -1700,10 +1729,10 @@
               <span id="lojaExtras-digitais" style="display:contents"></span>
             </div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Simulados digitais · no app</div>
+            <div class="loja-sec" style="margin-top:14px">Simulados digitais · no app</div>
             <div class="loja-grid"><span id="lojaSim-dig" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Mentoria</div>
+            <div class="loja-sec" style="margin-top:14px">Mentoria</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Mentoria Quad" data-preco="900" data-moeda="dmn">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></span>
@@ -1713,10 +1742,10 @@
               </button>
             </div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Eventos online · YouTube e lives exclusivas</div>
+            <div class="loja-sec" style="margin-top:14px">Eventos online · YouTube e lives exclusivas</div>
             <div class="loja-grid"><span id="lojaEventos-dig" style="display:contents"></span></div>
 
-            <div class="k-label sub-k" style="margin-top:14px">Itens do personagem</div>
+            <div class="loja-sec" style="margin-top:14px">Itens do personagem</div>
             <div class="loja-grid">
               <button class="loja-item" data-nome="Boina exclusiva" data-preco="20">
                 <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg></span>
@@ -1728,7 +1757,7 @@
               <span id="skinChain" style="display:contents"></span>
               <span id="lojaExtras-personagem" style="display:contents"></span>
             </div>
-            <div class="k-label sub-k" style="margin-top:14px">Itens de combate · vão para a mochila</div>
+            <div class="loja-sec" style="margin-top:14px">Itens de combate · vão para a mochila</div>
             <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
             <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
           </div>
@@ -2744,6 +2773,7 @@
           <div class="splash-symbol" style="background-image:url(__QUAD_SIMBOLO__)" aria-hidden="true"></div>
           <div class="splash-phrase">Comece seu sonho por aqui<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
           <div class="splash-brand">Quad Concursos</div>
+          <div class="splash-verify" id="splashVerify"></div>
         </div>
 
         <!-- ============ PORTÃO: JÁ É ALUNO / PRIMEIRA VEZ ============ -->
@@ -3167,19 +3197,21 @@
     var cards = view.querySelectorAll('.p-card');
     if (!cards.length) return;
     // fase 1: só leituras (evita layout thrashing durante o scroll)
-    var offs = [], best = null, bestD = Infinity;
+    var offs = [], hts = [], best = null, bestD = Infinity;
     cards.forEach(function (c, i) {
       var r = c.getBoundingClientRect();
       var off = (r.top + r.height / 2) - mid;
-      offs[i] = off;
+      offs[i] = off; hts[i] = r.height;
       var d = Math.abs(off);
       if (d < bestD) { bestD = d; best = c; }
     });
     // fase 2: só escritas
     cards.forEach(function (c, i) {
       var n = Math.max(-1, Math.min(1, offs[i] / half));
-      // leve profundidade da engrenagem (suave, para não distorcer a diagramação)
-      c.style.transform = 'perspective(1100px) rotateX(' + (n * -7).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.04).toFixed(3) + ')';
+      /* cards altos giram menos — senão a borda de um card gigante invade o
+         vizinho (ex.: herói da Quad Store × bloco de itens presenciais) */
+      var att = Math.min(1, 320 / Math.max(120, hts[i]));
+      c.style.transform = 'perspective(1100px) rotateX(' + (n * -7 * att).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.04 * att).toFixed(3) + ')';
       c.style.opacity = (1 - Math.abs(n) * 0.22).toFixed(3);
       c.classList.toggle('spot', c === best);
     });
@@ -3420,6 +3452,11 @@
       desc: 'Simulado completo no formato e no tempo da banca, com ranking geral e correção comentada no fim do dia.',
       score: [['Simulado concluído', '+120 score'], ['Aproveitamento acima de 70%', '+80 score bônus']],
       coins: [['Participação', '+25'], ['Top 10 do ranking', '+50']] },
+    { id: 'semana-insana', nome: 'Semana Insana', tipo: 'MARATONA · PRESENCIAL', modalidade: 'presencial', pago: true, preco: 400, moeda: 'dmn', quando: 'SEG · 27/07 · 18H', ate: '2026-07-31',
+      cor: 'gold', meta: 'SEG a SEX · 400 Dmn',
+      desc: 'Cinco noites seguidas de revisão intensiva na sede — a maratona mais dura do Quad. O ingresso vale a semana inteira; o item segue na Quad Store até o último dia.',
+      score: [['Presença em cada noite', '+30 score'], ['Semana completa', '+100 score bônus']],
+      coins: [['Semana completa', '+40']] },
     { id: 'mentoria-cfo', nome: 'Mentoria CFO · redação', tipo: 'MENTORIA · ONLINE', modalidade: 'online', pago: true, preco: 120, quando: 'DOM · 26/07 · 9H–11H', link: 'https://meet.quadconcursos.com.br/cfo-redacao',
       cor: 'navy2', meta: 'Acesso pago · 120 QdC',
       desc: 'Mentoria online de redação para o CFO: correção ao vivo, banca comentada e plano de treino individual. Acesso liberado pela Loja.',
@@ -3428,11 +3465,13 @@
   ];
   var evState = {};   /* por evento: { garimpado, inscrito } */
   function evTileHTML(ev) {
+    var st = evState[ev.id] || {};
+    var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
       '<span class="ev-name">' + ev.nome + '</span>' +
       '<span class="ev-meta">' + ev.meta + '</span>' +
-      (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : '') + '</button>';
+      (insc ? '<span class="tag gold">INSCRITO</span>' : (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : '')) + '</button>';
   }
   /* eventos que aparecem no Início: gratuitos + pagos já comprados */
   function eventosInicio() {
@@ -3460,25 +3499,39 @@
     ['presencial', 'online'].forEach(function (modal) {
       var g = alvos[modal]; if (!g) return;
       var pagos = EVENTOS.filter(function (ev) {
-        return ev.pago && (ev.modalidade === 'online') === (modal === 'online') && !(evState[ev.id] && evState[ev.id].comprado);
+        if (!ev.pago || (ev.modalidade === 'online') !== (modal === 'online')) return false;
+        var comprado = evState[ev.id] && evState[ev.id].comprado;
+        /* pontual comprado sai da vitrine; evento de VÁRIOS DIAS permanece
+           (marcado INSCRITO) até o último dia — depois some sozinho */
+        if (evAcabou(ev)) return false;
+        return !comprado || !!ev.ate;
       });
       g.innerHTML = pagos.map(function (ev) {
         var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
-        return '<button class="loja-item" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+        var comprado = evState[ev.id] && evState[ev.id].comprado;
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+          (comprado ? '<span class="li-estoque">INSCRITO</span>' : '') +
           '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
           '<span class="li-nome">' + ev.nome + '</span>' +
-          '<span class="li-desc">evento ' + modal + '</span>' +
-          '<span class="li-preco">' + fmt(ev.preco) + ' ' + moedaTxt(mo) + '</span></button>';
+          '<span class="li-desc">' + (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal) + '</span>' +
+          '<span class="li-preco">' + (comprado ? 'INSCRITO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
       g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
         bt.addEventListener('click', function () { comprarEvento(bt.dataset.evBuy); });
       });
     });
   }
+  function evAcabou(ev) {
+    if (!ev.ate) return false;
+    var hoje = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    var iso = hoje.getFullYear() + '-' + p(hoje.getMonth() + 1) + '-' + p(hoje.getDate());
+    return iso > ev.ate;
+  }
   function comprarEvento(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;
     var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
     if (!ev) return;
+    if (evState[id] && evState[id].comprado) { toast('Você já está inscrito — o evento segue aqui até o último dia.'); return; }
     var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: ev.nome, desc: 'evento ' + (ev.modalidade === 'online' ? 'online' : 'presencial'), preco: ev.preco, moeda: mo,
       ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.evento : '' }, function () {
@@ -3577,6 +3630,7 @@
     if (st.inscrito) evAplicaLink();
     $('btnEvInscrever').onclick = function () {
       st.inscrito = true;
+      if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
       this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
       evAplicaLink();
       if (typeof renderCalendario === 'function') renderCalendario();   /* entra no calendário do aluno */
@@ -3978,13 +4032,12 @@
     $('contaEmail').textContent = em;
     $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
     $('loginLayer').classList.add('off');
-    $('verifyEmail').textContent = em;
-    abrirGate('gateVerify');
-    setTimeout(function () {
-      // primeiro acesso deste aluno → onboard obrigatório (tutorial guiado)
-      var primeiro = lsGet(TUT_LS.done) !== '1';
-      entrarApp(primeiro);
-    }, 1400);
+    /* a verificação acontece DENTRO da vinheta — uma tela de carregamento só
+       (antes: gate "verificando" + vinheta = duas páginas em sequência) */
+    var primeiro = lsGet(TUT_LS.done) !== '1';
+    entrarApp(primeiro);
+    var sv = $('splashVerify');
+    if (sv) sv.innerHTML = 'Verificando a matrícula de <strong>' + em + '</strong>…';
   }
   $('btnAcessar').addEventListener('click', acessarPortal);
   $('loginEmail').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('loginSenha').focus(); });
@@ -4649,10 +4702,12 @@
         else { acao = 'Em breve'; dis = ' disabled'; }
       } else if (sm.insc || sm.comprado) { acao = 'Inscrito'; tagTxt = 'INSCRITO'; dis = ' disabled'; ok = true; }
       else { acao = 'Inscrever'; tagTxt = 'PRESENCIAL'; }
-      return '<div class="mission-row"><div class="m-dot">◈</div>' +
-        '<div class="grow"><div class="t">' + sm.rot + '</div><div class="d">' + (sm.det ? sm.det + ' · ' : '') + simHint(sm) + '</div></div>' +
-        '<span class="tag' + (ok ? ' ok' : '') + '">' + tagTxt + '</span>' +
-        '<button class="btn ghost small" data-sim="' + x.i + '"' + dis + '>' + acao + '</button></div>';
+      /* leiaute em camadas: título+tag / detalhe em linha inteira / ação à direita */
+      return '<div class="sim-row"><div class="sim-top"><div class="m-dot">◈</div>' +
+        '<div class="t">' + sm.rot + '</div>' +
+        '<span class="tag' + (ok ? ' ok' : '') + '">' + tagTxt + '</span></div>' +
+        '<div class="d">' + (sm.det ? sm.det + ' · ' : '') + simHint(sm) + '</div>' +
+        '<div class="sim-act"><button class="btn ghost small" data-sim="' + x.i + '"' + dis + '>' + acao + '</button></div></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado disponível agora.</p>';
     el.querySelectorAll('[data-sim]').forEach(function (bt) {
       bt.addEventListener('click', function () { simClick(parseInt(bt.dataset.sim, 10)); });

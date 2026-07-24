@@ -1,5 +1,29 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Pacote do aluno · Fase A (login, eventos, Missões, Quad Store)
+- **Login em UMA tela**: a página "verificando o cadastro" foi fundida à
+  vinheta — a verificação da matrícula agora aparece dentro da própria
+  vinheta (era a tela de carregamento duplicada); entrada ~1,4s mais
+  rápida
+- **"INSCRITO" no carrossel**: eventos garantidos (comprados ou com
+  inscrição feita) mostram a tag dourada INSCRITO nos "Eventos da
+  semana" do Início
+- **Evento de vários dias permanece na Quad Store até acabar** (ex.:
+  Semana Insana, SEG–SEX, 400 Dmn): comprado, fica na vitrine marcado
+  INSCRITO até o último dia e some sozinho; produto pontual (aulão,
+  mentoria, simulado) continua saindo na hora da compra
+- **Missões**: card de treinamento com ícone novo (policial no stand de
+  tiro); bloco de **Simulados** rediagramado em camadas — título + tag,
+  detalhe em linha inteira e botão à direita, sem disputa de espaço
+- **Quad Store** (antes "Loja Quad"): cabeçalho renomeado; bloco
+  "Atividades e itens · presenciais"; seção "Isoladas" sem o subtítulo;
+  14 divisórias de seção ganharam vida (barra azul + linha gradiente);
+  **corrigida a sobreposição** do cabeçalho pelo bloco seguinte — a roda
+  3D agora gira menos os cards altos (a borda de um card gigante invadia
+  o vizinho)
+- Nova suíte `vfasea` (20 checagens) verde; todas as demais suítes (incl.
+  tutorial completo) sem regressões
+
 ## 24/07/2026 — Relatórios com gráficos (Fase 3)
 - **Aba Relatórios reconstruída** com sub-navegação em 4 painéis
   (**Individuais · Turmas · Gerais · Loja**) e gráficos no tema da marca
