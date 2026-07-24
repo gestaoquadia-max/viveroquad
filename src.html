@@ -1051,6 +1051,8 @@
     font: 800 11px var(--ui); display: grid; place-items: center; padding: 0 6px; }
   /* lista de recados do chat */
   .chat-list { flex: 1; overflow-y: auto; padding: 6px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+  #profRecadosList { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  #profRecadosList .chat-msg { max-width: 100%; }
   .chat-msg { background: linear-gradient(160deg, #123E8C, #0C2A63); border-radius: 14px 14px 14px 4px;
     padding: 11px 13px; color: #EAF4FF; box-shadow: inset 0 0 0 1.5px rgba(120,180,255,0.3); max-width: 88%; }
   .chat-msg .cm-de { font: 800 9.5px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #8FC1FF; margin-bottom: 3px; }
@@ -1140,6 +1142,20 @@
   .tu-opt b { font: 800 14px Consolas, monospace; }
   .tu-opt small { font: 700 10px var(--ui); opacity: .75; }
   .tu-opt:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* ---------- Controle: banco de professores + criação de turmas ---------- */
+  .turno-pick { display: flex; gap: 8px; }
+  .turno-chip { flex: 1; padding: 8px 4px; border: 1.5px solid var(--p-line); border-radius: 10px; cursor: pointer;
+    background: var(--p-surface); color: var(--p-dim); font: 700 11.5px var(--ui); transition: .15s; }
+  .turno-chip.on { background: var(--p-blue); border-color: var(--p-blue); color: #fff; }
+  .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--p-dim); white-space: nowrap; }
+  .chk input { width: 15px; height: 15px; }
+  .ct-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ct-fld { display: flex; flex-direction: column; gap: 3px; }
+  .ct-fld span { font: 700 10px var(--ui); letter-spacing: .03em; text-transform: uppercase; color: var(--p-dim); }
+  .ct-fld input { width: 100%; }
+  .adm-hint { font-size: 11.5px; line-height: 1.5; color: var(--p-dim); margin: 6px 0 10px;
+    padding: 8px 10px; background: #F2F8FF; border: 1px solid var(--p-line); border-radius: 10px; }
 
   /* ---------- leitor de QR (gift card) ---------- */
   .scan-cam { position: relative; width: 100%; height: 170px; border-radius: 14px; overflow: hidden; margin: 10px 0 4px;
@@ -1979,6 +1995,11 @@
             <p class="sub">Suas turmas aparecem automaticamente — você entra na sala, cria o quiz da aula por PDF e ativa quando a aula começar.</p>
           </div>
 
+          <div class="p-card" id="profRecadosCard" style="display:none">
+            <div class="k-label">Recados da administração <span class="chat-badge" id="profRecBadge" style="display:none">1</span></div>
+            <div id="profRecadosList"></div>
+          </div>
+
           <div class="p-card" id="profTurmasCard">
             <div class="k-label">Minhas turmas</div>
             <div id="profTurmasList"></div>
@@ -2146,6 +2167,36 @@
           </div>
 
           <div class="p-card">
+            <div class="k-label">Banco de professores · corpo docente</div>
+            <div class="adm-form">
+              <input class="fld" id="admDocNome" placeholder="Nome do professor (ex.: Cap. Silva)">
+              <div class="k-label sub-k" style="margin-top:10px">Matérias que ministra <span style="opacity:.7">(até 3)</span></div>
+              <div class="adm-row">
+                <select class="fld" id="admDocMat1" title="Matéria 1"></select>
+                <select class="fld" id="admDocMat2" title="Matéria 2 (opcional)"></select>
+                <select class="fld" id="admDocMat3" title="Matéria 3 (opcional)"></select>
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Turnos de disponibilidade</div>
+              <div class="turno-pick" id="admDocTurnos">
+                <button type="button" class="turno-chip on" data-turno="manhã">Manhã</button>
+                <button type="button" class="turno-chip on" data-turno="tarde">Tarde</button>
+                <button type="button" class="turno-chip on" data-turno="noite">Noite</button>
+              </div>
+              <div class="adm-row" style="margin-top:10px">
+                <input class="fld" id="admDocGrad" placeholder="Graduação (ex.: Mestre em Direito)">
+                <label class="chk"><input type="checkbox" id="admDocSemGrad"> sem graduação</label>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admDocFone" placeholder="Telefone (ex.: (71) 9 8888-0000)" inputmode="tel" style="max-width:200px">
+                <button class="btn small" id="btnAdmDoc">Cadastrar professor</button>
+              </div>
+            </div>
+            <div class="adm-sep"><span>Professores cadastrados</span></div>
+            <div id="admDocList"></div>
+            <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
+          </div>
+
+          <div class="p-card">
             <div class="k-label">Criação de turmas · matrícula e vagas</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2173,11 +2224,13 @@
                 <span class="pct">2º até</span>
                 <input class="fld" id="admCtH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
               </div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admCtPrecoDmn" placeholder="Preço Dmn" inputmode="numeric" style="max-width:100px" title="Preço em Diamantes">
-                <input class="fld" id="admCtPrecoQdc" placeholder="Preço QdC" inputmode="numeric" style="max-width:100px" title="Preço em Quad Coins">
-                <input class="fld" id="admCtVagas" placeholder="Vagas" inputmode="numeric" style="max-width:80px" title="Vagas gerais">
-                <input class="fld" id="admCtVagasQdc" placeholder="em QdC" inputmode="numeric" style="max-width:80px" title="Destas, quantas em Quad Coins">
+              <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
+              <p class="adm-hint">A turma é vendida <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são divididas: as que você marcar em Quad Coins ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.</p>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admCtPrecoDmn" placeholder="ex.: 1800" inputmode="numeric"></label>
+                <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admCtPrecoQdc" placeholder="ex.: 2000" inputmode="numeric"></label>
+                <label class="ct-fld"><span>Vagas totais</span><input class="fld" id="admCtVagas" placeholder="ex.: 180" inputmode="numeric"></label>
+                <label class="ct-fld"><span>Dessas, em Quad Coins</span><input class="fld" id="admCtVagasQdc" placeholder="ex.: 10" inputmode="numeric"></label>
               </div>
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admCtArvore" type="file" accept=".pdf" title="Árvore do edital · PDF">
@@ -2221,9 +2274,13 @@
           </div>
 
           <div class="p-card">
-            <div class="k-label">Mensagem exclusiva para o aluno</div>
+            <div class="k-label">Mensagens individuais</div>
             <div class="adm-form">
               <div class="adm-row">
+                <select class="fld" id="admMsgTipo" title="Destinatário" style="max-width:130px">
+                  <option value="aluno">Para aluno</option>
+                  <option value="prof">Para professor</option>
+                </select>
                 <select class="fld" id="admMsgAluno"></select>
               </div>
               <div class="adm-row" style="margin-top:8px">
@@ -2233,7 +2290,7 @@
             </div>
             <div class="adm-sep"><span>Mensagens enviadas</span></div>
             <div id="admMsgList"></div>
-            <p class="sub" style="margin-top:8px">A mensagem chega como <strong>recado no "+"</strong> do aluno, com um <strong>contador de não lidas</strong> (estilo WhatsApp). O <strong>chat ao vivo</strong> fica marcado como próxima implementação.</p>
+            <p class="sub" style="margin-top:8px">Escolha <strong>aluno ou professor</strong> e envie um recado individual. Para o <strong>aluno</strong>, chega no "+" com contador (estilo WhatsApp); para o <strong>professor</strong>, aparece na <strong>sala dele</strong>, também com contador. O chat ao vivo fica como próxima implementação.</p>
           </div>
 
           <div class="p-card">
@@ -3336,7 +3393,35 @@
      Turma nasce no Painel de controle e vende em DUAS moedas com vagas
      separadas (gerais − QdC = Dmn). Matrícula bloqueia o turno; sem
      matrícula ativa, o app trava até entrar numa nova turma.            */
-  var PROFESSORES = ['Danilo Moura', 'Cap. Silva', 'Prof. Ferraz', 'Prof.ª Ritha Galvão', 'Prof. Nascimento', 'Prof.ª Ana Beatriz'];
+  /* banco de professores (Painel de controle) — fonte de verdade do corpo
+     docente. Alimenta a criação de turmas e a área do professor.        */
+  var DOCENTES = [
+    { nome: 'Danilo Moura',        materias: ['Direito Administrativo', 'Direito Constitucional'], turnos: ['manhã', 'noite'], grad: 'Especialista em Direito Público', fone: '(71) 9 8877-2301', desligado: false, bloqueado: false },
+    { nome: 'Cap. Silva',          materias: ['Direito Penal', 'Direito Penal Militar'],           turnos: ['noite'],          grad: 'Bacharel em Direito',              fone: '(71) 9 8811-1020', desligado: false, bloqueado: false },
+    { nome: 'Prof. Ferraz',        materias: ['Matemática', 'Informática'],                        turnos: ['manhã', 'tarde'], grad: 'Mestre em Matemática',             fone: '(71) 9 8822-3040', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ritha Galvão', materias: ['Língua Portuguesa', 'Redação oficial'],             turnos: ['manhã', 'tarde', 'noite'], grad: 'Doutora em Letras',       fone: '(71) 9 8833-5060', desligado: false, bloqueado: false },
+    { nome: 'Prof. Nascimento',    materias: ['História', 'Geografia', 'Direitos Humanos'],         turnos: ['tarde', 'noite'], grad: '',                                 fone: '(71) 9 8844-7080', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ana Beatriz',  materias: ['Língua Inglesa', 'Direito Processual Penal'],        turnos: ['noite'],          grad: 'Especialista em Idiomas',          fone: '(71) 9 8855-9010', desligado: false, bloqueado: false }
+  ];
+  function docenteDe(nome) { return DOCENTES.filter(function (d) { return d.nome === nome; })[0]; }
+  function docentesAtivos() { return DOCENTES.filter(function (d) { return !d.desligado; }); }
+  function matNorm(x) { return (x || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  function materiaCasa(docMat, treeMat) {
+    var a = matNorm(docMat), b = matNorm(treeMat);
+    return a === b || b.indexOf(a) === 0 || a.indexOf(b) === 0;   /* "Matemática" cobre "Matemática e Raciocínio Lógico" */
+  }
+  function docentesDaMateria(mat) {
+    return docentesAtivos().filter(function (d) {
+      return d.materias.some(function (m) { return materiaCasa(m, mat); });
+    });
+  }
+  /* PROFESSORES continua existindo (usado como fallback) e reflete os ativos */
+  var PROFESSORES = DOCENTES.map(function (d) { return d.nome; });
+  function sincProfessores() {
+    PROFESSORES.length = 0;
+    docentesAtivos().forEach(function (d) { PROFESSORES.push(d.nome); });
+  }
+  sincProfessores();
   var TURMAS_LOJA = [
     { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'nivelamento · mais teoria', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
     { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'regular · teoria + questões', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 170, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
@@ -4124,9 +4209,13 @@
     if (t.professores) return t.professores;
     var c = (typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
     var mats = (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : ['Língua Portuguesa', 'Matemática', 'Direito Constitucional', 'Direito Penal', 'Legislação específica'];
-    var off = edHash(t.id) % PROFESSORES.length;
+    var off = edHash(t.id) % (PROFESSORES.length || 1);
     t.professores = {};
-    mats.forEach(function (m, i) { t.professores[m] = PROFESSORES[(off + i) % PROFESSORES.length]; });
+    mats.forEach(function (m, i) {
+      var candidatos = docentesDaMateria(m);
+      if (candidatos.length) { t.professores[m] = candidatos[(off + i) % candidatos.length].nome; }
+      else if (PROFESSORES.length) { t.professores[m] = PROFESSORES[(off + i) % PROFESSORES.length]; }
+    });
     return t.professores;
   }
   function materiasDoProf(t, nome) {
@@ -4137,23 +4226,47 @@
   function turmasDoProf(nome) {
     return TURMAS_LOJA.filter(function (t) { return materiasDoProf(t, nome).length > 0; });
   }
-  (function () {
+  function renderProfSel() {
     var sel = $('profSel'); if (!sel) return;
-    sel.innerHTML = PROFESSORES.map(function (p) { return '<option>' + p + '</option>'; }).join('');
-  })();
+    var antes = sel.value;
+    sel.innerHTML = docentesAtivos().map(function (d) { return '<option>' + d.nome + '</option>'; }).join('');
+    if (antes) sel.value = antes;
+  }
+  renderProfSel();
   $('btnProfEntrar').addEventListener('click', function () {
     var em = $('profEmail').value.trim(), ch = $('profChave').value.trim().toUpperCase();
     if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
     // [INTEGRAÇÃO REAL] cadastro individual do professor, aprovado pela coordenação
     if (ch !== 'PROF-2026') { toast('Chave inválida — solicite a liberação à coordenação.'); return; }
+    var doc = docenteDe($('profSel').value);
+    if (doc && doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
     profLiberado = true;
     PROF_ATUAL = $('profSel').value;
     $('profGate').classList.remove('on');
     $('profNome').textContent = PROF_ATUAL;
     $('profTopNome').textContent = PROF_ATUAL;
     renderProfTurmas();
+    renderProfRecados();
     toast('Bem-vindo, ' + PROF_ATUAL + ' — boa aula!');
   });
+  function renderProfRecados() {
+    var card = $('profRecadosCard'), el = $('profRecadosList'); if (!card || !el) return;
+    var lista = (typeof RECADOS_PROF !== 'undefined' && PROF_ATUAL) ? (RECADOS_PROF[PROF_ATUAL] || []) : [];
+    card.style.display = lista.length ? 'block' : 'none';
+    var naoLidas = lista.filter(function (r) { return !r.lida; }).length;
+    var badge = $('profRecBadge');
+    if (badge) { badge.style.display = naoLidas ? 'inline-flex' : 'none'; badge.textContent = naoLidas; }
+    el.innerHTML = lista.map(function (r) {
+      return '<div class="chat-msg' + (r.lida ? '' : ' nova') + '"><div class="cm-de">Administração Quad</div>' +
+        '<div class="cm-tx">' + r.texto + '</div><div class="cm-qd">' + r.quando + '</div></div>';
+    }).join('');
+    /* abriu a sala = leu os recados */
+    setTimeout(function () {
+      lista.forEach(function (r) { r.lida = true; if (r.admRef) r.admRef.lida = true; });
+      if (badge) badge.style.display = 'none';
+      if (typeof renderAdmMsgs === 'function') renderAdmMsgs();
+    }, 800);
+  }
   function renderProfTurmas() {
     var el = $('profTurmasList'); if (!el || !PROF_ATUAL) return;
     var ts = turmasDoProf(PROF_ATUAL);
@@ -6409,13 +6522,15 @@
   }
   function renderCtProfs() {
     var el = $('admCtProfs'); if (!el) return;
-    var ops = PROFESSORES.map(function (p) { return '<option>' + p + '</option>'; }).join('');
     el.innerHTML = ctMaterias().map(function (mat, i) {
-      return '<div class="adm-bar"><span class="nm">' + mat + '</span>' +
+      var docs = docentesDaMateria(mat);
+      var ops = docs.length
+        ? docs.map(function (d) { return '<option>' + d.nome + '</option>'; }).join('')
+        : '<option value="">— sem professor da matéria —</option>';
+      var aviso = docs.length ? '' : '<small style="color:#B45309">cadastre um professor desta matéria no banco</small>';
+      return '<div class="adm-bar"><span class="nm">' + mat + aviso + '</span>' +
         '<select class="fld" data-ct-prof="' + i + '" style="max-width:170px">' + ops + '</select></div>';
     }).join('');
-    /* distribui o corpo docente para não nascer tudo com o mesmo nome */
-    el.querySelectorAll('[data-ct-prof]').forEach(function (sel, i) { sel.selectedIndex = i % PROFESSORES.length; });
   }
   function renderCtLista() {
     var el = $('admCtLista'); if (!el) return;
@@ -6436,6 +6551,76 @@
       });
     });
   }
+  /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
+  function todasMaterias() {
+    var set = {};
+    (typeof CONCURSOS !== 'undefined' ? CONCURSOS : []).forEach(function (c) {
+      if (c.arvore) c.arvore.forEach(function (m) { set[m[0]] = 1; });
+    });
+    MATERIAS_GENERICAS.forEach(function (m) { set[m] = 1; });
+    ['Direito Administrativo', 'Redação oficial', 'Direito Penal Militar', 'Direito Processual Penal'].forEach(function (m) { set[m] = 1; });
+    return Object.keys(set).sort();
+  }
+  function preencheMatSelects() {
+    var mats = todasMaterias();
+    ['admDocMat1', 'admDocMat2', 'admDocMat3'].forEach(function (id, k) {
+      var sel = $(id); if (!sel) return;
+      var vazio = k === 0 ? '' : '<option value="">— (opcional) —</option>';
+      sel.innerHTML = vazio + mats.map(function (m) { return '<option>' + m + '</option>'; }).join('');
+    });
+  }
+  (function () {
+    var host = $('admDocTurnos'); if (!host) return;
+    host.querySelectorAll('.turno-chip').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+    var semGrad = $('admDocSemGrad');
+    if (semGrad) semGrad.addEventListener('change', function () { $('admDocGrad').disabled = semGrad.checked; if (semGrad.checked) $('admDocGrad').value = ''; });
+  })();
+  function renderDocList() {
+    var el = $('admDocList'); if (!el) return;
+    el.innerHTML = DOCENTES.map(function (d, i) {
+      var st = d.desligado ? '<span class="tag warn">DESLIGADO</span>' : d.bloqueado ? '<span class="tag warn">BLOQUEADO</span>' : '<span class="tag ok">ATIVO</span>';
+      return '<div class="adm-bar"><span class="nm">' + d.nome + ' ' + st +
+        '<small>' + d.materias.join(', ') + ' · ' + d.turnos.join('/') + ' · ' + (d.grad || 'sem graduação') + ' · ' + (d.fone || '—') + '</small></span>' +
+        '<button class="btn ghost small" data-doc-desl="' + i + '">' + (d.desligado ? 'Readmitir' : 'Desligar') + '</button>' +
+        '<button class="btn ghost small" data-doc-bloq="' + i + '">' + (d.bloqueado ? 'Liberar' : 'Bloquear') + '</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum professor cadastrado.</p>';
+    el.querySelectorAll('[data-doc-desl]').forEach(function (b) {
+      b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docDesl]; d.desligado = !d.desligado; if (d.desligado) d.bloqueado = false; docentesMudaram(d.desligado ? '“' + d.nome + '” desligado — saiu das listas.' : '“' + d.nome + '” readmitido.'); });
+    });
+    el.querySelectorAll('[data-doc-bloq]').forEach(function (b) {
+      b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docBloq]; d.bloqueado = !d.bloqueado; docentesMudaram(d.bloqueado ? 'Acesso de “' + d.nome + '” bloqueado.' : 'Acesso de “' + d.nome + '” liberado.'); });
+    });
+  }
+  function docentesMudaram(msg) {
+    sincProfessores();
+    renderDocList();
+    if (typeof renderCtProfs === 'function') renderCtProfs();
+    if (typeof renderProfSel === 'function') renderProfSel();
+    if (typeof admMsgSelects === 'function') admMsgSelects();
+    if (msg) toast(msg);
+  }
+  var btnAdmDocEl = $('btnAdmDoc');
+  if (btnAdmDocEl) btnAdmDocEl.addEventListener('click', function () {
+    var nome = $('admDocNome').value.trim();
+    if (!nome || /["<>]/.test(nome)) { toast('Informe um nome válido para o professor.'); return; }
+    if (docenteDe(nome)) { toast('Já existe um professor com esse nome.'); return; }
+    var mats = ['admDocMat1', 'admDocMat2', 'admDocMat3'].map(function (id) { return $(id).value; }).filter(function (m) { return m; });
+    mats = mats.filter(function (m, i) { return mats.indexOf(m) === i; });   /* sem repetidas */
+    if (!mats.length) { toast('Escolha ao menos uma matéria.'); return; }
+    var turnos = [];
+    $('admDocTurnos').querySelectorAll('.turno-chip.on').forEach(function (c) { turnos.push(c.dataset.turno); });
+    if (!turnos.length) { toast('Marque ao menos um turno de disponibilidade.'); return; }
+    var semGrad = $('admDocSemGrad').checked;
+    var grad = semGrad ? '' : $('admDocGrad').value.trim();
+    DOCENTES.push({ nome: nome, materias: mats, turnos: turnos, grad: grad, fone: $('admDocFone').value.trim(), desligado: false, bloqueado: false });
+    $('admDocNome').value = ''; $('admDocGrad').value = ''; $('admDocFone').value = ''; $('admDocSemGrad').checked = false; $('admDocGrad').disabled = false;
+    $('admDocMat2').value = ''; $('admDocMat3').value = '';
+    docentesMudaram('Professor “' + nome + '” cadastrado — já aparece nas matérias que ministra.');
+  });
+  preencheMatSelects(); renderDocList();
+
   (function () {
     var tipoSel = $('admCtTipo'); if (!tipoSel) return;
     tipoSel.innerHTML = MODALIDADES.map(function (m) {
@@ -7158,7 +7343,17 @@
   function admContasSelects() {
     var opts = CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
     if ($('admCredAluno')) $('admCredAluno').innerHTML = opts;
-    if ($('admMsgAluno')) $('admMsgAluno').innerHTML = opts;
+    admMsgSelects();
+  }
+  function admMsgSelects() {
+    var sel = $('admMsgAluno'); if (!sel) return;
+    var tipo = $('admMsgTipo') ? $('admMsgTipo').value : 'aluno';
+    if (tipo === 'prof') {
+      sel.innerHTML = docentesAtivos().map(function (d) { return '<option value="prof:' + d.nome + '">' + d.nome + '</option>'; }).join('') ||
+        '<option value="">— nenhum professor ativo —</option>';
+    } else {
+      sel.innerHTML = CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
+    }
   }
   function renderAdmCred() {
     var el = $('admCredList'); if (!el) return;
@@ -7251,28 +7446,42 @@
   function renderAdmMsgs() {
     var el = $('admMsgList'); if (!el) return;
     el.innerHTML = ADM_MSGS.slice(0, 8).map(function (m) {
-      return '<div class="adm-bar"><span class="nm">' + m.texto + '<small>para ' + m.nome + ' · ' + m.quando + '</small></span>' +
+      return '<div class="adm-bar"><span class="nm">' + m.texto + '<small>para ' + (m.prof ? 'prof. ' : '') + m.nome + ' · ' + m.quando + '</small></span>' +
         '<span class="tag' + (m.lida ? ' ok' : '') + '">' + (m.lida ? 'LIDA' : 'ENVIADA') + '</span></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma mensagem enviada ainda.</p>';
   }
+  var RECADOS_PROF = {};   /* nome do professor → lista de recados da administração */
+  var tipoMsgEl = $('admMsgTipo');
+  if (tipoMsgEl) tipoMsgEl.addEventListener('change', admMsgSelects);
   var btnAdmMsgEl = $('btnAdmMsg');
   if (btnAdmMsgEl) btnAdmMsgEl.addEventListener('click', function () {
-    var c = contaDe($('admMsgAluno').value);
     var texto = $('admMsgTexto').value.trim();
-    if (!c) return;
     if (!texto) { toast('Escreva a mensagem.'); return; }
+    var val = $('admMsgAluno').value, tipo = $('admMsgTipo') ? $('admMsgTipo').value : 'aluno';
+    if (tipo === 'prof') {
+      var nomeP = val.replace(/^prof:/, '');
+      if (!nomeP) { toast('Escolha um professor.'); return; }
+      var msgP = { nome: nomeP, texto: texto, quando: 'agora', lida: false, prof: true };
+      ADM_MSGS.unshift(msgP);
+      (RECADOS_PROF[nomeP] = RECADOS_PROF[nomeP] || []).unshift({ texto: texto, quando: 'agora', lida: false, admRef: msgP });
+      if (typeof PROF_ATUAL !== 'undefined' && PROF_ATUAL === nomeP && typeof renderProfRecados === 'function') renderProfRecados();
+      $('admMsgTexto').value = '';
+      renderAdmMsgs();
+      toast('Recado enviado a ' + nomeP + ' — aparece na sala do professor.');
+      return;
+    }
+    var c = contaDe(val); if (!c) return;
     var msg = { nome: contaNome(c), texto: texto, quando: 'agora', lida: false };
     ADM_MSGS.unshift(msg);
     if (!c.seed) {
       RECADOS.unshift({ texto: texto, quando: 'agora', lida: false, admRef: msg });
       renderChatBadge();
-    } else {
-      msg.lida = false;
     }
     $('admMsgTexto').value = '';
     renderAdmMsgs();
     toast('Mensagem enviada — chega como recado no "+" do aluno.');
   });
+  window.__recadosProf = function () { return RECADOS_PROF; };
   var btnIrEstruturaEl = $('btnIrEstrutura');
   if (btnIrEstruturaEl) btnIrEstruturaEl.addEventListener('click', function () { showView('v-turmas', 'navAdmin'); });
   /* ---------- gift cards em lote: código + QR de liberação única ----------
@@ -7313,9 +7522,8 @@
       bt.addEventListener('click', function () {
         var l = GIFT_LOTES[+bt.dataset.lote];
         var qr = $('admGiftQRs');
-        var mostrar = l.codes.slice(0, 6);
-        qr.innerHTML = '<div class="adm-sep"><span>QR codes · lote ' + l.id + (l.codes.length > 6 ? ' (6 de ' + l.codes.length + ')' : '') + '</span></div>' +
-          '<div class="qr-wrap">' + mostrar.map(function (g) {
+        qr.innerHTML = '<div class="adm-sep"><span>QR codes · lote ' + l.id + ' · ' + l.codes.length + ' cartões</span></div>' +
+          '<div class="qr-wrap">' + l.codes.map(function (g) {
             return '<div class="qr-cell' + (g.usado ? ' usado' : '') + '">' + qrSvg(g.c) + '<small>' + g.c + '</small></div>';
           }).join('') + '</div>';
       });

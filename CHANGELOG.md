@@ -1,5 +1,30 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Ajustes do administrador · Controle Geral (item 1)
+- **Banco de professores** (novo bloco no Painel de controle): nome,
+  **matérias que ministra (até 3)**, **turnos de disponibilidade**,
+  **graduação** (com opção "sem graduação"), **telefone**, e as ações
+  de **desligar** e **bloquear acesso**. É a **fonte única do corpo
+  docente** — alimenta "Professores por matéria" na criação de turmas
+  (que passa a oferecer **só quem ministra aquela matéria e está
+  ativo**) e a lista da área do professor. Casamento por prefixo
+  (um professor de "Matemática" cobre "Matemática e Raciocínio Lógico")
+- **Criação de turmas mais clara**: os campos soltos "Preço/Preço/Vagas"
+  viraram uma grade **rotulada** (Preço em Diamantes · Preço em Quad
+  Coins · Vagas totais · Dessas, em Quad Coins) com um **texto de ajuda**
+  explicando a lógica (vendida nas duas moedas; vagas totais divididas,
+  o resto fica em Diamantes). Confirmado que cria a turma e ela aparece
+  em "Turmas · modalidades do Quad" na Quad Store
+- **"Mensagem exclusiva para o aluno" → "Mensagens individuais"**: agora
+  envia para **aluno ou professor**. Para o aluno, chega no "+" com
+  contador; para o **professor**, aparece na **sala dele** com contador,
+  e a leitura marca **LIDA** no histórico do admin
+- **Bug dos gift cards corrigido**: "Ver QR codes" mostrava só 6 —
+  agora exibe **todos** os cartões do lote (ex.: os 20 solicitados),
+  com o total no cabeçalho
+- Nova suíte `vfasee` (24 checagens) verde; todas as demais suítes
+  (incl. tutorial completo) sem regressões
+
 ## 24/07/2026 — Pacote do aluno · Fase D (gift cards com QR + estorno)
 - **Gift cards em lote com QR** (Painel de controle): a administração
   cria lotes (ex.: 100 cartões de 1.000 QdC **ou** Dmn); cada cartão
