@@ -1,5 +1,32 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Pacote do aluno · Fase C (área do professor + Quiz da aula)
+- **Área do professor reconstruída**: cadastro individual de ingresso
+  (e-mail funcional + chave PROF-2026 na demo, escolha do professor no
+  corpo docente); ao entrar, as **turmas em que o professor está
+  inserido aparecem sozinhas** (vindas dos professores por matéria da
+  criação de turmas), cada uma com as matérias dele
+- **Quiz da aula por PDF**: dentro da sala, o professor cria o quiz
+  anexando o **PDF** e escolhendo **múltipla escolha ou certo/errado**,
+  nº de questões e **tempo** — extração real do PDF marcada
+  `[INTEGRAÇÃO REAL]`. Criado ≠ ativado: quem decide a hora do start é
+  o professor, na aula
+- **Lado do aluno**: quiz criado → o selo "SEM QUIZ ABERTO" vira
+  **"AULA COM QUIZ"**; ativado → **"AULA COM QUIZ ATIVO"** + botão
+  **"Quiz"** na Aula de hoje. O quiz roda na estrutura do simulado
+  (cronômetro, uma questão por vez), **sem gabarito e sem premiação**
+  — as respostas vão direto ao professor. Quiz de outra turma não
+  aparece para o aluno
+- **Relatório da sala ao vivo**: respostas chegando (polling X/42,
+  incluindo o aluno real da demo), **% de acerto por questão** e botão
+  **"Relatório"** por questão com o **gráfico de alternativas**
+  (Letra A 11% · Letra B 60% · … com a correta marcada); feedback dos
+  alunos como placeholder EM BREVE; encerrar consolida o relatório
+- Aposentado o fluxo antigo de quiz único do professor (abrir/fechar
+  com card estático)
+- Nova suíte `vfasec` (30 checagens) verde; todas as demais suítes
+  (incl. tutorial completo) sem regressões
+
 ## 24/07/2026 — Pacote do aluno · Fase B (turmas de ponta a ponta)
 - **Criação de turmas migrou para o Painel de controle**, completa:
   tipo (RONDESP/PATAMO/BOPE) + apelido; **concurso** (PMBA Soldado/CFO,

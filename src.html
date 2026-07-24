@@ -1436,8 +1436,8 @@
         <div class="app-top" data-scope="professor" style="display:none">
           <div class="insignia" aria-hidden="true">★</div>
           <div class="who">
-            <div class="name">Prof. Andrade</div>
-            <div class="rank">Turma PC-BA · PATAMO · 19h–22h</div>
+            <div class="name" id="profTopNome">Professor</div>
+            <div class="rank" id="profTopSub">corpo docente do Quad</div>
           </div>
           <span class="tag live" id="liveTag" style="display:none">AO VIVO</span>
         </div>
@@ -1947,32 +1947,67 @@
         <!-- ============ PROFESSOR ============ -->
         <div class="view" id="v-sala">
           <div class="p-card">
-            <div class="k-label">Turma</div>
-            <h3>PC-BA · PATAMO <span class="tag">EDITAL PC-BA 2025</span></h3>
-            <p class="sub">Aula de hoje: Dir. Administrativo — Poderes · 42 alunos esperados.</p>
-          </div>
-          <div class="p-card" id="quizCtl">
-            <div class="k-label">Quiz da aula</div>
-            <h3 id="qcTitle">Quiz fechado</h3>
-            <p class="sub" id="qcSub">3 questões selecionadas do banco (tag: Poderes). Abrir libera para a sala; o aluno responde sem ver acerto ou erro.</p>
-            <div style="display:flex; gap:8px; margin-top:12px">
-              <button class="btn small" id="btnAbrirQuiz">Abrir quiz</button>
-              <button class="btn ghost small" id="btnFinalizarQuiz" disabled>Finalizar</button>
-            </div>
-            <div id="pollBox" style="display:none; margin-top:14px">
-              <div style="display:flex; align-items:center; gap:10px">
-                <div class="bar-track" style="flex:1"><div class="bar-fill" id="pollBar" style="width:0%"></div></div>
-                <span style="font:600 12px Consolas,monospace" id="pollCount">0/42</span>
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">Corpo docente · sala ao vivo</div>
+                <h3 class="aula-title" style="margin:2px 0 0" id="profNome">Professor</h3>
               </div>
-              <p class="sub" style="margin-top:8px">Respostas chegando (polling). Parcial por questão disponível ao vivo.</p>
             </div>
+            <p class="sub">Suas turmas aparecem automaticamente — você entra na sala, cria o quiz da aula por PDF e ativa quando a aula começar.</p>
           </div>
-          <div class="p-card" id="relCard" style="display:none">
-            <div class="k-label">Relatório da sala · parcial</div>
-            <div class="result-bar"><span class="q">Q1</span><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><span class="n">74%</span></div>
-            <div class="result-bar"><span class="q">Q2</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><span class="n">41%</span></div>
-            <div class="result-bar"><span class="q">Q3</span><div class="bar-track"><div class="bar-fill" style="width:63%"></div></div><span class="n">63%</span></div>
-            <p class="sub" style="margin-top:8px">Q2 (Poder de polícia) travou a sala — vale retomar antes do fim da aula. Ajuste da questão pode ser feito ao vivo pelo Admin.</p>
+
+          <div class="p-card" id="profTurmasCard">
+            <div class="k-label">Minhas turmas</div>
+            <div id="profTurmasList"></div>
+            <p class="sub" style="margin-top:8px">Turmas em que você está inserido (definidas na criação da turma, no Painel de controle, por matéria da árvore do edital).</p>
+          </div>
+
+          <div id="salaDetail" style="display:none">
+            <div class="p-card">
+              <div class="k-label">Sala aberta</div>
+              <h3 id="salaHead" style="margin:6px 0 2px">—</h3>
+              <p class="sub" id="salaInfo">—</p>
+              <div style="margin-top:10px"><button class="btn ghost small" id="btnSalaVoltar">← Minhas turmas</button></div>
+            </div>
+
+            <div class="p-card">
+              <div class="k-label">Quiz da aula · criar por PDF</div>
+              <div class="adm-form">
+                <div class="adm-row">
+                  <select class="fld" id="qzTipo" title="Tipo das questões">
+                    <option value="multipla">Múltipla escolha</option>
+                    <option value="ce">Certo ou errado</option>
+                  </select>
+                  <input class="fld" id="qzNq" placeholder="Nº questões" inputmode="numeric" style="max-width:110px" value="3">
+                  <input class="fld" id="qzMin" placeholder="Tempo (min)" inputmode="numeric" style="max-width:110px" value="10">
+                </div>
+                <div class="adm-row" style="margin-top:8px">
+                  <input class="fld" id="qzPdf" type="file" accept=".pdf" title="PDF com as questões do quiz">
+                </div>
+                <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+                  <button class="btn small" id="btnQuizCriar">Criar quiz</button>
+                  <button class="btn small" id="btnQuizAtivar" disabled>Ativar quiz</button>
+                  <button class="btn ghost small" id="btnQuizEncerrar" disabled>Encerrar</button>
+                </div>
+              </div>
+              <p class="sub" id="qzStatus" style="margin-top:10px">Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.</p>
+            </div>
+
+            <div class="p-card" id="qzRelCard" style="display:none">
+              <div class="k-label">Relatório da sala · ao vivo</div>
+              <div id="pollBox" style="margin-top:8px">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <div class="bar-track" style="flex:1"><div class="bar-fill" id="pollBar" style="width:0%"></div></div>
+                  <span style="font:600 12px Consolas,monospace" id="pollCount">0/42</span>
+                </div>
+                <p class="sub" style="margin-top:6px" id="pollSub">Respostas chegando (polling) — quantos alunos concluíram o quiz.</p>
+              </div>
+              <div class="adm-sep"><span>Acertos por questão</span></div>
+              <div id="qzRelList"></div>
+              <div class="adm-sep"><span>Feedback dos alunos</span></div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Avaliação da aula pelos alunos — entra na próxima implementação.</div>
+            </div>
           </div>
         </div>
 
@@ -2596,6 +2631,23 @@
           </div>
         </div>
 
+        <!-- ============ QUIZ DA AULA (professor ativa · sem premiação) ============ -->
+        <div class="quiz-layer" id="qaLayer">
+          <div class="quiz-head">
+            <div class="sd-head-row">
+              <div class="k-label" id="qaKicker">Quiz da aula</div>
+              <span class="sd-timer" id="qaTimer">--:--</span>
+            </div>
+            <h3 style="margin:0; font-size:15px" id="qaProgress">Questão 1</h3>
+            <p class="sub" style="margin-top:4px" id="qaSub">Sem gabarito agora — suas respostas vão direto para o relatório do professor.</p>
+          </div>
+          <div class="quiz-body" id="qaBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairQa">Sair</button>
+            <button class="btn" id="btnQaNext" disabled>Responder</button>
+          </div>
+        </div>
+
         <!-- ============ QUIZ OVERLAY ============ -->
         <div class="quiz-layer" id="quizLayer">
           <div class="quiz-head">
@@ -2810,6 +2862,29 @@
             </div>
             <button class="btn" id="btnAdmEntrar" style="width:100%">Liberar acesso</button>
             <p class="login-note">demo: chave NPP-2026 · no sistema real o cadastro de administrador é aprovado pela direção</p>
+          </div>
+        </div>
+
+        <!-- ============ ACESSO DO PROFESSOR (cadastro com liberação) ============ -->
+        <div class="gate-layer" id="profGate">
+          <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
+          <div class="gate-step">
+            <h2>Acesso do professor</h2>
+            <p class="login-sub">Área do corpo docente — cada professor entra com o próprio cadastro e vê as turmas em que está inserido.</p>
+            <div class="login-field" style="width:100%">
+              <label for="profEmail">E-mail funcional</label>
+              <input id="profEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
+            </div>
+            <div class="login-field" style="width:100%">
+              <label for="profChave">Chave de liberação</label>
+              <input id="profChave" placeholder="PROF-____" autocomplete="off">
+            </div>
+            <div class="login-field" style="width:100%">
+              <label for="profSel">Professor</label>
+              <select class="fld" id="profSel" style="width:100%"></select>
+            </div>
+            <button class="btn" id="btnProfEntrar" style="width:100%">Entrar na sala</button>
+            <p class="login-note">demo: chave PROF-2026 · no sistema real o cadastro é individual, aprovado pela coordenação</p>
           </div>
         </div>
 
@@ -3230,6 +3305,8 @@
       /* cadastro específico do administrador: exige liberação da direção */
       var ag = $('admGate');
       if (ag) ag.classList.toggle('on', p === 'admin' && !admLiberado);
+      var pg = $('profGate');
+      if (pg) pg.classList.toggle('on', p === 'professor' && !profLiberado);
       /* o robô de ajuda é do aluno — na área do administrador ele some */
       $('daniloFab').style.display = (p === 'admin' || (typeof tutOn !== 'undefined' && tutOn)) ? 'none' : '';
       if (p !== 'aluno') { $('daniloHint').style.display = 'none'; }
@@ -3948,50 +4025,289 @@
   }
   renderAulaHoje();
 
-  /* ---------- professor: quiz ao vivo ---------- */
-  var pollTimer = null, pollN = 0, quizLive = false;
-  $('btnAbrirQuiz').addEventListener('click', function () {
-    if (quizLive) return;
-    quizLive = true;
-    $('qcTitle').textContent = 'Quiz aberto — sala respondendo';
-    $('qcSub').textContent = 'Os alunos veem o quiz no Início. Nenhum feedback de acerto até você finalizar.';
+  /* ==================================================================
+     ÁREA DO PROFESSOR + QUIZ DA AULA
+     · cadastro individual (chave da coordenação) e escolha do professor
+     · turmas em que o professor está inserido aparecem sozinhas
+     · quiz por PDF (múltipla escolha ou certo/errado) com tempo
+     · criado → "Aula com Quiz" · ativado → botão Quiz para a sala
+     · sem premiação: as respostas alimentam o relatório ao vivo
+     ================================================================== */
+  var profLiberado = false, PROF_ATUAL = null, SALA_ATUAL = null;
+  var pollTimer = null, pollN = 0;
+  /* turmas sem corpo docente definido ganham distribuição automática */
+  function ensureProfs(t) {
+    if (t.professores) return t.professores;
+    var c = (typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
+    var mats = (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : ['Língua Portuguesa', 'Matemática', 'Direito Constitucional', 'Direito Penal', 'Legislação específica'];
+    var off = edHash(t.id) % PROFESSORES.length;
+    t.professores = {};
+    mats.forEach(function (m, i) { t.professores[m] = PROFESSORES[(off + i) % PROFESSORES.length]; });
+    return t.professores;
+  }
+  function materiasDoProf(t, nome) {
+    var ps = ensureProfs(t), out = [];
+    Object.keys(ps).forEach(function (m) { if (ps[m] === nome) out.push(m); });
+    return out;
+  }
+  function turmasDoProf(nome) {
+    return TURMAS_LOJA.filter(function (t) { return materiasDoProf(t, nome).length > 0; });
+  }
+  (function () {
+    var sel = $('profSel'); if (!sel) return;
+    sel.innerHTML = PROFESSORES.map(function (p) { return '<option>' + p + '</option>'; }).join('');
+  })();
+  $('btnProfEntrar').addEventListener('click', function () {
+    var em = $('profEmail').value.trim(), ch = $('profChave').value.trim().toUpperCase();
+    if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
+    // [INTEGRAÇÃO REAL] cadastro individual do professor, aprovado pela coordenação
+    if (ch !== 'PROF-2026') { toast('Chave inválida — solicite a liberação à coordenação.'); return; }
+    profLiberado = true;
+    PROF_ATUAL = $('profSel').value;
+    $('profGate').classList.remove('on');
+    $('profNome').textContent = PROF_ATUAL;
+    $('profTopNome').textContent = PROF_ATUAL;
+    renderProfTurmas();
+    toast('Bem-vindo, ' + PROF_ATUAL + ' — boa aula!');
+  });
+  function renderProfTurmas() {
+    var el = $('profTurmasList'); if (!el || !PROF_ATUAL) return;
+    var ts = turmasDoProf(PROF_ATUAL);
+    $('profTopSub').textContent = ts.length + (ts.length === 1 ? ' turma' : ' turmas') + ' · corpo docente';
+    el.innerHTML = ts.map(function (t) {
+      var mats = materiasDoProf(t, PROF_ATUAL);
+      return '<div class="mission-row"><div class="m-dot">◉</div>' +
+        '<div class="grow"><div class="t">' + t.nome + '</div>' +
+        '<div class="d">' + (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor + ' · você: ' + mats.join(', ') + '</div></div>' +
+        '<button class="btn ghost small" data-sala="' + t.id + '">Abrir sala</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não foi inserido em nenhuma turma.</p>';
+    el.querySelectorAll('[data-sala]').forEach(function (bt) {
+      bt.addEventListener('click', function () { abrirSala(bt.dataset.sala); });
+    });
+  }
+  function abrirSala(id) {
+    var t = turmaDe(id); if (!t) return;
+    SALA_ATUAL = id;
+    $('salaHead').textContent = t.nome;
+    $('salaInfo').textContent = (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor + ' · suas matérias: ' + materiasDoProf(t, PROF_ATUAL).join(', ');
+    $('profTurmasCard').style.display = 'none';
+    $('salaDetail').style.display = 'block';
+    qzSyncBotoes();
+  }
+  $('btnSalaVoltar').addEventListener('click', function () {
+    SALA_ATUAL = null;
+    $('salaDetail').style.display = 'none';
+    $('profTurmasCard').style.display = 'block';
+  });
+
+  /* ---------- quiz da aula: bancos (na demo; o PDF real é extraído) ---------- */
+  var QA_MULT = [
+    { txt: 'Sobre o poder de polícia, é correto afirmar que:', alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.', 'Decorre da supremacia do interesse público e condiciona direitos individuais.', 'Confunde-se com o poder disciplinar aplicado a servidores.', 'Só pode ser exercido pelo Poder Judiciário.'], right: 1 },
+    { txt: 'O ato administrativo discricionário caracteriza-se por:', alts: ['Ausência total de limites legais.', 'Margem de escolha em conveniência e oportunidade, dentro da lei.', 'Dispensa de motivação em qualquer caso.', 'Ser sempre revogável pelo Judiciário.'], right: 1 },
+    { txt: 'A hierarquia na Administração Pública autoriza:', alts: ['Delegação de atos políticos.', 'Avocação e revisão de atos dos subordinados.', 'Suprimir a competência legal de outro órgão.', 'Aplicar pena privativa de liberdade.'], right: 1 },
+    { txt: 'São atributos do ato administrativo:', alts: ['Presunção de legitimidade, imperatividade e autoexecutoriedade.', 'Coisa julgada, imperatividade e anterioridade.', 'Legalidade, moralidade e publicidade.', 'Tipicidade penal e culpabilidade.'], right: 0 },
+    { txt: 'O abuso de poder ocorre quando o agente:', alts: ['Atua dentro da competência com finalidade pública.', 'Excede a competência ou desvia a finalidade do ato.', 'Motiva o ato conforme a lei.', 'Delega atribuições com previsão legal.'], right: 1 }
+  ];
+  var QA_CE = [
+    { txt: 'O poder de polícia condiciona o exercício de direitos individuais em favor do interesse público.', right: 0 },
+    { txt: 'O poder disciplinar aplica-se a qualquer particular, mesmo sem vínculo com a Administração.', right: 1 },
+    { txt: 'A autoexecutoriedade permite executar o ato sem prévia autorização judicial, nos casos previstos.', right: 0 },
+    { txt: 'Ato vinculado admite juízo de conveniência e oportunidade do administrador.', right: 1 },
+    { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 }
+  ];
+  var QUIZ_AULA = null;   /* { turmaId, tipo, minutos, qs, status, alunoFez, respostasAluno } */
+  window.__quizAula = function () { return QUIZ_AULA; };
+  function qzSyncBotoes() {
+    var q = QUIZ_AULA && QUIZ_AULA.turmaId === SALA_ATUAL ? QUIZ_AULA : null;
+    $('btnQuizCriar').disabled = !!(q && q.status !== 'encerrado');
+    $('btnQuizAtivar').disabled = !(q && q.status === 'criado');
+    $('btnQuizEncerrar').disabled = !(q && q.status === 'ativo');
+    $('qzRelCard').style.display = (q && (q.status === 'ativo' || q.status === 'encerrado')) ? 'block' : 'none';
+    if (!q) { $('qzStatus').innerHTML = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.'; }
+  }
+  $('btnQuizCriar').addEventListener('click', function () {
+    if (!SALA_ATUAL) { toast('Abra uma sala primeiro.'); return; }
+    var tipo = $('qzTipo').value;
+    var nq = parseInt($('qzNq').value, 10), min = parseInt($('qzMin').value, 10);
+    var arq = ($('qzPdf').files && $('qzPdf').files[0]) ? $('qzPdf').files[0].name : '';
+    if (!arq) { toast('Anexe o PDF com as questões do quiz.'); return; }
+    if (!nq || nq < 1 || nq > 5) { toast('Número de questões: de 1 a 5 na demo.'); return; }
+    if (!min || min < 1 || min > 60) { toast('Tempo do quiz: de 1 a 60 minutos.'); return; }
+    var banco = tipo === 'ce' ? QA_CE : QA_MULT;
+    QUIZ_AULA = { turmaId: SALA_ATUAL, tipo: tipo, minutos: min, pdf: arq, status: 'criado', alunoFez: false, respostasAluno: [],
+      qs: banco.slice(0, nq).map(function (q) { return { txt: q.txt, alts: q.alts || ['Certo', 'Errado'], right: q.right }; }) };
+    $('qzStatus').innerHTML = '<strong>Quiz criado</strong> — ' + nq + ' questões (' + (tipo === 'ce' ? 'certo/errado' : 'múltipla escolha') + ') · ' + min + ' min · PDF “' + arq + '”. A sala já vê <strong>“Aula com Quiz”</strong>; ative quando a aula começar.';
+    qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz criado — a sala já sabe que hoje tem quiz.');
+  });
+  $('btnQuizAtivar').addEventListener('click', function () {
+    if (!QUIZ_AULA || QUIZ_AULA.status !== 'criado') return;
+    QUIZ_AULA.status = 'ativo';
+    $('qzStatus').innerHTML = '<strong>Quiz ATIVO</strong> — o botão “Quiz” apareceu para a sala com ' + QUIZ_AULA.minutos + ' min no relógio. Encerre para consolidar o relatório.';
     $('liveTag').style.display = 'inline-block';
-    $('pollBox').style.display = 'block';
-    $('btnAbrirQuiz').disabled = true;
-    $('btnFinalizarQuiz').disabled = false;
-    $('salaTag').textContent = 'QUIZ AO VIVO';
-    $('salaTag').classList.add('live');
-    $('salaSub').textContent = 'O professor abriu o quiz da aula. Entre agora — pontua em Quad Coins.';
-    $('btnEntrarQuiz').style.display = 'inline-block';
-    refreshSalaLock(); // se o aluno estiver offline, o botão entra travado
     pollN = 0;
+    $('pollCount').textContent = '0/42';
+    $('pollBar').style.width = '0%';
+    qzRelatorio();
+    clearInterval(pollTimer);
     pollTimer = setInterval(function () {
-      pollN = Math.min(42, pollN + Math.ceil(Math.random() * 5));
-      $('pollCount').textContent = pollN + '/42';
+      var alvo = QUIZ_AULA && QUIZ_AULA.alunoFez ? 42 : 41;   /* a última vaga é do aluno desta demo */
+      pollN = Math.min(alvo, pollN + Math.ceil(Math.random() * 5));
+      $('pollCount').textContent = (QUIZ_AULA && QUIZ_AULA.alunoFez ? Math.min(42, pollN + 1) : pollN) + '/42';
       $('pollBar').style.width = (pollN / 42 * 100) + '%';
       if (pollN >= 42) clearInterval(pollTimer);
     }, 700);
-    toast('Quiz aberto para a sala');
+    qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz ativado — a sala está respondendo.');
   });
-  $('btnFinalizarQuiz').addEventListener('click', function () {
-    if (!quizLive) return;
-    quizLive = false;
+  $('btnQuizEncerrar').addEventListener('click', function () {
+    if (!QUIZ_AULA || QUIZ_AULA.status !== 'ativo') return;
+    QUIZ_AULA.status = 'encerrado';
     clearInterval(pollTimer);
-    $('qcTitle').textContent = 'Quiz finalizado';
-    $('qcSub').textContent = 'Alunos recebem o resultado completo + vídeo de resolução. Parcial abaixo.';
     $('liveTag').style.display = 'none';
-    $('btnFinalizarQuiz').disabled = true;
-    $('relCard').style.display = 'block';
-    $('salaTag').textContent = 'SEM QUIZ ABERTO';
-    $('salaTag').classList.remove('live');
-    $('salaSub').textContent = 'Quiz encerrado. Quando o professor abrir o próximo, ele aparece aqui.';
-    $('btnEntrarQuiz').style.display = 'none';
-    toast('Relatório da sala gerado');
+    $('qzStatus').innerHTML = '<strong>Quiz encerrado</strong> — relatório consolidado abaixo. O aluno não pontua: o quiz é leitura pedagógica da sala.';
+    $('pollSub').textContent = 'Quiz encerrado — respostas consolidadas.';
+    qzRelatorio(); qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz encerrado — relatório da sala consolidado.');
   });
+  /* distribuição de alternativas por questão (determinística na demo) */
+  function qzDist(q, qi) {
+    var n = q.alts.length, pesos = [], soma = 0;
+    for (var i = 0; i < n; i++) { var w = 8 + (edHash(q.txt + ':' + i) % 25) + (i === q.right ? 42 : 0); pesos.push(w); soma += w; }
+    var pct = pesos.map(function (w) { return Math.round(w / soma * 100); });
+    var dif = 100 - pct.reduce(function (a, b) { return a + b; }, 0);
+    pct[q.right] += dif;
+    /* a resposta real do aluno desta demo entra no bolo */
+    if (QUIZ_AULA.alunoFez && QUIZ_AULA.respostasAluno[qi] != null) {
+      var esc = QUIZ_AULA.respostasAluno[qi];
+      pct[esc] = Math.min(100, pct[esc] + 2);
+      var doador = -1, maior = -1;
+      for (var d = 0; d < pct.length; d++) { if (d !== esc && pct[d] > maior) { maior = pct[d]; doador = d; } }
+      if (doador >= 0) pct[doador] = Math.max(0, pct[doador] - 2);
+    }
+    return pct;
+  }
+  function qzRelatorio() {
+    var el = $('qzRelList'); if (!el || !QUIZ_AULA) return;
+    var LETRAS = ['A', 'B', 'C', 'D', 'E'];
+    el.innerHTML = QUIZ_AULA.qs.map(function (q, i) {
+      var pct = qzDist(q, i), ac = pct[q.right];
+      return '<div class="result-bar"><span class="q">Q' + (i + 1) + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + ac + '%"></div></div>' +
+        '<span class="n">' + ac + '%</span>' +
+        '<button class="btn ghost small" data-qrel="' + i + '">Relatório</button></div>' +
+        '<div class="qrel-det" data-qrel-det="' + i + '" style="display:none">' +
+        q.alts.map(function (alt, ai) {
+          var rot = q.alts.length === 2 ? alt : ('Letra ' + LETRAS[ai]);
+          return '<div class="adm-bar"><span class="nm">' + rot + (ai === q.right ? ' <span class="tag ok">CORRETA</span>' : '') + '</span>' +
+            '<span class="mini-track"><i style="width:' + pct[ai] + '%;background:var(--p-blue)"></i></span>' +
+            '<span class="pct">' + pct[ai] + '%</span></div>';
+        }).join('') + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-qrel]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var det = el.querySelector('[data-qrel-det="' + bt.dataset.qrel + '"]');
+        det.style.display = det.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+  }
+
+  /* ---------- lado do aluno: selo na Aula de hoje + botão Quiz ---------- */
+  function quizDaMinhaTurma() {
+    if (!QUIZ_AULA) return null;
+    var minha = (typeof matriculasAtivas === 'function') && matriculasAtivas().some(function (m) { return m.turmaId === QUIZ_AULA.turmaId; });
+    return minha ? QUIZ_AULA : null;
+  }
+  function refreshQuizAula() {
+    var q = quizDaMinhaTurma();
+    var tag = $('salaTag'), sub = $('salaSub'), btn = $('btnEntrarQuiz');
+    if (!tag) return;
+    if (!q || q.status === 'encerrado') {
+      tag.textContent = 'SEM QUIZ ABERTO'; tag.classList.remove('live');
+      sub.textContent = q && q.status === 'encerrado' ? 'Quiz encerrado — o resultado sai com o professor.' : 'Quando o professor criar o quiz da aula, ele aparece aqui.';
+      btn.style.display = 'none';
+      return;
+    }
+    if (q.alunoFez) {
+      tag.textContent = 'QUIZ RESPONDIDO'; tag.classList.add('live');
+      sub.textContent = 'Respostas enviadas ao professor — sem gabarito agora, o resultado sai com ele.';
+      btn.style.display = 'none';
+      return;
+    }
+    if (q.status === 'criado') {
+      tag.textContent = 'AULA COM QUIZ'; tag.classList.remove('live');
+      sub.textContent = 'O professor preparou um quiz para a aula de hoje — ele ativa quando a aula começar.';
+      btn.style.display = 'none';
+      return;
+    }
+    /* ativo */
+    tag.textContent = 'AULA COM QUIZ ATIVO'; tag.classList.add('live');
+    sub.textContent = 'Quiz valendo, com ' + q.minutos + ' min no relógio — toque e responda.';
+    btn.textContent = 'Quiz';
+    btn.style.display = 'inline-block';
+    refreshSalaLock();
+  }
   $('btnEntrarQuiz').addEventListener('click', function () {
-    if (!online) { toast('O quiz ao vivo precisa de conexão com a internet.'); return; }
-    openQuiz('aula', 'Quiz ao vivo · registrado como OPEN_CLASS');
+    if (!online) { toast('O quiz da aula precisa de conexão com a internet.'); return; }
+    var q = quizDaMinhaTurma();
+    if (!q || q.status !== 'ativo') { toast('O quiz ainda não está ativo.'); return; }
+    abrirQuizAula(q);
   });
+
+  /* ---------- runtime do quiz da aula (cronômetro · sem premiação) ---------- */
+  var qaIdx = 0, qaSel = null, qaTimerT = null, qaFim = 0;
+  function qaTick() {
+    var resta = Math.max(0, Math.round((qaFim - Date.now()) / 1000));
+    var m = Math.floor(resta / 60), sg = resta % 60;
+    $('qaTimer').textContent = (m < 10 ? '0' : '') + m + ':' + (sg < 10 ? '0' : '') + sg;
+    if (resta <= 0) { clearInterval(qaTimerT); qaFinaliza(true); }
+  }
+  function abrirQuizAula(q) {
+    qaIdx = 0; qaSel = null;
+    q.respostasAluno = [];
+    $('qaKicker').textContent = 'Quiz da aula · ' + (turmaDe(q.turmaId) || {}).nome;
+    qaFim = Date.now() + q.minutos * 60000;
+    clearInterval(qaTimerT); qaTimerT = setInterval(qaTick, 250); qaTick();
+    qaRender();
+    $('qaLayer').classList.add('on');
+  }
+  function qaRender() {
+    var q = QUIZ_AULA, item = q.qs[qaIdx];
+    $('qaProgress').textContent = 'Questão ' + (qaIdx + 1) + ' de ' + q.qs.length;
+    $('qaBody').innerHTML = '<p class="q-txt">' + item.txt + '</p>' +
+      item.alts.map(function (alt, i) {
+        return '<button class="q-alt" data-qa="' + i + '">' + alt + '</button>';
+      }).join('');
+    qaSel = null; $('btnQaNext').disabled = true;
+    $('btnQaNext').textContent = qaIdx === q.qs.length - 1 ? 'Enviar ao professor' : 'Responder';
+    $('qaBody').querySelectorAll('[data-qa]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        qaSel = parseInt(bt.dataset.qa, 10);
+        $('qaBody').querySelectorAll('[data-qa]').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+        $('btnQaNext').disabled = false;
+      });
+    });
+  }
+  $('btnQaNext').addEventListener('click', function () {
+    if (qaSel == null) return;
+    QUIZ_AULA.respostasAluno[qaIdx] = qaSel;
+    if (qaIdx < QUIZ_AULA.qs.length - 1) { qaIdx++; qaRender(); return; }
+    qaFinaliza(false);
+  });
+  $('btnSairQa').addEventListener('click', function () {
+    clearInterval(qaTimerT);
+    $('qaLayer').classList.remove('on');
+    toast('Você saiu do quiz — dá para voltar enquanto ele estiver ativo.');
+  });
+  function qaFinaliza(tempoEsgotado) {
+    clearInterval(qaTimerT);
+    QUIZ_AULA.alunoFez = true;
+    $('qaLayer').classList.remove('on');
+    qzRelatorio();   /* a resposta real entra no relatório do professor */
+    refreshQuizAula();
+    toast(tempoEsgotado ? 'Tempo esgotado — o que você respondeu foi enviado ao professor.' : 'Respostas enviadas ao professor — sem gabarito agora, o resultado sai com ele.');
+  }
 
   /* ---------- vinheta (após conceder o acesso, antes de abrir o app) ---------- */
   var splashTimer = null, splashDone = null;
@@ -4034,9 +4350,9 @@
     var btn = $('btnEntrarQuiz');
     if (!btn) return;
     if (!online) {
-      if (btn.style.display !== 'none') { btn.disabled = true; btn.textContent = 'Quiz ao vivo indisponível offline'; }
+      if (btn.style.display !== 'none') { btn.disabled = true; btn.textContent = 'Quiz indisponível offline'; }
     } else if (btn.style.display !== 'none') {
-      btn.disabled = false; btn.textContent = 'Entrar no quiz ao vivo';
+      btn.disabled = false; btn.textContent = 'Quiz';
     }
   }
   function refreshNovaMissao() {
