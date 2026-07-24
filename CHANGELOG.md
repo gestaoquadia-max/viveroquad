@@ -1,5 +1,33 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Pacote do aluno · Fase B (turmas de ponta a ponta)
+- **Criação de turmas migrou para o Painel de controle**, completa:
+  tipo (RONDESP/PATAMO/BOPE) + apelido; **concurso** (PMBA Soldado/CFO,
+  fronteiras, GCM, PCBA, PPBA, PRF, **PF**); turno; datas; dois horários
+  seguidos; **preço em Dmn E em QdC**; **vagas gerais e vagas em QdC**
+  (gerais − QdC = Dmn); árvore do edital em PDF; **professores por
+  matéria** da árvore do concurso (CFO lista as 13 matérias reais;
+  concursos sem árvore usam matérias genéricas). A turma nasce na Quad
+  Store e na Estrutura. Categoria "turmas" **removida** do cadastro de
+  produtos da aba Loja
+- **Quad Store — turma é UM item com as duas moedas**: extinto o item
+  avulso "Vaga Quad Coin"; o card mostra vagas por moeda ("170 Dmn ·
+  10 QdC") e os dois preços; o clique abre o **pop-up "Creditar em"**
+  (Diamantes × Quad Coins, cada opção com preço e vagas restantes);
+  a matrícula debita a moeda escolhida e a vaga daquela moeda
+- **Bloqueio de turno**: matriculado num turno, as demais turmas do
+  mesmo turno ficam INDISPONÍVEL (independe da moeda) até o término da
+  turma — o aluno da demo (PATAMO Noite) vê as turmas noturnas
+  bloqueadas e pode comprar as matutinas (novas seeds RONDESP/BOPE
+  Manhã)
+- **Matrícula manda no app**: a primeira matrícula ativa define a turma
+  do Início (abaixo da patente), o ranking da sala e o **Domínio**
+  (árvore do edital do concurso da turma). **Sem matrícula ativa** o
+  app trava: aviso "Matrícula encerrada", só a Quad Store acessível,
+  e a nova matrícula destrava tudo na hora
+- Nova suíte `vfaseb` (27 checagens) verde; `vdmn`/`vinterno` ajustadas
+  ao modelo novo; todas as demais suítes (incl. tutorial) sem regressões
+
 ## 24/07/2026 — Pacote do aluno · Fase A (login, eventos, Missões, Quad Store)
 - **Login em UMA tela**: a página "verificando o cadastro" foi fundida à
   vinheta — a verificação da matrícula agora aparece dentro da própria

@@ -1130,6 +1130,17 @@
   .loja-sec::after { content: ''; flex: 1; height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, #BFD8F5, rgba(191,216,245,0)); }
 
+  /* ---------- matrícula: escolha da moeda ---------- */
+  .tu-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .tu-opt { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; cursor: pointer;
+    border: 1.5px solid #A9CCFF; border-radius: 14px; background: linear-gradient(180deg, #F2F8FF, #DCEBFF);
+    font: inherit; color: #1D55B0; text-align: left; }
+  .tu-opt.qdc { border-color: #F0D9A0; background: linear-gradient(180deg, #FFFBEF, #FBF0D2); color: #8A6D1F; }
+  .tu-opt .to-rot { flex: 1; font: 800 12px var(--ui); text-transform: uppercase; letter-spacing: .05em; }
+  .tu-opt b { font: 800 14px Consolas, monospace; }
+  .tu-opt small { font: 700 10px var(--ui); opacity: .75; }
+  .tu-opt:disabled { opacity: .45; cursor: not-allowed; }
+
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
@@ -1626,34 +1637,7 @@
 
             <div class="loja-sec">Turmas · modalidades do Quad</div>
             <div class="loja-grid" id="lojaTurmas">
-              <button class="loja-item" data-nome="Turma RONDESP · nivelamento" data-preco="1800" data-moeda="dmn" data-estoque="170">
-                <span class="li-estoque">170 vagas</span>
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-                <span class="li-nome">Turma RONDESP</span>
-                <span class="li-desc">nivelamento · mais teoria</span>
-                <span class="li-preco">1.800 Dmn</span>
-              </button>
-              <button class="loja-item" data-nome="Turma PATAMO · regular" data-preco="2200" data-moeda="dmn" data-estoque="170">
-                <span class="li-estoque">170 vagas</span>
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 5 5v6.2c0 4.4 3 7.3 7 8.8 4-1.5 7-4.4 7-8.8V5l-7-2.5Z"/></svg></span>
-                <span class="li-nome">Turma PATAMO</span>
-                <span class="li-desc">regular · teoria + questões</span>
-                <span class="li-preco">2.200 Dmn</span>
-              </button>
-              <button class="loja-item" data-nome="Turma BOPE · questões" data-preco="2600" data-moeda="dmn" data-estoque="170">
-                <span class="li-estoque">170 vagas</span>
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></span>
-                <span class="li-nome">Turma BOPE</span>
-                <span class="li-desc">questões · alta intensidade</span>
-                <span class="li-preco">2.600 Dmn</span>
-              </button>
-              <button class="loja-item" data-nome="Turma presencial" data-preco="300" data-estoque="10">
-                <span class="li-estoque">10 vagas</span>
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
-                <span class="li-nome">Vaga Quad Coin</span>
-                <span class="li-desc">vagas da turma em QdC</span>
-                <span class="li-preco">300 QdC</span>
-              </button>
+              <span id="lojaTurmasCore" style="display:contents"></span>
               <span id="lojaExtras-turmas" style="display:contents"></span>
             </div>
 
@@ -2105,6 +2089,52 @@
           </div>
 
           <div class="p-card">
+            <div class="k-label">Criação de turmas · matrícula e vagas</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCtTipo" title="Tipo da turma"></select>
+                <input class="fld" id="admCtApelido" placeholder="Apelido (ex.: Turma Águia)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCtConc" title="Concurso da turma"></select>
+                <select class="fld" id="admCtTurno" title="Turno" style="max-width:110px">
+                  <option value="manhã">Manhã</option>
+                  <option value="tarde">Tarde</option>
+                  <option value="noite" selected>Noite</option>
+                </select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCtIni" type="date" aria-label="Início" title="Início da turma" style="max-width:150px">
+                <span class="pct">até</span>
+                <input class="fld" id="admCtFim" type="date" aria-label="Término" title="Término da turma" style="max-width:150px">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <span class="pct">1º tempo</span>
+                <input class="fld" id="admCtH1i" type="time" style="max-width:104px" aria-label="Início do 1º tempo">
+                <span class="pct">→</span>
+                <input class="fld" id="admCtH1f" type="time" style="max-width:104px" aria-label="Fim do 1º tempo e início do 2º" title="Fim do 1º tempo — o 2º começa aqui">
+                <span class="pct">2º até</span>
+                <input class="fld" id="admCtH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCtPrecoDmn" placeholder="Preço Dmn" inputmode="numeric" style="max-width:100px" title="Preço em Diamantes">
+                <input class="fld" id="admCtPrecoQdc" placeholder="Preço QdC" inputmode="numeric" style="max-width:100px" title="Preço em Quad Coins">
+                <input class="fld" id="admCtVagas" placeholder="Vagas" inputmode="numeric" style="max-width:80px" title="Vagas gerais">
+                <input class="fld" id="admCtVagasQdc" placeholder="em QdC" inputmode="numeric" style="max-width:80px" title="Destas, quantas em Quad Coins">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCtArvore" type="file" accept=".pdf" title="Árvore do edital · PDF">
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Professores por matéria · árvore do edital</div>
+              <div id="admCtProfs" style="max-height:180px; overflow:auto"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmCtAbrir">Abrir turma</button></div>
+            </div>
+            <div class="adm-sep"><span>Turmas abertas</span></div>
+            <div id="admCtLista"></div>
+            <p class="sub" style="margin-top:8px">A turma <strong>nasce aqui</strong> e vai direto para a Quad Store com as <strong>vagas por moeda</strong> (gerais − QdC = Diamantes). O aluno escolhe a moeda num pop-up; comprou, as turmas do <strong>mesmo turno ficam bloqueadas</strong> para ele até o término. A <strong>árvore do edital em PDF</strong> define as matérias <span class="ref">[INTEGRAÇÃO REAL] leitura do arquivo</span>. A turma também aparece na Estrutura.</p>
+          </div>
+
+          <div class="p-card">
             <div class="k-label">Crédito manual · Quad Coins e Diamantes</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2162,39 +2192,6 @@
             </div>
             <p class="sub">O que o time cria daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e produtos.</p>
             <div style="margin-top:10px"><button class="btn ghost small" id="btnIrEstrutura">Estrutura · turmas, concursos e editais</button></div>
-          </div>
-
-          <div class="p-card">
-            <div class="k-label">Criação de turmas</div>
-            <div class="adm-form">
-              <div class="adm-row">
-                <select class="fld" id="admTuPreset" title="Nome pré-configurado (tipo da turma)"></select>
-                <input class="fld" id="admTuApelido" placeholder="Apelido (ex.: Turma Águia)">
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <select class="fld" id="admTuFoco" title="Foco do concurso"></select>
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admTuIni" type="date" aria-label="Início" title="Início da turma" style="max-width:150px">
-                <span class="pct">até</span>
-                <input class="fld" id="admTuFim" type="date" aria-label="Término" title="Término provável" style="max-width:150px">
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <span class="pct">1º tempo</span>
-                <input class="fld" id="admTuH1i" type="time" style="max-width:104px" aria-label="Início do 1º tempo">
-                <span class="pct">→</span>
-                <input class="fld" id="admTuH1f" type="time" style="max-width:104px" aria-label="Fim do 1º tempo e início do 2º" title="Fim do 1º tempo — o 2º começa aqui">
-                <span class="pct">2º até</span>
-                <input class="fld" id="admTuH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admTuArvore" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" title="Árvore do edital · anexo">
-              </div>
-              <div style="margin-top:10px"><button class="btn small" id="btnAdmTuAbrir">Abrir turma</button></div>
-            </div>
-            <div class="adm-sep"><span>Turmas abertas</span></div>
-            <div id="admTuLista"></div>
-            <p class="sub" style="margin-top:8px">O nome vem <strong>pré-configurado</strong> pelo tipo (RONDESP · Nivelamento, PATAMO · Regular, BOPE · Questões) e o apelido é livre. São <strong>dois horários seguidos</strong> (ex.: 19h–20h30 e 20h30–22h). A <strong>árvore do edital</strong> entra por anexo <span class="ref">[INTEGRAÇÃO REAL] leitura do arquivo</span>. A turma também aparece na Estrutura.</p>
           </div>
 
           <div class="p-card">
@@ -2538,7 +2535,6 @@
               </div>
               <div class="adm-row" style="margin-top:8px">
                 <select class="fld" id="admProdCat">
-                  <option value="turmas">Turmas e aulas</option>
                   <option value="digitais">Itens digitais (cursos, e-books…)</option>
                   <option value="personagem">Itens do personagem</option>
                   <option value="presencial">Itens presenciais (retirada)</option>
@@ -2557,7 +2553,7 @@
               <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
             </div>
             <div id="admProdList" style="margin-top:10px"></div>
-            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. Itens presenciais usam a <strong>quantidade</strong> como estoque e geram <strong>pedido de retirada</strong> na recepção. Toque no ✕ para remover.</p>
+            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. <strong>Turmas</strong> agora nascem no <strong>Painel de controle</strong> (Criação de turmas). Itens presenciais usam a <strong>quantidade</strong> como estoque e geram <strong>pedido de retirada</strong> na recepção. Toque no ✕ para remover.</p>
           </div>
 
           <div class="p-card">
@@ -2889,6 +2885,31 @@
           </div>
         </div>
 
+        <!-- matrícula em turma: escolha da moeda (vagas separadas por moeda) -->
+        <div class="compra-layer" id="turmaLayer" style="z-index:68">
+          <div class="compra-box">
+            <span class="compra-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <h3 class="compra-nome" id="tuLayNome">Turma</h3>
+            <p class="sub compra-desc" id="tuLayDesc">Escolha a moeda da matrícula — as vagas são separadas por moeda.</p>
+            <div class="tu-opts">
+              <button class="tu-opt" id="btnTuDmn"><span class="to-rot">Diamantes</span><b id="tuDmnTxt">1.800 Dmn</b><small id="tuDmnVagas">170 vagas</small></button>
+              <button class="tu-opt qdc" id="btnTuQdc"><span class="to-rot">Quad Coins</span><b id="tuQdcTxt">2.000 QdC</b><small id="tuQdcVagas">10 vagas</small></button>
+            </div>
+            <button class="btn ghost small" id="btnTuCancel" style="width:100%; margin-top:10px">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- sem matrícula ativa: funções bloqueadas até entrar numa turma -->
+        <div class="compra-layer" id="matLayer" style="z-index:69">
+          <div class="compra-box">
+            <span class="compra-ico" style="background:linear-gradient(160deg,#FFF6E3,#FBE9C8)"><svg viewBox="0 0 24 24" style="stroke:#B45309"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/></svg></span>
+            <h3 class="compra-nome">Matrícula encerrada</h3>
+            <p class="sub compra-desc">Sua turma terminou e a matrícula não foi renovada.<br>As funções do app ficam <strong>bloqueadas</strong> até você entrar em uma nova turma.</p>
+            <button class="btn" id="btnMatLoja" style="width:100%">Ver turmas na Quad Store</button>
+            <button class="btn ghost small" id="btnMatOk" style="width:100%; margin-top:10px">Entendi</button>
+          </div>
+        </div>
+
         <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
         <div class="help-layer" id="helpLayer">
           <div class="help-quad" id="helpQuad" aria-hidden="true"><span class="fab-sprite" id="helpSprite"></span></div>
@@ -3152,6 +3173,38 @@
     return true;
   }
 
+  /* ---------- turmas: catálogo da Quad Store + matrículas do aluno ----------
+     Turma nasce no Painel de controle e vende em DUAS moedas com vagas
+     separadas (gerais − QdC = Dmn). Matrícula bloqueia o turno; sem
+     matrícula ativa, o app trava até entrar numa nova turma.            */
+  var PROFESSORES = ['Danilo Moura', 'Cap. Silva', 'Prof. Ferraz', 'Prof.ª Ritha Galvão', 'Prof. Nascimento', 'Prof.ª Ana Beatriz'];
+  var TURMAS_LOJA = [
+    { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'nivelamento · mais teoria', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'regular · teoria + questões', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 170, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
+    { id: 'bope-n',    nome: 'Turma BOPE',    tipo: 'BOPE',    tipoDesc: 'questões · alta intensidade', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2600, precoQdc: 2800, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'rondesp-m', nome: 'Turma RONDESP Manhã', tipo: 'RONDESP', tipoDesc: 'nivelamento · matutina', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 600, precoQdc: 700, vagasDmn: 54, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'bope-m',    nome: 'Turma BOPE Manhã',    tipo: 'BOPE',    tipoDesc: 'questões · matutina',    turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 800, precoQdc: 900, vagasDmn: 44, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' }
+  ];
+  /* o aluno da demo veio do site já matriculado na PATAMO Noite (CFO) */
+  var MATRICULAS = [{ turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' }];
+  function turmaDe(id) { return TURMAS_LOJA.filter(function (t) { return t.id === id; })[0]; }
+  function hojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  function matriculasAtivas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return !m.fim || m.fim >= h; }); }
+  function turnoOcupadoPor(turno) {
+    var at = matriculasAtivas().filter(function (m) { return m.turno === turno; })[0];
+    return at ? ('Turma ' + at.tipo) : null;
+  }
+  var appLock = false;
+  function checarMatricula() {
+    appLock = matriculasAtivas().length === 0;
+    if (appLock) { var ml = $('matLayer'); if (ml) ml.classList.add('on'); }
+  }
+  /* exposto para a suíte de testes: simula o fim da turma sem viajar no tempo */
+  window.__mat = {
+    encerrar: function () { MATRICULAS.length = 0; checarMatricula(); if (typeof renderTurmasLoja === 'function') renderTurmasLoja(); },
+    ativas: function () { return matriculasAtivas().length; }
+  };
+
   /* ---------- personas ---------- */
   var personaAtiva = 'aluno';
   var personaViews = {
@@ -3291,6 +3344,10 @@
   spotlight($('v-inicio'));
   document.querySelectorAll('.nav-btn').forEach(function (nb) {
     nb.addEventListener('click', function () {
+      if (appLock && personaAtiva === 'aluno' && nb.closest('nav').id === 'navAluno' && nb.dataset.view !== 'v-loja') {
+        toast('Funções bloqueadas — matricule-se em uma turma na Quad Store para liberar.');
+        return;
+      }
       showView(nb.dataset.view, nb.closest('nav').id);
     });
   });
@@ -4065,6 +4122,7 @@
     deviceAuthorized = true;
     playSplash(function () {
       applyConnUI();
+      checarMatricula();  // sem matrícula ativa → funções bloqueadas + aviso
       daniloWave();       // o QUAD recebe o aluno acenando
       daniloHintMostra(); // "Precisa de ajuda?" fica 10s na tela
       var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
@@ -5929,68 +5987,99 @@
     toast('Turma “' + nome + '” aberta — ' + (c ? c.nome : '') + ' · ' + (modalidadeDe(mod) || {}).nome + '.');
   });
 
-  /* ---------- Painel interno · criação de turmas ----------
-     Nome pré-configurado pelo tipo (RONDESP/PATAMO/BOPE) + apelido livre;
-     foco do concurso por estado; dois horários seguidos; árvore por anexo. */
+  /* ---------- Painel de CONTROLE · criação de turmas ----------
+     Nome pré-configurado pelo tipo + apelido; concurso por estado;
+     turno; dois horários seguidos; preços e VAGAS POR MOEDA; árvore
+     do edital em PDF; professores por matéria da árvore.              */
   var TURMA_FOCOS = [
-    { id: 'sdba',    nome: 'Soldado · PM-BA' },
-    { id: 'cfo',     nome: 'Oficial (CFO) · PM-BA' },
-    { id: 'sdfront', nome: 'Soldado · PMs de fronteira' },
-    { id: 'gm',      nome: 'Guarda Municipal · Salvador-BA' },
-    { id: 'pcba',    nome: 'Polícia Civil · BA' },
-    { id: 'ppba',    nome: 'Polícia Penal · BA' },
-    { id: 'prf',     nome: 'PRF · nacional' }
+    { id: 'sdba',    nome: 'PMBA · Soldado' },
+    { id: 'cfo',     nome: 'PMBA · Oficial (CFO)' },
+    { id: 'sdfront', nome: 'PMs de fronteira · Soldado' },
+    { id: 'gm',      nome: 'GCM · Guarda Municipal' },
+    { id: 'pcba',    nome: 'PCBA · Polícia Civil' },
+    { id: 'ppba',    nome: 'PPBA · Polícia Penal' },
+    { id: 'prf',     nome: 'PRF · nacional' },
+    { id: 'pf',      nome: 'PF · Polícia Federal' }
   ];
-  function horaBR(h) { return h ? h.replace(':', 'h') : ''; }
-  function renderTuLista() {
-    var el = $('admTuLista'); if (!el) return;
-    var novas = TURMAS_ADM.filter(function (t) { return t.h1i; });
+  var MATERIAS_GENERICAS = ['Língua Portuguesa', 'Matemática', 'Direito Constitucional', 'Direito Penal', 'Legislação específica'];
+  function ctMaterias() {
+    var c = (typeof concursoDe === 'function') ? concursoDe($('admCtConc').value) : null;
+    return (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : MATERIAS_GENERICAS;
+  }
+  function renderCtProfs() {
+    var el = $('admCtProfs'); if (!el) return;
+    var ops = PROFESSORES.map(function (p) { return '<option>' + p + '</option>'; }).join('');
+    el.innerHTML = ctMaterias().map(function (mat, i) {
+      return '<div class="adm-bar"><span class="nm">' + mat + '</span>' +
+        '<select class="fld" data-ct-prof="' + i + '" style="max-width:170px">' + ops + '</select></div>';
+    }).join('');
+    /* distribui o corpo docente para não nascer tudo com o mesmo nome */
+    el.querySelectorAll('[data-ct-prof]').forEach(function (sel, i) { sel.selectedIndex = i % PROFESSORES.length; });
+  }
+  function renderCtLista() {
+    var el = $('admCtLista'); if (!el) return;
+    var novas = TURMAS_LOJA.filter(function (t) { return t.criada; });
     el.innerHTML = novas.map(function (t) {
-      var i = TURMAS_ADM.indexOf(t);
       return '<div class="adm-bar"><span class="nm">' + t.nome +
-        '<small>' + (t.focoNome || '') + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) +
-        ' · ' + horaBR(t.h1i) + '–' + horaBR(t.h1f) + ' e ' + horaBR(t.h1f) + '–' + horaBR(t.h2f) +
-        (t.edital ? ' · edital anexado' : '') + '</small></span>' +
-        '<button class="adm-x" data-rm-tu="' + i + '" aria-label="Remover">✕</button></div>';
+        '<small>' + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + ' · ' + fmt(t.precoDmn) + ' Dmn/' + fmt(t.precoQdc) + ' QdC · ' +
+        t.vagasDmn + '+' + t.vagasQdc + ' vagas' + (t.edital ? ' · edital anexado' : '') + '</small></span>' +
+        '<button class="adm-x" data-rm-ct="' + t.id + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta por aqui ainda.</p>';
-    el.querySelectorAll('[data-rm-tu]').forEach(function (b) {
+    el.querySelectorAll('[data-rm-ct]').forEach(function (b) {
       b.addEventListener('click', function () {
-        var t = TURMAS_ADM[+b.dataset.rmTu];
-        TURMAS_ADM.splice(+b.dataset.rmTu, 1);
-        renderTuLista(); renderTurmasAdm();
+        var t = turmaDe(b.dataset.rmCt); if (!t) return;
+        TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
+        TURMAS_ADM = TURMAS_ADM.filter(function (x) { return x.ctId !== t.id; });
+        renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
         toast('Turma “' + t.nome + '” removida.');
       });
     });
   }
   (function () {
-    var pre = $('admTuPreset'); if (!pre) return;
-    pre.innerHTML = MODALIDADES.map(function (m) {
+    var tipoSel = $('admCtTipo'); if (!tipoSel) return;
+    tipoSel.innerHTML = MODALIDADES.map(function (m) {
       return '<option value="' + m.id + '">' + m.id + ' · ' + m.nome.split('·')[0].trim() + '</option>';
     }).join('');
-    $('admTuFoco').innerHTML = TURMA_FOCOS.map(function (fo) {
+    $('admCtConc').innerHTML = TURMA_FOCOS.map(function (fo) {
       return '<option value="' + fo.id + '">' + fo.nome + '</option>';
     }).join('');
-    $('btnAdmTuAbrir').addEventListener('click', function () {
-      var mod = pre.value;
-      var ape = $('admTuApelido').value.trim();
-      var foco = TURMA_FOCOS.filter(function (fo) { return fo.id === $('admTuFoco').value; })[0];
-      var ini = $('admTuIni').value, fim = $('admTuFim').value;
-      var h1i = $('admTuH1i').value, h1f = $('admTuH1f').value, h2f = $('admTuH2f').value;
+    $('admCtConc').addEventListener('change', renderCtProfs);
+    renderCtProfs();
+    $('btnAdmCtAbrir').addEventListener('click', function () {
+      var tipo = tipoSel.value, ape = $('admCtApelido').value.trim();
+      var foco = TURMA_FOCOS.filter(function (fo) { return fo.id === $('admCtConc').value; })[0];
+      var turno = $('admCtTurno').value;
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
+      var pDmn = parseInt($('admCtPrecoDmn').value, 10), pQdc = parseInt($('admCtPrecoQdc').value, 10);
+      var vagas = parseInt($('admCtVagas').value, 10), vQdc = parseInt($('admCtVagasQdc').value, 10);
       if (/["<>]/.test(ape)) { toast('Use um apelido sem aspas ou sinais.'); return; }
-      if (!ini || !fim) { toast('Informe o início e o término provável.'); return; }
+      if (!ini || !fim) { toast('Informe o início e o término da turma.'); return; }
       if (fim < ini) { toast('O término deve ser depois do início.'); return; }
       if (!h1i || !h1f || !h2f) { toast('Informe os dois horários seguidos (ex.: 19:00–20:30 e 20:30–22:00).'); return; }
       if (!(h1i < h1f && h1f < h2f)) { toast('Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.'); return; }
-      var arq = ($('admTuArvore').files && $('admTuArvore').files[0]) ? $('admTuArvore').files[0].name : '';
-      var nome = mod + (ape ? ' · ' + ape : '');
-      TURMAS_ADM.unshift({ nome: nome, concurso: foco.id, focoNome: foco.nome, modalidade: mod,
+      if (!pDmn || pDmn < 1 || !pQdc || pQdc < 1) { toast('Informe o preço em Diamantes e em Quad Coins.'); return; }
+      if (!vagas || vagas < 1) { toast('Informe as vagas gerais.'); return; }
+      if (isNaN(vQdc) || vQdc < 0 || vQdc > vagas) { toast('Vagas em QdC deve ser um pedaço das vagas gerais (0 a ' + vagas + ').'); return; }
+      var arq = ($('admCtArvore').files && $('admCtArvore').files[0]) ? $('admCtArvore').files[0].name : '';
+      var profs = {};
+      var mats = ctMaterias();
+      $('admCtProfs').querySelectorAll('[data-ct-prof]').forEach(function (sel, i) { profs[mats[i]] = sel.value; });
+      var hor = h1i.replace(':', 'h') + '–' + h1f.replace(':', 'h') + ' e ' + h1f.replace(':', 'h') + '–' + h2f.replace(':', 'h');
+      var id = 'ct' + Date.now();
+      var nome = 'Turma ' + tipo + (ape ? ' · ' + ape : '') + (turno !== 'noite' ? ' (' + turno + ')' : '');
+      TURMAS_LOJA.push({ id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: (modalidadeDe(tipo) || {}).nome || tipo, turno: turno, hor: hor,
+        concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vagas - vQdc, vagasQdc: vQdc,
+        inicio: ini, fim: fim, edital: arq, professores: profs });
+      TURMAS_ADM.unshift({ ctId: id, nome: nome, concurso: foco.id, focoNome: foco.nome, modalidade: tipo,
         inicio: ini, fim: fim, h1i: h1i, h1f: h1f, h2f: h2f, edital: arq });
-      renderTuLista(); renderTurmasAdm();
-      $('admTuApelido').value = ''; $('admTuIni').value = ''; $('admTuFim').value = '';
-      $('admTuH1i').value = ''; $('admTuH1f').value = ''; $('admTuH2f').value = ''; $('admTuArvore').value = '';
-      toast('Turma “' + nome + '” aberta — ' + foco.nome + (arq ? ' · árvore do edital anexada.' : '.'));
+      renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+      $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
+      $('admCtH1i').value = ''; $('admCtH1f').value = ''; $('admCtH2f').value = '';
+      $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = ''; $('admCtArvore').value = '';
+      toast('Turma “' + nome + '” aberta — na Quad Store com ' + (vagas - vQdc) + ' vagas em Dmn e ' + vQdc + ' em QdC.');
     });
-    renderTuLista();
+    renderCtLista();
   })();
 
   /* ---------- admin ---------- */
@@ -6066,6 +6155,79 @@
     });
   }
   document.querySelectorAll('.loja-item').forEach(bindLojaItem);
+
+  /* ---------- turmas na Quad Store: item único com vagas POR MOEDA ----------
+     MATRICULADO = a turma do aluno · INDISPONÍVEL = turno já ocupado
+     (independe da moeda usada na compra) · ESGOTADA = sem vagas.        */
+  var TURMA_ICO = '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  function renderTurmasLoja() {
+    var host = $('lojaTurmasCore'); if (!host) return;
+    host.innerHTML = TURMAS_LOJA.map(function (t) {
+      var minha = matriculasAtivas().some(function (m) { return m.turmaId === t.id; });
+      var esgotada = t.vagasDmn <= 0 && t.vagasQdc <= 0;
+      var ocupadoPor = minha ? null : turnoOcupadoPor(t.turno);
+      var preco = minha ? 'MATRICULADO' : ocupadoPor ? 'INDISPONÍVEL' : esgotada ? 'ESGOTADA'
+        : fmt(t.precoDmn) + ' Dmn ou ' + fmt(t.precoQdc) + ' QdC';
+      return '<button class="loja-item' + (minha ? ' comprado' : '') + ((ocupadoPor || esgotada) && !minha ? ' indisponivel' : '') + '" data-turma="' + t.id + '">' +
+        '<span class="li-estoque">' + t.vagasDmn + ' Dmn · ' + t.vagasQdc + ' QdC</span>' +
+        '<span class="li-ico">' + TURMA_ICO + '</span>' +
+        '<span class="li-nome">' + t.nome + '</span>' +
+        '<span class="li-desc">' + t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + '</span>' +
+        '<span class="li-preco">' + preco + '</span></button>';
+    }).join('');
+    host.querySelectorAll('[data-turma]').forEach(function (bt) {
+      bt.addEventListener('click', function () { turmaClick(bt.dataset.turma); });
+    });
+    if (typeof queueSync === 'function') queueSync();
+  }
+  var turmaAberta = null;
+  function turmaClick(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var t = turmaDe(id); if (!t) return;
+    if (matriculasAtivas().some(function (m) { return m.turmaId === id; })) { toast('Esta já é a sua turma — bom serviço!'); return; }
+    var ocupadoPor = turnoOcupadoPor(t.turno);
+    if (ocupadoPor) { toast('Você já estuda no turno da ' + t.turno + ' (' + ocupadoPor + ') — turmas no mesmo horário ficam bloqueadas até a sua turma terminar.'); return; }
+    if (t.vagasDmn <= 0 && t.vagasQdc <= 0) { toast('Turma esgotada — aguarde o lançamento da próxima.'); return; }
+    turmaAberta = t;
+    $('tuLayNome').textContent = t.nome;
+    $('tuLayDesc').innerHTML = t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + '<br>Creditar em qual moeda? As vagas são separadas por moeda.';
+    $('tuDmnTxt').textContent = fmt(t.precoDmn) + ' Dmn';
+    $('tuDmnVagas').textContent = t.vagasDmn + (t.vagasDmn === 1 ? ' vaga' : ' vagas');
+    $('tuQdcTxt').textContent = fmt(t.precoQdc) + ' QdC';
+    $('tuQdcVagas').textContent = t.vagasQdc + (t.vagasQdc === 1 ? ' vaga' : ' vagas');
+    $('btnTuDmn').disabled = t.vagasDmn <= 0;
+    $('btnTuQdc').disabled = t.vagasQdc <= 0;
+    $('turmaLayer').classList.add('on');
+  }
+  function matricular(moeda) {
+    var t = turmaAberta; if (!t) return;
+    var preco = moeda === 'dmn' ? t.precoDmn : t.precoQdc;
+    if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
+    debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda));
+    if (moeda === 'dmn') t.vagasDmn--; else t.vagasQdc--;
+    var primeira = matriculasAtivas().length === 0;
+    MATRICULAS.push({ turmaId: t.id, rot: t.tipo.toUpperCase() + ' ' + t.turno.toUpperCase(), tipo: t.tipo, turno: t.turno, concurso: t.concurso, fim: t.fim });
+    if (typeof lojaCompraLog === 'function') lojaCompraLog(t.nome + ' · matrícula', preco, moeda);
+    if (primeira) {
+      /* primeira matrícula ativa → vira a turma do app inteiro (Início, ranking, Domínio) */
+      appLock = false;
+      var letra = { 'noite': 'N', 'manhã': 'M', 'tarde': 'T' }[t.turno] || 'N';
+      if (typeof sincronizarTurma === 'function') sincronizarTurma('TURMA ' + t.tipo.toUpperCase() + ' (' + letra + ')');
+      if (typeof definirDominio === 'function' && typeof concursoDe === 'function' && concursoDe(t.concurso)) definirDominio(t.concurso);
+    }
+    renderTurmasLoja();
+    $('turmaLayer').classList.remove('on');
+    var ml = $('matLayer'); if (ml) ml.classList.remove('on');
+    toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
+    turmaAberta = null;
+  }
+  $('btnTuDmn').addEventListener('click', function () { matricular('dmn'); });
+  $('btnTuQdc').addEventListener('click', function () { matricular('qdc'); });
+  $('btnTuCancel').addEventListener('click', function () { $('turmaLayer').classList.remove('on'); turmaAberta = null; });
+  $('turmaLayer').addEventListener('click', function (e) { if (e.target === $('turmaLayer')) { $('turmaLayer').classList.remove('on'); turmaAberta = null; } });
+  $('btnMatOk').addEventListener('click', function () { $('matLayer').classList.remove('on'); });
+  $('btnMatLoja').addEventListener('click', function () { $('matLayer').classList.remove('on'); showView('v-loja', 'navAluno'); });
+  renderTurmasLoja();
 
   /* ---------- catálogo de ícones (seletor do admin + render da Loja) ---------- */
   var ICON_CAT = {
