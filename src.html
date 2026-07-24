@@ -2107,6 +2107,39 @@
           </div>
 
           <div class="p-card">
+            <div class="k-label">Criação de turmas</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admTuPreset" title="Nome pré-configurado (tipo da turma)"></select>
+                <input class="fld" id="admTuApelido" placeholder="Apelido (ex.: Turma Águia)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admTuFoco" title="Foco do concurso"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admTuIni" type="date" aria-label="Início" title="Início da turma" style="max-width:150px">
+                <span class="pct">até</span>
+                <input class="fld" id="admTuFim" type="date" aria-label="Término" title="Término provável" style="max-width:150px">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <span class="pct">1º tempo</span>
+                <input class="fld" id="admTuH1i" type="time" style="max-width:104px" aria-label="Início do 1º tempo">
+                <span class="pct">→</span>
+                <input class="fld" id="admTuH1f" type="time" style="max-width:104px" aria-label="Fim do 1º tempo e início do 2º" title="Fim do 1º tempo — o 2º começa aqui">
+                <span class="pct">2º até</span>
+                <input class="fld" id="admTuH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admTuArvore" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" title="Árvore do edital · anexo">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmTuAbrir">Abrir turma</button></div>
+            </div>
+            <div class="adm-sep"><span>Turmas abertas</span></div>
+            <div id="admTuLista"></div>
+            <p class="sub" style="margin-top:8px">O nome vem <strong>pré-configurado</strong> pelo tipo (RONDESP · Nivelamento, PATAMO · Regular, BOPE · Questões) e o apelido é livre. São <strong>dois horários seguidos</strong> (ex.: 19h–20h30 e 20h30–22h). A <strong>árvore do edital</strong> entra por anexo <span class="ref">[INTEGRAÇÃO REAL] leitura do arquivo</span>. A turma também aparece na Estrutura.</p>
+          </div>
+
+          <div class="p-card">
             <div class="k-label">Avisos gerais · enviar</div>
             <div class="adm-form">
               <input class="fld" id="admAvTitulo" placeholder="Título (ex.: Aulão de véspera confirmado)">
@@ -2246,6 +2279,44 @@
             <div class="adm-sep"><span>Simulados lançados</span></div>
             <div id="admSimList"></div>
             <p class="sub" style="margin-top:8px"><strong>Presencial</strong>: liberação na sede pela aba Liberar. <strong>Digital</strong>: o PDF vira <strong>quiz cronometrado</strong> <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. <strong>Pago</strong> entra na <strong>Loja</strong> em <strong>QdC ou Diamantes</strong>; <strong>gratuito</strong> vai direto para os Simulados do aluno e premia em QdC. Toque no ✕ para remover.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Produtos digitais · pré-configurados</div>
+            <div id="admDigList"></div>
+            <p class="sub" style="margin-top:8px">Produtos digitais <strong>não têm estoque</strong>: ficam <strong>disponíveis</strong> na Loja (Itens digitais) até a administração torná-los <strong>indisponíveis</strong>. O catálogo é pré-configurado — e-books, vade mecum digital, cursos online e aulões exclusivos.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Criar skin do personagem</div>
+            <div class="adm-form">
+              <input class="fld" id="admSkNome" placeholder="Nome da skin (ex.: Boina de instrutor)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admSkDesc" placeholder="Descrição curta (ex.: edição limitada)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admSkMoeda" title="Moeda de venda">
+                  <option value="qdc">Vender em Quad Coins</option>
+                  <option value="dmn">Vender em Diamantes</option>
+                </select>
+                <input class="fld" id="admSkPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px">
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Visual da skin</div>
+              <div class="ico-pick" id="admSkIcones"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmSkin">Publicar skin</button></div>
+            </div>
+            <div class="adm-sep"><span>Skins criadas</span></div>
+            <div id="admSkinList"></div>
+            <p class="sub" style="margin-top:8px">A skin entra na hora em <strong>Itens do personagem</strong>, na Loja do aluno, com confirmação de compra e preço em QdC ou Diamantes. Toque no ✕ para tirar da Loja.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Quests · missões especiais</div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:6px">
+              <button class="btn ghost small" id="btnAdmQuests">Criar Quests</button>
+              <span class="tag">EM BREVE</span>
+            </div>
+            <p class="sub" style="margin-top:8px">Missões especiais criadas pela administração — caça a itens, desafios de equipe, eventos de skin. Estrutura reservada; próxima implementação.</p>
           </div>
         </div>
 
@@ -5645,7 +5716,8 @@
     el.innerHTML = TURMAS_ADM.map(function (t, i) {
       var c = concursoDe(t.concurso), m = modalidadeDe(t.modalidade);
       return '<div class="adm-bar"><span class="nm">' + t.nome +
-        '<small>' + (c ? c.nome : '?') + ' · ' + (m ? m.nome : t.modalidade) + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) + '</small></span>' +
+        '<small>' + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.modalidade) + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) +
+        (t.h1i ? ' · ' + t.h1i.replace(':', 'h') + '–' + t.h1f.replace(':', 'h') + ' e ' + t.h1f.replace(':', 'h') + '–' + t.h2f.replace(':', 'h') : '') + '</small></span>' +
         '<button class="adm-x" data-rm-turma="' + i + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma cadastrada.</p>';
     el.querySelectorAll('[data-rm-turma]').forEach(function (b) {
@@ -5670,6 +5742,70 @@
     var c = concursoDe(conc);
     toast('Turma “' + nome + '” aberta — ' + (c ? c.nome : '') + ' · ' + (modalidadeDe(mod) || {}).nome + '.');
   });
+
+  /* ---------- Painel interno · criação de turmas ----------
+     Nome pré-configurado pelo tipo (RONDESP/PATAMO/BOPE) + apelido livre;
+     foco do concurso por estado; dois horários seguidos; árvore por anexo. */
+  var TURMA_FOCOS = [
+    { id: 'sdba',    nome: 'Soldado · PM-BA' },
+    { id: 'cfo',     nome: 'Oficial (CFO) · PM-BA' },
+    { id: 'sdfront', nome: 'Soldado · PMs de fronteira' },
+    { id: 'gm',      nome: 'Guarda Municipal · Salvador-BA' },
+    { id: 'pcba',    nome: 'Polícia Civil · BA' },
+    { id: 'ppba',    nome: 'Polícia Penal · BA' },
+    { id: 'prf',     nome: 'PRF · nacional' }
+  ];
+  function horaBR(h) { return h ? h.replace(':', 'h') : ''; }
+  function renderTuLista() {
+    var el = $('admTuLista'); if (!el) return;
+    var novas = TURMAS_ADM.filter(function (t) { return t.h1i; });
+    el.innerHTML = novas.map(function (t) {
+      var i = TURMAS_ADM.indexOf(t);
+      return '<div class="adm-bar"><span class="nm">' + t.nome +
+        '<small>' + (t.focoNome || '') + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) +
+        ' · ' + horaBR(t.h1i) + '–' + horaBR(t.h1f) + ' e ' + horaBR(t.h1f) + '–' + horaBR(t.h2f) +
+        (t.edital ? ' · edital anexado' : '') + '</small></span>' +
+        '<button class="adm-x" data-rm-tu="' + i + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta por aqui ainda.</p>';
+    el.querySelectorAll('[data-rm-tu]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = TURMAS_ADM[+b.dataset.rmTu];
+        TURMAS_ADM.splice(+b.dataset.rmTu, 1);
+        renderTuLista(); renderTurmasAdm();
+        toast('Turma “' + t.nome + '” removida.');
+      });
+    });
+  }
+  (function () {
+    var pre = $('admTuPreset'); if (!pre) return;
+    pre.innerHTML = MODALIDADES.map(function (m) {
+      return '<option value="' + m.id + '">' + m.id + ' · ' + m.nome.split('·')[0].trim() + '</option>';
+    }).join('');
+    $('admTuFoco').innerHTML = TURMA_FOCOS.map(function (fo) {
+      return '<option value="' + fo.id + '">' + fo.nome + '</option>';
+    }).join('');
+    $('btnAdmTuAbrir').addEventListener('click', function () {
+      var mod = pre.value;
+      var ape = $('admTuApelido').value.trim();
+      var foco = TURMA_FOCOS.filter(function (fo) { return fo.id === $('admTuFoco').value; })[0];
+      var ini = $('admTuIni').value, fim = $('admTuFim').value;
+      var h1i = $('admTuH1i').value, h1f = $('admTuH1f').value, h2f = $('admTuH2f').value;
+      if (/["<>]/.test(ape)) { toast('Use um apelido sem aspas ou sinais.'); return; }
+      if (!ini || !fim) { toast('Informe o início e o término provável.'); return; }
+      if (fim < ini) { toast('O término deve ser depois do início.'); return; }
+      if (!h1i || !h1f || !h2f) { toast('Informe os dois horários seguidos (ex.: 19:00–20:30 e 20:30–22:00).'); return; }
+      if (!(h1i < h1f && h1f < h2f)) { toast('Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.'); return; }
+      var arq = ($('admTuArvore').files && $('admTuArvore').files[0]) ? $('admTuArvore').files[0].name : '';
+      var nome = mod + (ape ? ' · ' + ape : '');
+      TURMAS_ADM.unshift({ nome: nome, concurso: foco.id, focoNome: foco.nome, modalidade: mod,
+        inicio: ini, fim: fim, h1i: h1i, h1f: h1f, h2f: h2f, edital: arq });
+      renderTuLista(); renderTurmasAdm();
+      $('admTuApelido').value = ''; $('admTuIni').value = ''; $('admTuFim').value = '';
+      $('admTuH1i').value = ''; $('admTuH1f').value = ''; $('admTuH2f').value = ''; $('admTuArvore').value = '';
+      toast('Turma “' + nome + '” aberta — ' + foco.nome + (arq ? ' · árvore do edital anexada.' : '.'));
+    });
+    renderTuLista();
+  })();
 
   /* ---------- admin ---------- */
   $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
@@ -5760,7 +5896,10 @@
     camiseta:   '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg>',
     caneca:     '<svg viewBox="0 0 24 24"><path d="M4 5h12v11a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M16 8h2a3 3 0 0 1 0 6h-2"/></svg>',
     medalha:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="6"/><path d="m9 8.5-3-6M15 8.5l3-6M12 11.5l1 2 2 .2-1.5 1.4.4 2.1L12 17l-1.9 -.9.4-2.1L9 12.7l2-.2Z"/></svg>',
-    boina:      '<svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>'
+    boina:      '<svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>',
+    farda:      '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2h-4Z"/><path d="M12 6v13"/><path d="M9 9h1.6M13.4 9H15"/></svg>',
+    colete:     '<svg viewBox="0 0 24 24"><path d="M9 3v3l-2.5 3v11H11V9L10 6V3Z"/><path d="M15 3v3l2.5 3v11H13V9l1-3V3Z"/><path d="M7 15h4M13 15h4"/></svg>',
+    fuzil:      '<svg viewBox="0 0 24 24"><path d="m2.5 13.5 14.5-8 1.8 3.2-12.6 7H3.5Z"/><path d="m13.5 11.5 3.2 4.8M8.5 14.2 6.5 20"/></svg>'
   };
   var ICON_POR_CAT = { turmas: 'turma', eventos: 'evento', personagem: 'camiseta', presencial: 'presencial' };
   function icoDe(chave, cat) { return ICON_CAT[chave] || ICON_CAT[ICON_POR_CAT[cat]] || ICON_CAT.presencial; }
@@ -5954,7 +6093,7 @@
   var admProdIcone = 'presencial';
   (function () {
     var host = $('admProdIcones'); if (!host) return;
-    var ordem = ['turma', 'aula', 'aulao', 'evento', 'simulado', 'garrafinha', 'modulo', 'vademecum', 'chaveiro', 'camiseta', 'caneca', 'medalha'];
+    var ordem = ['turma', 'aula', 'aulao', 'evento', 'simulado', 'garrafinha', 'modulo', 'vademecum', 'chaveiro', 'camiseta', 'caneca', 'medalha', 'boina', 'farda', 'colete', 'fuzil', 'presencial'];
     host.innerHTML = ordem.map(function (k, i) {
       return '<button type="button" class="ico-opt' + (k === admProdIcone ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
     }).join('');
@@ -5968,6 +6107,92 @@
     });
   })();
   renderLojaExtras();
+
+  /* ---------- produtos digitais pré-configurados (Painel interno) ----------
+     Sem estoque: disponível ↔ indisponível controla a presença na Loja.   */
+  var PROD_DIG_PRE = [
+    { id: 'ebook',   nome: 'E-book · Direito Constitucional', desc: 'material digital do Quad', preco: 90,  moeda: 'qdc', icone: 'modulo' },
+    { id: 'vadedig', nome: 'Vade Mecum digital',              desc: 'legislação sempre à mão',  preco: 160, moeda: 'qdc', icone: 'vademecum' },
+    { id: 'cursonl', nome: 'Curso online · Direito Penal',    desc: 'videoaulas + questões',    preco: 900, moeda: 'dmn', icone: 'aula' },
+    { id: 'aulaoex', nome: 'Aulão exclusivo gravado',         desc: 'revisão de véspera',       preco: 60,  moeda: 'qdc', icone: 'aulao' }
+  ];
+  PROD_DIG_PRE.forEach(function (d) { d.disp = false; });
+  function renderDigPre() {
+    var el = $('admDigList'); if (!el) return;
+    el.innerHTML = PROD_DIG_PRE.map(function (d, i) {
+      return '<div class="adm-bar"><span class="nm">' + d.nome +
+        '<small>' + d.desc + ' · ' + fmt(d.preco) + ' ' + moedaTxt(d.moeda) + ' · sem estoque</small></span>' +
+        '<span class="tag' + (d.disp ? ' ok' : '') + '">' + (d.disp ? 'DISPONÍVEL' : 'INDISPONÍVEL') + '</span>' +
+        '<button class="btn ghost small" data-dig="' + i + '">' + (d.disp ? 'Tirar da Loja' : 'Disponibilizar') + '</button></div>';
+    }).join('');
+    el.querySelectorAll('[data-dig]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var d = PROD_DIG_PRE[+b.dataset.dig];
+        d.disp = !d.disp;
+        if (d.disp) { LOJA_EXTRAS.push({ nome: d.nome, desc: d.desc, cat: 'digitais', preco: d.preco, moeda: d.moeda, icone: d.icone }); }
+        else { LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== d.nome; }); }
+        renderLojaExtras(); renderDigPre();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast(d.disp ? '“' + d.nome + '” disponível na Loja — Itens digitais.' : '“' + d.nome + '” fora da Loja.');
+      });
+    });
+  }
+  renderDigPre();
+
+  /* ---------- criador de skins (Painel interno) ----------
+     A skin publicada entra em Itens do personagem, com confirmação de
+     compra e preço em QdC ou Dmn. Aplicação no boneco é da V1.           */
+  var admSkIco = 'boina';
+  function renderSkinsAdm() {
+    var el = $('admSkinList'); if (!el) return;
+    var sk = LOJA_EXTRAS.filter(function (p) { return p.skin; });
+    el.innerHTML = sk.map(function (p) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome +
+        '<small>' + p.desc + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
+        '<button class="adm-x" data-rm-skin="' + p.nome + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma skin criada ainda.</p>';
+    el.querySelectorAll('[data-rm-skin]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== b.dataset.rmSkin; });
+        renderLojaExtras(); renderSkinsAdm();
+        toast('Skin “' + b.dataset.rmSkin + '” removida da Loja.');
+      });
+    });
+  }
+  (function () {
+    var host = $('admSkIcones'); if (!host) return;
+    var ordem = ['boina', 'camiseta', 'farda', 'colete', 'fuzil', 'medalha'];
+    host.innerHTML = ordem.map(function (k) {
+      return '<button type="button" class="ico-opt' + (k === admSkIco ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
+    }).join('');
+    host.querySelectorAll('.ico-opt').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        admSkIco = bt.dataset.ico;
+        host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+      });
+    });
+    $('btnAdmSkin').addEventListener('click', function () {
+      var nome = $('admSkNome').value.trim(), desc = $('admSkDesc').value.trim();
+      var moeda = $('admSkMoeda').value, preco = parseInt($('admSkPreco').value, 10);
+      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido à skin.'); return; }
+      if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+      if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+        toast('Já existe um item com esse nome na Loja.'); return;
+      }
+      LOJA_EXTRAS.push({ nome: nome, desc: desc || 'skin do personagem', cat: 'personagem', preco: preco, moeda: moeda, icone: admSkIco, skin: true });
+      renderLojaExtras(); renderSkinsAdm();
+      if (typeof renderPrecos === 'function') renderPrecos();
+      $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = '';
+      toast('Skin “' + nome + '” publicada em Itens do personagem.');
+    });
+  })();
+  renderSkinsAdm();
+
+  /* ---------- Quests · estrutura reservada ---------- */
+  $('btnAdmQuests').addEventListener('click', function () {
+    toast('Quests — missões especiais da administração. Próxima implementação.');
+  });
   renderPresenciais();
   renderEventosLoja();   /* vitrine de eventos pagos (ICON_CAT já existe aqui) */
   renderAdmProdList();

@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Painel interno completo (Fase 2)
+- **Criação de turmas** no Painel interno: nome **pré-configurado pelo
+  tipo** (RONDESP · Nivelamento, PATAMO · Regular, BOPE · Questões) +
+  **apelido livre** (ex.: "Turma Águia"); **foco do concurso por estado**
+  (Soldado PM-BA, Oficial CFO, PMs de fronteira, Guarda Municipal,
+  Polícia Civil BA, Polícia Penal BA, PRF); início/término; **dois
+  horários seguidos** (ex.: 19h–20h30 e 20h30–22h, o 2º começa quando o
+  1º termina — validado); **árvore do edital por anexo**
+  `[INTEGRAÇÃO REAL] leitura do arquivo`. A turma entra na hora na
+  lista do painel **e na Estrutura**
+- **Produtos digitais pré-configurados**: e-book, Vade Mecum digital,
+  curso online e aulão exclusivo gravado — **sem estoque**, com toggle
+  **DISPONÍVEL ↔ INDISPONÍVEL** que coloca/tira o produto da Loja
+  (Itens digitais) na hora
+- **Criador de skins**: nome, descrição, preço em **QdC ou Dmn** e
+  banco de visuais (boina, camiseta, farda, colete, fuzil, medalha);
+  publica direto em **Itens do personagem** com confirmação de compra;
+  ✕ tira da Loja
+- **Quests · missões especiais**: card com botão "Criar Quests" e selo
+  EM BREVE (estrutura reservada, sem funcionalidade — como combinado)
+- **Banco de ícones ampliado** no cadastro de produtos físicos (boina,
+  farda, colete, fuzil, retirada presencial)
+- Nova suíte `vinterno` (23 checagens) verde; `vcontrole`, `vadmin`,
+  `vestrutura`, `vdmn`, `vsim`, `vloja2/3`, `vskin` e o tutorial
+  completo sem regressões
+
 ## 24/07/2026 — Administrador em 5 áreas + Painel de controle (Fase 1)
 - **Barra do administrador reconstruída em 5 áreas**: Painel de
   **controle** (nova, agora é a tela inicial) · Painel **interno** (a
