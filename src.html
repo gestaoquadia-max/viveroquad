@@ -1042,6 +1042,21 @@
   .adm-sep { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px;
     font: 800 10px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--p-dim); }
   .adm-sep::before, .adm-sep::after { content: ''; height: 1px; background: var(--p-line); flex: 1; }
+  /* contador de recados não lidos (estilo WhatsApp) no "+" e na linha do chat */
+  .nav-plus { position: relative; }
+  .plus-badge { position: absolute; top: -4px; right: -4px; min-width: 19px; height: 19px; border-radius: 999px;
+    background: #E63946; color: #fff; font: 800 11px var(--ui); display: grid; place-items: center;
+    padding: 0 5px; box-shadow: 0 2px 6px rgba(180,20,40,0.45); border: 2px solid #fff; }
+  .chat-badge { flex: none; min-width: 20px; height: 20px; border-radius: 999px; background: #E63946; color: #fff;
+    font: 800 11px var(--ui); display: grid; place-items: center; padding: 0 6px; }
+  /* lista de recados do chat */
+  .chat-list { flex: 1; overflow-y: auto; padding: 6px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .chat-msg { background: linear-gradient(160deg, #123E8C, #0C2A63); border-radius: 14px 14px 14px 4px;
+    padding: 11px 13px; color: #EAF4FF; box-shadow: inset 0 0 0 1.5px rgba(120,180,255,0.3); max-width: 88%; }
+  .chat-msg .cm-de { font: 800 9.5px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #8FC1FF; margin-bottom: 3px; }
+  .chat-msg .cm-tx { font-size: 12.5px; line-height: 1.5; }
+  .chat-msg .cm-qd { font-size: 10px; color: #9FC2F0; margin-top: 5px; text-align: right; }
+  .chat-msg.nova { box-shadow: inset 0 0 0 1.5px rgba(255,120,120,0.55); }
   /* Estrutura: concursos */
   .conc-row { padding: 10px 0; border-bottom: 1px solid var(--p-line); }
   .conc-row:last-child { border-bottom: none; }
@@ -2018,17 +2033,77 @@
           </div>
         </div>
 
-        <!-- ============ ADMIN · HOJE (operação do dia) ============ -->
+        <!-- ============ ADMIN · PAINEL DE CONTROLE ============ -->
+        <div class="view" id="v-adm-controle">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · governança das contas</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Painel de controle</h3>
+              </div>
+            </div>
+            <p class="sub">Crédito manual de moedas, bloqueio de contas e mensagens exclusivas — ações diretas na conta do aluno.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Crédito manual · Quad Coins e Diamantes</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCredAluno"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCredMoeda">
+                  <option value="qdc">Quad Coins</option>
+                  <option value="dmn">Diamantes</option>
+                </select>
+                <input class="fld" id="admCredValor" placeholder="Valor" inputmode="numeric" style="max-width:90px">
+                <button class="btn small" id="btnAdmCred">Creditar</button>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCredMotivo" placeholder="Motivo (ex.: recarga do site · gift card presencial)">
+              </div>
+            </div>
+            <div class="adm-sep"><span>Créditos lançados</span></div>
+            <div id="admCredList"></div>
+            <p class="sub" style="margin-top:8px">A adição de Quad Coins e Diamantes é <strong>livre para a administração</strong> — usada para recargas do site, gift cards presenciais e correções. Cai na conta do aluno <strong>na hora</strong>.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Contas · bloquear e desbloquear</div>
+            <div id="admContasList"></div>
+            <p class="sub" style="margin-top:8px">O bloqueio <strong>suspende o uso do app imediatamente</strong>: o aluno é desconectado e, ao tentar entrar com login e senha, vê o aviso de conta bloqueada com a orientação de procurar a administração.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Mensagem exclusiva para o aluno</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admMsgAluno"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admMsgTexto" placeholder="Mensagem (ex.: Compareça à recepção para retirar seu material)">
+                <button class="btn small" id="btnAdmMsg">Enviar</button>
+              </div>
+            </div>
+            <div class="adm-sep"><span>Mensagens enviadas</span></div>
+            <div id="admMsgList"></div>
+            <p class="sub" style="margin-top:8px">A mensagem chega como <strong>recado no "+"</strong> do aluno, com um <strong>contador de não lidas</strong> (estilo WhatsApp). O <strong>chat ao vivo</strong> fica marcado como próxima implementação.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · PAINEL INTERNO (criação e operação) ============ -->
         <div class="view" id="v-adm-hoje">
           <div class="p-card">
             <div class="card-head">
               <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
               <div class="grow">
-                <div class="card-eyebrow">N.P.P. · operação do dia</div>
-                <h3 class="aula-title" style="margin:2px 0 0">Central do administrador</h3>
+                <div class="card-eyebrow">N.P.P. · criação e operação</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Painel interno</h3>
               </div>
             </div>
-            <p class="sub">O que o time envia daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e Loja.</p>
+            <p class="sub">O que o time cria daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e produtos.</p>
+            <div style="margin-top:10px"><button class="btn ghost small" id="btnIrEstrutura">Estrutura · turmas, concursos e editais</button></div>
           </div>
 
           <div class="p-card">
@@ -2439,10 +2514,15 @@
               <span class="grow"><span class="t">Loja · Intendência</span><span class="d">gaste seus Quad Coins em turmas, eventos e itens</span></span>
               <span class="tag gold">NOVO</span>
             </button>
-            <button class="plus-row locked" data-lock="Camada viva — chat e grupos chegam na V2">
+            <button class="plus-row" id="rowChat">
               <span class="p-ico">✉</span>
-              <span class="grow"><span class="t">Chat e grupos de questões</span><span class="d">quiz anônimo estilo Telegram, sem expor ninguém</span></span>
-              <span class="tag v2">V2</span>
+              <span class="grow"><span class="t">Chat · recados da administração</span><span class="d">mensagens exclusivas para você</span></span>
+              <span class="chat-badge" id="chatBadge" style="display:none">1</span>
+            </button>
+            <button class="plus-row locked" data-lock="Chat ao vivo com a administração — próxima implementação">
+              <span class="p-ico">✆</span>
+              <span class="grow"><span class="t">Chat ao vivo</span><span class="d">conversa em tempo real com o time Quad</span></span>
+              <span class="tag v1">EM BREVE</span>
             </button>
             <button class="plus-row locked" data-lock="Guarnições, GvG e PvP chegam na V2">
               <span class="p-ico">⚔</span>
@@ -2556,6 +2636,27 @@
           </div>
         </div>
 
+        <!-- ============ CHAT · RECADOS DA ADMINISTRAÇÃO ============ -->
+        <div class="storage-layer" id="chatLayer">
+          <div class="storage-head">
+            <span class="sh-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.9-.9L3 20l1.2-4.4a8 8 0 0 1-1.2-4.1A8.4 8.4 0 0 1 11.5 3.2a8.4 8.4 0 0 1 9.5 8.3Z"/></svg></span>
+            <div><h3>Chat · recados</h3><div class="sh-sub" id="chatSub">mensagens da administração</div></div>
+            <button class="storage-close" id="btnChatFechar" aria-label="Fechar chat">✕</button>
+          </div>
+          <div class="chat-list" id="chatList"></div>
+          <div class="storage-quest">✆ <strong>Chat ao vivo em breve:</strong> por enquanto, os recados chegam por aqui — responda procurando a administração.</div>
+        </div>
+
+        <!-- ============ CONTA BLOQUEADA (pop-up) ============ -->
+        <div class="compra-layer" id="bloqLayer" style="z-index:70">
+          <div class="compra-box">
+            <span class="compra-ico" style="background:linear-gradient(160deg,#FBE9E9,#F5D6D6)"><svg viewBox="0 0 24 24" style="stroke:#C0392B"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.6"/></svg></span>
+            <h3 class="compra-nome">Conta bloqueada</h3>
+            <p class="sub compra-desc">O acesso desta conta foi suspenso pela administração.<br><strong>Entre em contato com a administração</strong> para regularizar.</p>
+            <button class="btn" id="btnBloqOk" style="width:100%">Entendi</button>
+          </div>
+        </div>
+
         <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
         <div class="help-layer" id="helpLayer">
           <div class="help-quad" id="helpQuad" aria-hidden="true"><span class="fab-sprite" id="helpSprite"></span></div>
@@ -2619,7 +2720,7 @@
         <nav class="navbar" id="navAluno">
           <button class="nav-btn active" data-view="v-inicio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 10.3 12 3l9 7.3"/><path d="M5.2 9.4V20a1 1 0 0 0 1 1h11.6a1 1 0 0 0 1-1V9.4"/><path d="M9.5 21v-6h5v6"/></svg></span>Início</button>
           <button class="nav-btn" data-view="v-missoes"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.3"/><path d="M12 1.6v4M12 18.4v4M1.6 12h4M18.4 12h4"/></svg></span>Missões</button>
-          <button class="nav-plus" id="btnPlus" aria-label="Mais: Pré-TAF, calendário, materiais e prévias"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="nav-plus" id="btnPlus" aria-label="Mais: chat, Pré-TAF, calendário, materiais e prévias"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="plus-badge" id="plusBadge" style="display:none">1</span></button>
           <button class="nav-btn" data-view="v-dominio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 5 5v6.2c0 4.4 3 7.3 7 8.8 4-1.5 7-4.4 7-8.8V5l-7-2.5Z"/><path d="m12 8.2 1.15 2.35 2.6.38-1.88 1.83.44 2.59L12 14.13l-2.31 1.22.44-2.59-1.88-1.83 2.6-.38Z" fill="currentColor" stroke="none"/></svg></span>Domínio</button>
           <button class="nav-btn" data-view="v-loja"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Loja</button>
         </nav>
@@ -2627,11 +2728,11 @@
           <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
         </nav>
         <nav class="navbar" id="navAdmin" style="display:none">
-          <button class="nav-btn active" data-view="v-adm-hoje"><span class="ico">◈</span>Hoje</button>
-          <button class="nav-btn" data-view="v-adm-liber"><span class="ico">✓</span>Liberar</button>
-          <button class="nav-btn" data-view="v-adm-alunos"><span class="ico">◉</span>Alunos</button>
+          <button class="nav-btn active" data-view="v-adm-controle"><span class="ico">⛭</span>Controle</button>
+          <button class="nav-btn" data-view="v-adm-hoje"><span class="ico">◈</span>Interno</button>
+          <button class="nav-btn" data-view="v-adm-alunos"><span class="ico">◉</span>Relatórios</button>
+          <button class="nav-btn" data-view="v-adm-liber"><span class="ico">✓</span>Liberações</button>
           <button class="nav-btn" data-view="v-adm-loja"><span class="ico">⬒</span>Loja</button>
-          <button class="nav-btn" data-view="v-turmas"><span class="ico">⌗</span>Estrutura</button>
         </nav>
       </div>
     </div>
@@ -2824,7 +2925,7 @@
   var personaViews = {
     aluno: { nav: 'navAluno', home: 'v-inicio' },
     professor: { nav: 'navProfessor', home: 'v-sala' },
-    admin: { nav: 'navAdmin', home: 'v-adm-hoje' }
+    admin: { nav: 'navAdmin', home: 'v-adm-controle' }
   };
   document.querySelectorAll('.persona-btn').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -3668,6 +3769,9 @@
     if (!em || em.indexOf('@') < 0) { toast('Informe seu login (e-mail).'); return; }
     if (!pw) { toast('Digite sua senha.'); return; }
     if (!online) { toast('O login precisa de conexão com a internet.'); return; }
+    /* conta bloqueada pela administração: não entra e vê o aviso */
+    var contaEu = (typeof contaDe === 'function') ? contaDe('eu') : null;
+    if (contaEu && contaEu.bloqueada) { $('bloqLayer').classList.add('on'); return; }
     currentEmail = em;
     $('contaEmail').textContent = em;
     $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
@@ -4840,6 +4944,7 @@
   $('plusPop').addEventListener('click', function (e) { if (e.target === $('plusPop')) $('plusPop').classList.remove('on'); });
   document.querySelectorAll('.plus-row').forEach(function (row) {
     row.addEventListener('click', function () {
+      if (row.id === 'rowChat') { $('plusPop').classList.remove('on'); abrirChat(); return; }
       if (row.dataset.goto) {
         $('plusPop').classList.remove('on');
         showView(row.dataset.goto, 'navAluno');
@@ -6057,6 +6162,146 @@
     $('admGate').classList.remove('on');
     toast('Acesso do administrador liberado — bom serviço!');
   });
+
+  /* ==================================================================
+     PAINEL DE CONTROLE (N.P.P.) — governança das contas
+     · crédito manual de QdC/Dmn (livre para a administração)
+     · bloqueio de conta = suspensão imediata + aviso no login
+     · mensagem exclusiva → recado no "+" do aluno com contador
+     ================================================================== */
+  var CONTAS = [
+    { id: 'eu',    seed: false, bloqueada: false },   /* a conta desta demo */
+    { id: 'sant',  seed: true,  nome: 'AL SGT QUAD SANTIAGO',   bloqueada: false },
+    { id: 'brand', seed: true,  nome: 'SD QUAD BRANDÃO',        bloqueada: false },
+    { id: 'nasc',  seed: true,  nome: 'AL CB QUAD NASCIMENTO',  bloqueada: false }
+  ];
+  function contaNome(c) { return c.seed ? c.nome : (nomeCurto() + ' · esta conta'); }
+  function contaDe(id) { return CONTAS.filter(function (c) { return c.id === id; })[0]; }
+  var CREDITOS = [];
+  var RECADOS = [];        /* recados recebidos pela conta desta demo */
+  var ADM_MSGS = [];       /* histórico do admin (todas as contas) */
+
+  function admContasSelects() {
+    var opts = CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
+    if ($('admCredAluno')) $('admCredAluno').innerHTML = opts;
+    if ($('admMsgAluno')) $('admMsgAluno').innerHTML = opts;
+  }
+  function renderAdmCred() {
+    var el = $('admCredList'); if (!el) return;
+    el.innerHTML = CREDITOS.slice(0, 8).map(function (cr) {
+      return '<div class="adm-bar"><span class="nm">' + cr.nome + '<small>' + (cr.motivo || 'crédito manual') + ' · ' + cr.quando + '</small></span>' +
+        '<span class="pct">+' + fmt(cr.valor) + ' ' + moedaTxt(cr.moeda) + '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum crédito lançado ainda.</p>';
+  }
+  var btnAdmCredEl = $('btnAdmCred');
+  if (btnAdmCredEl) btnAdmCredEl.addEventListener('click', function () {
+    var c = contaDe($('admCredAluno').value);
+    var moeda = $('admCredMoeda').value;
+    var valor = parseInt($('admCredValor').value, 10);
+    var motivo = $('admCredMotivo').value.trim();
+    if (!c) return;
+    if (!valor || valor < 1) { toast('Informe o valor do crédito.'); return; }
+    if (!c.seed) {   /* conta desta demo: cai na carteira na hora */
+      if (moeda === 'dmn') addDiamante(valor, '+' + fmt(valor) + ' Diamantes creditados pela administração');
+      else addScore(valor, '+' + fmt(valor) + ' Quad Coins creditados pela administração');
+    } else {
+      toast('+' + fmt(valor) + ' ' + moedaTxt(moeda) + ' creditados para ' + contaNome(c) + '.');
+    }
+    CREDITOS.unshift({ nome: contaNome(c), moeda: moeda, valor: valor, motivo: motivo, quando: 'agora' });
+    $('admCredValor').value = ''; $('admCredMotivo').value = '';
+    renderAdmCred();
+  });
+
+  /* ---------- bloqueio de contas ---------- */
+  function renderAdmContas() {
+    var el = $('admContasList'); if (!el) return;
+    el.innerHTML = CONTAS.map(function (c, i) {
+      return '<div class="mission-row"><div class="grow"><div class="t">' + contaNome(c) + '</div>' +
+        '<div class="d">' + (c.bloqueada ? 'acesso suspenso pela administração' : 'acesso liberado') + '</div></div>' +
+        '<span class="tag' + (c.bloqueada ? ' warn' : ' ok') + '">' + (c.bloqueada ? 'BLOQUEADA' : 'ATIVA') + '</span>' +
+        '<button class="btn ghost small" data-bloq="' + i + '">' + (c.bloqueada ? 'Desbloquear' : 'Bloquear') + '</button></div>';
+    }).join('');
+    el.querySelectorAll('[data-bloq]').forEach(function (bt) {
+      bt.addEventListener('click', function () { alternarBloqueio(parseInt(bt.dataset.bloq, 10)); });
+    });
+  }
+  function alternarBloqueio(i) {
+    var c = CONTAS[i]; if (!c) return;
+    c.bloqueada = !c.bloqueada;
+    renderAdmContas();
+    if (!c.seed && c.bloqueada) {
+      /* suspensão imediata: derruba a sessão do aluno e avisa */
+      toast('Conta bloqueada — o uso do app foi suspenso imediatamente.');
+      setTimeout(function () {
+        document.querySelector('[data-persona="aluno"]').click();
+        sairConta();
+        $('bloqLayer').classList.add('on');
+      }, 400);
+    } else if (!c.seed && !c.bloqueada) {
+      toast('Conta desbloqueada — o aluno já pode entrar de novo.');
+    } else {
+      toast(contaNome(c) + ': conta ' + (c.bloqueada ? 'bloqueada' : 'desbloqueada') + '.');
+    }
+  }
+  var btnBloqOkEl = $('btnBloqOk');
+  if (btnBloqOkEl) btnBloqOkEl.addEventListener('click', function () { $('bloqLayer').classList.remove('on'); });
+
+  /* ---------- mensagens exclusivas → chat no "+" ---------- */
+  function chatNaoLidas() { return RECADOS.filter(function (r) { return !r.lida; }).length; }
+  function renderChatBadge() {
+    var n = chatNaoLidas();
+    var pb = $('plusBadge'), cb = $('chatBadge');
+    if (pb) { pb.style.display = n ? 'grid' : 'none'; pb.textContent = n; }
+    if (cb) { cb.style.display = n ? 'grid' : 'none'; cb.textContent = n; }
+    if (typeof queueSync === 'function') queueSync();
+  }
+  function renderChat() {
+    var el = $('chatList'); if (!el) return;
+    el.innerHTML = RECADOS.map(function (r) {
+      return '<div class="chat-msg' + (r.lida ? '' : ' nova') + '"><div class="cm-de">Administração Quad</div>' +
+        '<div class="cm-tx">' + r.texto + '</div><div class="cm-qd">' + r.quando + '</div></div>';
+    }).join('') || '<p class="sub" style="padding:10px 0; color:#BFD8F5">Nenhum recado por enquanto.</p>';
+    var sub = $('chatSub'); if (sub) sub.textContent = RECADOS.length ? RECADOS.length + ' recado' + (RECADOS.length > 1 ? 's' : '') : 'mensagens da administração';
+  }
+  function abrirChat() {
+    renderChat();
+    $('chatLayer').classList.add('on');
+    /* abriu = leu: zera o contador e marca LIDA no painel do admin */
+    setTimeout(function () {
+      RECADOS.forEach(function (r) { r.lida = true; if (r.admRef) r.admRef.lida = true; });
+      renderChatBadge(); renderAdmMsgs();
+    }, 600);
+  }
+  var btnChatFecharEl = $('btnChatFechar');
+  if (btnChatFecharEl) btnChatFecharEl.addEventListener('click', function () { $('chatLayer').classList.remove('on'); });
+  function renderAdmMsgs() {
+    var el = $('admMsgList'); if (!el) return;
+    el.innerHTML = ADM_MSGS.slice(0, 8).map(function (m) {
+      return '<div class="adm-bar"><span class="nm">' + m.texto + '<small>para ' + m.nome + ' · ' + m.quando + '</small></span>' +
+        '<span class="tag' + (m.lida ? ' ok' : '') + '">' + (m.lida ? 'LIDA' : 'ENVIADA') + '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma mensagem enviada ainda.</p>';
+  }
+  var btnAdmMsgEl = $('btnAdmMsg');
+  if (btnAdmMsgEl) btnAdmMsgEl.addEventListener('click', function () {
+    var c = contaDe($('admMsgAluno').value);
+    var texto = $('admMsgTexto').value.trim();
+    if (!c) return;
+    if (!texto) { toast('Escreva a mensagem.'); return; }
+    var msg = { nome: contaNome(c), texto: texto, quando: 'agora', lida: false };
+    ADM_MSGS.unshift(msg);
+    if (!c.seed) {
+      RECADOS.unshift({ texto: texto, quando: 'agora', lida: false, admRef: msg });
+      renderChatBadge();
+    } else {
+      msg.lida = false;
+    }
+    $('admMsgTexto').value = '';
+    renderAdmMsgs();
+    toast('Mensagem enviada — chega como recado no "+" do aluno.');
+  });
+  var btnIrEstruturaEl = $('btnIrEstrutura');
+  if (btnIrEstruturaEl) btnIrEstruturaEl.addEventListener('click', function () { showView('v-turmas', 'navAdmin'); });
+  admContasSelects(); renderAdmCred(); renderAdmContas(); renderAdmMsgs(); renderChatBadge();
 
   /* ---------- avisos gerais (professores e time → aluno) ---------- */
   var AVISOS = [

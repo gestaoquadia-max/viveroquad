@@ -1,5 +1,30 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Administrador em 5 áreas + Painel de controle (Fase 1)
+- **Barra do administrador reconstruída em 5 áreas**: Painel de
+  **controle** (nova, agora é a tela inicial) · Painel **interno** (a
+  antiga "Hoje") · **Relatórios** (antiga "Alunos") · **Liberações** ·
+  **Loja**. A Estrutura (turmas/concursos/editais) agora abre por um
+  botão dentro do Painel interno
+- **Painel de controle — governança das contas**:
+  - **Crédito manual de Quad Coins e Diamantes** (valor livre para a
+    administração, com motivo e histórico de lançamentos); o crédito
+    **cai na carteira do aluno na hora** — é por aqui que a recarga do
+    site e o gift card presencial se materializam
+  - **Bloquear/desbloquear contas** com **suspensão imediata**: o aluno
+    logado é derrubado na hora e vê o pop-up "Conta bloqueada — entre em
+    contato com a administração"; enquanto bloqueada, o login é negado
+    com o mesmo aviso
+  - **Mensagem exclusiva para o aluno**: chega como recado no "+" do
+    aluno com **contador vermelho estilo WhatsApp** no botão; abrir o
+    chat zera o contador e marca a mensagem como **LIDA** para o
+    administrador
+  - **Chat ao vivo** presente no "+" como **EM BREVE** (mesmo padrão do
+    GvG/PvP)
+- Nova suíte `vcontrole` (19 checagens) verde; `vadmin`, `vestrutura`,
+  `vdmn`, `vsim`, `vloja/2/3`, `vskin`, `vev`, `vacesso` e o tutorial
+  completo sem regressões
+
 ## 24/07/2026 — Diamante (nova moeda) + Loja Quad reconstruída (Fase A)
 - **Diamante**: nova moeda com a arte oficial do gestor, exibida **logo
   abaixo do Quad Coin** no topo. Não é conquistado em missões — é
