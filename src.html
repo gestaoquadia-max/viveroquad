@@ -6441,8 +6441,10 @@
     var dl = $('domTreeLabel'); if (dl) dl.textContent = 'Árvore do edital · ' + c.nome;
     renderEdital();
     renderConcursos();
+    if (typeof renderRelatorios === 'function') renderRelatorios();   /* relatórios seguem a árvore/Domínio */
     toast('Domínio do aluno agora segue o edital de ' + c.nome + '.');
   }
+  window.__dominio = definirDominio;   /* exposto para a suíte de testes */
   function renderConcursos() {
     var el = $('admConcList'); if (!el) return;
     el.innerHTML = CONCURSOS.map(function (c) {
@@ -6972,10 +6974,12 @@
   function renderAdmProdList() {
     var el = document.getElementById('admProdList'); if (!el) return;
     var linhas = LOJA_EXTRAS.map(function (p, i) {
-      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + '</small></span>' +
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
+        '<button class="btn ghost small" data-ed-extra="' + i + '">Editar</button>' +
         '<button class="adm-x" data-rm-extra="' + i + '" aria-label="Remover">✕</button></div>';
     }).concat(ITENS_PRESENCIAIS.map(function (p) {
-      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>Itens presenciais · ' + p.estoque + ' em estoque</small></span>' +
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>Itens presenciais · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + ' · ' + p.estoque + ' em estoque</small></span>' +
+        '<button class="btn ghost small" data-ed-pres="' + p.id + '">Editar</button>' +
         '<button class="adm-x" data-rm-pres="' + p.id + '" aria-label="Remover">✕</button></div>';
     }));
     el.innerHTML = linhas.join('');
@@ -6993,9 +6997,39 @@
         var id = bt.dataset.rmPres, p = presDe(id); if (!p) return;
         ITENS_PRESENCIAIS = ITENS_PRESENCIAIS.filter(function (x) { return x.id !== id; });
         renderPresenciais(); renderAdmProdList();
+        if (typeof renderPrecos === 'function') renderPrecos();
         toast('“' + p.nome + '” removido da Loja.');
       });
     });
+    el.querySelectorAll('[data-ed-extra]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarProduto('extra', LOJA_EXTRAS[+bt.dataset.edExtra]); });
+    });
+    el.querySelectorAll('[data-ed-pres]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarProduto('pres', presDe(bt.dataset.edPres)); });
+    });
+  }
+  /* edição de produto: traz de volta ao formulário; o item continua na Loja
+     e só muda quando salvamos. */
+  var admProdEdit = null;
+  function editarProduto(tipo, p) {
+    if (!p) return;
+    admProdEdit = { tipo: tipo, ref: p };
+    $('admProdNome').value = p.nome;
+    $('admProdDesc').value = p.desc || '';
+    $('admProdCat').value = tipo === 'pres' ? 'presencial' : p.cat;
+    if ($('admProdMoeda')) $('admProdMoeda').value = p.moeda || 'qdc';
+    $('admProdPreco').value = p.preco;
+    $('admProdQtd').value = tipo === 'pres' ? p.estoque : '';
+    admProdIcone = p.icone || 'presencial';
+    var host = $('admProdIcones');
+    if (host) host.querySelectorAll('.ico-opt').forEach(function (o) { o.classList.toggle('sel', o.dataset.ico === admProdIcone); });
+    var btn = $('btnAdmProd'); if (btn) btn.textContent = 'Salvar alterações';
+    var kl = document.querySelector('#v-adm-loja .k-label'); if (kl) kl.scrollIntoView({ block: 'start' });
+    toast('Editando “' + p.nome + '” — ele segue na Loja até você salvar.');
+  }
+  function admProdEditReset() {
+    admProdEdit = null;
+    var btn = $('btnAdmProd'); if (btn) btn.textContent = 'Publicar na Loja';
   }
   var btnAdmProdEl = $('btnAdmProd');
   if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
@@ -7006,6 +7040,22 @@
     var icone = admProdIcone;
     if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto.'); return; }
     if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+    /* SALVAR EDIÇÃO: atualiza no lugar, sem tirar da Loja */
+    if (admProdEdit) {
+      var ref = admProdEdit.ref;
+      if (nome !== ref.nome && (ITENS_PRESENCIAIS.concat(LOJA_EXTRAS).some(function (p) { return p !== ref && p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]:not([data-turma])'))) {
+        toast('Já existe outro item com esse nome na Loja.'); return;
+      }
+      ref.nome = nome; ref.desc = desc; ref.preco = preco; ref.moeda = moeda; ref.icone = icone;
+      if (admProdEdit.tipo === 'pres' && qtd && qtd >= 1) ref.estoque = qtd;
+      if (admProdEdit.tipo === 'pres') renderPresenciais(); else renderLojaExtras();
+      $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
+      admProdEditReset();
+      renderAdmProdList();
+      if (typeof renderPrecos === 'function') renderPrecos();
+      toast('“' + nome + '” atualizado na Loja.');
+      return;
+    }
     if (ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
       toast('Já existe um item com esse nome na Loja.'); return;
     }
@@ -7345,6 +7395,7 @@
     if ($('admCredAluno')) $('admCredAluno').innerHTML = opts;
     admMsgSelects();
   }
+  var msgAlvoExtra = null;   /* aluno de apoio (seed) sem conta → opção temporária */
   function admMsgSelects() {
     var sel = $('admMsgAluno'); if (!sel) return;
     var tipo = $('admMsgTipo') ? $('admMsgTipo').value : 'aluno';
@@ -7352,7 +7403,8 @@
       sel.innerHTML = docentesAtivos().map(function (d) { return '<option value="prof:' + d.nome + '">' + d.nome + '</option>'; }).join('') ||
         '<option value="">— nenhum professor ativo —</option>';
     } else {
-      sel.innerHTML = CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
+      var extra = msgAlvoExtra ? '<option value="apoio:' + msgAlvoExtra + '">' + msgAlvoExtra + ' · apoio</option>' : '';
+      sel.innerHTML = extra + CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
     }
   }
   function renderAdmCred() {
@@ -7470,6 +7522,15 @@
       toast('Recado enviado a ' + nomeP + ' — aparece na sala do professor.');
       return;
     }
+    if (val && val.indexOf('apoio:') === 0) {
+      var nomeA = val.replace(/^apoio:/, '');
+      ADM_MSGS.unshift({ nome: nomeA, texto: texto, quando: 'agora', lida: false });
+      msgAlvoExtra = null;
+      $('admMsgTexto').value = '';
+      admMsgSelects(); renderAdmMsgs();
+      toast('Recado individual enviado a ' + nomeA + '.');
+      return;
+    }
     var c = contaDe(val); if (!c) return;
     var msg = { nome: contaNome(c), texto: texto, quando: 'agora', lida: false };
     ADM_MSGS.unshift(msg);
@@ -7477,8 +7538,9 @@
       RECADOS.unshift({ texto: texto, quando: 'agora', lida: false, admRef: msg });
       renderChatBadge();
     }
+    msgAlvoExtra = null;
     $('admMsgTexto').value = '';
-    renderAdmMsgs();
+    admMsgSelects(); renderAdmMsgs();
     toast('Mensagem enviada — chega como recado no "+" do aluno.');
   });
   window.__recadosProf = function () { return RECADOS_PROF; };
@@ -7510,6 +7572,24 @@
     for (r = 0; r < N; r++) for (c = 0; c < N; c++) if (m[r][c]) out += '<rect x="' + c + '" y="' + r + '" width="1" height="1"/>';
     return out + '</svg>';
   }
+  var giftLoteAberto = -1, giftQrOpen = false;
+  var GIFT_QR_CAP = 6;   /* mostra os 6 primeiros; "ver completo" abre o resto */
+  function renderGiftQRs() {
+    var qr = $('admGiftQRs'); if (!qr) return;
+    if (giftLoteAberto < 0 || !GIFT_LOTES[giftLoteAberto]) { qr.innerHTML = ''; return; }
+    var l = GIFT_LOTES[giftLoteAberto];
+    var mostra = giftQrOpen ? l.codes : l.codes.slice(0, GIFT_QR_CAP);
+    var html = '<div class="adm-sep"><span>QR codes · lote ' + l.id + ' · ' + l.codes.length + ' cartões</span></div>' +
+      '<div class="qr-wrap">' + mostra.map(function (g) {
+        return '<div class="qr-cell' + (g.usado ? ' usado' : '') + '">' + qrSvg(g.c) + '<small>' + g.c + '</small></div>';
+      }).join('') + '</div>';
+    if (l.codes.length > GIFT_QR_CAP) {
+      html += '<button class="btn ghost small rk-toggle" id="giftQrBtn">' +
+        (giftQrOpen ? 'Mostrar menos' : 'Ver todos os ' + l.codes.length + ' QR codes') + '</button>';
+    }
+    qr.innerHTML = html;
+    if ($('giftQrBtn')) $('giftQrBtn').onclick = function () { giftQrOpen = !giftQrOpen; renderGiftQRs(); };
+  }
   function renderGiftLotes() {
     var el = $('admGiftLotes'); if (!el) return;
     el.innerHTML = GIFT_LOTES.map(function (l, i) {
@@ -7519,15 +7599,9 @@
         '<button class="btn ghost small" data-lote="' + i + '">Ver QR codes</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum lote criado ainda.</p>';
     el.querySelectorAll('[data-lote]').forEach(function (bt) {
-      bt.addEventListener('click', function () {
-        var l = GIFT_LOTES[+bt.dataset.lote];
-        var qr = $('admGiftQRs');
-        qr.innerHTML = '<div class="adm-sep"><span>QR codes · lote ' + l.id + ' · ' + l.codes.length + ' cartões</span></div>' +
-          '<div class="qr-wrap">' + l.codes.map(function (g) {
-            return '<div class="qr-cell' + (g.usado ? ' usado' : '') + '">' + qrSvg(g.c) + '<small>' + g.c + '</small></div>';
-          }).join('') + '</div>';
-      });
+      bt.addEventListener('click', function () { giftLoteAberto = +bt.dataset.lote; giftQrOpen = false; renderGiftQRs(); });
     });
+    if (giftLoteAberto >= 0) renderGiftQRs();   /* mantém o lote aberto após resgates */
   }
   var giftSeq = 0;
   $('btnAdmGift').addEventListener('click', function () {
@@ -7934,7 +8008,8 @@
   }
   function relComputeDif() {
     var subs = [], assMap = [], matMap = [];
-    EDITAL_CFO.forEach(function (mat, mi) {
+    var arvore = (typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO;
+    arvore.forEach(function (mat, mi) {
       var matPcts = [];
       mat[1].forEach(function (ass) {
         var pcts = ass[1].map(function (sub) {
@@ -7969,10 +8044,28 @@
         '<button class="btn ghost small" data-apoio="' + a.nome + '">Acionar</button></div>';
     }).join('');
     $('admApoioList').querySelectorAll('[data-apoio]').forEach(function (bt) {
-      bt.addEventListener('click', function () {
-        toast('Suporte acionado para ' + bt.dataset.apoio + ' — contato pela coordenação.');
-      });
+      bt.addEventListener('click', function () { acionarApoio(bt.dataset.apoio); });
     });
+  }
+  /* Acionar aluno de apoio → leva ao bloco "Mensagens individuais" já pronto
+     para enviar um recado individual (a funcionalidade já existe no sistema) */
+  function acionarApoio(nome) {
+    if (typeof msgAlvoExtra !== 'undefined') {
+      var conta = CONTAS.filter(function (c) { return contaNome(c) === nome; })[0];
+      msgAlvoExtra = conta ? null : nome;   /* seed sem conta → opção temporária */
+      showView('v-adm-controle', 'navAdmin');
+      if ($('admMsgTipo')) $('admMsgTipo').value = 'aluno';
+      admMsgSelects();
+      if (conta && $('admMsgAluno')) $('admMsgAluno').value = conta.id;
+      else if ($('admMsgAluno')) $('admMsgAluno').value = 'apoio:' + nome;
+      if ($('admMsgTexto')) { $('admMsgTexto').value = 'Percebemos que você precisa de um reforço — vamos combinar um plano juntos?'; }
+      var card = $('admMsgTexto') ? $('admMsgTexto').closest('.p-card') : null;
+      if (card) card.scrollIntoView({ block: 'center' });
+      if ($('admMsgTexto')) $('admMsgTexto').focus();
+      toast('Recado individual para ' + nome + ' — revise e envie.');
+    } else {
+      toast('Suporte acionado para ' + nome + '.');
+    }
   }
   var navAlunosBtn = document.querySelector('#navAdmin .nav-btn[data-view="v-adm-alunos"]');
   if (navAlunosBtn) navAlunosBtn.addEventListener('click', function () { renderRelatorios(); });
@@ -7981,35 +8074,38 @@
   function lojaPrecosLista() {
     var itens = [];
     document.querySelectorAll('.loja-item[data-nome]:not([data-skin])').forEach(function (it) {
-      itens.push({ nome: it.dataset.nome, preco: +it.dataset.preco });
+      itens.push({ nome: it.dataset.nome, preco: +it.dataset.preco, moeda: it.dataset.moeda === 'dmn' ? 'dmn' : 'qdc' });
     });
     SKIN_CADEIA.concat(SKIN_FARDAS).forEach(function (sk) {
-      if (!itens.some(function (x) { return x.nome === sk.nome; })) itens.push({ nome: sk.nome, preco: sk.preco });
+      if (!itens.some(function (x) { return x.nome === sk.nome; })) itens.push({ nome: sk.nome, preco: sk.preco, moeda: 'qdc' });
     });
     return itens;
   }
   function renderPrecos() {
     $('admPrecosList').innerHTML = lojaPrecosLista().map(function (x) {
       return '<div class="adm-bar"><span class="nm">' + x.nome + '</span>' +
-        '<input class="fld" data-preco-item="' + x.nome + '" value="' + x.preco + '" inputmode="numeric" style="max-width:90px;text-align:right"> <span class="pct">QdC</span></div>';
+        '<input class="fld" data-preco-item="' + x.nome + '" data-preco-moeda="' + x.moeda + '" value="' + x.preco + '" inputmode="numeric" style="max-width:84px;text-align:right"> <span class="pct">' + moedaTxt(x.moeda) + '</span></div>';
     }).join('');
   }
   $('btnAdmPrecos').addEventListener('click', function () {
     var mudados = 0;
     $('admPrecosList').querySelectorAll('[data-preco-item]').forEach(function (inp) {
-      var nome = inp.dataset.precoItem, preco = parseInt(inp.value, 10);
+      var nome = inp.dataset.precoItem, preco = parseInt(inp.value, 10), mo = inp.dataset.precoMoeda === 'dmn' ? 'dmn' : 'qdc';
       if (!preco || preco < 1) return;
       document.querySelectorAll('.loja-item[data-nome="' + nome + '"]').forEach(function (it) {
         if (+it.dataset.preco !== preco) mudados++;
         it.dataset.preco = preco;
         var pr = it.querySelector('.li-preco');
-        if (pr && pr.textContent.indexOf('QdC') >= 0) pr.textContent = preco + ' QdC';
+        if (pr && (pr.textContent.indexOf('QdC') >= 0 || pr.textContent.indexOf('Dmn') >= 0)) pr.textContent = fmt(preco) + ' ' + moedaTxt(mo);
       });
+      /* reflete também nos dados dos produtos cadastrados (LOJA_EXTRAS/ITENS_PRESENCIAIS) */
+      LOJA_EXTRAS.concat(ITENS_PRESENCIAIS).forEach(function (p) { if (p.nome === nome) p.preco = preco; });
       SKIN_CADEIA.concat(SKIN_FARDAS).forEach(function (sk) {
         if (sk.nome === nome && sk.preco !== preco) { sk.preco = preco; mudados++; }
       });
     });
     renderSkins();   /* a vitrine da cadeia reflete o preço novo */
+    if (typeof renderAdmProdList === 'function') renderAdmProdList();
     if (typeof queueSync === 'function') queueSync();
     toast(mudados ? 'Preços atualizados na Loja dos alunos.' : 'Nenhum preço alterado.');
   });

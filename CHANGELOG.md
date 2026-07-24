@@ -1,5 +1,27 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Ajustes do administrador · Controle/Relatórios/Loja (itens 1, 3 e 5)
+- **Gift cards · "ver completo"**: os QR do lote não cabiam na tela
+  (mostrava 6 de 20). Agora abrem **6 e um botão "Ver todos os N QR
+  codes"** (colapso no padrão do ranking da sala), com "Mostrar menos"
+- **Relatórios seguem a árvore do edital / Domínio**: os cálculos usam
+  a **árvore atual** (não mais a fixa do CFO) — trocar o Domínio pela
+  Estrutura ou por uma nova matrícula recalcula dificuldades, pedagógico
+  e gerais na hora
+- **"Alunos que precisam de apoio" · botão Acionar**: agora **abre o
+  bloco "Mensagens individuais"** com o aluno pré-selecionado e um texto
+  sugerido, pronto para enviar o recado individual (reaproveita a
+  funcionalidade já existente)
+- **Loja · editar produto**: cada item cadastrado ganhou botão
+  **Editar**, que traz o produto de volta ao formulário "Cadastrar
+  produto ou serviço"; ele **continua na Loja durante a edição** e só
+  muda **ao salvar** (botão vira "Salvar alterações")
+- **Loja · preços em Diamantes**: o editor "Preços da Loja" passou a
+  mostrar e atualizar o preço na **moeda de cada item** (QdC **ou**
+  Dmn), refletindo na vitrine do aluno e nos dados do produto
+- Nova suíte `vfasef` (18 checagens) verde; todas as demais suítes
+  (incl. tutorial completo) sem regressões
+
 ## 24/07/2026 — Ajustes do administrador · Controle Geral (item 1)
 - **Banco de professores** (novo bloco no Painel de controle): nome,
   **matérias que ministra (até 3)**, **turnos de disponibilidade**,
