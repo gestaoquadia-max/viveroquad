@@ -1141,6 +1141,21 @@
   .tu-opt small { font: 700 10px var(--ui); opacity: .75; }
   .tu-opt:disabled { opacity: .45; cursor: not-allowed; }
 
+  /* ---------- leitor de QR (gift card) ---------- */
+  .scan-cam { position: relative; width: 100%; height: 170px; border-radius: 14px; overflow: hidden; margin: 10px 0 4px;
+    background: radial-gradient(120% 120% at 50% 20%, #17325E 0%, #0A1B38 70%); }
+  .scan-frame { position: absolute; inset: 26px 64px; border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 999px rgba(4,12,28,0.45); }
+  .scan-line { position: absolute; left: 70px; right: 70px; height: 2px; background: linear-gradient(90deg, transparent, #47B0FF, transparent);
+    animation: scanY 1.6s ease-in-out infinite alternate; }
+  @keyframes scanY { from { top: 34px; } to { top: 158px; } }
+  .qr-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .qr-cell { text-align: center; }
+  .qr-cell svg { width: 100%; max-width: 96px; background: #fff; border: 1px solid var(--p-line); border-radius: 8px; padding: 5px; }
+  .qr-cell small { display: block; font: 700 9.5px Consolas, monospace; color: var(--p-dim); margin-top: 3px; word-break: break-all; }
+  .qr-cell.usado svg { opacity: .3; }
+  .qr-cell.usado small::after { content: ' · USADO'; color: #C0392B; }
+
   /* ---------- nav inferior gamificada ---------- */
   .navbar { background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -6px 18px rgba(20,50,79,0.08); }
@@ -1745,6 +1760,13 @@
             <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
             <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
           </div>
+
+          <!-- ================= ESTORNOS · ATÉ 7 DIAS ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>Estornos · até 7 dias</div>
+            <div id="lojaEstornos"></div>
+            <p class="sub" style="margin-top:8px">Compras feitas há até <strong>7 dias</strong> podem ser estornadas — as moedas voltam para a sua conta na hora e a administração é avisada. A contagem regressiva mostra o prazo de cada item.</p>
+          </div>
         </div>
 
         <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
@@ -2212,6 +2234,33 @@
             <div class="adm-sep"><span>Mensagens enviadas</span></div>
             <div id="admMsgList"></div>
             <p class="sub" style="margin-top:8px">A mensagem chega como <strong>recado no "+"</strong> do aluno, com um <strong>contador de não lidas</strong> (estilo WhatsApp). O <strong>chat ao vivo</strong> fica marcado como próxima implementação.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Gift cards · lotes com QR code</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <input class="fld" id="admGiftQtd" placeholder="Quantidade (ex.: 100)" inputmode="numeric" style="max-width:150px">
+                <input class="fld" id="admGiftValor" placeholder="Valor (ex.: 1000)" inputmode="numeric" style="max-width:130px">
+                <select class="fld" id="admGiftMoeda" title="Moeda do gift card">
+                  <option value="qdc">Quad Coins</option>
+                  <option value="dmn">Diamantes</option>
+                </select>
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmGift">Criar lote de gift cards</button></div>
+            </div>
+            <div class="adm-sep"><span>Lotes criados</span></div>
+            <div id="admGiftLotes"></div>
+            <div id="admGiftQRs"></div>
+            <p class="sub" style="margin-top:8px">Cada gift card nasce com <strong>código e QR próprios</strong>, de <strong>liberação única</strong> — usou, invalidou na hora. A arte final dos QR para impressão é <span class="ref">[INTEGRAÇÃO REAL] geração/leitura de QR</span>; na demo o padrão é ilustrativo e o resgate vale pelo código.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Estornos e desistências</div>
+            <div id="admEstList"></div>
+            <div class="adm-sep"><span>Itens mais estornados</span></div>
+            <div id="admEstTop"></div>
+            <p class="sub" style="margin-top:8px">Estornos feitos pelo aluno na Quad Store (até <strong>7 dias</strong> da compra) chegam aqui na hora — quem estornou, o que estornou e o ranking do que mais volta.</p>
           </div>
         </div>
 
@@ -2793,6 +2842,10 @@
               <span class="grow"><span class="t">Loja · Intendência</span><span class="d">gaste seus Quad Coins em turmas, eventos e itens</span></span>
               <span class="tag gold">NOVO</span>
             </button>
+            <button class="plus-row" id="rowGift">
+              <span class="p-ico"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8c-2.5 0-4.5-1.2-4.5-3S9 2.6 10.4 3.4 12 8 12 8Zm0 0c2.5 0 4.5-1.2 4.5-3S15 2.6 13.6 3.4 12 8 12 8Z"/></svg></span>
+              <span class="grow"><span class="t">Validar Gift Card</span><span class="d">aponte a câmera para o QR code</span></span>
+            </button>
             <button class="plus-row" id="rowChat">
               <span class="p-ico">✉</span>
               <span class="grow"><span class="t">Chat · recados da administração</span><span class="d">mensagens exclusivas para você</span></span>
@@ -2971,6 +3024,20 @@
               <button class="tu-opt qdc" id="btnTuQdc"><span class="to-rot">Quad Coins</span><b id="tuQdcTxt">2.000 QdC</b><small id="tuQdcVagas">10 vagas</small></button>
             </div>
             <button class="btn ghost small" id="btnTuCancel" style="width:100%; margin-top:10px">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- validar gift card: leitor de QR (câmera simulada na demo) -->
+        <div class="compra-layer" id="scanLayer" style="z-index:67">
+          <div class="compra-box">
+            <h3 class="compra-nome">Validar Gift Card</h3>
+            <div class="scan-cam" aria-label="Câmera apontada para o QR code">
+              <div class="scan-frame"></div>
+              <div class="scan-line"></div>
+            </div>
+            <p class="sub compra-desc" id="scanHint">Aponte a câmera para o <strong>QR code</strong> do gift card — a leitura credita e <strong>invalida o cartão na hora</strong>. Câmera real é <span class="ref">[INTEGRAÇÃO REAL] leitura de QR</span>.</p>
+            <button class="btn" id="btnScanDemo" style="width:100%">Simular leitura do QR (demo)</button>
+            <button class="btn ghost small" id="btnScanFechar" style="width:100%; margin-top:10px">Fechar</button>
           </div>
         </div>
 
@@ -3239,8 +3306,25 @@
   /* gift cards de liberação única (demo) */
   var GIFT_CARDS = { 'QUAD-100': 100, 'QUAD-500': 500 };
   var giftUsados = {};
+  var GIFT_LOTES = [];   /* lotes criados no Painel de controle: cada código com QR e liberação única */
+  function giftDoLote(c) {
+    for (var i = 0; i < GIFT_LOTES.length; i++) {
+      var g = GIFT_LOTES[i].codes.filter(function (x) { return x.c === c; })[0];
+      if (g) return { g: g, lote: GIFT_LOTES[i] };
+    }
+    return null;
+  }
   function resgatarGift(codigo) {
     var c = (codigo || '').trim().toUpperCase();
+    var hit = giftDoLote(c);
+    if (hit) {
+      if (hit.g.usado) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
+      hit.g.usado = true;   /* invalida o QR na mesma hora */
+      if (hit.lote.moeda === 'dmn') addDiamante(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Diamantes!');
+      else addScore(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Quad Coins!');
+      if (typeof renderGiftLotes === 'function') renderGiftLotes();
+      return true;
+    }
     if (!GIFT_CARDS[c]) { toast('Gift card inválido — confira o código.'); return false; }
     if (giftUsados[c]) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
     giftUsados[c] = true;
@@ -5576,6 +5660,7 @@
   document.querySelectorAll('.plus-row').forEach(function (row) {
     row.addEventListener('click', function () {
       if (row.id === 'rowChat') { $('plusPop').classList.remove('on'); abrirChat(); return; }
+      if (row.id === 'rowGift') { $('plusPop').classList.remove('on'); $('scanLayer').classList.add('on'); return; }
       if (row.dataset.goto) {
         $('plusPop').classList.remove('on');
         showView(row.dataset.goto, 'navAluno');
@@ -7190,6 +7275,101 @@
   });
   var btnIrEstruturaEl = $('btnIrEstrutura');
   if (btnIrEstruturaEl) btnIrEstruturaEl.addEventListener('click', function () { showView('v-turmas', 'navAdmin'); });
+  /* ---------- gift cards em lote: código + QR de liberação única ----------
+     Na demo o padrão do QR é ilustrativo (determinístico por código);
+     impressão e leitura reais são [INTEGRAÇÃO REAL].                     */
+  function qrSvg(code) {
+    var N = 21, m = [], r, c;
+    for (r = 0; r < N; r++) { m.push([]); for (c = 0; c < N; c++) m[r].push(0); }
+    function finder(r0, c0) {
+      for (r = 0; r < 7; r++) for (c = 0; c < 7; c++) {
+        var borda = r === 0 || r === 6 || c === 0 || c === 6;
+        var miolo = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+        m[r0 + r][c0 + c] = (borda || miolo) ? 1 : 0;
+      }
+    }
+    finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+    var h = edHash(code), bit = 0;
+    for (r = 0; r < N; r++) for (c = 0; c < N; c++) {
+      var emFinder = (r < 8 && (c < 8 || c >= N - 8)) || (r >= N - 8 && c < 8);
+      if (emFinder) continue;
+      if (bit % 24 === 0) h = edHash(code + ':' + bit);
+      m[r][c] = (h >>> (bit % 24)) & 1;
+      bit++;
+    }
+    var out = '<svg viewBox="0 0 ' + N + ' ' + N + '" shape-rendering="crispEdges">';
+    for (r = 0; r < N; r++) for (c = 0; c < N; c++) if (m[r][c]) out += '<rect x="' + c + '" y="' + r + '" width="1" height="1"/>';
+    return out + '</svg>';
+  }
+  function renderGiftLotes() {
+    var el = $('admGiftLotes'); if (!el) return;
+    el.innerHTML = GIFT_LOTES.map(function (l, i) {
+      var usados = l.codes.filter(function (x) { return x.usado; }).length;
+      return '<div class="adm-bar"><span class="nm">Lote ' + l.id + ' · ' + l.codes.length + ' gift cards de ' + fmt(l.valor) + ' ' + moedaTxt(l.moeda) +
+        '<small>' + usados + ' de ' + l.codes.length + ' resgatados · liberação única</small></span>' +
+        '<button class="btn ghost small" data-lote="' + i + '">Ver QR codes</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum lote criado ainda.</p>';
+    el.querySelectorAll('[data-lote]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var l = GIFT_LOTES[+bt.dataset.lote];
+        var qr = $('admGiftQRs');
+        var mostrar = l.codes.slice(0, 6);
+        qr.innerHTML = '<div class="adm-sep"><span>QR codes · lote ' + l.id + (l.codes.length > 6 ? ' (6 de ' + l.codes.length + ')' : '') + '</span></div>' +
+          '<div class="qr-wrap">' + mostrar.map(function (g) {
+            return '<div class="qr-cell' + (g.usado ? ' usado' : '') + '">' + qrSvg(g.c) + '<small>' + g.c + '</small></div>';
+          }).join('') + '</div>';
+      });
+    });
+  }
+  var giftSeq = 0;
+  $('btnAdmGift').addEventListener('click', function () {
+    var qtd = parseInt($('admGiftQtd').value, 10), val = parseInt($('admGiftValor').value, 10);
+    var mo = $('admGiftMoeda').value;
+    if (!qtd || qtd < 1 || qtd > 500) { toast('Quantidade do lote: de 1 a 500.'); return; }
+    if (!val || val < 1) { toast('Informe o valor de cada gift card.'); return; }
+    giftSeq++;
+    var lote = { id: 'G' + giftSeq, valor: val, moeda: mo, codes: [] };
+    for (var i = 1; i <= qtd; i++) {
+      var base = (edHash('gift:' + giftSeq + ':' + i + ':' + val) % 46656).toString(36).toUpperCase();
+      while (base.length < 3) base = '0' + base;
+      lote.codes.push({ c: 'QG' + giftSeq + '-' + base + i, usado: false });
+    }
+    GIFT_LOTES.push(lote);
+    $('admGiftQtd').value = ''; $('admGiftValor').value = '';
+    renderGiftLotes();
+    toast('Lote criado — ' + qtd + ' gift cards de ' + fmt(val) + ' ' + moedaTxt(mo) + ', cada um com o seu QR.');
+  });
+  /* leitor do aluno (câmera simulada): valida o primeiro código ainda ativo */
+  $('btnScanDemo').addEventListener('click', function () {
+    var alvo = null;
+    GIFT_LOTES.forEach(function (l) { if (!alvo) alvo = l.codes.filter(function (x) { return !x.usado; })[0]; });
+    if (!alvo) { toast('Nenhum gift card ativo — a administração cria os lotes no Painel de controle.'); return; }
+    if (resgatarGift(alvo.c)) { $('scanLayer').classList.remove('on'); }
+  });
+  $('btnScanFechar').addEventListener('click', function () { $('scanLayer').classList.remove('on'); });
+  $('scanLayer').addEventListener('click', function (e) { if (e.target === $('scanLayer')) $('scanLayer').classList.remove('on'); });
+
+  /* ---------- estornos e desistências (lado da administração) ---------- */
+  var ESTORNOS = [];
+  function renderAdmEstornos() {
+    var el = $('admEstList'); if (!el) return;
+    el.innerHTML = ESTORNOS.map(function (e) {
+      return '<div class="adm-bar"><span class="nm">' + e.item + '<small>' + e.aluno + ' · ' + e.quando + '</small></span>' +
+        '<span class="pct">+' + fmt(e.valor) + ' ' + moedaTxt(e.moeda) + '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum estorno registrado.</p>';
+    var top = $('admEstTop'); if (!top) return;
+    var cont = {};
+    ESTORNOS.forEach(function (e) { cont[e.item] = (cont[e.item] || 0) + 1; });
+    var rank = Object.keys(cont).map(function (k) { return { n: k, v: cont[k] }; }).sort(function (a, b) { return b.v - a.v; });
+    var max = rank.length ? rank[0].v : 1;
+    top.innerHTML = rank.slice(0, 5).map(function (x) {
+      return '<div class="adm-bar"><span class="nm">' + x.n + '</span>' +
+        '<span class="mini-track"><i style="width:' + Math.round(x.v / max * 100) + '%;background:var(--p-blue)"></i></span>' +
+        '<span class="pct">' + x.v + '×</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Sem dados ainda.</p>';
+  }
+  renderGiftLotes(); renderAdmEstornos();
+
   admContasSelects(); renderAdmCred(); renderAdmContas(); renderAdmMsgs(); renderChatBadge();
 
   /* ---------- avisos gerais (professores e time → aluno) ---------- */
@@ -7625,17 +7805,72 @@
     if (typeof queueSync === 'function') queueSync();
     toast(mudados ? 'Preços atualizados na Loja dos alunos.' : 'Nenhum preço alterado.');
   });
+  var DIA_MS = 86400000;
   var COMPRAS = [
-    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Aulão especial', valor: 80, quando: 'ontem' },
-    { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', valor: 40, quando: 'hoje' }
+    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Aulão especial', valor: 80, quando: 'ontem', ts: Date.now() - DIA_MS },
+    { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', valor: 40, quando: 'hoje', ts: Date.now() }
   ];
+  /* compras anteriores do aluno desta demo — para ver a contagem regressiva */
+  COMPRAS.push({ aluno: nomeCurto(), item: 'Módulo impresso', valor: 150, moeda: 'qdc', quando: 'há 2 dias', ts: Date.now() - 2 * DIA_MS });
+  COMPRAS.push({ aluno: nomeCurto(), item: 'Garrafinha Quad', valor: 90, moeda: 'qdc', quando: 'há 8 dias', ts: Date.now() - 8 * DIA_MS });
   function lojaCompraLog(item, valor, moeda) {
-    COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora' });
+    COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now() });
     renderCompras();
+    if (typeof renderEstornos === 'function') renderEstornos();
+  }
+  /* ---------- estornos: até 7 dias, moedas de volta e aviso ao admin ---------- */
+  function estornoDias(cp) { return 7 - Math.floor((Date.now() - (cp.ts || 0)) / DIA_MS); }
+  function renderEstornos() {
+    var el = $('lojaEstornos'); if (!el) return;
+    var minhas = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto() && !cp.estornado; });
+    el.innerHTML = minhas.map(function (cp) {
+      var dias = estornoDias(cp), i = COMPRAS.indexOf(cp);
+      var prazo = dias > 0
+        ? '<span class="tag' + (dias <= 2 ? ' warn' : '') + '">' + (dias === 7 ? 'FALTAM 7 DIAS' : dias === 1 ? 'ÚLTIMO DIA' : 'FALTAM ' + dias + ' DIAS') + '</span>'
+        : '<span class="tag">PRAZO ENCERRADO</span>';
+      var btn = dias > 0
+        ? '<button class="btn ghost small" data-est="' + i + '">Estornar</button>'
+        : '<button class="btn ghost small" disabled>Estornar</button>';
+      return '<div class="mission-row"><div class="grow"><div class="t">' + cp.item + '</div>' +
+        '<div class="d">' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + ' · ' + cp.quando + '</div></div>' + prazo + btn + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma compra recente para estornar.</p>';
+    el.querySelectorAll('[data-est]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        /* confirmação em dois toques — evita estorno sem querer */
+        if (bt.dataset.conf !== '1') {
+          bt.dataset.conf = '1'; bt.textContent = 'Confirmar estorno?'; bt.classList.add('warn');
+          setTimeout(function () { bt.dataset.conf = ''; bt.textContent = 'Estornar'; bt.classList.remove('warn'); }, 4000);
+          return;
+        }
+        estornar(+bt.dataset.est);
+      });
+    });
+  }
+  function estornar(i) {
+    var cp = COMPRAS[i]; if (!cp || cp.estornado || estornoDias(cp) <= 0) return;
+    cp.estornado = true;
+    var mo = cp.moeda || 'qdc';
+    if (mo === 'dmn') addDiamante(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Diamantes de volta.');
+    else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
+    /* estorno de matrícula desfaz a vaga e libera o turno */
+    if (/ · matrícula$/.test(cp.item)) {
+      var nomeTurma = cp.item.replace(/ · matrícula$/, '');
+      var t = TURMAS_LOJA.filter(function (x) { return x.nome === nomeTurma; })[0];
+      if (t) {
+        if (mo === 'dmn') t.vagasDmn++; else t.vagasQdc++;
+        MATRICULAS = MATRICULAS.filter(function (m) { return m.turmaId !== t.id; });
+        if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
+        if (typeof checarMatricula === 'function') checarMatricula();
+      }
+    }
+    ESTORNOS.push({ aluno: cp.aluno, item: cp.item, valor: cp.valor, moeda: mo, quando: 'agora' });
+    renderEstornos(); renderCompras();
+    if (typeof renderAdmEstornos === 'function') renderAdmEstornos();
   }
   var relOpen = { compras: false };
   function compraRow(cp) {
     return '<div class="adm-bar"><span class="nm">' + cp.item + '<small>' + cp.aluno + ' · ' + cp.quando + '</small></span>' +
+      (cp.estornado ? '<span class="tag warn">ESTORNADO</span>' : '') +
       '<span class="pct">−' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
   }
   function renderCompras() {
@@ -7783,7 +8018,7 @@
 
   renderAvisos(); admCronoInit(); renderAdmEventos();
   renderPedidos(); renderSimPres(); renderAdmSimList();
-  renderRelatorios(); renderPrecos();
+  renderRelatorios(); renderPrecos(); renderEstornos();
   renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */

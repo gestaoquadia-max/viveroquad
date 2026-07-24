@@ -1,5 +1,29 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Pacote do aluno · Fase D (gift cards com QR + estorno)
+- **Gift cards em lote com QR** (Painel de controle): a administração
+  cria lotes (ex.: 100 cartões de 1.000 QdC **ou** Dmn); cada cartão
+  nasce com **código e QR próprios, de liberação única** — usou,
+  invalidou na hora. "Ver QR codes" mostra os cartões do lote (padrão
+  ilustrativo na demo; impressão/leitura reais `[INTEGRAÇÃO REAL]`),
+  com marcação USADO e contagem "X de Y resgatados"
+- **Validar Gift Card no "+"** do aluno: abre o leitor com moldura de
+  câmera e varredura; a leitura credita as moedas e **invalida o QR na
+  mesma hora** (na demo, botão "simular leitura"). O **código do lote
+  também vale digitado** no campo de gift card da Quad Store
+- **Estornos · até 7 dias** (novo bloco na Quad Store): compras
+  recentes com **contagem regressiva** (FALTAM X DIAS · ÚLTIMO DIA ·
+  PRAZO ENCERRADO com botão desativado); estorno em **dois toques**
+  ("Confirmar estorno?") devolve as moedas na hora. **Estorno de
+  matrícula** devolve a vaga da moeda usada, desfaz a matrícula e
+  **libera o turno** de novo
+- **"Estornos e desistências"** no Painel de controle: registra quem
+  estornou, o que estornou e o **ranking dos itens mais estornados**;
+  o log de Compradores (Relatórios · Loja) marca ESTORNADO
+- Nova suíte `vfased` (28 checagens) verde; todas as demais suítes
+  (incl. tutorial completo) sem regressões — **fecha o pacote do aluno
+  (Fases A–D)**
+
 ## 24/07/2026 — Pacote do aluno · Fase C (área do professor + Quiz da aula)
 - **Área do professor reconstruída**: cadastro individual de ingresso
   (e-mail funcional + chave PROF-2026 na demo, escolha do professor no
