@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Ajustes do administrador · Liberações (item 4)
+- **Aba Liberações reconstruída** com cabeçalho próprio (recepção e
+  portaria):
+  - **"Produtos físicos · retirada na recepção"** — o bloco de retirada
+    passou a ser sobre **itens físicos** (garrafinhas, camisas, livros,
+    vade mecum, chaveiros); os pedidos-semente viraram produtos físicos.
+    Confirmar entrega dá baixa e devolve o item ao estoque da Loja
+  - **"Autorizações de acesso"** (era "Simulados presenciais · liberar
+    entrada") — portaria das atividades presenciais em **sub-blocos por
+    tipo**: Eventos no Quad, Aulões, Excursões, Isoladas, Treinamento TAF
+    e **Simulados** (mantido no bloco próprio). Cada pessoa tem
+    **"Liberar entrada"** → **ENTRADA LIBERADA**
+  - **"Inscritos por atividade"** (bloco novo) — escolha qualquer
+    atividade presencial do banco (turmas, aulões, isoladas, eventos,
+    simulados, excursões, TAF) e veja **quem está inscrito**; a lista
+    abre com **5 nomes + "Ver todos os N inscritos"** (colapso no padrão
+    do ranking completo), recolhendo com "Mostrar menos" e reiniciando ao
+    trocar de atividade
+- Nova suíte `vfaseh` (16 checagens) verde; `vadmin` (usa admSpLista e a
+  retirada) e todas as demais suítes (incl. tutorial) sem regressões
+- **Fecha o pacote das 5 áreas do administrador** (Controle, Interno,
+  Relatórios, Liberações, Loja)
+
 ## 24/07/2026 — Ajustes do administrador · Controle interno (item 2)
 - **Avisos · editar**: cada aviso enviado ganhou botão **Editar** (ao
   lado de Remover), que o traz de volta ao formulário; o botão vira

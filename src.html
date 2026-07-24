@@ -2519,15 +2519,35 @@
         <!-- ============ ADMIN · LIBERAÇÕES ============ -->
         <div class="view" id="v-adm-liber">
           <div class="p-card">
-            <div class="k-label">Produtos presenciais · retirada na recepção</div>
-            <div id="admPedidosList"></div>
-            <p class="sub" style="margin-top:8px">Compra com Quad Coins na Loja gera o pedido aqui. Na retirada, a administração confirma a entrega e dá baixa.</p>
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6l-8-3Z"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · recepção e portaria</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Liberações</h3>
+              </div>
+            </div>
+            <p class="sub">Entrega de <strong>itens físicos</strong> na recepção, <strong>autorização de acesso</strong> às atividades presenciais e a <strong>lista de inscritos</strong> por atividade.</p>
           </div>
 
           <div class="p-card">
-            <div class="k-label">Simulados presenciais · liberar entrada e pontuar presença</div>
+            <div class="k-label">Produtos físicos · retirada na recepção</div>
+            <div id="admPedidosList"></div>
+            <p class="sub" style="margin-top:8px">Garrafinhas, camisas, livros, vade mecum, chaveiros — a compra na Loja gera o pedido aqui. Na retirada, a administração <strong>confirma a entrega</strong> e dá baixa; o item volta ao estoque da Loja.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Autorizações de acesso</div>
+            <p class="sub" style="margin-bottom:4px">Portaria das atividades presenciais: libere a entrada de quem chega à sede. Onde a atividade gera QdC na presença, a liberação também pontua.</p>
+            <div id="admAcessos"></div>
+            <div class="k-label sub-k" style="margin-top:12px">Simulados</div>
             <div id="admSpLista"></div>
-            <p class="sub" style="margin-top:8px">O simulado presencial é <strong>lançado na aba Hoje</strong>. Todo inscrito (pago <strong>ou grátis</strong>) aparece aqui. A administração <strong>libera a entrada</strong> quando o aluno chega à sede; nos simulados que geram QdC, a liberação <strong>pontua quem compareceu</strong>. Liberado, o simulado vai para o <strong>histórico</strong> do aluno.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Inscritos por atividade</div>
+            <select class="fld" id="admAtivSel" style="margin-top:6px"></select>
+            <div id="admAtivInscritos" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">Escolha qualquer atividade presencial do banco (turmas, aulões, isoladas, eventos, simulados, excursões, TAF) para ver <strong>quem está inscrito</strong>. Listas grandes abrem com <strong>“ver todos”</strong>.</p>
           </div>
         </div>
 
@@ -7961,9 +7981,9 @@
   /* ---------- liberações: produtos presenciais (dar baixa) ---------- */
   var PRESENCIAIS = ['Turma presencial', 'Aula isolada', 'Aulão especial', 'Evento presencial'];
   var PEDIDOS = [
-    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Aulão especial', quando: 'ontem · 19h40', status: 'aguardando' },
-    { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', quando: 'hoje · 9h12', status: 'aguardando' },
-    { aluno: 'AL CB QUAD NASCIMENTO', item: 'Turma presencial', quando: 'sexta · 20h05', status: 'entregue' }
+    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Garrafinha Quad', quando: 'ontem · 19h40', status: 'aguardando' },
+    { aluno: 'SD QUAD BRANDÃO', item: 'Camiseta Quad', quando: 'hoje · 9h12', status: 'aguardando' },
+    { aluno: 'AL CB QUAD NASCIMENTO', item: 'Vade Mecum', quando: 'sexta · 20h05', status: 'entregue' }
   ];
   function pedidoNovo(item) {
     PEDIDOS.unshift({ aluno: nomeCurto(), item: item, quando: 'agora', status: 'aguardando' });
@@ -7999,6 +8019,90 @@
       });
     });
   }
+
+  /* ---------- Autorizações de acesso: portaria por tipo de atividade ----------
+     Simulados vêm de SIM_INSC (bloco próprio). Os demais tipos ficam aqui,
+     com liberação de entrada por pessoa.                                    */
+  function inscNome(seed, i) {
+    var pref = (i % 5 === 0) ? 'AL SGT QUAD ' : (i % 3 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+    return pref + RK_NOMES[(seed + i * 7) % RK_NOMES.length].toUpperCase();
+  }
+  function inscritosSeed(seed, n, euNoPrimeiro) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push({ nome: (euNoPrimeiro && i === 0) ? nomeCurto() : inscNome(seed, i), liberado: false, euSou: euNoPrimeiro && i === 0 });
+    return out;
+  }
+  var ACESSOS = {
+    eventos:   { rot: 'Eventos no Quad', det: 'Aniversário do Quad · sábado 15h', seed: 3, n: 5, eu: true, lista: null },
+    auloes:    { rot: 'Aulões', det: 'Aulão de véspera · quinta 19h', seed: 11, n: 6, eu: false, lista: null },
+    excursoes: { rot: 'Excursões', det: 'Excursão concurso PM-BA · domingo 6h', seed: 19, n: 4, eu: false, lista: null },
+    isoladas:  { rot: 'Isoladas', det: 'Isolada Dir. Administrativo · terça 20h', seed: 27, n: 3, eu: false, lista: null },
+    taf:       { rot: 'Treinamento TAF', det: 'Pré-TAF · pista do quartel · sábado 7h', seed: 31, n: 5, eu: false, lista: null }
+  };
+  function ensureAcessos() {
+    Object.keys(ACESSOS).forEach(function (k) {
+      var g = ACESSOS[k];
+      if (!g.lista) g.lista = inscritosSeed(g.seed, g.n, g.eu);
+    });
+  }
+  function renderAcessos() {
+    var el = $('admAcessos'); if (!el) return;
+    ensureAcessos();
+    var ordem = ['eventos', 'auloes', 'excursoes', 'isoladas', 'taf'];
+    el.innerHTML = ordem.map(function (k) {
+      var g = ACESSOS[k];
+      var linhas = g.lista.map(function (p, i) {
+        var right = p.liberado
+          ? '<span class="tag ok">ENTRADA LIBERADA</span>'
+          : '<button class="btn small" data-ac="' + k + ':' + i + '">Liberar entrada</button>';
+        return '<div class="mission-row"><div class="grow"><div class="t">' + p.nome + (p.euSou ? ' · você' : '') + '</div>' +
+          '<div class="d">' + g.det + '</div></div>' + right + '</div>';
+      }).join('');
+      return '<div class="k-label sub-k" style="margin-top:12px">' + g.rot + ' <span class="tag">' + g.lista.length + '</span></div>' + linhas;
+    }).join('');
+    el.querySelectorAll('[data-ac]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var pr = bt.dataset.ac.split(':'), g = ACESSOS[pr[0]], p = g.lista[+pr[1]];
+        if (!p || p.liberado) return;
+        p.liberado = true;
+        renderAcessos();
+        toast('Entrada liberada — ' + p.nome + ' · ' + g.rot + '.');
+      });
+    });
+  }
+
+  /* ---------- Inscritos por atividade: banco + lista colapsável (estilo ranking) ---------- */
+  var ATIVIDADES = [
+    { id: 'a-patamo', nome: 'Turma PATAMO (Noite)', tipo: 'Turma', n: 42, seed: 5 },
+    { id: 'a-rondesp', nome: 'Turma RONDESP (Noite)', tipo: 'Turma', n: 38, seed: 9 },
+    { id: 'a-aulao', nome: 'Aulão de véspera RONDESP', tipo: 'Aulão', n: 73, seed: 13 },
+    { id: 'a-isolada', nome: 'Isolada Dir. Administrativo', tipo: 'Isolada', n: 21, seed: 17 },
+    { id: 'a-evento', nome: 'Aniversário do Quad', tipo: 'Evento', n: 128, seed: 23 },
+    { id: 'a-simulado', nome: 'Simuladão Quad', tipo: 'Simulado', n: 54, seed: 29 },
+    { id: 'a-excursao', nome: 'Excursão concurso PM-BA', tipo: 'Excursão', n: 40, seed: 31 },
+    { id: 'a-taf', nome: 'Treinamento TAF', tipo: 'TAF', n: 30, seed: 37 }
+  ];
+  var ativOpen = false;
+  function ativDe(id) { return ATIVIDADES.filter(function (a) { return a.id === id; })[0]; }
+  function renderAtivInscritos() {
+    var sel = $('admAtivSel'), el = $('admAtivInscritos'); if (!sel || !el) return;
+    var a = ativDe(sel.value); if (!a) { el.innerHTML = ''; return; }
+    var CAP = 5;
+    var total = a.n, mostra = ativOpen ? total : Math.min(CAP, total);
+    var linhas = '';
+    for (var i = 1; i <= mostra; i++) linhas += '<div class="mission-row"><div class="cal-date">' + i + 'º</div>' +
+      '<div class="grow"><div class="t">' + inscNome(a.seed, i) + '</div>' +
+      '<div class="d">' + a.tipo + ' · ' + a.nome + '</div></div><span class="tag ok">INSCRITO</span></div>';
+    var html = '<div class="k-label sub-k" style="margin-top:2px">' + a.tipo + ' · ' + a.nome + ' <span class="tag">' + total + ' inscritos</span></div>' + linhas;
+    if (total > CAP) html += '<button class="btn ghost small rk-toggle" id="ativBtn">' + (ativOpen ? 'Mostrar menos' : 'Ver todos os ' + total + ' inscritos') + '</button>';
+    el.innerHTML = html;
+    if ($('ativBtn')) $('ativBtn').onclick = function () { ativOpen = !ativOpen; renderAtivInscritos(); };
+  }
+  (function () {
+    var sel = $('admAtivSel'); if (!sel) return;
+    sel.innerHTML = ATIVIDADES.map(function (a) { return '<option value="' + a.id + '">' + a.tipo + ' · ' + a.nome + '</option>'; }).join('');
+    sel.addEventListener('change', function () { ativOpen = false; renderAtivInscritos(); });
+  })();
 
   /* ---------- Liberações: inscritos presenciais (liberar entrada e pontuar) ----------
      Todos os inscritos (pagos OU grátis) aparecem agrupados por simulado. A
@@ -8453,6 +8557,8 @@
 
   renderAvisos(); admCronoInit(); renderAdmEventos();
   renderPedidos(); renderSimPres(); renderAdmSimList();
+  if (typeof renderAcessos === 'function') renderAcessos();
+  if (typeof renderAtivInscritos === 'function') renderAtivInscritos();
   renderRelatorios(); renderPrecos(); renderEstornos();
   renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
 
