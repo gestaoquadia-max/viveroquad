@@ -1,5 +1,45 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Área do professor: menu completo e professor nos eventos
+
+**Professor nos eventos**
+
+- O cadastro de evento ganhou **"Professores no evento"** — chips que saem
+  direto do **Banco de professores**, com marcação múltipla (um evento
+  pode ter mais de um professor). Editar o evento traz os nomes já
+  marcados.
+- O nome aparece **para o aluno** no card do carrossel, na página do
+  evento e na vitrine da Loja ("com Cap. Silva e Prof.ª Ritha Galvão"), e
+  **para a coordenação** na lista de "Eventos da semana · regras de score
+  e Coins".
+
+**Menu do professor · 5 áreas**
+
+- **Painel de controle** — foto (enviada por ele, com iniciais como
+  padrão), nome, graduação, contato, turnos, matérias que leciona, turmas
+  em que está inserido e **troca de senha** (senha atual, mínimo de 6
+  caracteres, confirmação). A senha passou a ser **individual por
+  docente**.
+- **Eventos** — "Aula de hoje" aparece **um bloco por turma/turno em que
+  ele tem aula hoje** (manhã, tarde e noite quando for o caso), com os
+  tempos dele marcados **SUA AULA** e as faixas AGORA/ENCERRADO do
+  horário real; e "Eventos da semana · com você", só com os eventos em
+  que a coordenação inseriu o nome dele.
+- **Quiz ao vivo** — a área que já existia, agora com aba própria.
+- **Calendário** — as aulas das turmas dele na semana mais os eventos em
+  que está inserido.
+- **Recepção** — recados da administração + o chat com a recepção
+  **montado e desativado**, marcado EM BREVE (entra na V1 com as
+  atividades online).
+
+**Bloqueio e desligamento**
+
+- Se a coordenação **bloqueia ou desliga** quem está logado, a sessão cai
+  na hora e o portão mostra um recado cordial: *"Olá! Informamos que o
+  sr. está temporariamente afastado das atividades. Assim que ajustarmos
+  as coisas por aqui, chamaremos novamente…"* — sem tom de punição.
+- O robô de ajuda do aluno deixou de aparecer na área do professor.
+
 ## 25/07/2026 — Quiz da aula: 30 questões, 180 min, refazer e descartar
 
 - **Causa do "não criou"**: o limite era de **1 a 5 questões** (tamanho do

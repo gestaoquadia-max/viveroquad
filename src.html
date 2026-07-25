@@ -1149,11 +1149,20 @@
   .tu-opt:disabled { opacity: .45; cursor: not-allowed; }
 
   /* ---------- Controle: banco de professores + criação de turmas ---------- */
-  .turno-pick { display: flex; gap: 8px; }
+  .turno-pick { display: flex; gap: 8px; flex-wrap: wrap; }
   .turno-chip { flex: 1; padding: 8px 4px; border: 1.5px solid var(--p-line); border-radius: 10px; cursor: pointer;
     background: var(--p-surface); color: var(--p-dim); font: 700 11.5px var(--ui); transition: .15s; }
   .turno-chip.on { background: var(--p-blue); border-color: var(--p-blue); color: #fff; }
   .turno-chip.on::before { content: '✓ '; font-weight: 900; }
+  /* perfil do professor */
+  .pf-head { display: flex; gap: 14px; align-items: center; }
+  .pf-foto { width: 78px; height: 78px; border-radius: 50%; overflow: hidden; flex: 0 0 78px;
+    border: 2.5px solid var(--p-blue); background: var(--p-soft); display: grid; place-items: center;
+    font: 800 24px/1 var(--font-mil, inherit); color: var(--p-blue); }
+  .pf-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pf-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .aula-turno { font: 800 10.5px/1 Consolas, monospace; letter-spacing: .1em; color: var(--p-blue);
+    text-transform: uppercase; }
   .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--p-dim); white-space: nowrap; }
   .chk input { width: 15px; height: 15px; }
   .ct-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -1993,22 +2002,106 @@
           </div>
         </div>
 
-        <!-- ============ PROFESSOR ============ -->
+        <!-- ============ PROFESSOR · PAINEL DE CONTROLE ============ -->
+        <div class="view" id="v-prof-painel">
+          <div class="p-card">
+            <div class="k-label">Painel de controle · seu cadastro</div>
+            <div class="pf-head" style="margin-top:10px">
+              <div class="pf-foto" id="profFoto">—</div>
+              <div class="grow">
+                <h3 style="margin:0" id="profPnNome">Professor</h3>
+                <p class="sub" id="profPnGrad" style="margin:2px 0 0">—</p>
+                <div class="pf-chips" id="profPnTurnos"></div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn ghost small" id="btnProfFoto">Trocar foto</button>
+              <input id="profFotoFile" type="file" accept="image/*" style="display:none">
+              <button class="btn ghost small" id="btnProfFotoTirar" style="display:none">Remover foto</button>
+            </div>
+            <p class="sub" style="margin-top:8px">Nome, matérias, turnos e contato vêm do <strong>Banco de professores</strong> da coordenação. A <strong>foto</strong> é você quem escolhe.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Matérias que você leciona</div>
+            <div id="profPnMaterias"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Turmas em que você está inserido</div>
+            <div id="profPnTurmas"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Trocar senha</div>
+            <div class="adm-form" style="margin-top:8px">
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaAtual">Senha atual</label>
+                <input id="profSenhaAtual" type="password" placeholder="••••••••" autocomplete="off">
+              </div>
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaNova">Nova senha</label>
+                <input id="profSenhaNova" type="password" placeholder="mínimo 6 caracteres" autocomplete="off">
+              </div>
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaConf">Repita a nova senha</label>
+                <input id="profSenhaConf" type="password" placeholder="••••••••" autocomplete="off">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnProfSenha">Salvar nova senha</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · EVENTOS ============ -->
+        <div class="view" id="v-prof-eventos">
+          <div class="p-card">
+            <div class="k-label">Aula de hoje</div>
+            <div id="profAulasHoje" style="margin-top:8px"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Eventos da semana · com você</div>
+            <div id="profEvList" style="margin-top:8px"></div>
+            <p class="sub" style="margin-top:8px">Só aparecem os eventos em que a coordenação inseriu o seu nome. Quem inclui é o Painel de controle da administração.</p>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · CALENDÁRIO ============ -->
+        <div class="view" id="v-prof-cal">
+          <div class="p-card">
+            <div class="k-label">Seu calendário · aulas e eventos</div>
+            <div id="profCalList" style="margin-top:8px"></div>
+            <p class="sub" style="margin-top:8px">Aulas das suas turmas na semana e os eventos em que você está inserido.</p>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · RECEPÇÃO ============ -->
+        <div class="view" id="v-prof-chat">
+          <div class="p-card" id="profRecadosCard" style="display:none">
+            <div class="k-label">Recados da administração <span class="chat-badge" id="profRecBadge" style="display:none">1</span></div>
+            <div id="profRecadosList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Comunicação com a recepção <span class="tag">EM BREVE</span></div>
+            <p class="sub" style="margin-top:8px">Conversa direta com a administração do Quad — pedir material, avisar sobre a aula, resolver pendência de turma.</p>
+            <div class="rel-ph" style="margin-top:10px"><span class="tag">EM BREVE</span>O chat com a recepção entra junto com as atividades online, na V1.</div>
+            <div class="adm-form" style="margin-top:10px; opacity:.55">
+              <input class="fld" id="profChatTexto" placeholder="Escreva para a recepção…" disabled>
+              <div style="margin-top:8px"><button class="btn small" id="btnProfChat" disabled>Enviar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · QUIZ AO VIVO ============ -->
         <div class="view" id="v-sala">
           <div class="p-card">
             <div class="card-head">
               <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg></div>
               <div class="grow">
-                <div class="card-eyebrow">Corpo docente · sala ao vivo</div>
+                <div class="card-eyebrow">Corpo docente · quiz ao vivo</div>
                 <h3 class="aula-title" style="margin:2px 0 0" id="profNome">Professor</h3>
               </div>
             </div>
             <p class="sub">Suas turmas aparecem automaticamente — você entra na sala, cria o quiz da aula por PDF e ativa quando a aula começar.</p>
-          </div>
-
-          <div class="p-card" id="profRecadosCard" style="display:none">
-            <div class="k-label">Recados da administração <span class="chat-badge" id="profRecBadge" style="display:none">1</span></div>
-            <div id="profRecadosList"></div>
           </div>
 
           <div class="p-card" id="profTurmasCard">
@@ -2401,6 +2494,8 @@
                 </select>
                 <input class="fld" id="admEvNovoPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px" disabled>
               </div>
+              <div class="k-label sub-k" style="margin-top:10px">Professores no evento <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
+              <div class="turno-pick" id="admEvProfs"></div>
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admEvNovoData" type="date" aria-label="Data do evento" style="max-width:140px">
                 <input class="fld" id="admEvNovoInicio" type="time" value="19:00" aria-label="Início" style="max-width:100px" title="Início">
@@ -3016,6 +3111,7 @@
               <input id="profSenha" type="password" placeholder="••••••••" autocomplete="off">
             </div>
             <button class="btn" id="btnProfEntrar" style="width:100%">Entrar na sala</button>
+            <p class="sub" id="profSaidaMsg" style="display:none; margin-top:14px; text-align:center; background:var(--p-soft); border-radius:12px; padding:12px"></p>
             <p class="login-note" id="profGateNota"></p>
           </div>
         </div>
@@ -3199,7 +3295,11 @@
           <button class="nav-btn" data-view="v-loja"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Loja</button>
         </nav>
         <nav class="navbar" id="navProfessor" style="display:none">
-          <button class="nav-btn active" data-view="v-sala"><span class="ico">◉</span>Sala ao vivo</button>
+          <button class="nav-btn active" data-view="v-prof-painel"><span class="ico">⛭</span>Controle</button>
+          <button class="nav-btn" data-view="v-prof-eventos"><span class="ico">◈</span>Eventos</button>
+          <button class="nav-btn" data-view="v-sala"><span class="ico">◉</span>Quiz ao vivo</button>
+          <button class="nav-btn" data-view="v-prof-cal"><span class="ico">▤</span>Calendário</button>
+          <button class="nav-btn" data-view="v-prof-chat"><span class="ico">✉</span>Recepção<span class="chat-badge" id="profRecBadgeNav" style="display:none">1</span></button>
         </nav>
         <nav class="navbar" id="navAdmin" style="display:none">
           <button class="nav-btn active" data-view="v-adm-controle"><span class="ico">⛭</span>Controle</button>
@@ -3476,7 +3576,7 @@
   var personaAtiva = 'aluno';
   var personaViews = {
     aluno: { nav: 'navAluno', home: 'v-inicio' },
-    professor: { nav: 'navProfessor', home: 'v-sala' },
+    professor: { nav: 'navProfessor', home: 'v-prof-painel' },
     admin: { nav: 'navAdmin', home: 'v-adm-controle' }
   };
   document.querySelectorAll('.persona-btn').forEach(function (b) {
@@ -3500,7 +3600,8 @@
       var pg = $('profGate');
       if (pg) pg.classList.toggle('on', p === 'professor' && !profLiberado);
       /* o robô de ajuda é do aluno — na área do administrador ele some */
-      $('daniloFab').style.display = (p === 'admin' || (typeof tutOn !== 'undefined' && tutOn)) ? 'none' : '';
+      /* o robô de ajuda é do aluno — some nas áreas de professor e administrador */
+      $('daniloFab').style.display = (p !== 'aluno' || (typeof tutOn !== 'undefined' && tutOn)) ? 'none' : '';
       if (p !== 'aluno') { $('daniloHint').style.display = 'none'; }
     });
   });
@@ -3614,6 +3715,9 @@
     /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
     if (id === 'v-calendario' && typeof renderCalendario === 'function') renderCalendario();
+    if (id.indexOf('v-prof-') === 0 && typeof renderProfTudo === 'function') renderProfTudo();
+    /* abrir a Recepção é o que marca os recados como lidos */
+    if (id === 'v-prof-chat' && typeof renderProfRecados === 'function') renderProfRecados();
     spotlight($(id));
   }
   initLoop($('v-inicio'));
@@ -3760,12 +3864,12 @@
      pago (true → vendido na Loja; false → gratuito, dá recompensa ao participar),
      preco, e regras de score/coins.                                          */
   var EVENTOS = [
-    { id: 'nac', nome: 'NAC · Atualidades', tipo: 'ENCONTRO · AO VIVO', modalidade: 'online', pago: false, preco: 0, quando: 'QUA · 22/07 · 19H–21H',
+    { id: 'nac', nome: 'NAC · Atualidades', tipo: 'ENCONTRO · AO VIVO', modalidade: 'online', pago: false, preco: 0, quando: 'QUA · 22/07 · 19H–21H', profs: ['Danilo Moura'],
       cor: 'teal', meta: 'Atualidades da semana com Danilo Moura',
       desc: 'Encontro semanal do Núcleo de Atualidades e Conhecimentos: os fatos da semana que podem cair na sua prova, analisados ao vivo.',
       score: [['Presença no encontro', '+30 score'], ['Acerto no quiz de atualidades', '+2 score por questão']],
       coins: [['Check-in ao vivo', '+10']] },
-    { id: 'aulao-rondesp', nome: 'Aulão de véspera RONDESP', tipo: 'AULÃO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'QUI · 23/07 · 19H–22H',
+    { id: 'aulao-rondesp', nome: 'Aulão de véspera RONDESP', tipo: 'AULÃO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'QUI · 23/07 · 19H–22H', profs: ['Cap. Silva', 'Prof.ª Ritha Galvão'],
       cor: '', meta: 'Revisão final antes da prova', tag: 'COINS', garimpo: true,
       desc: 'Aulão de véspera com os professores do Quad: pontos quentes do edital RONDESP, macetes de prova e rodada de questões comentadas.',
       score: [['Presença confirmada', '+40 score'], ['Acerto na rodada de questões', '+1 score por questão']],
@@ -3775,7 +3879,7 @@
       desc: 'Uma hora de desafios-relâmpago no app: quem explora e resolve primeiro, garimpa mais. Os Coins da gincana expiram com ela.',
       score: [['Desafio concluído', '+5 score por desafio']],
       coins: [['Desafio vencido', '+5 por desafio'], ['Garimpo escondido na gincana', '+15'], ['Top 3 da noite', '+30']] },
-    { id: 'simuladao', nome: 'Simuladão Quad', tipo: 'SIMULADO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'SÁB · 25/07 · 8H–13H',
+    { id: 'simuladao', nome: 'Simuladão Quad', tipo: 'SIMULADO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'SÁB · 25/07 · 8H–13H', profs: ['Prof. Nascimento'],
       cor: 'purple', meta: '140 questões · formato da banca',
       desc: 'Simulado completo no formato e no tempo da banca, com ranking geral e correção comentada no fim do dia.',
       score: [['Simulado concluído', '+120 score'], ['Aproveitamento acima de 70%', '+80 score bônus']],
@@ -3792,6 +3896,35 @@
       coins: [['Entrega da redação treino', '+15']] }
   ];
   var evState = {};   /* por evento: { garimpado, inscrito } */
+  /* professores do evento: alimentam o card do aluno, o painel do admin e,
+     mais adiante, a agenda do próprio professor. */
+  function evProfs(ev) { return (ev && ev.profs) ? ev.profs.slice() : []; }
+  function evProfsTxt(ev) {
+    var ps = evProfs(ev);
+    if (!ps.length) return '';
+    if (ps.length === 1) return 'com ' + ps[0];
+    return 'com ' + ps.slice(0, -1).join(', ') + ' e ' + ps[ps.length - 1];
+  }
+  /* a grade do cronograma usa abreviações ("DIR. ADMIN."); o banco de
+     professores usa o nome cheio ("Direito Administrativo"). Casa as duas. */
+  function matPalavras(x) {
+    var t = (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : (x || '');
+    return t.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
+      .filter(function (w) { return w.length > 2 && ['de', 'da', 'do', 'dos', 'das', 'com'].indexOf(w) < 0; });
+  }
+  function materiaBate(docMat, gradeMat) {
+    var A = matPalavras(docMat), B = matPalavras(gradeMat);
+    if (!A.length || !B.length) return false;
+    var hits = 0;
+    A.forEach(function (x) {
+      if (B.some(function (y) { var n = Math.min(3, x.length, y.length); return x.slice(0, n) === y.slice(0, n); })) hits++;
+    });
+    return hits >= Math.min(A.length, B.length);
+  }
+  function eventosDoProf(nome) {
+    return EVENTOS.filter(function (ev) { return evProfs(ev).indexOf(nome) >= 0; });
+  }
+  window.__evProf = eventosDoProf;   /* exposto para a suíte de testes */
   function evTileHTML(ev) {
     var st = evState[ev.id] || {};
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
@@ -3800,7 +3933,7 @@
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
       '<span class="ev-name">' + ev.nome + '</span>' +
-      '<span class="ev-meta">' + ev.meta + '</span>' + etiqueta + '</button>';
+      '<span class="ev-meta">' + (evProfsTxt(ev) || ev.meta) + '</span>' + etiqueta + '</button>';
   }
   /* eventos no Início: gratuitos + pagos ainda não vencidos.
      Pago não comprado aparece com "Na Loja" (clique leva à Loja);
@@ -3847,7 +3980,7 @@
           (comprado ? '<span class="li-estoque">INSCRITO</span>' : '') +
           '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
           '<span class="li-nome">' + ev.nome + '</span>' +
-          '<span class="li-desc">' + (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal) + '</span>' +
+          '<span class="li-desc">' + (evProfsTxt(ev) || (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal)) + '</span>' +
           '<span class="li-preco">' + (comprado ? 'INSCRITO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
       g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
@@ -3947,7 +4080,7 @@
     $('evTipo').textContent = ev.tipo;
     $('evQuando').textContent = ev.quando;
     $('evNome').textContent = ev.nome;
-    $('evMetaP').textContent = ev.meta;
+    $('evMetaP').textContent = ev.meta + (evProfsTxt(ev) ? ' · ' + evProfsTxt(ev) : '');
     var h = '<div class="p-card"><p class="sub" style="font-size:12.5px">' + ev.desc + '</p></div>';
     h += '<div class="p-card"><div class="k-label">Regras de score</div>' +
       ev.score.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts">' + r[1] + '</span></div>'; }).join('') + '</div>';
@@ -4317,7 +4450,8 @@
   /* Cada professor tem a SUA conta: o e-mail funcional já diz quem entrou.
      Nada de escolher o nome numa lista — o perfil vem do cadastro.
      [INTEGRAÇÃO REAL] senha individual do professor, definida no cadastro. */
-  var PROF_SENHA_DEMO = 'quad1234';
+  var PROF_SENHA_DEMO = 'quad1234';   /* senha inicial de todo cadastro novo */
+  function senhaDoProf(d) { return (d && d.senha) ? d.senha : PROF_SENHA_DEMO; }
   function semAcento(x) { return (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x; }
   function emailDoProf(nome) {
     var limpo = semAcento(nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim();
@@ -4342,33 +4476,209 @@
     var doc = docentePorEmail(em);
     if (!doc) { toast('E-mail não encontrado no corpo docente — procure a coordenação.'); return; }
     if (doc.desligado) { toast('Este cadastro está desligado — procure a coordenação.'); return; }
-    if (sn !== PROF_SENHA_DEMO) { toast('Senha incorreta.'); return; }
+    if (sn !== senhaDoProf(doc)) { toast('Senha incorreta.'); return; }
     if (doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
     profLiberado = true;
     PROF_ATUAL = doc.nome;
+    if ($('profSaidaMsg')) $('profSaidaMsg').style.display = 'none';
     $('profSenha').value = '';
     $('profGate').classList.remove('on');
     $('profNome').textContent = PROF_ATUAL;
     $('profTopNome').textContent = PROF_ATUAL;
     renderProfTurmas();
     renderProfRecados();
+    renderProfTudo();
     toast('Bem-vindo, ' + PROF_ATUAL + ' — boa aula!');
   });
+  /* ---------- Painel de controle do professor ---------- */
+  function profIniciais(nome) {
+    var ps = (nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim().split(/\s+/);
+    return ((ps[0] || '?')[0] + (ps.length > 1 ? ps[ps.length - 1][0] : '')).toUpperCase();
+  }
+  function renderProfPainel() {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var foto = $('profFoto');
+    if (foto) {
+      foto.innerHTML = d.foto ? '<img src="' + d.foto + '" alt="Foto de ' + d.nome + '">' : profIniciais(d.nome);
+      if ($('btnProfFotoTirar')) $('btnProfFotoTirar').style.display = d.foto ? 'inline-flex' : 'none';
+    }
+    if ($('profPnNome')) $('profPnNome').textContent = d.nome;
+    if ($('profPnGrad')) $('profPnGrad').textContent = (d.grad || 'sem graduação informada') + ' · ' + (d.fone || 'telefone não informado');
+    if ($('profPnTurnos')) {
+      $('profPnTurnos').innerHTML = (d.turnos || []).map(function (t) {
+        return '<span class="tag">' + t.toUpperCase() + '</span>';
+      }).join('') || '<span class="tag warn">SEM TURNO DEFINIDO</span>';
+    }
+    if ($('profPnMaterias')) {
+      $('profPnMaterias').innerHTML = (d.materias || []).map(function (m) {
+        return '<div class="adm-bar"><span class="nm">' + m + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matéria cadastrada — fale com a coordenação.</p>';
+    }
+    if ($('profPnTurmas')) {
+      var ts = turmasDoProf(PROF_ATUAL);
+      $('profPnTurmas').innerHTML = ts.map(function (t) {
+        return '<div class="adm-bar"><span class="nm">' + t.nome +
+          '<small>' + (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor +
+          ' · você: ' + materiasDoProf(t, PROF_ATUAL).join(', ') + '</small></span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não foi inserido em nenhuma turma.</p>';
+    }
+  }
+  if ($('btnProfFoto')) $('btnProfFoto').addEventListener('click', function () { $('profFotoFile').click(); });
+  if ($('profFotoFile')) $('profFotoFile').addEventListener('change', function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var r = new FileReader();
+    r.onload = function () { d.foto = r.result; renderProfPainel(); toast('Foto atualizada.'); };
+    r.readAsDataURL(f);
+    this.value = '';
+  });
+  if ($('btnProfFotoTirar')) $('btnProfFotoTirar').addEventListener('click', function () {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    d.foto = null; renderProfPainel(); toast('Foto removida — voltaram as iniciais.');
+  });
+  if ($('btnProfSenha')) $('btnProfSenha').addEventListener('click', function () {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var at = $('profSenhaAtual').value, nv = $('profSenhaNova').value, cf = $('profSenhaConf').value;
+    if (at !== senhaDoProf(d)) { toast('A senha atual não confere.'); return; }
+    if (!nv || nv.length < 6) { toast('A nova senha precisa de pelo menos 6 caracteres.'); return; }
+    if (nv !== cf) { toast('As duas novas senhas não são iguais.'); return; }
+    if (nv === at) { toast('A nova senha precisa ser diferente da atual.'); return; }
+    d.senha = nv;
+    $('profSenhaAtual').value = ''; $('profSenhaNova').value = ''; $('profSenhaConf').value = '';
+    toast('Senha alterada — use a nova no próximo acesso.');
+  });
+
+  /* ---------- Eventos do professor: aula de hoje + eventos com o nome dele ---------- */
+  function profAulasDeHoje(nome, diaIdx) {
+    var idx = (diaIdx == null) ? new Date().getDay() - 1 : diaIdx;   /* seg=0 … sex=4 */
+    if (idx < 0 || idx > 4) return [];
+    var out = [];
+    turmasDoProf(nome).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)];
+      if (!grade) return;
+      var minhas = materiasDoProf(t, nome);
+      var slots = horSlots(t.hor) || CRONO.slots;
+      var tempos = (grade.aulas[idx] || []).map(function (a, i) {
+        var meu = (a.p === nome) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+        return { hr: slots[i] || CRONO.slots[i], mat: a.m, prof: a.p, enc: a.e, meu: meu };
+      });
+      if (tempos.some(function (x) { return x.meu; })) {
+        out.push({ turma: t, sala: grade.sala, tempos: tempos });
+      }
+    });
+    return out;
+  }
+  function renderProfEventos() {
+    if (!PROF_ATUAL) return;
+    var el = $('profAulasHoje');
+    if (el) {
+      var aulas = profAulasDeHoje(PROF_ATUAL);
+      var agora = new Date(), mins = agora.getHours() * 60 + agora.getMinutes();
+      el.innerHTML = aulas.map(function (a) {
+        var faixas = slotsFaixas(a.tempos.map(function (x) { return x.hr; }));
+        var linhas = a.tempos.map(function (x, i) {
+          var cls = '', st = '';
+          var fx = faixas[i];
+          if (fx) {
+            if (mins >= fx[1]) { cls = ' done'; st = 'ENCERRADO'; }
+            else if (mins >= fx[0]) { cls = ' now'; st = 'AGORA'; }
+          }
+          if (!x.meu) { cls += ' done'; }
+          return '<div class="aula-slot' + cls + '"><span class="a-hr">' + x.hr + '</span>' +
+            '<div class="a-info"><b>' + (x.mat || 'a definir') + '</b><span>' +
+            (x.enc ? 'Encontro ' + String(x.enc).padStart(2, '0') + ' · ' : '') +
+            (x.meu ? 'sua aula' : 'Prof. ' + (x.prof || 'a definir')) + '</span></div>' +
+            (st ? '<span class="a-st">' + st + '</span>' : (x.meu ? '<span class="a-st">SUA AULA</span>' : '')) + '</div>';
+        }).join('');
+        return '<div class="p-card" style="margin-bottom:12px">' +
+          '<div class="aula-turno">' + a.turma.turno + '</div>' +
+          '<h3 class="aula-title" style="margin:2px 0 0">' + a.turma.nome + ' · ' + a.sala + '</h3>' +
+          '<p class="sub">' + (a.turma.focoNome || a.turma.concurso) + ' · ' + a.turma.hor + '</p>' +
+          linhas +
+          '<div style="margin-top:10px"><button class="btn ghost small" data-ir-sala="' + a.turma.id + '">Abrir o quiz desta sala</button></div>' +
+          '</div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você não tem aula hoje. Quando tiver, aparece um bloco por turno — manhã, tarde e noite.</p>';
+      el.querySelectorAll('[data-ir-sala]').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          showView('v-sala', 'navProfessor');
+          abrirSala(bt.dataset.irSala);
+        });
+      });
+    }
+    var ev = $('profEvList');
+    if (ev) {
+      var meus = eventosDoProf(PROF_ATUAL).filter(function (x) { return !evAcabou(x); });
+      ev.innerHTML = meus.map(function (x) {
+        var quem = evProfs(x).filter(function (n) { return n !== PROF_ATUAL; });
+        return '<div class="mission-row"><div class="m-dot">◈</div>' +
+          '<div class="grow"><div class="t">' + x.nome + '</div>' +
+          '<div class="d">' + x.quando + ' · ' + (x.modalidade || '') +
+          (quem.length ? ' · com ' + quem.join(', ') : '') + '</div></div>' +
+          '<span class="tag ok">VOCÊ</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento com o seu nome nesta semana.</p>';
+    }
+  }
+
+  /* ---------- Calendário do professor ---------- */
+  function renderProfCal() {
+    var el = $('profCalList'); if (!el || !PROF_ATUAL) return;
+    var rows = [];
+    var hojeIdx = new Date().getDay() - 1;
+    turmasDoProf(PROF_ATUAL).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)]; if (!grade) return;
+      var minhas = materiasDoProf(t, PROF_ATUAL);
+      var slots = horSlots(t.hor) || CRONO.slots;
+      CRONO.dias.forEach(function (dia, di) {
+        (grade.aulas[di] || []).forEach(function (a, i) {
+          var meu = (a.p === PROF_ATUAL) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+          if (!meu) return;
+          rows.push({
+            ord: di * 10 + i,
+            html: calRow(di === hojeIdx ? 'HOJE' : CRONO.datas[di].split('/')[0],
+              dia.slice(0, 3).toUpperCase(),
+              (a.m || 'Aula') + ' · ' + t.nome,
+              (slots[i] || CRONO.slots[i]) + ' · ' + grade.sala + ' · ' + t.turno,
+              'AULA', di === hojeIdx ? 'live' : '')
+          });
+        });
+      });
+    });
+    rows.sort(function (a, b) { return a.ord - b.ord; });
+    var html = rows.map(function (r) { return r.html; }).join('');
+    eventosDoProf(PROF_ATUAL).filter(function (x) { return !evAcabou(x); }).forEach(function (x) {
+      var partes = x.quando.split(' · ');
+      var dm = partes[1] || '';
+      html += calRow((dm.split('/')[0]) || '·', partes[0] || '', x.nome,
+        (partes[2] ? partes[2] + ' · ' : '') + (x.online ? 'evento online' : 'evento presencial'), 'EVENTO', 'gold');
+    });
+    el.innerHTML = html || '<p class="sub" style="padding:8px 0">Nada agendado para você nesta semana.</p>';
+  }
+
+  function renderProfTudo() {
+    if (!PROF_ATUAL) return;
+    renderProfPainel(); renderProfEventos(); renderProfCal();
+  }
+  window.__prof = function (dia) {
+    return { atual: PROF_ATUAL, aulas: profAulasDeHoje(PROF_ATUAL, dia), eventos: eventosDoProf(PROF_ATUAL).map(function (e) { return e.nome; }) };
+  };
+
   function renderProfRecados() {
     var card = $('profRecadosCard'), el = $('profRecadosList'); if (!card || !el) return;
     var lista = (typeof RECADOS_PROF !== 'undefined' && PROF_ATUAL) ? (RECADOS_PROF[PROF_ATUAL] || []) : [];
     card.style.display = lista.length ? 'block' : 'none';
     var naoLidas = lista.filter(function (r) { return !r.lida; }).length;
-    var badge = $('profRecBadge');
-    if (badge) { badge.style.display = naoLidas ? 'inline-flex' : 'none'; badge.textContent = naoLidas; }
+    [$('profRecBadge'), $('profRecBadgeNav')].forEach(function (badge) {
+      if (badge) { badge.style.display = naoLidas ? 'inline-flex' : 'none'; badge.textContent = naoLidas; }
+    });
     el.innerHTML = lista.map(function (r) {
       return '<div class="chat-msg' + (r.lida ? '' : ' nova') + '"><div class="cm-de">Administração Quad</div>' +
         '<div class="cm-tx">' + r.texto + '</div><div class="cm-qd">' + r.quando + '</div></div>';
     }).join('');
-    /* abriu a sala = leu os recados */
+    /* leu de fato quando ABRIU a tela da recepção */
+    if (currentView !== 'v-prof-chat') { return; }
     setTimeout(function () {
       lista.forEach(function (r) { r.lida = true; if (r.admRef) r.admRef.lida = true; });
-      if (badge) badge.style.display = 'none';
+      [$('profRecBadge'), $('profRecBadgeNav')].forEach(function (bd) { if (bd) bd.style.display = 'none'; });
       if (typeof renderAdmMsgs === 'function') renderAdmMsgs();
     }, 800);
   }
@@ -6804,11 +7114,34 @@
       b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docBloq]; d.bloqueado = !d.bloqueado; docentesMudaram(d.bloqueado ? 'Acesso de “' + d.nome + '” bloqueado.' : 'Acesso de “' + d.nome + '” liberado.'); });
     });
   }
+  /* se a coordenação bloqueia ou desliga QUEM ESTÁ LOGADO, a sessão cai na hora */
+  function checarAcessoProf() {
+    if (!profLiberado || !PROF_ATUAL) return;
+    var d = docenteDe(PROF_ATUAL);
+    if (!d || (!d.bloqueado && !d.desligado)) return;
+    var trat = /^(Prof\.ª|Prof\.ª)/.test(PROF_ATUAL) ? 'a sra.' : 'o sr.';
+    profLiberado = false; PROF_ATUAL = null;
+    pollParar();
+    SALA_ATUAL = null;
+    if ($('salaDetail')) $('salaDetail').style.display = 'none';
+    if ($('profTurmasCard')) $('profTurmasCard').style.display = 'block';
+    if ($('profEmail')) $('profEmail').value = '';
+    if ($('profSenha')) $('profSenha').value = '';
+    if ($('profSaidaMsg')) {
+      $('profSaidaMsg').style.display = 'block';
+      $('profSaidaMsg').textContent = 'Olá! Informamos que ' + trat + ' está temporariamente afastado das atividades. ' +
+        'Assim que ajustarmos as coisas por aqui, chamaremos novamente. Qualquer dúvida, fale com a coordenação — obrigado pela parceria.';
+    }
+    if (personaAtiva === 'professor' && $('profGate')) { $('profGate').classList.add('on'); }
+  }
   function docentesMudaram(msg) {
     sincProfessores();
+    checarAcessoProf();
     renderDocList();
     if (typeof renderCtProfs === 'function') renderCtProfs();
     if (typeof profGateNota === 'function') profGateNota();
+    if (typeof renderEvProfChips === 'function') renderEvProfChips();
+    if (typeof renderProfTudo === 'function') renderProfTudo();
     if (typeof admMsgSelects === 'function') admMsgSelects();
     if (msg) toast(msg);
   }
@@ -7985,7 +8318,8 @@
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
       var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS');
       var insc = evInscritosCount(ev.id);
-      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
+      var quem = evProfsTxt(ev);
+      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (quem ? ' · ' + quem : '') + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
         '<button class="btn ghost small" data-ed-ev="' + ev.id + '">Editar</button>' +
         '<button class="adm-x" data-cancel-ev="' + ev.id + '" aria-label="Cancelar evento">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento criado.</p>';
@@ -8017,6 +8351,7 @@
     if ($('admEvNovoMoeda')) $('admEvNovoMoeda').value = ev.moeda || 'qdc';
     $('admEvNovoPreco').value = ev.pago ? ev.preco : '';
     if (ev.dataISO) $('admEvNovoData').value = ev.dataISO;
+    renderEvProfChips(evProfs(ev));
     admEvCamposToggle();
     var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Salvar alterações';
     admEvPreview();
@@ -8065,6 +8400,22 @@
     $('admEvNovoPrev').textContent = q ? 'Agendado para: ' + q : 'Escolha a data, o início e o término na agenda.';
   }
   /* liga/desliga os campos de link (online) e preço (pago) */
+  /* os chips saem do Banco de professores — cadastrou lá, aparece aqui */
+  function renderEvProfChips(marcados) {
+    var host = $('admEvProfs'); if (!host) return;
+    var sel = marcados || evProfChipsSel();
+    host.innerHTML = (typeof docentesAtivos === 'function' ? docentesAtivos() : []).map(function (d) {
+      return '<button type="button" class="turno-chip' + (sel.indexOf(d.nome) >= 0 ? ' on' : '') + '" data-ev-prof="' + d.nome + '">' + d.nome + '</button>';
+    }).join('') || '<p class="sub" style="padding:4px 0">Nenhum professor ativo no banco de professores.</p>';
+    host.querySelectorAll('[data-ev-prof]').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+  }
+  function evProfChipsSel() {
+    var host = $('admEvProfs'); if (!host) return [];
+    return [].slice.call(host.querySelectorAll('.turno-chip.on')).map(function (b) { return b.dataset.evProf; });
+  }
+  renderEvProfChips([]);
   function admEvCamposToggle() {
     var online = $('admEvNovoModal').value === 'online';
     var pago = $('admEvNovoTipo').value === 'pago';
@@ -8086,6 +8437,7 @@
     var resumo = $('admEvNovoResumo').value.trim();
     var modalidade = $('admEvNovoModal').value;            /* online | presencial (tópico) */
     var pago = $('admEvNovoTipo').value === 'pago';
+    var profs = evProfChipsSel();
     var link = modalidade === 'online' ? $('admEvNovoLink').value.trim() : '';
     var preco = parseInt($('admEvNovoPreco').value, 10);
     if (!nome) { toast('Dê um nome ao evento.'); return; }
@@ -8099,7 +8451,7 @@
     if (evEdit) {
       var ev = null; EVENTOS.forEach(function (x) { if (x.id === evEdit) ev = x; });
       if (ev) {
-        ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link;
+        ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link; ev.profs = profs;
         ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
         ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
         ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
@@ -8107,6 +8459,7 @@
       evEditReset();
       $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
       $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
+      renderEvProfChips([]);
       admEvPreview(); renderAdmEventos(); renderEventosLoja(); renderEvStrip();
       if (typeof renderCalendario === 'function') renderCalendario();
       toast('Evento “' + nome + '” atualizado — vale para todos, inclusive quem já está inscrito.');
@@ -8114,12 +8467,13 @@
     }
     EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
       tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
-      quando: quando, dataISO: dataISO, modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv,
+      quando: quando, dataISO: dataISO, modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
       desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
     $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
     $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
+    renderEvProfChips([]);
     admEvPreview();
     renderAdmEventos();
     renderEventosLoja();   /* pago → vitrine da Loja */
