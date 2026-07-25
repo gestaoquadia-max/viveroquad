@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Informações do professor: relatório de aulas e eventos (item 7)
+
+- A aba **Recepção** virou **Informações** e ganhou, acima da comunicação
+  com a recepção, o bloco **"Seus números · aulas e eventos"**.
+- Quatro períodos: **Mês · Trimestre · Semestre · Ano**. Cada um mostra
+  **aulas ministradas**, **horas em sala** (estimadas pela grade real da
+  turma) e **eventos com você**.
+- Abaixo, o detalhamento: **aulas por turma** — com as matérias dele
+  naquela turma, a frequência semanal e o total do período — e a lista
+  dos **eventos com o nome dele**, marcados AGENDADO ou REALIZADO.
+- A contagem sai da **grade das turmas** (a mesma que o cronograma
+  atualiza) e dos **eventos em que a coordenação inseriu o nome dele** —
+  nada digitado à parte. A presença confirmada por chamada fica marcada
+  como `[INTEGRAÇÃO REAL]`.
+
 ## 25/07/2026 — Cada coisa nasce no seu lugar (item 6)
 
 **Cadastrar produto ou serviço**

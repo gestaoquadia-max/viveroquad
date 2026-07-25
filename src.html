@@ -2060,6 +2060,22 @@
 
         <!-- ============ PROFESSOR · RECEPÇÃO ============ -->
         <div class="view" id="v-prof-chat">
+          <div class="p-card">
+            <div class="k-label">Seus números · aulas e eventos</div>
+            <div class="rel-tabs" id="profRelTabs" style="margin-top:8px">
+              <button class="rel-tab on" data-per="mes">Mês</button>
+              <button class="rel-tab" data-per="tri">Trimestre</button>
+              <button class="rel-tab" data-per="sem">Semestre</button>
+              <button class="rel-tab" data-per="ano">Ano</button>
+            </div>
+            <div id="profRelResumo" style="margin-top:10px"></div>
+            <div class="adm-sep"><span>Aulas por turma</span></div>
+            <div id="profRelTurmas"></div>
+            <div class="adm-sep"><span>Eventos com você</span></div>
+            <div id="profRelEventos"></div>
+            <p class="sub" style="margin-top:8px">Contagem a partir da <strong>grade das suas turmas</strong> e dos <strong>eventos em que a coordenação inseriu o seu nome</strong>. <span class="ref">[INTEGRAÇÃO REAL] presença confirmada por chamada</span></p>
+          </div>
+
           <div class="p-card" id="profRecadosCard">
             <div class="k-label">Comunicação com a recepção <span class="chat-badge" id="profRecBadge" style="display:none">1</span></div>
             <p class="sub" style="margin-top:6px">Recados da administração do Quad chegam aqui — os mesmos enviados em <strong>Mensagens individuais</strong> no Painel de controle.</p>
@@ -3311,7 +3327,7 @@
           <button class="nav-btn" data-view="v-prof-eventos"><span class="ico">◈</span>Eventos</button>
           <button class="nav-btn" data-view="v-sala"><span class="ico">◉</span>Quiz ao vivo</button>
           <button class="nav-btn" data-view="v-prof-cal"><span class="ico">▤</span>Calendário</button>
-          <button class="nav-btn" data-view="v-prof-chat"><span class="ico">✉</span>Recepção<span class="chat-badge" id="profRecBadgeNav" style="display:none">1</span></button>
+          <button class="nav-btn" data-view="v-prof-chat"><span class="ico">✉</span>Informações<span class="chat-badge" id="profRecBadgeNav" style="display:none">1</span></button>
         </nav>
         <nav class="navbar" id="navAdmin" style="display:none">
           <button class="nav-btn active" data-view="v-adm-controle"><span class="ico">⛭</span>Controle</button>
@@ -4671,9 +4687,80 @@
     el.innerHTML = html || '<p class="sub" style="padding:8px 0">Nada agendado para você nesta semana.</p>';
   }
 
+  /* ---------- Informações: relatório de aulas e eventos por período ---------- */
+  var PROF_PER = 'mes';
+  var PROF_PERIODOS = { mes: { rot: 'no mês', semanas: 4 }, tri: { rot: 'no trimestre', semanas: 13 },
+    sem: { rot: 'no semestre', semanas: 26 }, ano: { rot: 'no ano', semanas: 52 } };
+  /* quantas aulas ele tem por SEMANA em cada turma (grade fixa da coordenação) */
+  function profAulasSemana(nome) {
+    var out = [];
+    turmasDoProf(nome).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)]; if (!grade) return;
+      var minhas = materiasDoProf(t, nome), n = 0, mats = {};
+      CRONO.dias.forEach(function (dia, di) {
+        (grade.aulas[di] || []).forEach(function (a) {
+          var meu = (a.p === nome) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+          if (meu) { n++; if (a.m) mats[a.m] = 1; }
+        });
+      });
+      if (n) out.push({ turma: t, porSemana: n, materias: Object.keys(mats) });
+    });
+    return out;
+  }
+  function renderProfRel() {
+    if (!PROF_ATUAL) return;
+    var per = PROF_PERIODOS[PROF_PER] || PROF_PERIODOS.mes;
+    var porTurma = profAulasSemana(PROF_ATUAL);
+    var totalAulas = porTurma.reduce(function (a, x) { return a + x.porSemana * per.semanas; }, 0);
+    var evs = eventosDoProf(PROF_ATUAL);
+    /* eventos são pontuais: no mês conta o que está na agenda; nos períodos
+       maiores, a recorrência mensal da grade de eventos do Quad             */
+    var totalEv = Math.round(evs.length * (per.semanas / 4));
+    var horas = porTurma.reduce(function (a, x) {
+      var sl = horSlots(x.turma.hor) || CRONO.slots;
+      var fx = slotsFaixas(sl);
+      var minutos = fx.reduce(function (m, f) { return m + (f ? (f[1] - f[0]) : 0); }, 0) / (sl.length || 1);
+      return a + (x.porSemana * per.semanas * (minutos || 90)) / 60;
+    }, 0);
+    if ($('profRelResumo')) {
+      $('profRelResumo').innerHTML =
+        '<div class="adm-bar"><span class="nm">Aulas ministradas<small>' + per.rot + ' · ' + porTurma.length + (porTurma.length === 1 ? ' turma' : ' turmas') + '</small></span><span class="pct">' + totalAulas + '</span></div>' +
+        '<div class="adm-bar"><span class="nm">Horas em sala<small>estimativa pela grade</small></span><span class="pct">' + Math.round(horas) + 'h</span></div>' +
+        '<div class="adm-bar"><span class="nm">Eventos com você<small>' + per.rot + '</small></span><span class="pct">' + totalEv + '</span></div>';
+    }
+    if ($('profRelTurmas')) {
+      var maxT = porTurma.reduce(function (m, x) { return Math.max(m, x.porSemana); }, 1);
+      $('profRelTurmas').innerHTML = porTurma.map(function (x) {
+        var tot = x.porSemana * per.semanas;
+        return '<div class="adm-bar"><span class="nm">' + x.turma.nome +
+          '<small>' + (x.materias.join(', ') || 'sua matéria') + ' · ' + x.porSemana + '×/semana</small></span>' +
+          '<span class="mini-track"><i style="width:' + Math.round(x.porSemana / maxT * 100) + '%;background:var(--p-blue)"></i></span>' +
+          '<span class="pct">' + tot + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não tem aulas lançadas na grade.</p>';
+    }
+    if ($('profRelEventos')) {
+      $('profRelEventos').innerHTML = evs.map(function (e) {
+        var quem = evProfs(e).filter(function (n) { return n !== PROF_ATUAL; });
+        return '<div class="adm-bar"><span class="nm">' + e.nome +
+          '<small>' + e.quando + (quem.length ? ' · com ' + quem.join(', ') : '') + '</small></span>' +
+          '<span class="tag' + (evAcabou(e) ? '' : ' ok') + '">' + (evAcabou(e) ? 'REALIZADO' : 'AGENDADO') + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento com o seu nome no período.</p>';
+    }
+  }
+  (function () {
+    var tabs = $('profRelTabs'); if (!tabs) return;
+    tabs.querySelectorAll('.rel-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        tabs.querySelectorAll('.rel-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        PROF_PER = bt.dataset.per;
+        renderProfRel();
+      });
+    });
+  })();
   function renderProfTudo() {
     if (!PROF_ATUAL) return;
-    renderProfPainel(); renderProfEventos(); renderProfCal();
+    renderProfPainel(); renderProfEventos(); renderProfCal(); renderProfRel();
   }
   window.__prof = function (dia) {
     return { atual: PROF_ATUAL, aulas: profAulasDeHoje(PROF_ATUAL, dia), eventos: eventosDoProf(PROF_ATUAL).map(function (e) { return e.nome; }) };
