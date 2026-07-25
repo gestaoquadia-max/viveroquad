@@ -1,5 +1,29 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Ajustes: apagar professor, cronograma integrado, recado na recepção, aulão como evento
+
+- **Apagar professor** (item 1): o Banco de professores ganhou o **✕** ao
+  lado de Desligar e Bloquear. Apagar é **definitivo** e pede confirmação
+  no próprio botão ("Apagar?"). Quem sai do banco sai também das
+  **turmas**, dos **eventos** e da própria sessão, se estiver logado.
+- **Cronograma integrado** (item 2): **Matéria** e **Professor** deixaram
+  de ser digitados à mão. A matéria vem da **árvore do edital da turma**;
+  o professor vem do **Banco de professores**, filtrado por quem ministra
+  aquela matéria. Matéria sem professor cadastrado **não deixa gravar** e
+  diz o porquê. A troca atualiza na hora o card "Aula de hoje" do aluno,
+  o **corpo docente da turma**, a **agenda e o calendário do professor**,
+  e fica registrada num **histórico de alterações** no próprio bloco.
+- **Recado na "Comunicação com a recepção"** (item 3): o recado enviado
+  em *Mensagens individuais* agora chega dentro do bloco da recepção do
+  professor (não mais num card separado), com contador na aba. A resposta
+  do professor segue marcada **EM BREVE** para a V1, como combinado.
+- **"Aulão especial" virou evento de verdade** (item 4): era um botão
+  fixo na Loja, fora das regras. Agora é um **evento** como os demais —
+  com data, professor, carrossel do Início, tag na Loja, entrada no
+  calendário do aluno quando comprado e saída automática quando a data
+  passa. Como consequência, ele deixou de gerar "pedido de retirada" na
+  recepção, que é coisa de item físico.
+
 ## 25/07/2026 — Área do professor: menu completo e professor nos eventos
 
 **Professor nos eventos**
