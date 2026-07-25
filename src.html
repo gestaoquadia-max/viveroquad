@@ -1752,12 +1752,6 @@
 
             <div class="loja-sec" style="margin-top:14px">Mentoria</div>
             <div class="loja-grid">
-              <button class="loja-item" data-nome="Mentoria Quad" data-preco="900" data-moeda="dmn">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></span>
-                <span class="li-nome">Mentoria Quad</span>
-                <span class="li-desc">acompanhamento do time</span>
-                <span class="li-preco">900 Dmn</span>
-              </button>
               <span id="lojaExtras-mentoria" style="display:contents"></span>
             </div>
 
@@ -3742,6 +3736,8 @@
     if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
     /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
+    if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
+    if (id === 'v-loja' && typeof renderEventosLoja === 'function') renderEventosLoja(); /* e da vitrine */
     if (id === 'v-calendario' && typeof renderCalendario === 'function') renderCalendario();
     if (id.indexOf('v-prof-') === 0 && typeof renderProfTudo === 'function') renderProfTudo();
     /* abrir a Recepção é o que marca os recados como lidos */
@@ -3958,6 +3954,8 @@
     return EVENTOS.filter(function (ev) { return evProfs(ev).indexOf(nome) >= 0; });
   }
   window.__evProf = eventosDoProf;   /* exposto para a suíte de testes */
+  window.__eventos = function () { return EVENTOS; };
+  window.__evEstado = function () { return evState; };
   function evTileHTML(ev) {
     var st = evState[ev.id] || {};
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
@@ -4032,6 +4030,8 @@
     var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
     if (!ev) return;
     if (evState[id] && evState[id].comprado) { toast('Você já está inscrito — o evento segue aqui até o último dia.'); return; }
+    var choque = choqueDeAgenda(agendaDoEvento(ev));
+    if (choque) { toast(msgChoque(choque, 'Este evento')); return; }
     var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: ev.nome, desc: 'evento ' + (ev.modalidade === 'online' ? 'online' : 'presencial'), preco: ev.preco, moeda: mo,
       ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.evento : '' }, function () {
@@ -4040,7 +4040,7 @@
       var st = evState[id] || (evState[id] = { garimpado: false, inscrito: false });
       st.comprado = true; st.inscrito = true;   /* comprou o acesso = já está dentro */
       if (typeof renderAdmEventos === 'function') renderAdmEventos();
-      if (typeof lojaCompraLog === 'function') lojaCompraLog(ev.nome, ev.preco, mo);
+      if (typeof lojaCompraLog === 'function') lojaCompraLog(ev.nome, ev.preco, mo, 'evento', id);
       renderEventosLoja();
       renderEvStrip();                                  /* entra no carrossel do Início */
       if (typeof renderCalendario === 'function') renderCalendario();
@@ -4144,6 +4144,9 @@
     }
     if (st.inscrito) evAplicaLink();
     $('btnEvInscrever').onclick = function () {
+      if (ev.pago) { comprarEvento(ev.id); return; }   /* pago passa pela compra (e pela agenda) */
+      var chq = choqueDeAgenda(agendaDoEvento(ev));
+      if (chq) { toast(msgChoque(chq, 'Este evento')); return; }
       st.inscrito = true;
       if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
       if (typeof renderAdmEventos === 'function') renderAdmEventos();   /* contador de inscritos no admin */
@@ -4179,6 +4182,7 @@
     EVENTOS.forEach(function (ev) {
       var st = evState[ev.id];
       if (!st || !st.inscrito) return;
+      if (typeof evAcabou === 'function' && evAcabou(ev)) return;   /* passou a data: sai do calendário, fica no histórico */
       var partes = ev.quando.split(' · ');   /* ['QUA','22/07','19H'] */
       var dsem = partes[0] || '', dm = partes[1] || '', hora = partes[2] || '';
       var dia = (dm.split('/')[0]) || dm || '·';
@@ -5935,12 +5939,20 @@
   function comprarSimulado(id) {
     var sm = null; SIMULADOS.forEach(function (s) { if (s.id === id) sm = s; });
     if (!sm || sm.comprado) return;
+    if (sm.tag === 'PRESENCIAL' && sm.dataISO) {
+      var fs = faixaDe(sm.hi && sm.hf ? (sm.hi + '–' + sm.hf) : (sm.quando || ''));
+      var ds = diaDaData(sm.dataISO);
+      if (fs && ds != null) {
+        var cq = choqueDeAgenda({ dias: [ds], ini: fs[0], fim: fs[1], rot: sm.rot, de: sm.dataISO, ate: sm.dataISO });
+        if (cq) { toast(msgChoque(cq, 'Este simulado')); return; }
+      }
+    }
     var mo = sm.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: sm.rot, desc: sm.tag === 'DIGITAL' ? 'simulado digital' : 'simulado presencial', preco: sm.valor, moeda: mo, ico: SIM_ICO }, function () {
       if (saldoDe(mo) < sm.valor) { toast(semSaldoMsg(mo)); return; }
       debitar(mo, sm.valor, sm.rot + ' · −' + fmt(sm.valor) + ' ' + moedaTxt(mo));
       sm.comprado = true;
-      lojaCompraLog(sm.rot, sm.valor, mo);
+      lojaCompraLog(sm.rot, sm.valor, mo, 'simulado', sm.id);
       if (sm.tag === 'PRESENCIAL') {
         sm.insc = true;
         simInscrever(sm);
@@ -7464,6 +7476,12 @@
   function bindLojaItem(it) {
     it.addEventListener('click', function () {
       if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
+      /* isolada ocupa dia e horário — não entra por cima do que o aluno já tem */
+      if (it.dataset.isolada && typeof ISOLADAS !== 'undefined') {
+        var isoAlvo = ISOLADAS.filter(function (x) { return x.id === it.dataset.isolada; })[0];
+        var chq = isoAlvo ? choqueDeAgenda(agendaDaIsolada(isoAlvo)) : null;
+        if (chq) { toast(msgChoque(chq, 'Esta isolada')); return; }
+      }
       var preco = parseInt(it.dataset.preco, 10), nome = it.dataset.nome;
       var moeda = it.dataset.moeda === 'dmn' ? 'dmn' : 'qdc';
       function executa() {
@@ -7473,7 +7491,7 @@
         lojaOwned[nome] = true;
         if (typeof refreshChips === 'function') refreshChips();
         debitar(moeda, preco, nome + ' adquirido · −' + preco + ' ' + moedaTxt(moeda));
-        lojaCompraLog(nome, preco, moeda);                          /* governança da Loja */
+        lojaCompraLog(nome, preco, moeda, 'item', nome);             /* governança da Loja */
         /* estoque (vagas): decrementa; esgotou → o item desaparece do sistema */
         if (it.dataset.estoque) {
           var resta = parseInt(it.dataset.estoque, 10) - 1;
@@ -7546,13 +7564,16 @@
   }
   function matricular(moeda) {
     var t = turmaAberta; if (!t) return;
+    var fx = faixaCompleta(t.hor);
+    var chq = fx ? choqueDeAgenda({ dias: [1, 2, 3, 4, 5], ini: fx[0], fim: fx[1], rot: t.nome, de: t.inicio, ate: t.fim }) : null;
+    if (chq) { toast(msgChoque(chq, 'Esta turma')); return; }
     var preco = moeda === 'dmn' ? t.precoDmn : t.precoQdc;
     if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
     debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda));
     if (moeda === 'dmn') t.vagasDmn--; else t.vagasQdc--;
     var primeira = matriculasAtivas().length === 0;
     MATRICULAS.push({ turmaId: t.id, rot: t.tipo.toUpperCase() + ' ' + t.turno.toUpperCase(), tipo: t.tipo, turno: t.turno, concurso: t.concurso, fim: t.fim });
-    if (typeof lojaCompraLog === 'function') lojaCompraLog(t.nome + ' · matrícula', preco, moeda);
+    if (typeof lojaCompraLog === 'function') lojaCompraLog(t.nome + ' · matrícula', preco, moeda, 'matricula', t.id);
     if (primeira) {
       /* primeira matrícula ativa → vira a turma do app inteiro (Início, ranking, Domínio) */
       appLock = false;
@@ -7615,7 +7636,9 @@
     'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true }
   };
   function prodDestino(v) { return PROD_DESTINOS[v] || PROD_DESTINOS['pres:outros']; }
-  var LOJA_EXTRAS = [];
+  var LOJA_EXTRAS = [
+    { nome: 'Mentoria Quad', desc: 'acompanhamento individual com o time', cat: 'mentoria', preco: 900, moeda: 'dmn', icone: 'mentoria', dataISO: '2026-08-12' }
+  ];
   function renderLojaExtras() {
     ['turmas', 'digitais', 'mentoria', 'personagem'].forEach(function (cat) {
       var host = document.getElementById('lojaExtras-' + cat);
@@ -7640,7 +7663,7 @@
     { id: 'excursao',   nome: 'Excursão · concurso PM-BA', desc: 'viagem organizada pelo Quad', preco: 600, moeda: 'dmn', icone: 'presencial', estoque: 40, cat: 'excursao', estado: 'disp' },
     { id: 'vademecum',  nome: 'Vade Mecum',       desc: 'legislação da carreira', preco: 200, moeda: 'qdc', icone: 'vademecum', estoque: 8,  cat: 'modulos', estado: 'disp' },
     { id: 'modulo',     nome: 'Módulo impresso',  desc: 'apostila da matéria',    preco: 150, moeda: 'qdc', icone: 'modulo',    estoque: 15, cat: 'modulos', estado: 'disp' },
-    { id: 'simufis',    nome: 'Simulado físico',  desc: 'caderno impresso',       preco: 120, moeda: 'qdc', icone: 'simulado',  estoque: 30, cat: 'modulos', estado: 'disp' },
+    { id: 'simufis',    nome: 'Caderno de simulados impresso', desc: 'apostila com provas anteriores', preco: 120, moeda: 'qdc', icone: 'simulado', estoque: 30, cat: 'modulos', estado: 'disp' },
     { id: 'taf',        nome: 'Treinamento TAF',  desc: 'preparação para a prova física', preco: 450, moeda: 'dmn', icone: 'medalha', estoque: 30, cat: 'taf', estado: 'disp' },
     { id: 'garrafinha', nome: 'Garrafinha Quad',  desc: 'squeeze da tropa',       preco: 90,  moeda: 'qdc', icone: 'garrafinha', estoque: 12, cat: 'outros', estado: 'disp' },
     { id: 'chaveiro',   nome: 'Chaveiro Quad',    desc: 'brinde da marca',        preco: 40,  moeda: 'qdc', icone: 'chaveiro',  estoque: 25, cat: 'outros', estado: 'disp' },
@@ -7657,6 +7680,102 @@
   ];
   var DIA_ABREV = { 'segunda-feira': 'SEG', 'terça-feira': 'TER', 'quarta-feira': 'QUA', 'quinta-feira': 'QUI', 'sexta-feira': 'SEX', 'sábado': 'SÁB', 'domingo': 'DOM' };
   function isoDiasTxt(iso) { return (iso.dias || []).map(function (d) { return DIA_ABREV[d] || d; }).join(' e '); }
+  /* =============== AGENDA DO ALUNO · choque de horário ===============
+     Turma, isolada, evento e simulado presencial ocupam dia + faixa de
+     horário. Nada pode ser comprado por cima de algo que o aluno já tem. */
+  var DIA_IDX = { 'domingo': 0, 'segunda-feira': 1, 'terça-feira': 2, 'quarta-feira': 3,
+    'quinta-feira': 4, 'sexta-feira': 5, 'sábado': 6 };
+  function horaMin(t) {
+    var m = /(\d{1,2})\s*[:hH]\s*(\d{2})?/.exec(String(t || ''));
+    return m ? (+m[1]) * 60 + (m[2] ? +m[2] : 0) : null;
+  }
+  function faixaDe(txt) {
+    var partes = String(txt || '').split(/–|—|-/);
+    if (partes.length < 2) return null;
+    var a = horaMin(partes[0]), b = horaMin(partes[partes.length - 1]);
+    if (a == null || b == null) return null;
+    if (b <= a) b += 24 * 60;   /* 22h–00h atravessa a meia-noite */
+    return [a, b];
+  }
+  function faixaCompleta(hor) {
+    if (!hor) return null;
+    var blocos = String(hor).split(' e ');
+    var f1 = faixaDe(blocos[0]), f2 = faixaDe(blocos[blocos.length - 1]);
+    if (!f1) return null;
+    return [f1[0], f2 ? f2[1] : f1[1]];
+  }
+  function diaDaData(iso) {
+    if (!iso) return null;
+    var q = String(iso).split('-');
+    if (q.length !== 3) return null;
+    return new Date(+q[0], +q[1] - 1, +q[2]).getDay();
+  }
+  function periodosCruzam(a, b) {
+    if (!a.de || !a.ate || !b.de || !b.ate) return true;   /* sem período definido: assume que cruza */
+    return a.de <= b.ate && b.de <= a.ate;
+  }
+  /* tudo que o aluno JÁ tem ocupando agenda */
+  function agendaOcupada() {
+    var out = [];
+    if (typeof matriculasAtivas === 'function') {
+      matriculasAtivas().forEach(function (m) {
+        var t = turmaDe(m.turmaId); if (!t) return;
+        var f = faixaCompleta(t.hor); if (!f) return;
+        out.push({ dias: [1, 2, 3, 4, 5], ini: f[0], fim: f[1], rot: t.nome, de: t.inicio, ate: t.fim });
+      });
+    }
+    if (typeof ISOLADAS !== 'undefined') {
+      ISOLADAS.forEach(function (iso) {
+        if (!lojaOwned[iso.nome] || !iso.dias || !iso.dias.length) return;
+        var f = faixaDe(isoHorarioTxt(iso)); if (!f) return;
+        out.push({ dias: iso.dias.map(function (d) { return DIA_IDX[d]; }), ini: f[0], fim: f[1],
+          rot: iso.nome, de: iso.ini, ate: iso.fim });
+      });
+    }
+    if (typeof EVENTOS !== 'undefined') {
+      EVENTOS.forEach(function (ev) {
+        var st = evState[ev.id];
+        if (!st || !(st.comprado || st.inscrito)) return;
+        var a = agendaDoEvento(ev); if (!a) return;
+        out.push(a);
+      });
+    }
+    return out;
+  }
+  function agendaDoEvento(ev) {
+    var partes = String(ev.quando || '').split(' · ');
+    var f = faixaDe(partes[partes.length - 1]); if (!f) return null;
+    var dias = [];
+    if (ev.ate && ev.dataISO && ev.ate !== ev.dataISO) {
+      /* recorrente (isolada virada evento): usa os dias da isolada de origem */
+      var iso = (typeof ISOLADAS !== 'undefined') ? ISOLADAS.filter(function (x) { return 'ev-' + x.id === ev.id; })[0] : null;
+      if (iso && iso.dias) { dias = iso.dias.map(function (d) { return DIA_IDX[d]; }); }
+    }
+    if (!dias.length) {
+      var d = diaDaData(ev.dataISO);
+      if (d == null) return null;
+      dias = [d];
+    }
+    return { dias: dias, ini: f[0], fim: f[1], rot: ev.nome, de: ev.dataISO, ate: ev.ate || ev.dataISO };
+  }
+  /* devolve o nome do compromisso que bate de frente, ou null */
+  function choqueDeAgenda(cand) {
+    if (!cand || cand.ini == null || !cand.dias || !cand.dias.length) return null;
+    var ocupada = agendaOcupada(), achado = null;
+    ocupada.forEach(function (o) {
+      if (achado) return;
+      if (o.rot === cand.rot) return;                      /* é ele mesmo */
+      if (!periodosCruzam(o, cand)) return;
+      var mesmoDia = o.dias.some(function (d) { return cand.dias.indexOf(d) >= 0; });
+      if (!mesmoDia) return;
+      if (cand.ini < o.fim && o.ini < cand.fim) { achado = o.rot; }
+    });
+    return achado;
+  }
+  function msgChoque(rot, oQue) {
+    return 'Choque de horário: nesse dia e horário você já tem “' + rot + '”. ' +
+      (oQue ? oQue + ' não pode ser comprad' + (/a$/.test(oQue) ? 'a' : 'o') + ' por cima.' : '');
+  }
   function isoHorarioTxt(iso) {
     if (!iso.hi || !iso.hf) return '';
     var h = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
@@ -7684,6 +7803,12 @@
     g.querySelectorAll('.loja-item').forEach(bindLojaItem);
   }
   /* comprada, a isolada vira um EVENTO recorrente — carrossel e calendário de graça */
+  function agendaDaIsolada(iso) {
+    var f = faixaDe(isoHorarioTxt(iso));
+    if (!f || !iso.dias || !iso.dias.length) return null;
+    return { dias: iso.dias.map(function (d) { return DIA_IDX[d]; }), ini: f[0], fim: f[1],
+      rot: iso.nome, de: iso.ini, ate: iso.fim };
+  }
   function isoladaComprada(nome) {
     var iso = ISOLADAS.filter(function (x) { return x.nome === nome; })[0];
     if (!iso || !iso.dias || !iso.dias.length) { renderIsoladas(); return; }
@@ -7785,7 +7910,7 @@
     debitar(mo, total, compraQtd + '× ' + p.nome + ' · −' + fmt(total) + ' ' + moedaTxt(mo));
     p.estoque -= compraQtd;
     p.estado = 'aguardando';
-    lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo);
+    lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo, 'pres', p.id, { qtd: compraQtd });
     pedidoPresencial(p, compraQtd);
     if (typeof agendaDoProduto === 'function') { agendaDoProduto(p.nome); }
     var q = compraQtd;
@@ -7871,6 +7996,12 @@
   admProdDataToggle();
   /* item com data, comprado, entra nos Eventos da semana e no calendário */
   var PROD_AGENDA = {};   /* nome do item → { dataISO, rot } */
+  /* itens do catálogo semente que já nascem com data seguem a mesma regra dos criados agora */
+  (function () {
+    LOJA_EXTRAS.concat(typeof ITENS_PRESENCIAIS !== 'undefined' ? ITENS_PRESENCIAIS : []).forEach(function (p) {
+      if (p.dataISO) { PROD_AGENDA[p.nome] = { dataISO: p.dataISO, rot: p.cat === 'mentoria' ? 'Mentoria' : 'Atividade' }; }
+    });
+  })();
   function agendaDoProduto(nome) {
     var a = PROD_AGENDA[nome]; if (!a) return;
     var evId = 'pr-' + nome.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
@@ -8104,14 +8235,15 @@
   function itemDe(id) { return ITENS_COMBATE.filter(function (x) { return x.id === id; })[0]; }
   function renderLojaCombate() {
     var g = $('combatGrid'); if (!g) return;
-    g.innerHTML = ITENS_COMBATE.map(function (it) {
-      var tem = MOCHILA.indexOf(it.id) >= 0;
-      return '<button class="loja-item' + (tem ? ' comprado' : '') + '" data-combate="' + it.id + '">' +
+    /* item comprado sai da vitrine — o lugar dele agora é a mochila */
+    var aVenda = ITENS_COMBATE.filter(function (it) { return MOCHILA.indexOf(it.id) < 0; });
+    g.innerHTML = aVenda.map(function (it) {
+      return '<button class="loja-item" data-combate="' + it.id + '">' +
         '<span class="li-ico">' + (ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '')) + '</span>' +
         '<span class="li-nome">' + it.nome + '</span>' +
         '<span class="li-desc">' + it.desc + '</span>' +
-        '<span class="li-preco">' + (tem ? 'NA MOCHILA' : it.preco + ' QdC') + '</span></button>';
-    }).join('');
+        '<span class="li-preco">' + it.preco + ' QdC</span></button>';
+    }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Todos os itens de combate já estão na sua mochila.</p>';
     g.querySelectorAll('[data-combate]').forEach(function (bt) {
       bt.addEventListener('click', function () { mochilaComprar(bt.dataset.combate); });
     });
@@ -8125,7 +8257,7 @@
       if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
       addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
       MOCHILA.push(id);
-      if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco);
+      if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
       renderLojaCombate();
       renderMochila();
       toast(it.nome + ' foi para a mochila de combate!');
@@ -8218,7 +8350,7 @@
       ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.camiseta : '' }, function () {
       if (score < sk.preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
       addScore(-sk.preco, sk.nome + ' adquirido · −' + sk.preco + ' QdC');
-      lojaCompraLog(sk.nome, sk.preco);
+      lojaCompraLog(sk.nome, sk.preco, 'qdc', 'skin', sk.id);
       lojaOwned[sk.nome] = true;
       if (skinEtapa < SKIN_CADEIA.length && SKIN_CADEIA[skinEtapa].id === sk.id) {
         skinEtapa++;              /* o elo comprado desaparece; entra o próximo */
@@ -9324,8 +9456,9 @@
   /* compras anteriores do aluno desta demo — para ver a contagem regressiva */
   COMPRAS.push({ aluno: nomeCurto(), item: 'Módulo impresso', valor: 150, moeda: 'qdc', quando: 'há 2 dias', ts: Date.now() - 2 * DIA_MS });
   COMPRAS.push({ aluno: nomeCurto(), item: 'Garrafinha Quad', valor: 90, moeda: 'qdc', quando: 'há 8 dias', ts: Date.now() - 8 * DIA_MS });
-  function lojaCompraLog(item, valor, moeda) {
-    COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now() });
+  function lojaCompraLog(item, valor, moeda, tipo, ref, extra) {
+    COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now(),
+      tipo: tipo || 'item', ref: ref != null ? ref : item, extra: extra || null });
     renderCompras();
     if (typeof renderEstornos === 'function') renderEstornos();
   }
@@ -9357,26 +9490,107 @@
       });
     });
   }
+  /* estornar NÃO é só devolver a moeda: o que foi comprado volta para a Loja
+     e sai da posse do aluno — cada tipo de compra desfaz do seu jeito.      */
+  function desfazerCompra(cp, mo) {
+    var tipo = cp.tipo || 'item', ref = cp.ref;
+    if (tipo === 'matricula' || / · matrícula$/.test(cp.item)) {
+      var t = turmaDe(ref) || TURMAS_LOJA.filter(function (x) { return x.nome === cp.item.replace(/ · matrícula$/, ''); })[0];
+      if (t) {
+        if (mo === 'dmn') t.vagasDmn++; else t.vagasQdc++;
+        MATRICULAS = MATRICULAS.filter(function (m) { return m.turmaId !== t.id; });
+        if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
+        if (typeof checarMatricula === 'function') checarMatricula();
+        if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+      }
+      return;
+    }
+    if (tipo === 'combate') {
+      MOCHILA = MOCHILA.filter(function (x) { return x !== ref; });
+      if (typeof renderLojaCombate === 'function') renderLojaCombate();
+      if (typeof renderMochila === 'function') renderMochila();
+      return;
+    }
+    if (tipo === 'evento') {
+      var st = evState[ref];
+      if (st) { st.comprado = false; st.inscrito = false; }
+      if (typeof renderEventosLoja === 'function') renderEventosLoja();
+      if (typeof renderEvStrip === 'function') renderEvStrip();
+      if (typeof renderCalendario === 'function') renderCalendario();
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();
+      return;
+    }
+    if (tipo === 'simulado') {
+      var sm = null; SIMULADOS.forEach(function (x) { if (x.id === ref) sm = x; });
+      if (sm) {
+        sm.comprado = false; sm.insc = false;
+        if (typeof SIM_INSC !== 'undefined') {   /* sai da lista da recepção */
+          var tirou = false;
+          SIM_INSC = SIM_INSC.filter(function (x) {
+            if (!tirou && x.euSou && x.simRot === sm.rot) { tirou = true; return false; }
+            return true;
+          });
+          if (typeof renderSimPres === 'function') renderSimPres();
+        }
+        if (typeof renderSimulados === 'function') renderSimulados();
+      }
+      return;
+    }
+    if (tipo === 'skin') {
+      var sk = (typeof skinDados === 'function') ? skinDados(ref) : null;
+      if (sk) {
+        lojaOwned[sk.nome] = false;
+        if (typeof skinEtapa !== 'undefined' && typeof SKIN_CADEIA !== 'undefined') {
+          var idx = -1; SKIN_CADEIA.forEach(function (x, k) { if (x.id === sk.id) idx = k; });
+          if (idx >= 0 && skinEtapa === idx + 1) { skinEtapa = idx; }
+        }
+        if (typeof fardaEscolhida !== 'undefined' && fardaEscolhida === sk.id) { fardaEscolhida = null; }
+        if (typeof renderSkins === 'function') renderSkins();
+      }
+      return;
+    }
+    if (tipo === 'pres') {
+      var pr = (typeof presDe === 'function') ? presDe(ref) : null;
+      var qtd = (cp.extra && cp.extra.qtd) ? cp.extra.qtd : 1;
+      if (pr) { pr.estoque += qtd; pr.estado = null; }
+      if (typeof PEDIDOS !== 'undefined') {
+        var achou = false;
+        PEDIDOS = PEDIDOS.filter(function (pd) {
+          if (!achou && pd.presId === ref && pd.aluno === cp.aluno) { achou = true; return false; }
+          return true;
+        });
+        if (typeof renderPedidos === 'function') renderPedidos();
+      }
+      if (typeof renderPresenciais === 'function') renderPresenciais();
+      return;
+    }
+    /* item avulso da vitrine: volta a ficar à venda, com preço e estoque de volta */
+    var el = document.querySelector('.loja-item[data-nome="' + String(ref).replace(/"/g, '') + '"]');
+    lojaOwned[ref] = false;
+    if (el) {
+      el.classList.remove('comprado');
+      var pr2 = el.querySelector('.li-preco');
+      if (pr2) pr2.textContent = fmt(parseInt(el.dataset.preco, 10)) + ' ' + moedaTxt(el.dataset.moeda === 'dmn' ? 'dmn' : 'qdc');
+      if (el.dataset.estoque) {
+        var resta = parseInt(el.dataset.estoque, 10) + 1;
+        el.dataset.estoque = resta;
+        var bd = el.querySelector('.li-estoque');
+        if (bd) bd.textContent = resta + (resta === 1 ? ' vaga' : ' vagas');
+      }
+    }
+    if (typeof refreshChips === 'function') refreshChips();
+  }
   function estornar(i) {
     var cp = COMPRAS[i]; if (!cp || cp.estornado || estornoDias(cp) <= 0) return;
     cp.estornado = true;
     var mo = cp.moeda || 'qdc';
     if (mo === 'dmn') addDiamante(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Diamantes de volta.');
     else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
-    /* estorno de matrícula desfaz a vaga e libera o turno */
-    if (/ · matrícula$/.test(cp.item)) {
-      var nomeTurma = cp.item.replace(/ · matrícula$/, '');
-      var t = TURMAS_LOJA.filter(function (x) { return x.nome === nomeTurma; })[0];
-      if (t) {
-        if (mo === 'dmn') t.vagasDmn++; else t.vagasQdc++;
-        MATRICULAS = MATRICULAS.filter(function (m) { return m.turmaId !== t.id; });
-        if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
-        if (typeof checarMatricula === 'function') checarMatricula();
-      }
-    }
+    desfazerCompra(cp, mo);
     ESTORNOS.push({ aluno: cp.aluno, item: cp.item, valor: cp.valor, moeda: mo, quando: 'agora' });
     renderEstornos(); renderCompras();
     if (typeof renderAdmEstornos === 'function') renderAdmEstornos();
+    toast('Estorno concluído — “' + cp.item + '” voltou para a Loja e o valor foi devolvido.');
   }
   var relOpen = { compras: false };
   function compraRow(cp) {

@@ -1,5 +1,34 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Mochila, estorno que desfaz de verdade, agenda sem choque e expiração
+
+- **Item de combate sai da vitrine** (item 1): comprado, ele deixa a Loja
+  e passa a existir só na **mochila** — acabou o rótulo "NA MOCHILA"
+  ocupando espaço na prateleira.
+- **Estorno desfaz a compra** (item 2): antes o valor voltava, mas o
+  **item continuava com o aluno** — produto marcado ADQUIRIDO, evento
+  INSCRITO, item na mochila, skin vestida. Agora cada tipo de compra tem
+  o seu desfazer: **produto** volta à venda com preço e estoque,
+  **evento** volta à vitrine e sai do calendário, **item de combate**
+  sai da mochila e volta à Loja, **skin** volta para a vitrine,
+  **simulado** sai da lista da recepção, **matrícula** devolve a vaga
+  (como já fazia).
+- **Agenda sem choque** (item 4): turma, isolada, evento e simulado
+  presencial ocupam **dia + faixa de horário**. Comprar algo por cima de
+  um compromisso é **bloqueado**, com a mensagem dizendo **com o quê**
+  choca ("você já tem Turma PATAMO"). Vale para matrícula, isolada,
+  evento pago, inscrição gratuita em evento e simulado presencial.
+- **Expiração conferida e corrigida** (item 3): o que vence some do
+  carrossel, da vitrine e do **calendário** — e continua no **histórico
+  de compras** do aluno e no log da coordenação. Dois defeitos reais
+  foram encontrados aqui: o calendário **mantinha eventos vencidos**, e
+  carrossel/vitrine só se atualizavam depois de outra ação.
+- **Varredura dos itens fora das regras** (item 5): **"Mentoria Quad"**
+  era outro botão fixo no HTML, sem data e sem entrar no calendário —
+  virou item de catálogo com data, seguindo a regra. **"Simulado
+  físico"** foi renomeado para **"Caderno de simulados impresso"**, para
+  não se confundir com os simulados do Lançamento de simulados.
+
 ## 25/07/2026 — Informações do professor: relatório de aulas e eventos (item 7)
 
 - A aba **Recepção** virou **Informações** e ganhou, acima da comunicação
