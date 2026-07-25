@@ -2033,8 +2033,8 @@
                     <option value="multipla">Múltipla escolha</option>
                     <option value="ce">Certo ou errado</option>
                   </select>
-                  <input class="fld" id="qzNq" placeholder="Nº questões" inputmode="numeric" style="max-width:110px" value="3">
-                  <input class="fld" id="qzMin" placeholder="Tempo (min)" inputmode="numeric" style="max-width:110px" value="10">
+                  <input class="fld" id="qzNq" placeholder="Questões (1–30)" title="Número de questões: de 1 a 30" inputmode="numeric" style="max-width:130px" value="10">
+                  <input class="fld" id="qzMin" placeholder="Tempo (1–180 min)" title="Tempo do quiz: de 1 a 180 minutos" inputmode="numeric" style="max-width:140px" value="10">
                 </div>
                 <div class="adm-row" style="margin-top:8px">
                   <input class="fld" id="qzPdf" type="file" accept=".pdf" title="PDF com as questões do quiz">
@@ -4409,27 +4409,56 @@
     { txt: 'O ato administrativo discricionário caracteriza-se por:', alts: ['Ausência total de limites legais.', 'Margem de escolha em conveniência e oportunidade, dentro da lei.', 'Dispensa de motivação em qualquer caso.', 'Ser sempre revogável pelo Judiciário.'], right: 1 },
     { txt: 'A hierarquia na Administração Pública autoriza:', alts: ['Delegação de atos políticos.', 'Avocação e revisão de atos dos subordinados.', 'Suprimir a competência legal de outro órgão.', 'Aplicar pena privativa de liberdade.'], right: 1 },
     { txt: 'São atributos do ato administrativo:', alts: ['Presunção de legitimidade, imperatividade e autoexecutoriedade.', 'Coisa julgada, imperatividade e anterioridade.', 'Legalidade, moralidade e publicidade.', 'Tipicidade penal e culpabilidade.'], right: 0 },
-    { txt: 'O abuso de poder ocorre quando o agente:', alts: ['Atua dentro da competência com finalidade pública.', 'Excede a competência ou desvia a finalidade do ato.', 'Motiva o ato conforme a lei.', 'Delega atribuições com previsão legal.'], right: 1 }
+    { txt: 'O abuso de poder ocorre quando o agente:', alts: ['Atua dentro da competência com finalidade pública.', 'Excede a competência ou desvia a finalidade do ato.', 'Motiva o ato conforme a lei.', 'Delega atribuições com previsão legal.'], right: 1 },
+    { txt: 'A revogação do ato administrativo:', alts: ['Atinge ato ilegal, com efeitos retroativos.', 'Atinge ato válido e inconveniente, com efeitos para frente.', 'Só pode ser feita pelo Judiciário.', 'Independe de competência do agente.'], right: 1 },
+    { txt: 'São requisitos do ato administrativo:', alts: ['Competência, finalidade, forma, motivo e objeto.', 'Competência, culpa, dolo e resultado.', 'Publicidade, oralidade e celeridade.', 'Ampla defesa, contraditório e duplo grau.'], right: 0 },
+    { txt: 'A anulação do ato administrativo ilegal:', alts: ['Depende sempre de ação judicial.', 'Pode ser feita pela própria Administração, de ofício.', 'Gera direito adquirido ao beneficiado.', 'Só cabe se houver prejuízo ao erário.'], right: 1 },
+    { txt: 'Sobre a improbidade administrativa, é correto afirmar:', alts: ['Alcança apenas agentes públicos efetivos.', 'Exige dolo nas condutas, salvo exceções legais.', 'É modalidade de crime militar.', 'Dispensa a demonstração de conduta.'], right: 1 },
+    { txt: 'O princípio da eficiência na Administração Pública:', alts: ['Autoriza descumprir a legalidade em nome do resultado.', 'Exige boa gestão de meios e resultados, dentro da lei.', 'Aplica-se apenas à esfera federal.', 'Foi revogado pela Constituição de 1988.'], right: 1 }
   ];
   var QA_CE = [
     { txt: 'O poder de polícia condiciona o exercício de direitos individuais em favor do interesse público.', right: 0 },
     { txt: 'O poder disciplinar aplica-se a qualquer particular, mesmo sem vínculo com a Administração.', right: 1 },
     { txt: 'A autoexecutoriedade permite executar o ato sem prévia autorização judicial, nos casos previstos.', right: 0 },
     { txt: 'Ato vinculado admite juízo de conveniência e oportunidade do administrador.', right: 1 },
-    { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 }
+    { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 },
+    { txt: 'A revogação atinge ato válido e produz efeitos apenas para o futuro.', right: 0 },
+    { txt: 'A anulação de ato ilegal depende sempre de decisão judicial.', right: 1 },
+    { txt: 'A publicidade é requisito de eficácia dos atos administrativos em regra.', right: 0 },
+    { txt: 'O agente público responde por improbidade independentemente de dolo em qualquer hipótese.', right: 1 },
+    { txt: 'A competência é elemento vinculado do ato administrativo.', right: 0 },
+    { txt: 'A Administração pode rever os próprios atos, de ofício, quando eivados de ilegalidade.', right: 0 }
   ];
   /* CADA TURMA tem o SEU quiz: turmaId -> quiz. Dois professores (ou o mesmo
      professor em salas seguidas) trabalham ao mesmo tempo sem se atropelar.  */
   var QUIZZES = {};   /* { turmaId, tipo, minutos, pdf, qs, status, alunoFez, respostasAluno, pollN } */
+  var QZ_MAX_Q = 30;  /* teto por quiz — o PDF real manda o número de questões */
+  /* [INTEGRAÇÃO REAL] as questões saem da extração do PDF anexado. Na demo o
+     banco cobre as primeiras e, se o professor pedir mais do que o banco tem,
+     as seguintes seguem numeradas para o quiz não ficar curto do que ele pediu. */
+  function qzMontarQuestoes(tipo, nq) {
+    var banco = tipo === 'ce' ? QA_CE : QA_MULT;
+    var out = [];
+    for (var i = 0; i < nq; i++) {
+      var base = banco[i % banco.length];
+      var volta = Math.floor(i / banco.length);
+      out.push({
+        txt: (volta ? 'Q' + (i + 1) + ' · ' : '') + base.txt,
+        alts: base.alts || ['Certo', 'Errado'],
+        right: base.right
+      });
+    }
+    return out;
+  }
   function quizDaSala(id) { return QUIZZES[id || SALA_ATUAL] || null; }
   window.__quizAula = function (id) { return quizDaSala(id); };
   window.__quizzes = function () { return QUIZZES; };
-  var QZ_VAZIO = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.';
+  var QZ_VAZIO = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. De <strong>1 a 30 questões</strong> e <strong>1 a 180 minutos</strong>. Criado, o aluno vê "Aula com Quiz" e você ainda pode <strong>refazer ou descartar</strong>; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo e o quiz trava. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.';
   function qzStatusTxt(q) {
     if (!q) { return QZ_VAZIO; }
     var tp = q.tipo === 'ce' ? 'certo/errado' : 'múltipla escolha';
     if (q.status === 'criado') {
-      return '<strong>Quiz criado</strong> — ' + q.qs.length + ' questões (' + tp + ') · ' + q.minutos + ' min · PDF “' + q.pdf + '”. A sala já vê <strong>“Aula com Quiz”</strong>; ative quando a aula começar.';
+      return '<strong>Quiz criado</strong> — ' + q.qs.length + ' questões (' + tp + ') · ' + q.minutos + ' min · PDF “' + q.pdf + '”. A sala já vê <strong>“Aula com Quiz”</strong>. Ainda dá para <strong>refazer</strong> ou <strong>descartar</strong>; ative quando a aula começar.';
     }
     if (q.status === 'ativo') {
       return '<strong>Quiz ATIVO</strong> — o botão “Quiz” apareceu para a sala com ' + q.minutos + ' min no relógio. Encerre para consolidar o relatório.';
@@ -4456,9 +4485,12 @@
   }
   function qzSyncBotoes() {
     var q = quizDaSala();
-    $('btnQuizCriar').disabled = !!(q && q.status !== 'encerrado');
+    /* enquanto NÃO estiver ativo, o professor pode refazer o quiz quantas vezes quiser */
+    $('btnQuizCriar').disabled = !!(q && q.status === 'ativo');
+    $('btnQuizCriar').textContent = (q && q.status === 'criado') ? 'Refazer quiz' : 'Criar quiz';
     $('btnQuizAtivar').disabled = !(q && q.status === 'criado');
-    $('btnQuizEncerrar').disabled = !(q && q.status === 'ativo');
+    $('btnQuizEncerrar').disabled = !(q && (q.status === 'criado' || q.status === 'ativo'));
+    $('btnQuizEncerrar').textContent = (q && q.status === 'criado') ? 'Descartar' : 'Encerrar';
     $('qzRelCard').style.display = (q && (q.status === 'ativo' || q.status === 'encerrado')) ? 'block' : 'none';
     $('qzStatus').innerHTML = qzStatusTxt(q);
     $('liveTag').style.display = (q && q.status === 'ativo') ? 'inline-block' : 'none';
@@ -4477,11 +4509,10 @@
     var nq = parseInt($('qzNq').value, 10), min = parseInt($('qzMin').value, 10);
     var arq = ($('qzPdf').files && $('qzPdf').files[0]) ? $('qzPdf').files[0].name : '';
     if (!arq) { toast('Anexe o PDF com as questões do quiz.'); return; }
-    if (!nq || nq < 1 || nq > 5) { toast('Número de questões: de 1 a 5 na demo.'); return; }
-    if (!min || min < 1 || min > 60) { toast('Tempo do quiz: de 1 a 60 minutos.'); return; }
-    var banco = tipo === 'ce' ? QA_CE : QA_MULT;
+    if (!nq || nq < 1 || nq > QZ_MAX_Q) { toast('Número de questões: de 1 a ' + QZ_MAX_Q + ' por quiz.'); return; }
+    if (!min || min < 1 || min > 180) { toast('Tempo do quiz: de 1 a 180 minutos.'); return; }
     QUIZZES[SALA_ATUAL] = { turmaId: SALA_ATUAL, tipo: tipo, minutos: min, pdf: arq, status: 'criado', alunoFez: false, respostasAluno: [], pollN: 0,
-      qs: banco.slice(0, nq).map(function (q) { return { txt: q.txt, alts: q.alts || ['Certo', 'Errado'], right: q.right }; }) };
+      qs: qzMontarQuestoes(tipo, nq) };
     qzSyncBotoes(); refreshQuizAula();
     toast('Quiz criado — a sala “' + (turmaDe(SALA_ATUAL) || {}).nome + '” já sabe que hoje tem quiz.');
   });
@@ -4494,7 +4525,15 @@
   });
   $('btnQuizEncerrar').addEventListener('click', function () {
     var q = quizDaSala();
-    if (!q || q.status !== 'ativo') return;
+    if (!q) return;
+    if (q.status === 'criado') {   /* nem chegou a valer: some sem deixar rastro para a sala */
+      delete QUIZZES[SALA_ATUAL];
+      pollParar();
+      qzSyncBotoes(); refreshQuizAula();
+      toast('Quiz descartado — a sala voltou a ficar sem quiz.');
+      return;
+    }
+    if (q.status !== 'ativo') return;
     q.status = 'encerrado';
     qzSyncBotoes(); refreshQuizAula();
     toast('Quiz encerrado — relatório da sala consolidado.');
@@ -4574,15 +4613,16 @@
       btn.style.display = 'none';
       return;
     }
+    var daTurma = (typeof turmaDe === 'function' && turmaDe(q.turmaId)) ? ' — ' + turmaDe(q.turmaId).nome : '';
     if (q.status === 'criado') {
       tag.textContent = 'AULA COM QUIZ'; tag.classList.remove('live');
-      sub.textContent = 'O professor preparou um quiz para a aula de hoje — ele ativa quando a aula começar.';
+      sub.textContent = 'O professor preparou um quiz de ' + q.qs.length + ' questões para a aula de hoje' + daTurma + ' — ele ativa quando a aula começar.';
       btn.style.display = 'none';
       return;
     }
     /* ativo */
     tag.textContent = 'AULA COM QUIZ ATIVO'; tag.classList.add('live');
-    sub.textContent = 'Quiz valendo, com ' + q.minutos + ' min no relógio — toque e responda.';
+    sub.textContent = 'Quiz valendo' + daTurma + ': ' + q.qs.length + ' questões e ' + q.minutos + ' min no relógio — toque e responda.';
     btn.textContent = 'Quiz';
     btn.style.display = 'inline-block';
     refreshSalaLock();

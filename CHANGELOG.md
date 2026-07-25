@@ -1,5 +1,22 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Quiz da aula: 30 questões, 180 min, refazer e descartar
+
+- **Causa do "não criou"**: o limite era de **1 a 5 questões** (tamanho do
+  banco da demo). Pedir 10 caía na validação e a mensagem não deixava a
+  faixa clara.
+- Agora vale **de 1 a 30 questões** e **de 1 a 180 minutos**; os bancos
+  de certo/errado e de múltipla escolha subiram para 10 questões cada e,
+  acima disso, as questões seguem **numeradas e distintas** até o total
+  pedido. Os campos mostram a faixa (`Questões (1–30)`,
+  `Tempo (1–180 min)`) e as mensagens de erro dizem o limite.
+- **Quiz criado continua editável**: enquanto não for ativado, o botão
+  vira **"Refazer quiz"** e o outro vira **"Descartar"**. Depois de
+  **ativado**, o quiz trava (a sala já está respondendo).
+- **O aluno passa a saber de qual turma é o quiz** — o card "Aula de
+  hoje" mostra a turma e quantas questões tem, o que importa para quem
+  tem duas matrículas.
+
 ## 25/07/2026 — Login do professor: e-mail e senha, como qualquer conta
 
 - Saíram do portão do professor a **"Chave de liberação"** e o seletor
