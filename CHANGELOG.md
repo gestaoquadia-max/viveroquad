@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Login do professor: e-mail e senha, como qualquer conta
+
+- Saíram do portão do professor a **"Chave de liberação"** e o seletor
+  **"Professor"**. Ficaram só **e-mail funcional** e **senha** — o mesmo
+  formato do login do aluno.
+- **O e-mail identifica quem entrou**: o sistema casa o e-mail com o
+  cadastro do corpo docente e abre o perfil daquele professor, com as
+  turmas em que ele está inserido. Ninguém escolhe o próprio nome numa
+  lista.
+- Mensagens de recusa específicas: e-mail fora do corpo docente,
+  cadastro desligado, senha incorreta e acesso bloqueado pela
+  coordenação.
+- Na demo a senha é `quad1234` (indicada no rodapé do portão); no
+  sistema real cada professor tem a própria senha, definida no cadastro
+  da coordenação — marcado como `[INTEGRAÇÃO REAL]`.
+
 ## 25/07/2026 — Correções da avaliação funcional (itens 1 a 8)
 
 Aplicação dos ajustes levantados na auditoria de ponta a ponta das três

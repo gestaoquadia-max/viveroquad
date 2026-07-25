@@ -3006,21 +3006,17 @@
           <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
           <div class="gate-step">
             <h2>Acesso do professor</h2>
-            <p class="login-sub">Área do corpo docente — cada professor entra com o próprio cadastro e vê as turmas em que está inserido.</p>
+            <p class="login-sub">Área do corpo docente — o e-mail funcional já identifica o professor e abre o perfil dele, com as turmas em que está inserido.</p>
             <div class="login-field" style="width:100%">
               <label for="profEmail">E-mail funcional</label>
               <input id="profEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
             </div>
             <div class="login-field" style="width:100%">
-              <label for="profChave">Chave de liberação</label>
-              <input id="profChave" placeholder="PROF-____" autocomplete="off">
-            </div>
-            <div class="login-field" style="width:100%">
-              <label for="profSel">Professor</label>
-              <select class="fld" id="profSel" style="width:100%"></select>
+              <label for="profSenha">Senha</label>
+              <input id="profSenha" type="password" placeholder="••••••••" autocomplete="off">
             </div>
             <button class="btn" id="btnProfEntrar" style="width:100%">Entrar na sala</button>
-            <p class="login-note">demo: chave PROF-2026 · no sistema real o cadastro é individual, aprovado pela coordenação</p>
+            <p class="login-note" id="profGateNota"></p>
           </div>
         </div>
 
@@ -4318,8 +4314,10 @@
   function turmasDoProf(nome) {
     return TURMAS_LOJA.filter(function (t) { return materiasDoProf(t, nome).length > 0; });
   }
-  /* cada docente tem o seu e-mail funcional — escolher o professor já preenche
-     o campo, e a entrada só acontece se o e-mail for o daquele professor.      */
+  /* Cada professor tem a SUA conta: o e-mail funcional já diz quem entrou.
+     Nada de escolher o nome numa lista — o perfil vem do cadastro.
+     [INTEGRAÇÃO REAL] senha individual do professor, definida no cadastro. */
+  var PROF_SENHA_DEMO = 'quad1234';
   function semAcento(x) { return (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x; }
   function emailDoProf(nome) {
     var limpo = semAcento(nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim();
@@ -4327,31 +4325,28 @@
     var chave = (partes[partes.length - 1] || 'professor').toLowerCase().replace(/[^a-z]/g, '');
     return chave + '@quadconcursos.com.br';
   }
-  function profEmailPrefill() {
-    var sel = $('profSel'), em = $('profEmail'); if (!sel || !em) return;
-    em.value = emailDoProf(sel.value);
-    em.placeholder = emailDoProf(sel.value);
+  function docentePorEmail(em) {
+    var alvo = (em || '').trim().toLowerCase();
+    return DOCENTES.filter(function (d) { return emailDoProf(d.nome) === alvo; })[0] || null;
   }
-  function renderProfSel() {
-    var sel = $('profSel'); if (!sel) return;
-    var antes = sel.value;
-    sel.innerHTML = docentesAtivos().map(function (d) { return '<option>' + d.nome + '</option>'; }).join('');
-    if (antes) sel.value = antes;
-    profEmailPrefill();
+  function profGateNota() {
+    var el = $('profGateNota'); if (!el) return;
+    var d = docentesAtivos()[0];
+    el.innerHTML = 'demo: ' + (d ? emailDoProf(d.nome) : 'nome@quadconcursos.com.br') +
+      ' · senha ' + PROF_SENHA_DEMO + ' — no sistema real cada professor tem a própria senha, definida no cadastro da coordenação';
   }
-  renderProfSel();
-  if ($('profSel')) $('profSel').addEventListener('change', profEmailPrefill);
+  profGateNota();
   $('btnProfEntrar').addEventListener('click', function () {
-    var em = $('profEmail').value.trim(), ch = $('profChave').value.trim().toUpperCase();
+    var em = $('profEmail').value.trim(), sn = $('profSenha').value;
     if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
-    // [INTEGRAÇÃO REAL] cadastro individual do professor, aprovado pela coordenação
-    var esperado = emailDoProf($('profSel').value);
-    if (em.toLowerCase() !== esperado) { toast('Esse e-mail não é o cadastro de ' + $('profSel').value + ' — use ' + esperado + '.'); return; }
-    if (ch !== 'PROF-2026') { toast('Chave inválida — solicite a liberação à coordenação.'); return; }
-    var doc = docenteDe($('profSel').value);
-    if (doc && doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
+    var doc = docentePorEmail(em);
+    if (!doc) { toast('E-mail não encontrado no corpo docente — procure a coordenação.'); return; }
+    if (doc.desligado) { toast('Este cadastro está desligado — procure a coordenação.'); return; }
+    if (sn !== PROF_SENHA_DEMO) { toast('Senha incorreta.'); return; }
+    if (doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
     profLiberado = true;
-    PROF_ATUAL = $('profSel').value;
+    PROF_ATUAL = doc.nome;
+    $('profSenha').value = '';
     $('profGate').classList.remove('on');
     $('profNome').textContent = PROF_ATUAL;
     $('profTopNome').textContent = PROF_ATUAL;
@@ -6773,7 +6768,7 @@
     sincProfessores();
     renderDocList();
     if (typeof renderCtProfs === 'function') renderCtProfs();
-    if (typeof renderProfSel === 'function') renderProfSel();
+    if (typeof profGateNota === 'function') profGateNota();
     if (typeof admMsgSelects === 'function') admMsgSelects();
     if (msg) toast(msg);
   }
