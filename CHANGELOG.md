@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Cada coisa nasce no seu lugar (item 6)
+
+**Cadastrar produto ou serviço**
+
+- O seletor de destino foi refeito: agora aponta para as **seções reais
+  da Loja** e só oferece o que **este bloco** de fato cria — Módulos,
+  Excursões, Treinamento para o TAF, Outros (retirada), Cursos online e
+  Mentoria.
+- Saíram as opções que nascem em outro lugar: **turmas e isoladas**
+  (Criação de turmas e isoladas), **simulados** (Lançamento de
+  simulados), **eventos presenciais e online** (Eventos da semana) e
+  **itens do personagem e de combate** (Criar skin do personagem).
+- **Excursões, TAF e Mentoria** ganharam campo de **data**: comprados,
+  entram nos **Eventos da semana** e no **calendário** do aluno. Módulos,
+  Outros e Cursos online seguem como compra simples, sem agenda.
+- A seção **Mentoria** da Loja passou a receber cadastros novos.
+
+**Criar skin do personagem**
+
+- O bloco ganhou um seletor: **Skin do personagem** (veste o avatar) ou
+  **Item de combate** (vai para a mochila) — a funcionalidade de itens de
+  combate não existia em lugar nenhum do painel.
+- Item de combate é sempre em **Quad Coins**, entra na seção **Itens de
+  combate** da Loja e vai para a **mochila** de quem comprar. A lista do
+  painel mostra skins e itens juntos, com selo e ✕ para remover.
+
 ## 25/07/2026 — Matérias isoladas (item 5)
 
 - O bloco virou **"Criação de turmas e isoladas · matrícula e vagas"** e o

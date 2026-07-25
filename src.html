@@ -1758,6 +1758,7 @@
                 <span class="li-desc">acompanhamento do time</span>
                 <span class="li-preco">900 Dmn</span>
               </button>
+              <span id="lojaExtras-mentoria" style="display:contents"></span>
             </div>
 
             <div class="loja-sec" style="margin-top:14px">Eventos online · YouTube e lives exclusivas</div>
@@ -2578,6 +2579,12 @@
           <div class="p-card">
             <div class="k-label">Criar skin do personagem</div>
             <div class="adm-form">
+              <div class="adm-row" style="margin-bottom:8px">
+                <select class="fld" id="admSkTipo" title="O que você está criando">
+                  <option value="skin">Skin do personagem (veste o avatar)</option>
+                  <option value="combate">Item de combate (vai para a mochila)</option>
+                </select>
+              </div>
               <input class="fld" id="admSkNome" placeholder="Nome da skin (ex.: Boina de instrutor)">
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admSkDesc" placeholder="Descrição curta (ex.: edição limitada)">
@@ -2593,9 +2600,9 @@
               <div class="ico-pick" id="admSkIcones"></div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmSkin">Publicar skin</button></div>
             </div>
-            <div class="adm-sep"><span>Skins criadas</span></div>
+            <div class="adm-sep"><span>Skins e itens criados</span></div>
             <div id="admSkinList"></div>
-            <p class="sub" style="margin-top:8px">A skin entra na hora em <strong>Itens do personagem</strong>, na Loja do aluno, com confirmação de compra e preço em QdC ou Diamantes. Toque no ✕ para tirar da Loja.</p>
+            <p class="sub" style="margin-top:8px">A <strong>skin</strong> entra em <strong>Itens do personagem</strong> e veste o avatar; o <strong>item de combate</strong> entra em <strong>Itens de combate</strong> e vai para a <strong>mochila</strong> do aluno (sempre em Quad Coins). Toque no ✕ para tirar da Loja.</p>
           </div>
 
           <div class="p-card">
@@ -2787,10 +2794,13 @@
                 <input class="fld" id="admProdDesc" placeholder="Descrição curta (ex.: brinde da tropa)">
               </div>
               <div class="adm-row" style="margin-top:8px">
-                <select class="fld" id="admProdCat">
-                  <option value="digitais">Itens digitais (cursos, e-books…)</option>
-                  <option value="personagem">Itens do personagem</option>
-                  <option value="presencial">Itens presenciais (retirada)</option>
+                <select class="fld" id="admProdCat" title="Onde o item entra na Loja">
+                  <option value="pres:modulos">Módulos · vade mecum, apostilas e cadernos</option>
+                  <option value="pres:excursao">Excursões para concursos</option>
+                  <option value="pres:taf">Treinamento para o TAF</option>
+                  <option value="pres:outros">Outros · retirada na recepção</option>
+                  <option value="dig:cursos">Cursos online</option>
+                  <option value="dig:mentoria">Mentoria</option>
                 </select>
               </div>
               <div class="adm-row" style="margin-top:8px">
@@ -2801,12 +2811,16 @@
                 <input class="fld" id="admProdPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px">
                 <input class="fld" id="admProdQtd" placeholder="Qtd." inputmode="numeric" style="max-width:70px" title="Estoque (itens presenciais)">
               </div>
+              <div class="adm-row" id="admProdDataBox" style="margin-top:8px; display:none">
+                <span class="pct">Data</span>
+                <input class="fld" id="admProdData" type="date" style="max-width:150px" aria-label="Data da atividade" title="Data — entra no calendário do aluno que comprar">
+              </div>
               <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
               <div class="ico-pick" id="admProdIcones"></div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
             </div>
             <div id="admProdList" style="margin-top:10px"></div>
-            <p class="sub" style="margin-top:8px">O produto aparece <strong>na hora</strong> na categoria escolhida da Loja do aluno. <strong>Turmas</strong> agora nascem no <strong>Painel de controle</strong> (Criação de turmas). Itens presenciais usam a <strong>quantidade</strong> como estoque e geram <strong>pedido de retirada</strong> na recepção. Toque no ✕ para remover.</p>
+            <p class="sub" style="margin-top:8px">O produto entra <strong>na hora</strong> na seção escolhida da Loja do aluno. Cada coisa nasce no seu lugar: <strong>turmas e isoladas</strong> em “Criação de turmas e isoladas”, <strong>simulados</strong> em “Lançamento de simulados”, <strong>eventos</strong> em “Eventos da semana” e <strong>itens do personagem e de combate</strong> em “Criar skin do personagem” — por isso eles não aparecem aqui. Itens de retirada usam a <strong>quantidade</strong> como estoque e geram <strong>pedido na recepção</strong>; <strong>Excursões, TAF e Mentoria</strong> aceitam <strong>data</strong> e, quando comprados, entram nos <strong>Eventos da semana</strong> e no <strong>calendário</strong> do aluno. Toque no ✕ para remover.</p>
           </div>
 
           <div class="p-card">
@@ -7384,6 +7398,7 @@
         /* a boina do tutorial sai da vitrine assim que comprada */
         if (nome === 'Boina exclusiva') it.style.display = 'none';
         if (it.dataset.isolada && typeof isoladaComprada === 'function') { isoladaComprada(nome); }
+        if (typeof agendaDoProduto === 'function') { agendaDoProduto(nome); }
         var presencial = it.dataset.presencial === '1' || PRESENCIAIS.indexOf(nome) >= 0;
         if (presencial) pedidoNovo(nome);                           /* retirada na recepção */
         if (LINKS_ONLINE[nome]) {                                   /* atividade online: link junto */
@@ -7500,10 +7515,22 @@
   /* ---------- produtos/serviços cadastrados pela administração ----------
      Entram nas categorias da Loja do aluno em tempo real. Presenciais têm
      estoque, compra por quantidade e pedido de retirada.                  */
-  var LOJA_CAT_NOME = { turmas: 'Turmas e aulas', eventos: 'Eventos', digitais: 'Itens digitais', personagem: 'Itens do personagem', presencial: 'Itens presenciais' };
+  var LOJA_CAT_NOME = { turmas: 'Turmas e aulas', eventos: 'Eventos', digitais: 'Cursos online', mentoria: 'Mentoria', personagem: 'Itens do personagem', presencial: 'Itens presenciais' };
+  /* cada opção do "Cadastrar produto ou serviço" aponta para UMA seção da Loja.
+     Turmas, isoladas, simulados, eventos e itens do personagem nascem nos
+     blocos próprios — por isso não estão aqui.                             */
+  var PROD_DESTINOS = {
+    'pres:modulos':  { via: 'pres', cat: 'modulos',  rot: 'Módulos · vade mecum, apostilas e cadernos', estoque: true },
+    'pres:excursao': { via: 'pres', cat: 'excursao', rot: 'Excursões para concursos', estoque: true, data: true },
+    'pres:taf':      { via: 'pres', cat: 'taf',      rot: 'Treinamento para o TAF', estoque: true, data: true },
+    'pres:outros':   { via: 'pres', cat: 'outros',   rot: 'Outros · retirada na recepção', estoque: true },
+    'dig:cursos':    { via: 'dig',  cat: 'digitais', rot: 'Cursos online' },
+    'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true }
+  };
+  function prodDestino(v) { return PROD_DESTINOS[v] || PROD_DESTINOS['pres:outros']; }
   var LOJA_EXTRAS = [];
   function renderLojaExtras() {
-    ['turmas', 'digitais', 'personagem'].forEach(function (cat) {
+    ['turmas', 'digitais', 'mentoria', 'personagem'].forEach(function (cat) {
       var host = document.getElementById('lojaExtras-' + cat);
       if (!host) return;
       host.innerHTML = LOJA_EXTRAS.filter(function (p) { return p.cat === cat; }).map(function (p) {
@@ -7673,6 +7700,7 @@
     p.estado = 'aguardando';
     lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo);
     pedidoPresencial(p, compraQtd);
+    if (typeof agendaDoProduto === 'function') { agendaDoProduto(p.nome); }
     var q = compraQtd;
     fecharCompra();
     renderPresenciais();
@@ -7729,7 +7757,8 @@
     admProdEdit = { tipo: tipo, ref: p };
     $('admProdNome').value = p.nome;
     $('admProdDesc').value = p.desc || '';
-    $('admProdCat').value = tipo === 'pres' ? 'presencial' : p.cat;
+    $('admProdCat').value = tipo === 'pres' ? ('pres:' + (p.cat || 'outros')) : (p.cat === 'mentoria' ? 'dig:mentoria' : 'dig:cursos');
+    admProdDataToggle();
     if ($('admProdMoeda')) $('admProdMoeda').value = p.moeda || 'qdc';
     $('admProdPreco').value = p.preco;
     $('admProdQtd').value = tipo === 'pres' ? p.estoque : '';
@@ -7743,6 +7772,36 @@
   function admProdEditReset() {
     admProdEdit = null;
     var btn = $('btnAdmProd'); if (btn) btn.textContent = 'Publicar na Loja';
+  }
+  function admProdDataToggle() {
+    var box = $('admProdDataBox'); if (!box) return;
+    var d = prodDestino($('admProdCat').value);
+    box.style.display = d.data ? 'flex' : 'none';
+    if (!d.data && $('admProdData')) $('admProdData').value = '';
+    if ($('admProdQtd')) $('admProdQtd').style.display = d.estoque ? '' : 'none';
+  }
+  if ($('admProdCat')) $('admProdCat').addEventListener('change', admProdDataToggle);
+  admProdDataToggle();
+  /* item com data, comprado, entra nos Eventos da semana e no calendário */
+  var PROD_AGENDA = {};   /* nome do item → { dataISO, rot } */
+  function agendaDoProduto(nome) {
+    var a = PROD_AGENDA[nome]; if (!a) return;
+    var evId = 'pr-' + nome.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+    if (!EVENTOS.some(function (e) { return e.id === evId; })) {
+      var pr = a.dataISO.split('-');
+      var dt = new Date(+pr[0], +pr[1] - 1, +pr[2]);
+      var DS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+      EVENTOS.push({ id: evId, nome: nome, tipo: a.rot.toUpperCase(), modalidade: 'presencial', online: false,
+        pago: false, preco: 0, profs: [],
+        quando: DS[dt.getDay()] + ' · ' + pr[2] + '/' + pr[1] + ' · ' + a.rot,
+        dataISO: a.dataISO, cor: 'gold', meta: a.rot,
+        desc: 'Atividade contratada na Quad Store — ' + a.rot + '.',
+        score: [['Presença confirmada', '+30 score']], coins: [['Check-in', '+10']] });
+    }
+    evState[evId] = evState[evId] || {};
+    evState[evId].inscrito = true;
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderCalendario === 'function') renderCalendario();
   }
   var btnAdmProdEl = $('btnAdmProd');
   if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
@@ -7772,19 +7831,24 @@
     if (ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
       toast('Já existe um item com esse nome na Loja.'); return;
     }
-    if (cat === 'presencial') {
+    var dest = prodDestino(cat);
+    var dataAt = $('admProdData') ? $('admProdData').value : '';
+    if (dest.data && dataAt) { PROD_AGENDA[nome] = { dataISO: dataAt, rot: dest.rot.split('·')[0].trim() }; }
+    if (dest.via === 'pres') {
       if (!qtd || qtd < 1) { toast('Informe a quantidade em estoque.'); return; }
-      ITENS_PRESENCIAIS.push({ id: 'p' + Date.now(), nome: nome, desc: desc, preco: preco, moeda: moeda, icone: icone, estoque: qtd, cat: 'outros', estado: 'disp' });
+      ITENS_PRESENCIAIS.push({ id: 'p' + Date.now(), nome: nome, desc: desc, preco: preco, moeda: moeda, icone: icone, estoque: qtd, cat: dest.cat, estado: 'disp' });
       renderPresenciais();
     } else {
       /* itens digitais não têm estoque — ficam disponíveis até serem removidos */
-      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: cat, preco: preco, moeda: moeda, icone: icone });
+      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: dest.cat, preco: preco, moeda: moeda, icone: icone });
       renderLojaExtras();
     }
     $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
+    if ($('admProdData')) $('admProdData').value = '';
     renderAdmProdList();
     if (typeof renderPrecos === 'function') renderPrecos();   /* entra também no editor de preços */
-    toast('Produto publicado na Loja — categoria ' + LOJA_CAT_NOME[cat] + ' · em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.');
+    toast('Publicado em “' + dest.rot + '” · em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') +
+      (dest.data && dataAt ? ' — com data, entra no calendário de quem comprar.' : '.'));
   });
   /* seletor de ícones do formulário de produto */
   var admProdIcone = 'presencial';
@@ -7843,16 +7907,29 @@
   function renderSkinsAdm() {
     var el = $('admSkinList'); if (!el) return;
     var sk = LOJA_EXTRAS.filter(function (p) { return p.skin; });
+    var cb = (typeof ITENS_COMBATE !== 'undefined') ? ITENS_COMBATE.filter(function (i) { return i.criado; }) : [];
     el.innerHTML = sk.map(function (p) {
-      return '<div class="adm-bar"><span class="nm">' + p.nome +
+      return '<div class="adm-bar"><span class="nm">' + p.nome + ' <span class="tag">SKIN</span>' +
         '<small>' + p.desc + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
         '<button class="adm-x" data-rm-skin="' + p.nome + '" aria-label="Remover">✕</button></div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma skin criada ainda.</p>';
+    }).join('') + cb.map(function (i) {
+      return '<div class="adm-bar"><span class="nm">' + i.nome + ' <span class="tag gold">COMBATE</span>' +
+        '<small>' + i.desc + ' · ' + fmt(i.preco) + ' QdC · vai para a mochila</small></span>' +
+        '<button class="adm-x" data-rm-comb="' + i.id + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma skin ou item de combate criado ainda.</p>';
     el.querySelectorAll('[data-rm-skin]').forEach(function (b) {
       b.addEventListener('click', function () {
         LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== b.dataset.rmSkin; });
         renderLojaExtras(); renderSkinsAdm();
         toast('Skin “' + b.dataset.rmSkin + '” removida da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-rm-comb]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var it = ITENS_COMBATE.filter(function (x) { return x.id === b.dataset.rmComb; })[0];
+        ITENS_COMBATE = ITENS_COMBATE.filter(function (x) { return x.id !== b.dataset.rmComb; });
+        renderLojaCombate(); renderSkinsAdm();
+        toast('Item de combate “' + (it ? it.nome : '') + '” removido da Loja.');
       });
     });
   }
@@ -7869,13 +7946,32 @@
         bt.classList.add('sel');
       });
     });
+    var skTipo = $('admSkTipo');
+    if (skTipo) skTipo.addEventListener('change', function () {
+      var comb = skTipo.value === 'combate';
+      $('admSkMoeda').style.display = comb ? 'none' : '';
+      $('admSkNome').placeholder = comb ? 'Nome do item (ex.: Rádio comunicador)' : 'Nome da skin (ex.: Boina de instrutor)';
+      $('admSkDesc').placeholder = comb ? 'Descrição curta (ex.: comunicação em campo)' : 'Descrição curta (ex.: edição limitada)';
+      $('btnAdmSkin').textContent = comb ? 'Publicar item de combate' : 'Publicar skin';
+    });
     $('btnAdmSkin').addEventListener('click', function () {
       var nome = $('admSkNome').value.trim(), desc = $('admSkDesc').value.trim();
-      var moeda = $('admSkMoeda').value, preco = parseInt($('admSkPreco').value, 10);
-      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido à skin.'); return; }
+      var ehCombate = $('admSkTipo') && $('admSkTipo').value === 'combate';
+      var moeda = ehCombate ? 'qdc' : $('admSkMoeda').value;   /* mochila é sempre em Quad Coins */
+      var preco = parseInt($('admSkPreco').value, 10);
+      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao item.'); return; }
       if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
-      if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+      if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) ||
+          (typeof ITENS_COMBATE !== 'undefined' && ITENS_COMBATE.some(function (p) { return p.nome === nome; })) ||
+          document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
         toast('Já existe um item com esse nome na Loja.'); return;
+      }
+      if (ehCombate) {
+        ITENS_COMBATE.push({ id: 'cb' + Date.now(), nome: nome, desc: desc || 'utilitário de campo', preco: preco, ico: admSkIco, criado: true });
+        renderLojaCombate(); renderSkinsAdm();
+        $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = '';
+        toast('Item de combate “' + nome + '” publicado — vai para a mochila de quem comprar.');
+        return;
       }
       LOJA_EXTRAS.push({ nome: nome, desc: desc || 'skin do personagem', cat: 'personagem', preco: preco, moeda: moeda, icone: admSkIco, skin: true });
       renderLojaExtras(); renderSkinsAdm();
@@ -7924,7 +8020,7 @@
     g.innerHTML = ITENS_COMBATE.map(function (it) {
       var tem = MOCHILA.indexOf(it.id) >= 0;
       return '<button class="loja-item' + (tem ? ' comprado' : '') + '" data-combate="' + it.id + '">' +
-        '<span class="li-ico">' + ITEM_ICO[it.id] + '</span>' +
+        '<span class="li-ico">' + (ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '')) + '</span>' +
         '<span class="li-nome">' + it.nome + '</span>' +
         '<span class="li-desc">' + it.desc + '</span>' +
         '<span class="li-preco">' + (tem ? 'NA MOCHILA' : it.preco + ' QdC') + '</span></button>';
