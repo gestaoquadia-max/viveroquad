@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Banco de professores · turnos mais claros (correção de UX)
+- **Sintoma**: não dava para cadastrar um professor marcando os 3 turnos
+- **Causa**: os chips de turno **nasciam todos ligados**; quem clicava
+  nos três (achando que selecionava) na verdade **desligava** os três →
+  sobrava nenhum turno → "Marque ao menos um turno" bloqueava o cadastro
+- **Correção**: os chips agora começam **desmarcados**; clicar
+  **seleciona** (com **✓** no selecionado) e o rótulo ganhou a dica
+  **"— toque para marcar"**. Marcar os 3 turnos passa a funcionar
+- Suítes de professor (`vfasee`, `vfaseb`, `vfasec`, `vcontrole`,
+  `vadmin`) e tutorial completo sem regressões
+
 ## 24/07/2026 — Quad Store · separação dos blocos (roda 3D só no Início)
 - **Causa raiz da sobreposição**: a "engrenagem" 3D (perspective +
   rotateX + scale) rodava em **todas** as views. Nos cards altos da Loja

@@ -1153,6 +1153,7 @@
   .turno-chip { flex: 1; padding: 8px 4px; border: 1.5px solid var(--p-line); border-radius: 10px; cursor: pointer;
     background: var(--p-surface); color: var(--p-dim); font: 700 11.5px var(--ui); transition: .15s; }
   .turno-chip.on { background: var(--p-blue); border-color: var(--p-blue); color: #fff; }
+  .turno-chip.on::before { content: '✓ '; font-weight: 900; }
   .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--p-dim); white-space: nowrap; }
   .chk input { width: 15px; height: 15px; }
   .ct-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -2181,11 +2182,11 @@
                 <select class="fld" id="admDocMat2" title="Matéria 2 (opcional)"></select>
                 <select class="fld" id="admDocMat3" title="Matéria 3 (opcional)"></select>
               </div>
-              <div class="k-label sub-k" style="margin-top:10px">Turnos de disponibilidade</div>
+              <div class="k-label sub-k" style="margin-top:10px">Turnos de disponibilidade <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
               <div class="turno-pick" id="admDocTurnos">
-                <button type="button" class="turno-chip on" data-turno="manhã">Manhã</button>
-                <button type="button" class="turno-chip on" data-turno="tarde">Tarde</button>
-                <button type="button" class="turno-chip on" data-turno="noite">Noite</button>
+                <button type="button" class="turno-chip" data-turno="manhã">Manhã</button>
+                <button type="button" class="turno-chip" data-turno="tarde">Tarde</button>
+                <button type="button" class="turno-chip" data-turno="noite">Noite</button>
               </div>
               <div class="adm-row" style="margin-top:10px">
                 <input class="fld" id="admDocGrad" placeholder="Graduação (ex.: Mestre em Direito)">
