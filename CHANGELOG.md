@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 24/07/2026 — Quad Store · separação dos blocos (roda 3D só no Início)
+- **Causa raiz da sobreposição**: a "engrenagem" 3D (perspective +
+  rotateX + scale) rodava em **todas** as views. Nos cards altos da Loja
+  isso fazia um bloco **tombar e invadir o vizinho** ("Atividades e itens
+  · presenciais" encaixando atrás de "Itens digitais" e colando no herói)
+- **Correção**: a roda 3D passou a ser **exclusiva do Início**; nas
+  demais views (Loja, Missões, Domínio, admin) os blocos ficam **planos**
+  — sem sobreposição, geometria verificada (0 overlaps)
+- **Mais respiro na Quad Store**: herói com margem maior e os
+  macro-blocos com espaçamento de 18px, separando com clareza herói ·
+  presenciais · digitais
+- Todas as suítes (incl. tutorial e `vhero`) sem regressões — o efeito
+  3D do Início segue intacto
+
 ## 24/07/2026 — Ajustes do administrador · Liberações (item 4)
 - **Aba Liberações reconstruída** com cabeçalho próprio (recepção e
   portaria):
