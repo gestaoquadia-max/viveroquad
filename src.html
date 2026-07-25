@@ -1695,20 +1695,7 @@
             </div>
 
             <div class="loja-sec" style="margin-top:14px">Isoladas</div>
-            <div class="loja-grid">
-              <button class="loja-item" data-nome="Isolada Dir. Administrativo" data-preco="350" data-moeda="dmn">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>
-                <span class="li-nome">Isolada Dir. Administrativo</span>
-                <span class="li-desc">com Danilo Moura</span>
-                <span class="li-preco">350 Dmn</span>
-              </button>
-              <button class="loja-item" data-nome="Aula isolada" data-preco="40">
-                <span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>
-                <span class="li-nome">Aula isolada</span>
-                <span class="li-desc">qualquer matéria</span>
-                <span class="li-preco">40 QdC</span>
-              </button>
-            </div>
+            <div class="loja-grid"><span id="lojaIsoladas" style="display:contents"></span></div>
 
             <div class="loja-sec" style="margin-top:14px">Simulados presenciais · na sede</div>
             <div class="loja-grid"><span id="lojaSim-pres" style="display:contents"></span></div>
@@ -2282,7 +2269,7 @@
           </div>
 
           <div class="p-card">
-            <div class="k-label">Criação de turmas · matrícula e vagas</div>
+            <div class="k-label">Criação de turmas e isoladas · matrícula e vagas</div>
             <div class="adm-form">
               <div class="adm-row">
                 <select class="fld" id="admCtTipo" title="Tipo da turma"></select>
@@ -2296,17 +2283,31 @@
                   <option value="noite" selected>Noite</option>
                 </select>
               </div>
+              <div id="admCtIsoBox" style="display:none">
+                <div class="k-label sub-k" style="margin-top:10px">Dias da semana <span style="opacity:.7; font-weight:600">— toque para marcar (mínimo 1)</span></div>
+                <div class="turno-pick" id="admCtDias">
+                  <button type="button" class="turno-chip" data-dia="segunda-feira">SEG</button>
+                  <button type="button" class="turno-chip" data-dia="terça-feira">TER</button>
+                  <button type="button" class="turno-chip" data-dia="quarta-feira">QUA</button>
+                  <button type="button" class="turno-chip" data-dia="quinta-feira">QUI</button>
+                  <button type="button" class="turno-chip" data-dia="sexta-feira">SEX</button>
+                  <button type="button" class="turno-chip" data-dia="sábado">SÁB</button>
+                  <button type="button" class="turno-chip" data-dia="domingo">DOM</button>
+                </div>
+                <div class="k-label sub-k" style="margin-top:10px">Professor da isolada</div>
+                <select class="fld" id="admCtIsoProf" style="width:100%"></select>
+              </div>
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admCtIni" type="date" aria-label="Início" title="Início da turma" style="max-width:150px">
                 <span class="pct">até</span>
                 <input class="fld" id="admCtFim" type="date" aria-label="Término" title="Término da turma" style="max-width:150px">
               </div>
               <div class="adm-row" style="margin-top:8px">
-                <span class="pct">1º tempo</span>
+                <span class="pct" id="admCtLbH1">1º tempo</span>
                 <input class="fld" id="admCtH1i" type="time" style="max-width:104px" aria-label="Início do 1º tempo">
                 <span class="pct">→</span>
                 <input class="fld" id="admCtH1f" type="time" style="max-width:104px" aria-label="Fim do 1º tempo e início do 2º" title="Fim do 1º tempo — o 2º começa aqui">
-                <span class="pct">2º até</span>
+                <span class="pct" id="admCtLbH2">2º até</span>
                 <input class="fld" id="admCtH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
               </div>
               <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
@@ -2320,8 +2321,10 @@
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admCtArvore" type="file" accept=".pdf" title="Árvore do edital · PDF">
               </div>
-              <div class="k-label sub-k" style="margin-top:10px">Professores por matéria · árvore do edital</div>
-              <div id="admCtProfs" style="max-height:180px; overflow:auto"></div>
+              <div id="admCtProfsBox">
+                <div class="k-label sub-k" style="margin-top:10px">Professores por matéria · árvore do edital</div>
+                <div id="admCtProfs" style="max-height:180px; overflow:auto"></div>
+              </div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmCtAbrir">Abrir turma</button></div>
             </div>
             <div class="adm-sep"><span>Turmas abertas</span></div>
@@ -7061,12 +7064,27 @@
   function renderCtLista() {
     var el = $('admCtLista'); if (!el) return;
     var novas = TURMAS_LOJA.filter(function (t) { return t.criada; });
+    var isos = (typeof ISOLADAS !== 'undefined') ? ISOLADAS.filter(function (i) { return i.criada; }) : [];
     el.innerHTML = novas.map(function (t) {
       return '<div class="adm-bar"><span class="nm">' + t.nome +
         '<small>' + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + ' · ' + fmt(t.precoDmn) + ' Dmn/' + fmt(t.precoQdc) + ' QdC · ' +
         t.vagasDmn + '+' + t.vagasQdc + ' vagas' + (t.edital ? ' · edital anexado' : '') + '</small></span>' +
         '<button class="adm-x" data-rm-ct="' + t.id + '" aria-label="Remover">✕</button></div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta por aqui ainda.</p>';
+    }).join('') + isos.map(function (i) {
+      return '<div class="adm-bar"><span class="nm">' + i.nome + ' <span class="tag">ISOLADA</span>' +
+        '<small>' + isoDesc(i) + ' · ' + fmt(i.preco) + ' ' + moedaTxt(i.moeda) + ' · ' + i.vagas + ' vagas</small></span>' +
+        '<button class="adm-x" data-rm-iso="' + i.id + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma ou isolada aberta por aqui ainda.</p>';
+    el.querySelectorAll('[data-rm-iso]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = ISOLADAS.filter(function (x) { return x.id === b.dataset.rmIso; })[0]; if (!i) return;
+        ISOLADAS = ISOLADAS.filter(function (x) { return x.id !== i.id; });
+        EVENTOS = EVENTOS.filter(function (e) { return e.id !== 'ev-' + i.id; });
+        renderIsoladas(); renderCtLista(); renderEvStrip();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('Isolada “' + i.nome + '” removida.');
+      });
+    });
     el.querySelectorAll('[data-rm-ct]').forEach(function (b) {
       b.addEventListener('click', function () { removerTurma(b.dataset.rmCt); });
     });
@@ -7205,7 +7223,30 @@
     var tipoSel = $('admCtTipo'); if (!tipoSel) return;
     tipoSel.innerHTML = MODALIDADES.map(function (m) {
       return '<option value="' + m.id + '">' + m.id + ' · ' + m.nome.split('·')[0].trim() + '</option>';
-    }).join('');
+    }).join('') + '<option value="ISOLADA">MATÉRIAS ISOLADAS</option>';
+    function ehIsolada() { return tipoSel.value === 'ISOLADA'; }
+    function admCtIsoToggle() {
+      var iso = ehIsolada();
+      $('admCtIsoBox').style.display = iso ? 'block' : 'none';
+      $('admCtProfsBox').style.display = iso ? 'none' : 'block';
+      $('admCtApelido').placeholder = iso ? 'Matéria (ex.: Língua Portuguesa)' : 'Apelido (ex.: Turma Águia)';
+      $('admCtLbH1').textContent = iso ? 'das' : '1º tempo';
+      $('admCtLbH2').style.display = iso ? 'none' : '';
+      $('admCtH2f').style.display = iso ? 'none' : '';
+      $('admCtH1f').title = iso ? 'Fim da aula isolada' : 'Fim do 1º tempo — o 2º começa aqui';
+      $('btnAdmCtAbrir').textContent = iso ? 'Abrir isolada' : 'Abrir turma';
+      if (iso) {
+        $('admCtIsoProf').innerHTML = (typeof docentesAtivos === 'function' ? docentesAtivos() : [])
+          .map(function (d) { return '<option>' + d.nome + '</option>'; }).join('')
+          || '<option value="">— sem professor no banco —</option>';
+      }
+    }
+    tipoSel.addEventListener('change', admCtIsoToggle);
+    $('admCtDias').querySelectorAll('.turno-chip').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+    admCtIsoToggle();
+    window.__isoToggle = admCtIsoToggle;
     $('admCtConc').innerHTML = TURMA_FOCOS.map(function (fo) {
       return '<option value="' + fo.id + '">' + fo.nome + '</option>';
     }).join('');
@@ -7213,6 +7254,35 @@
     renderCtProfs();
     $('btnAdmCtAbrir').addEventListener('click', function () {
       var tipo = tipoSel.value, ape = $('admCtApelido').value.trim();
+      /* ---------- MATÉRIAS ISOLADAS: dias fixos + período ---------- */
+      if (tipo === 'ISOLADA') {
+        var dias = [].slice.call($('admCtDias').querySelectorAll('.turno-chip.on')).map(function (c) { return c.dataset.dia; });
+        var iIni = $('admCtIni').value, iFim = $('admCtFim').value;
+        var iHi = $('admCtH1i').value, iHf = $('admCtH1f').value;
+        var iDmn = parseInt($('admCtPrecoDmn').value, 10), iQdc = parseInt($('admCtPrecoQdc').value, 10);
+        var iVagas = parseInt($('admCtVagas').value, 10);
+        if (!ape) { toast('Informe a matéria da isolada.'); return; }
+        if (/["<>]/.test(ape)) { toast('Use um nome sem aspas ou sinais.'); return; }
+        if (!dias.length) { toast('Escolha ao menos um dia da semana para a isolada.'); return; }
+        if (!iIni || !iFim) { toast('Informe o período da isolada (início e término).'); return; }
+        if (iFim < iIni) { toast('O término deve ser depois do início.'); return; }
+        if (!iHi || !iHf || !(iHi < iHf)) { toast('Informe o horário da isolada (das __ às __).'); return; }
+        if ((!iDmn || iDmn < 1) && (!iQdc || iQdc < 1)) { toast('Informe o preço da isolada em ao menos uma moeda.'); return; }
+        if (!iVagas || iVagas < 1) { toast('Informe as vagas da isolada.'); return; }
+        var usaDmn = !!(iDmn && iDmn >= 1);
+        var novaIso = { id: 'iso' + Date.now(), materia: ape, nome: 'Isolada ' + ape,
+          prof: $('admCtIsoProf') ? $('admCtIsoProf').value : '', dias: dias, hi: iHi, hf: iHf,
+          ini: iIni, fim: iFim, preco: usaDmn ? iDmn : iQdc, moeda: usaDmn ? 'dmn' : 'qdc', vagas: iVagas, criada: true };
+        ISOLADAS.push(novaIso);
+        renderIsoladas(); renderCtLista();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
+        $('admCtH1i').value = ''; $('admCtH1f').value = '';
+        $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = '';
+        $('admCtDias').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
+        toast('Isolada de ' + ape + ' aberta — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.');
+        return;
+      }
       var foco = TURMA_FOCOS.filter(function (fo) { return fo.id === $('admCtConc').value; })[0];
       var turno = $('admCtTurno').value;
       var ini = $('admCtIni').value, fim = $('admCtFim').value;
@@ -7313,6 +7383,7 @@
         }
         /* a boina do tutorial sai da vitrine assim que comprada */
         if (nome === 'Boina exclusiva') it.style.display = 'none';
+        if (it.dataset.isolada && typeof isoladaComprada === 'function') { isoladaComprada(nome); }
         var presencial = it.dataset.presencial === '1' || PRESENCIAIS.indexOf(nome) >= 0;
         if (presencial) pedidoNovo(nome);                           /* retirada na recepção */
         if (LINKS_ONLINE[nome]) {                                   /* atividade online: link junto */
@@ -7461,6 +7532,62 @@
     { id: 'chaveiro',   nome: 'Chaveiro Quad',    desc: 'brinde da marca',        preco: 40,  moeda: 'qdc', icone: 'chaveiro',  estoque: 25, cat: 'outros', estado: 'disp' },
     { id: 'camiseta',   nome: 'Camiseta Quad',    desc: 'camisa temática',        preco: 180, moeda: 'qdc', icone: 'camiseta',  estoque: 20, cat: 'outros', estado: 'disp' }
   ];
+  /* ---------- ISOLADAS: matérias avulsas com dias fixos e período ----------
+     Nascem no bloco "Criação de turmas e isoladas". Compradas, viram evento
+     recorrente: entram no carrossel do Início e no calendário do aluno.   */
+  var ISOLADAS = [
+    { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura',
+      dias: ['terça-feira'], hi: '20:00', hf: '22:00', ini: '2026-08-04', fim: '2026-10-20', preco: 350, moeda: 'dmn', vagas: 30 },
+    { id: 'iso-livre', materia: 'qualquer matéria', nome: 'Aula isolada', prof: '',
+      dias: [], hi: '', hf: '', ini: '', fim: '', preco: 40, moeda: 'qdc', vagas: 60 }
+  ];
+  var DIA_ABREV = { 'segunda-feira': 'SEG', 'terça-feira': 'TER', 'quarta-feira': 'QUA', 'quinta-feira': 'QUI', 'sexta-feira': 'SEX', 'sábado': 'SÁB', 'domingo': 'DOM' };
+  function isoDiasTxt(iso) { return (iso.dias || []).map(function (d) { return DIA_ABREV[d] || d; }).join(' e '); }
+  function isoHorarioTxt(iso) {
+    if (!iso.hi || !iso.hf) return '';
+    var h = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
+    return h(iso.hi) + '–' + h(iso.hf);
+  }
+  function isoDesc(iso) {
+    var p = [];
+    if (isoDiasTxt(iso)) p.push(isoDiasTxt(iso) + (isoHorarioTxt(iso) ? ' · ' + isoHorarioTxt(iso) : ''));
+    if (iso.prof) p.push('com ' + iso.prof);
+    if (iso.ini && iso.fim) p.push(dataBRcompleta(iso.ini) + ' a ' + dataBRcompleta(iso.fim));
+    return p.join(' · ') || iso.materia;
+  }
+  function renderIsoladas() {
+    var g = $('lojaIsoladas'); if (!g) return;
+    g.innerHTML = ISOLADAS.map(function (iso) {
+      var comprado = lojaOwned[iso.nome];
+      var mo = iso.moeda === 'dmn' ? 'dmn' : 'qdc';
+      return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
+        (iso.vagas ? '<span class="li-estoque">' + iso.vagas + ' vagas</span>' : '') +
+        '<span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>' +
+        '<span class="li-nome">' + iso.nome + '</span>' +
+        '<span class="li-desc">' + isoDesc(iso) + '</span>' +
+        '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+    }).join('');
+    g.querySelectorAll('.loja-item').forEach(bindLojaItem);
+  }
+  /* comprada, a isolada vira um EVENTO recorrente — carrossel e calendário de graça */
+  function isoladaComprada(nome) {
+    var iso = ISOLADAS.filter(function (x) { return x.nome === nome; })[0];
+    if (!iso || !iso.dias || !iso.dias.length) { renderIsoladas(); return; }
+    var evId = 'ev-' + iso.id;
+    if (!EVENTOS.some(function (e) { return e.id === evId; })) {
+      EVENTOS.push({ id: evId, nome: iso.nome, tipo: 'ISOLADA · PRESENCIAL', modalidade: 'presencial', online: false,
+        pago: false, preco: 0, profs: iso.prof ? [iso.prof] : [],
+        quando: isoDiasTxt(iso) + ' · ' + dataBRcompleta(iso.ini).slice(0, 5) + ' · ' + isoHorarioTxt(iso).toUpperCase(),
+        dataISO: iso.ini, ate: iso.fim, cor: 'teal', meta: iso.materia + ' · isolada',
+        desc: 'Matéria isolada de ' + iso.materia + ', ' + isoDesc(iso) + '.',
+        score: [['Presença na aula', '+20 score']], coins: [['Check-in na aula', '+5']] });
+    }
+    evState[evId] = evState[evId] || {};
+    evState[evId].inscrito = true;
+    renderIsoladas();
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderCalendario === 'function') renderCalendario();
+  }
   function presDe(id) { return ITENS_PRESENCIAIS.filter(function (x) { return x.id === id; })[0]; }
   function renderPresenciais() {
     ['excursao', 'modulos', 'taf', 'outros'].forEach(function (cat) {
@@ -7764,6 +7891,7 @@
     toast('Quests — missões especiais da administração. Próxima implementação.');
   });
   renderPresenciais();
+  renderIsoladas();
   renderEventosLoja();   /* vitrine de eventos pagos (ICON_CAT já existe aqui) */
   renderAdmProdList();
 

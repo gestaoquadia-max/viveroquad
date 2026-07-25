@@ -1,5 +1,25 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Matérias isoladas (item 5)
+
+- O bloco virou **"Criação de turmas e isoladas · matrícula e vagas"** e o
+  seletor de tipo ganhou **MATÉRIAS ISOLADAS**, ao lado de RONDESP,
+  PATAMO e BOPE.
+- Ao escolher isolada o formulário se adapta: aparecem os **sete botões
+  de dia da semana** (mínimo um), o campo de apelido vira **matéria**, os
+  dois tempos viram um **horário único** ("das __ às __"), o corpo
+  docente por matéria dá lugar a **um professor** e o botão vira
+  "Abrir isolada".
+- Exemplos que passam a funcionar: *Língua Portuguesa, todo sábado das 14
+  às 17, de 20/08/2026 a 20/10/2026* e *Direito Administrativo, terças e
+  quintas das 22 às 00*.
+- A isolada entra **na hora** na seção **Isoladas** da Quad Store, com
+  dias, horário, período, professor e vagas. Comprada, vira **evento
+  recorrente**: aparece nos **Eventos da semana** e no **calendário** do
+  aluno, e sai sozinha quando o período termina.
+- As duas isoladas que eram botões fixos no HTML passaram a ser
+  cadastros do sistema, como as novas.
+
 ## 25/07/2026 — Ajustes: apagar professor, cronograma integrado, recado na recepção, aulão como evento
 
 - **Apagar professor** (item 1): o Banco de professores ganhou o **✕** ao
