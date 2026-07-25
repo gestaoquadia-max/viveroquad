@@ -1,5 +1,67 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/07/2026 — Correções da avaliação funcional (itens 1 a 8)
+
+Aplicação dos ajustes levantados na auditoria de ponta a ponta das três
+áreas. Tudo verificado em navegador real (Playwright): 44 checagens novas
+(`vfix1` 24 · `vfix2` 20) e regressão completa sem quebras.
+
+**Os três problemas graves**
+
+- **Quiz da aula agora é por turma.** Antes existia **um único**
+  `QUIZ_AULA` global: criar quiz numa segunda sala **apagava em silêncio**
+  o da primeira (status zerado, "Encerrar" desabilitado no meio da aula).
+  Agora cada turma guarda o seu quiz (`QUIZZES[turmaId]`), com status,
+  respostas e contador de "respondendo agora" próprios — dois professores
+  trabalham ao mesmo tempo sem se atropelar. Sair da sala guarda o estado;
+  voltar restaura status, relógio e relatório.
+- **Turma criada no Controle entra no Cronograma semanal.** A grade
+  passou a ser derivada das **turmas reais** (as mesmas da Quad Store):
+  turma nova nasce com a grade em branco para a coordenação preencher e
+  turma removida some. A turma-fantasma **"CORE NOITE"** (existia só no
+  cronograma) foi eliminada e **"BOPE"** virou **"BOPE NOITE"**, com turno
+  explícito como as demais.
+- **Fim do formulário duplicado de turma.** A aba Estrutura tinha um
+  segundo "Abrir turma" que criava turma **sem preço e sem vagas** — ela
+  nunca chegava à Loja. O formulário saiu; a lista da Estrutura agora
+  **espelha as turmas reais** (com turno, horário e período) e um botão
+  leva ao lugar certo (Painel de controle · Criação de turmas). Remover
+  turma virou operação única, com **trava**: turma com matrícula ativa
+  não sai sem estorno.
+
+**Coerência de dados**
+
+- **Relatórios** e **Liberações** deixaram de usar listas escritas à mão:
+  o seletor de turmas dos Relatórios e o banco de "Inscritos por
+  atividade" leem turmas e eventos vivos. Turma sem ninguém mostra
+  **"sem inscritos"** em vez de número inventado.
+- **Preços e vagas das turmas** ganharam editor próprio na aba Loja
+  (Dmn, QdC e vagas por moeda) — dá para corrigir o valor **sem apagar e
+  recriar** a turma, preservando as matrículas.
+
+**Área do aluno**
+
+- **"Minhas turmas · matrículas ativas"** no Perfil: a segunda matrícula
+  deixou de ser invisível (antes o dinheiro saía e nada aparecia). Cada
+  turma mostra foco, turno, horário e período, com selo
+  **PRINCIPAL** / **ATIVA**.
+- **Ranking da sala** deixou de ser fixo em "42 alunos" — o total sai da
+  turma real do aluno.
+- Textos corrigidos: o menu "+" e o card do Quadrômetro falam
+  **Quad Store** (não mais "Intendência") e citam **Quad Coins e
+  Diamantes** (não mais "exclusivamente em Coins"); o campo de gift card
+  usa o formato real dos lotes (`QG1-4KZ7`).
+
+**Área do professor**
+
+- **Relatório da sala começa em branco** ("aguardando as respostas") em
+  vez de exibir 74%/78% simulados antes de qualquer aluno responder.
+- **E-mail institucional por docente**: escolher o professor preenche o
+  e-mail dele; entrar com o e-mail de outra pessoa é recusado, com a
+  mensagem dizendo qual é o certo.
+- **Ninguém é escalado em matéria que não dá**: sem professor cadastrado
+  para a matéria, a vaga fica em aberto em vez de sortear um nome.
+
 ## 24/07/2026 — Banco de professores · turnos mais claros (correção de UX)
 - **Sintoma**: não dava para cadastrar um professor marcando os 3 turnos
 - **Causa**: os chips de turno **nasciam todos ligados**; quem clicava

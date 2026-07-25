@@ -1622,6 +1622,11 @@
             <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10.</p>
           </div>
           <div class="p-card">
+            <div class="k-label">Minhas turmas · matrículas ativas</div>
+            <div id="minhasTurmasList"></div>
+            <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A <strong>turma principal</strong> é a que comanda o Início, o Domínio e o ranking da sala.</p>
+          </div>
+          <div class="p-card">
             <div class="k-label" id="rankSalaHead">Ranking da sala · 42 alunos</div>
             <div id="rankSalaList"></div>
           </div>
@@ -1642,9 +1647,9 @@
             <p class="sub" style="margin-top:10px">A economia (V1) premia constância — nunca volume bruto.</p>
           </div>
           <div class="p-card">
-            <h3>Intendência · gastar Quad Coins <span class="tag gold">LOJA ABERTA</span></h3>
-            <p class="sub">Troque seus Quad Coins por turmas, simulados, eventos e itens do personagem — exclusivamente em Coins.</p>
-            <div style="margin-top:10px"><button class="btn small" id="btnIrLoja">Ir para a Loja</button></div>
+            <h3>Quad Store · onde o esforço vira avanço <span class="tag gold">LOJA ABERTA</span></h3>
+            <p class="sub">Troque seus <strong>Quad Coins</strong> e <strong>Diamantes</strong> por turmas, simulados, eventos e itens do personagem.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnIrLoja">Ir para a Quad Store</button></div>
           </div>
           <div class="p-card" style="opacity:0.7">
             <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
@@ -1663,7 +1668,7 @@
               <span class="loja-saldo dmn"><img src="__DIAMANTE__" alt="" aria-hidden="true"><b id="lojaSaldoDmn">150</b>&nbsp;Dmn</span>
             </div>
             <div class="lh-gift">
-              <input class="fld" id="giftCode" placeholder="Código do gift card (ex.: QUAD-100)" autocomplete="off">
+              <input class="fld" id="giftCode" placeholder="Código do gift card (ex.: QG1-4KZ7)" autocomplete="off">
               <button class="btn small" id="btnGift">Resgatar</button>
             </div>
           </div>
@@ -2077,20 +2082,8 @@
           <div class="p-card">
             <div class="k-label">Turmas · concurso × modalidade × período</div>
             <div id="admTurmaList"></div>
-            <div class="adm-form" style="margin-top:10px">
-              <input class="fld" id="admTurmaNome" placeholder="Nome da turma (ex.: PATAMO Manhã)">
-              <div class="adm-row" style="margin-top:8px">
-                <select class="fld" id="admTurmaConc"></select>
-                <select class="fld" id="admTurmaMod"></select>
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admTurmaIni" type="date" aria-label="Início" title="Início" style="max-width:150px">
-                <span class="pct">até</span>
-                <input class="fld" id="admTurmaFim" type="date" aria-label="Término" title="Término provável" style="max-width:150px">
-                <button class="btn small" id="btnAdmTurma">Abrir turma</button>
-              </div>
-            </div>
-            <p class="sub" style="margin-top:8px">A turma referencia o <strong>edital</strong> (concurso) e a <strong>modalidade</strong>, com <strong>início e término provável</strong>. Toque no ✕ para remover.</p>
+            <p class="sub" style="margin-top:8px">Esta é a <strong>lista viva</strong> das turmas: cada uma referencia o <strong>edital</strong> (concurso) e a <strong>modalidade</strong>, com <strong>início e término provável</strong>. Para <strong>abrir uma turma nova</strong> use o bloco <strong>“Criação de turmas · matrícula e vagas”</strong> no Painel de controle — é lá que entram preço, vagas e horário, e só assim ela chega à Quad Store.</p>
+            <button class="btn ghost small" id="btnEstrIrCriarTurma" style="margin-top:8px">Ir para a criação de turmas</button>
           </div>
 
           <div class="p-card" style="opacity:0.9">
@@ -2730,6 +2723,13 @@
             <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins. O log de <strong>compradores</strong> agora fica em <strong>Relatórios · Loja</strong>.</p>
           </div>
 
+          <div class="p-card">
+            <div class="k-label">Preços e vagas das turmas · atualizar</div>
+            <div id="admPrecoTurmas"></div>
+            <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecoTurma">Aplicar nas turmas</button></div>
+            <p class="sub" style="margin-top:8px">Ajuste o valor em <strong>Diamantes</strong> e em <strong>Quad Coins</strong> e as <strong>vagas restantes</strong> de cada moeda <strong>sem apagar a turma</strong> — quem já está matriculado continua matriculado.</p>
+          </div>
+
         </div>
 
         <!-- ============ PROVA DE PROMOÇÃO (overlay próprio) ============ -->
@@ -2922,7 +2922,7 @@
             </button>
             <button class="plus-row" data-goto="v-loja">
               <span class="p-ico">◈</span>
-              <span class="grow"><span class="t">Loja · Intendência</span><span class="d">gaste seus Quad Coins em turmas, eventos e itens</span></span>
+              <span class="grow"><span class="t">Quad Store</span><span class="d">gaste Quad Coins e Diamantes em turmas, eventos e itens</span></span>
               <span class="tag gold">NOVO</span>
             </button>
             <button class="plus-row" id="rowGift">
@@ -3386,7 +3386,8 @@
     if (msg) toast(msg);
     if (typeof queueSync === 'function') queueSync();
   }
-  /* gift cards de liberação única (demo) */
+  /* [DEMO] códigos de recarga usados só para demonstrar a tela — os gift cards
+     de verdade nascem em lote no Painel de controle, no formato QG<lote>-<código>. */
   var GIFT_CARDS = { 'QUAD-100': 100, 'QUAD-500': 500 };
   var giftUsados = {};
   var GIFT_LOTES = [];   /* lotes criados no Painel de controle: cada código com QR e liberação única */
@@ -3682,11 +3683,6 @@
     { id: 'BOPE',    nome: 'Questões · BOPE',       teoria: 20, questoes: 80, desc: 'mais questões — alta intensidade' }
   ];
   function modalidadeDe(id) { for (var i = 0; i < MODALIDADES.length; i++) if (MODALIDADES[i].id === id) return MODALIDADES[i]; return null; }
-  var TURMAS_ADM = [
-    { nome: 'PATAMO Noite', concurso: 'cfo',  modalidade: 'PATAMO',  inicio: '2026-06-01', fim: '2026-12-15' },
-    { nome: 'RONDESP Noite', concurso: 'sdba', modalidade: 'RONDESP', inicio: '2026-07-01', fim: '2027-01-30' },
-    { nome: 'BOPE Intensivo', concurso: 'pcba', modalidade: 'BOPE',   inicio: '2026-05-15', fim: '2026-11-20' }
-  ];
   var EDITAL_ATUAL = EDITAL_CFO;     /* árvore que o Domínio do aluno mostra */
   var CONCURSO_ATUAL_ID = 'cfo';
   function concursoDe(id) { for (var i = 0; i < CONCURSOS.length; i++) if (CONCURSOS[i].id === id) return CONCURSOS[i]; return null; }
@@ -4184,22 +4180,33 @@
         [{ e: 7, m: 'GEOGRAFIA', p: 'Noelice' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
         [{ e: 5, m: 'PENAL MILITAR', p: 'Minho' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }]
       ] },
-      'BOPE': { sala: 'SALA 3', tipo: 'questões', aulas: [
+      'BOPE NOITE': { sala: 'SALA 3', tipo: 'questões', aulas: [
         [{ e: 2, m: 'MATEMÁTICA', p: 'Dan Reis' }, { e: 1, m: 'HISTÓRIA', p: 'Moab Kigran' }],
         [{ e: 1, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 2, m: 'IGUALDADE', p: 'Bruno Araújo' }],
         [{ e: 2, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 2, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }],
         [{ e: 3, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 2, m: 'GEOGRAFIA', p: 'Noelice' }],
         [{ e: 2, m: 'DIR. ADMIN.', p: 'Danilo Moura' }, { e: 2, m: 'REDAÇÃO', p: 'Rodrigo' }]
-      ] },
-      'CORE NOITE': { sala: 'SALA 2', tipo: 'questões', aulas: [
-        [{ e: 4, m: 'MED. LEGAL', p: 'Rodrigo' }, { e: 6, m: 'DIR. CONST.', p: 'John Bernam' }],
-        [{ e: 9, m: 'LEG. EXTRAVAGANTES', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'John Bernam' }],
-        [{ e: 4, m: 'MED. LEGAL', p: 'Rodrigo' }, { e: 5, m: 'LEG. GERAL', p: 'Alan' }],
-        [{ e: 7, m: 'IGUALDADE', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. CONST.', p: 'John Bernam' }],
-        [{ e: 4, m: 'DISCURSIVA', p: 'Rodrigo' }, { e: 11, m: 'PORTUGUÊS', p: 'Alisson Lopes' }]
       ] }
     }
   };
+  /* A grade do cronograma segue as TURMAS REAIS (as mesmas da Quad Store):
+     turma nova nasce com a grade em branco para a coordenação preencher, e
+     turma que não existe mais some daqui — nada de turma-fantasma.        */
+  function cronoKey(t) { return (t.tipo || '').toUpperCase() + ' ' + (t.turno || 'noite').toUpperCase(); }
+  function sincronizarCronoTurmas() {
+    if (typeof TURMAS_LOJA === 'undefined') return;
+    var vivas = {};
+    TURMAS_LOJA.forEach(function (t) {
+      var k = cronoKey(t);
+      vivas[k] = 1;
+      if (!CRONO.turmas[k]) {
+        CRONO.turmas[k] = { sala: 'a definir', tipo: (t.tipoDesc || '').split('·').pop().trim() || 'aulas',
+          aulas: [0, 1, 2, 3, 4].map(function () { return [{ e: 0, m: '', p: '' }, { e: 0, m: '', p: '' }]; }) };
+      }
+    });
+    Object.keys(CRONO.turmas).forEach(function (k) { if (!vivas[k]) { delete CRONO.turmas[k]; } });
+  }
+  sincronizarCronoTurmas();
   var ALUNO_TURMA = 'PATAMO NOITE';   /* vem da matrícula do aluno */
   // [INTEGRAÇÃO REAL] a turma vem do cadastro geral do site; aqui, o valor
   // confirmado no cadastro ("TURMA PATAMO (N)") vira a turma do app inteiro
@@ -4297,8 +4304,9 @@
     t.professores = {};
     mats.forEach(function (m, i) {
       var candidatos = docentesDaMateria(m);
+      /* sem professor DAQUELA matéria a vaga fica em aberto — nada de escalar
+         quem não dá a matéria só para preencher a grade */
       if (candidatos.length) { t.professores[m] = candidatos[(off + i) % candidatos.length].nome; }
-      else if (PROFESSORES.length) { t.professores[m] = PROFESSORES[(off + i) % PROFESSORES.length]; }
     });
     return t.professores;
   }
@@ -4310,17 +4318,35 @@
   function turmasDoProf(nome) {
     return TURMAS_LOJA.filter(function (t) { return materiasDoProf(t, nome).length > 0; });
   }
+  /* cada docente tem o seu e-mail funcional — escolher o professor já preenche
+     o campo, e a entrada só acontece se o e-mail for o daquele professor.      */
+  function semAcento(x) { return (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x; }
+  function emailDoProf(nome) {
+    var limpo = semAcento(nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim();
+    var partes = limpo.split(/\s+/);
+    var chave = (partes[partes.length - 1] || 'professor').toLowerCase().replace(/[^a-z]/g, '');
+    return chave + '@quadconcursos.com.br';
+  }
+  function profEmailPrefill() {
+    var sel = $('profSel'), em = $('profEmail'); if (!sel || !em) return;
+    em.value = emailDoProf(sel.value);
+    em.placeholder = emailDoProf(sel.value);
+  }
   function renderProfSel() {
     var sel = $('profSel'); if (!sel) return;
     var antes = sel.value;
     sel.innerHTML = docentesAtivos().map(function (d) { return '<option>' + d.nome + '</option>'; }).join('');
     if (antes) sel.value = antes;
+    profEmailPrefill();
   }
   renderProfSel();
+  if ($('profSel')) $('profSel').addEventListener('change', profEmailPrefill);
   $('btnProfEntrar').addEventListener('click', function () {
     var em = $('profEmail').value.trim(), ch = $('profChave').value.trim().toUpperCase();
     if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
     // [INTEGRAÇÃO REAL] cadastro individual do professor, aprovado pela coordenação
+    var esperado = emailDoProf($('profSel').value);
+    if (em.toLowerCase() !== esperado) { toast('Esse e-mail não é o cadastro de ' + $('profSel').value + ' — use ' + esperado + '.'); return; }
     if (ch !== 'PROF-2026') { toast('Chave inválida — solicite a liberação à coordenação.'); return; }
     var doc = docenteDe($('profSel').value);
     if (doc && doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
@@ -4376,6 +4402,7 @@
     qzSyncBotoes();
   }
   $('btnSalaVoltar').addEventListener('click', function () {
+    pollParar();
     SALA_ATUAL = null;
     $('salaDetail').style.display = 'none';
     $('profTurmasCard').style.display = 'block';
@@ -4396,15 +4423,58 @@
     { txt: 'Ato vinculado admite juízo de conveniência e oportunidade do administrador.', right: 1 },
     { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 }
   ];
-  var QUIZ_AULA = null;   /* { turmaId, tipo, minutos, qs, status, alunoFez, respostasAluno } */
-  window.__quizAula = function () { return QUIZ_AULA; };
+  /* CADA TURMA tem o SEU quiz: turmaId -> quiz. Dois professores (ou o mesmo
+     professor em salas seguidas) trabalham ao mesmo tempo sem se atropelar.  */
+  var QUIZZES = {};   /* { turmaId, tipo, minutos, pdf, qs, status, alunoFez, respostasAluno, pollN } */
+  function quizDaSala(id) { return QUIZZES[id || SALA_ATUAL] || null; }
+  window.__quizAula = function (id) { return quizDaSala(id); };
+  window.__quizzes = function () { return QUIZZES; };
+  var QZ_VAZIO = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.';
+  function qzStatusTxt(q) {
+    if (!q) { return QZ_VAZIO; }
+    var tp = q.tipo === 'ce' ? 'certo/errado' : 'múltipla escolha';
+    if (q.status === 'criado') {
+      return '<strong>Quiz criado</strong> — ' + q.qs.length + ' questões (' + tp + ') · ' + q.minutos + ' min · PDF “' + q.pdf + '”. A sala já vê <strong>“Aula com Quiz”</strong>; ative quando a aula começar.';
+    }
+    if (q.status === 'ativo') {
+      return '<strong>Quiz ATIVO</strong> — o botão “Quiz” apareceu para a sala com ' + q.minutos + ' min no relógio. Encerre para consolidar o relatório.';
+    }
+    return '<strong>Quiz encerrado</strong> — relatório consolidado abaixo. O aluno não pontua: o quiz é leitura pedagógica da sala.';
+  }
+  /* o "respondendo agora" pertence ao quiz da sala aberta — nunca vaza de uma turma para outra */
+  function pollPinta(q) {
+    var n = q ? q.pollN : 0, extra = (q && q.alunoFez) ? 1 : 0;
+    if ($('pollCount')) $('pollCount').textContent = Math.min(42, n + extra) + '/42';
+    if ($('pollBar')) $('pollBar').style.width = (n / 42 * 100) + '%';
+  }
+  function pollParar() { clearInterval(pollTimer); pollTimer = null; }
+  function pollRodar(q) {
+    pollParar();
+    if (!q || q.status !== 'ativo') { return; }
+    pollPinta(q);
+    pollTimer = setInterval(function () {
+      var alvo = q.alunoFez ? 42 : 41;   /* a última vaga é do aluno desta demo */
+      q.pollN = Math.min(alvo, q.pollN + Math.ceil(Math.random() * 5));
+      pollPinta(q);
+      if (q.pollN >= alvo) { pollParar(); }
+    }, 700);
+  }
   function qzSyncBotoes() {
-    var q = QUIZ_AULA && QUIZ_AULA.turmaId === SALA_ATUAL ? QUIZ_AULA : null;
+    var q = quizDaSala();
     $('btnQuizCriar').disabled = !!(q && q.status !== 'encerrado');
     $('btnQuizAtivar').disabled = !(q && q.status === 'criado');
     $('btnQuizEncerrar').disabled = !(q && q.status === 'ativo');
     $('qzRelCard').style.display = (q && (q.status === 'ativo' || q.status === 'encerrado')) ? 'block' : 'none';
-    if (!q) { $('qzStatus').innerHTML = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.'; }
+    $('qzStatus').innerHTML = qzStatusTxt(q);
+    $('liveTag').style.display = (q && q.status === 'ativo') ? 'inline-block' : 'none';
+    if ($('pollSub')) {
+      $('pollSub').textContent = (q && q.status === 'encerrado')
+        ? 'Quiz encerrado — respostas consolidadas.'
+        : 'Acompanhe quantos alunos já enviaram as respostas.';
+    }
+    pollPinta(q);
+    if (q && (q.status === 'ativo' || q.status === 'encerrado')) { qzRelatorio(q); }
+    pollRodar(q);
   }
   $('btnQuizCriar').addEventListener('click', function () {
     if (!SALA_ATUAL) { toast('Abra uma sala primeiro.'); return; }
@@ -4415,52 +4485,35 @@
     if (!nq || nq < 1 || nq > 5) { toast('Número de questões: de 1 a 5 na demo.'); return; }
     if (!min || min < 1 || min > 60) { toast('Tempo do quiz: de 1 a 60 minutos.'); return; }
     var banco = tipo === 'ce' ? QA_CE : QA_MULT;
-    QUIZ_AULA = { turmaId: SALA_ATUAL, tipo: tipo, minutos: min, pdf: arq, status: 'criado', alunoFez: false, respostasAluno: [],
+    QUIZZES[SALA_ATUAL] = { turmaId: SALA_ATUAL, tipo: tipo, minutos: min, pdf: arq, status: 'criado', alunoFez: false, respostasAluno: [], pollN: 0,
       qs: banco.slice(0, nq).map(function (q) { return { txt: q.txt, alts: q.alts || ['Certo', 'Errado'], right: q.right }; }) };
-    $('qzStatus').innerHTML = '<strong>Quiz criado</strong> — ' + nq + ' questões (' + (tipo === 'ce' ? 'certo/errado' : 'múltipla escolha') + ') · ' + min + ' min · PDF “' + arq + '”. A sala já vê <strong>“Aula com Quiz”</strong>; ative quando a aula começar.';
     qzSyncBotoes(); refreshQuizAula();
-    toast('Quiz criado — a sala já sabe que hoje tem quiz.');
+    toast('Quiz criado — a sala “' + (turmaDe(SALA_ATUAL) || {}).nome + '” já sabe que hoje tem quiz.');
   });
   $('btnQuizAtivar').addEventListener('click', function () {
-    if (!QUIZ_AULA || QUIZ_AULA.status !== 'criado') return;
-    QUIZ_AULA.status = 'ativo';
-    $('qzStatus').innerHTML = '<strong>Quiz ATIVO</strong> — o botão “Quiz” apareceu para a sala com ' + QUIZ_AULA.minutos + ' min no relógio. Encerre para consolidar o relatório.';
-    $('liveTag').style.display = 'inline-block';
-    pollN = 0;
-    $('pollCount').textContent = '0/42';
-    $('pollBar').style.width = '0%';
-    qzRelatorio();
-    clearInterval(pollTimer);
-    pollTimer = setInterval(function () {
-      var alvo = QUIZ_AULA && QUIZ_AULA.alunoFez ? 42 : 41;   /* a última vaga é do aluno desta demo */
-      pollN = Math.min(alvo, pollN + Math.ceil(Math.random() * 5));
-      $('pollCount').textContent = (QUIZ_AULA && QUIZ_AULA.alunoFez ? Math.min(42, pollN + 1) : pollN) + '/42';
-      $('pollBar').style.width = (pollN / 42 * 100) + '%';
-      if (pollN >= 42) clearInterval(pollTimer);
-    }, 700);
+    var q = quizDaSala();
+    if (!q || q.status !== 'criado') return;
+    q.status = 'ativo'; q.pollN = 0;
     qzSyncBotoes(); refreshQuizAula();
     toast('Quiz ativado — a sala está respondendo.');
   });
   $('btnQuizEncerrar').addEventListener('click', function () {
-    if (!QUIZ_AULA || QUIZ_AULA.status !== 'ativo') return;
-    QUIZ_AULA.status = 'encerrado';
-    clearInterval(pollTimer);
-    $('liveTag').style.display = 'none';
-    $('qzStatus').innerHTML = '<strong>Quiz encerrado</strong> — relatório consolidado abaixo. O aluno não pontua: o quiz é leitura pedagógica da sala.';
-    $('pollSub').textContent = 'Quiz encerrado — respostas consolidadas.';
-    qzRelatorio(); qzSyncBotoes(); refreshQuizAula();
+    var q = quizDaSala();
+    if (!q || q.status !== 'ativo') return;
+    q.status = 'encerrado';
+    qzSyncBotoes(); refreshQuizAula();
     toast('Quiz encerrado — relatório da sala consolidado.');
   });
   /* distribuição de alternativas por questão (determinística na demo) */
-  function qzDist(q, qi) {
+  function qzDist(quiz, q, qi) {
     var n = q.alts.length, pesos = [], soma = 0;
     for (var i = 0; i < n; i++) { var w = 8 + (edHash(q.txt + ':' + i) % 25) + (i === q.right ? 42 : 0); pesos.push(w); soma += w; }
     var pct = pesos.map(function (w) { return Math.round(w / soma * 100); });
     var dif = 100 - pct.reduce(function (a, b) { return a + b; }, 0);
     pct[q.right] += dif;
     /* a resposta real do aluno desta demo entra no bolo */
-    if (QUIZ_AULA.alunoFez && QUIZ_AULA.respostasAluno[qi] != null) {
-      var esc = QUIZ_AULA.respostasAluno[qi];
+    if (quiz.alunoFez && quiz.respostasAluno[qi] != null) {
+      var esc = quiz.respostasAluno[qi];
       pct[esc] = Math.min(100, pct[esc] + 2);
       var doador = -1, maior = -1;
       for (var d = 0; d < pct.length; d++) { if (d !== esc && pct[d] > maior) { maior = pct[d]; doador = d; } }
@@ -4468,11 +4521,18 @@
     }
     return pct;
   }
-  function qzRelatorio() {
-    var el = $('qzRelList'); if (!el || !QUIZ_AULA) return;
+  function qzRelatorio(quiz) {
+    var el = $('qzRelList');
+    quiz = quiz || quizDaSala();
+    if (!el || !quiz) return;
+    /* ANTES de alguém responder o relatório fica em branco — nada de % inventado na aula */
+    if (!quiz.pollN && !quiz.alunoFez) {
+      el.innerHTML = '<p class="sub" style="padding:8px 0">Aguardando as respostas da sala — o gráfico por questão aparece assim que os alunos começarem a enviar.</p>';
+      return;
+    }
     var LETRAS = ['A', 'B', 'C', 'D', 'E'];
-    el.innerHTML = QUIZ_AULA.qs.map(function (q, i) {
-      var pct = qzDist(q, i), ac = pct[q.right];
+    el.innerHTML = quiz.qs.map(function (q, i) {
+      var pct = qzDist(quiz, q, i), ac = pct[q.right];
       return '<div class="result-bar"><span class="q">Q' + (i + 1) + '</span>' +
         '<div class="bar-track"><div class="bar-fill" style="width:' + ac + '%"></div></div>' +
         '<span class="n">' + ac + '%</span>' +
@@ -4495,9 +4555,13 @@
 
   /* ---------- lado do aluno: selo na Aula de hoje + botão Quiz ---------- */
   function quizDaMinhaTurma() {
-    if (!QUIZ_AULA) return null;
-    var minha = (typeof matriculasAtivas === 'function') && matriculasAtivas().some(function (m) { return m.turmaId === QUIZ_AULA.turmaId; });
-    return minha ? QUIZ_AULA : null;
+    var ativas = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    var cands = [];
+    ativas.forEach(function (m) { if (QUIZZES[m.turmaId]) cands.push(QUIZZES[m.turmaId]); });
+    if (!cands.length) return null;
+    var ordem = { ativo: 0, criado: 1, encerrado: 2 };
+    cands.sort(function (a, b) { return (ordem[a.status] || 9) - (ordem[b.status] || 9); });
+    return cands[0];
   }
   function refreshQuizAula() {
     var q = quizDaMinhaTurma();
@@ -4536,7 +4600,7 @@
   });
 
   /* ---------- runtime do quiz da aula (cronômetro · sem premiação) ---------- */
-  var qaIdx = 0, qaSel = null, qaTimerT = null, qaFim = 0;
+  var qaIdx = 0, qaSel = null, qaTimerT = null, qaFim = 0, QA_ATUAL = null;
   function qaTick() {
     var resta = Math.max(0, Math.round((qaFim - Date.now()) / 1000));
     var m = Math.floor(resta / 60), sg = resta % 60;
@@ -4544,7 +4608,7 @@
     if (resta <= 0) { clearInterval(qaTimerT); qaFinaliza(true); }
   }
   function abrirQuizAula(q) {
-    qaIdx = 0; qaSel = null;
+    qaIdx = 0; qaSel = null; QA_ATUAL = q;
     q.respostasAluno = [];
     $('qaKicker').textContent = 'Quiz da aula · ' + (turmaDe(q.turmaId) || {}).nome;
     qaFim = Date.now() + q.minutos * 60000;
@@ -4553,7 +4617,7 @@
     $('qaLayer').classList.add('on');
   }
   function qaRender() {
-    var q = QUIZ_AULA, item = q.qs[qaIdx];
+    var q = QA_ATUAL, item = q.qs[qaIdx];
     $('qaProgress').textContent = 'Questão ' + (qaIdx + 1) + ' de ' + q.qs.length;
     $('qaBody').innerHTML = '<p class="q-txt">' + item.txt + '</p>' +
       item.alts.map(function (alt, i) {
@@ -4572,8 +4636,8 @@
   }
   $('btnQaNext').addEventListener('click', function () {
     if (qaSel == null) return;
-    QUIZ_AULA.respostasAluno[qaIdx] = qaSel;
-    if (qaIdx < QUIZ_AULA.qs.length - 1) { qaIdx++; qaRender(); return; }
+    QA_ATUAL.respostasAluno[qaIdx] = qaSel;
+    if (qaIdx < QA_ATUAL.qs.length - 1) { qaIdx++; qaRender(); return; }
     qaFinaliza(false);
   });
   $('btnSairQa').addEventListener('click', function () {
@@ -4583,9 +4647,9 @@
   });
   function qaFinaliza(tempoEsgotado) {
     clearInterval(qaTimerT);
-    QUIZ_AULA.alunoFez = true;
+    QA_ATUAL.alunoFez = true;
     $('qaLayer').classList.remove('on');
-    qzRelatorio();   /* a resposta real entra no relatório do professor */
+    if (SALA_ATUAL === QA_ATUAL.turmaId) { qzRelatorio(QA_ATUAL); }   /* a resposta real entra no relatório do professor */
     refreshQuizAula();
     toast(tempoEsgotado ? 'Tempo esgotado — o que você respondeu foi enviado ao professor.' : 'Respostas enviadas ao professor — sem gabarito agora, o resultado sai com ele.');
   }
@@ -6061,7 +6125,8 @@
     $('cardTurma').textContent = turmaLabel();
     var pt = $('progTurma'); if (pt) pt.textContent = turmaLabel();
     var qt = $('quadTurma'); if (qt) qt.textContent = turmaLabel();
-    var rh = $('rankSalaHead'); if (rh) rh.textContent = 'Ranking da sala · ' + turmaLabel().replace('Turma ', '') + ' · 42 alunos';
+    renderMinhasTurmas();
+    var rh = $('rankSalaHead'); if (rh) rh.textContent = 'Ranking da sala · ' + turmaLabel().replace('Turma ', '') + ' · ' + salaTotal() + ' alunos';
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
     $('xpFill').style.width = pct + '%';
     $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
@@ -6121,12 +6186,37 @@
     for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, arr[j - 1] - RK_OFF[(j * 5) % RK_OFF.length]);
     return arr;
   }
+  /* todas as matrículas ativas do aluno — inclusive a 2ª turma comprada na Quad Store */
+  function renderMinhasTurmas() {
+    var el = $('minhasTurmasList'); if (!el) return;
+    var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    el.innerHTML = ats.map(function (m, i) {
+      var t = (typeof turmaDe === 'function') ? turmaDe(m.turmaId) : null;
+      var nome = t ? t.nome : ('Turma ' + m.tipo);
+      var det = [(t && t.focoNome) || '', m.turno, t ? t.hor : ''].filter(Boolean).join(' · ');
+      var per = (t && t.inicio) ? (dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim)) : ('até ' + (m.fim ? dataBRcompleta(m.fim) : '—'));
+      return '<div class="mission-row"><div class="m-dot">◉</div>' +
+        '<div class="grow"><div class="t">' + nome + '</div><div class="d">' + det + '<br>' + per + '</div></div>' +
+        '<span class="tag' + (i === 0 ? ' ok' : '') + '">' + (i === 0 ? 'PRINCIPAL' : 'ATIVA') + '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matrícula ativa — abra a Quad Store para entrar numa turma.</p>';
+  }
+  /* quantos alunos a sala tem de verdade: sai da turma principal do aluno */
+  function turmaPrincipal() {
+    var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    return (ats.length && typeof turmaDe === 'function') ? turmaDe(ats[0].turmaId) : null;
+  }
+  function salaTotal() {
+    var t = turmaPrincipal();
+    var n = (t && typeof turmaInscritos === 'function') ? turmaInscritos(t) : 0;
+    return Math.max(12, n);
+  }
+  function salaPos(total) { return Math.min(total, Math.max(3, Math.round(total * 0.29))); }
   var rkOpen = { sala: false, geral: false };
   function renderRankings() {
     var elS = $('rankSalaList'), elG = $('rankGeralList');
     if (!elS || !elG) return;
-    // sala: 42 alunos, aluno em 12º
-    var sTot = 42, sPos = 12, sc = rkScores(sTot, sPos, carreira.scoreCarreira);
+    // sala: o total vem da turma real do aluno (matrícula principal)
+    var sTot = salaTotal(), sPos = salaPos(sTot), sc = rkScores(sTot, sPos, carreira.scoreCarreira);
     function salaRow(i) {
       if (i === sPos) return rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false);
       var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
@@ -6138,7 +6228,7 @@
     } else {
       for (var i2 = sPos - 2; i2 <= sPos + 2; i2++) html += salaRow(i2);
     }
-    html += '<button class="btn ghost small rk-toggle" id="rkSalaBtn">' + (rkOpen.sala ? 'Mostrar menos' : 'Ver ranking completo · 42 alunos') + '</button>';
+    html += '<button class="btn ghost small rk-toggle" id="rkSalaBtn">' + (rkOpen.sala ? 'Mostrar menos' : 'Ver ranking completo · ' + sTot + ' alunos') + '</button>';
     elS.innerHTML = html;
     $('rkSalaBtn').onclick = function () { rkOpen.sala = !rkOpen.sala; renderRankings(); };
     // geral: 1.286 usuários, aluno em 87º
@@ -6555,36 +6645,42 @@
   }
   var DIA_SEM_TURMA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   function dataBRcompleta(iso) { if (!iso) return '—'; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  /* remover turma é uma operação só — vale para a Estrutura e para o Painel de controle */
+  function removerTurma(id) {
+    var t = turmaDe(id); if (!t) return;
+    var presos = (typeof matriculasAtivas === 'function')
+      ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
+    if (presos) { toast('“' + t.nome + '” tem ' + presos + ' matrícula' + (presos > 1 ? 's' : '') + ' ativa' + (presos > 1 ? 's' : '') + ' — estorne antes de remover.'); return; }
+    TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
+    sincronizarCronoTurmas();
+    renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+    if (typeof admCronoInit === 'function') admCronoInit();
+    if (typeof relTurmasInit === 'function') relTurmasInit();
+    if (typeof ativInit === 'function') ativInit();
+    if (typeof renderPrecoTurmas === 'function') renderPrecoTurmas();
+    toast('Turma “' + t.nome + '” removida.');
+  }
   function renderTurmasAdm() {
     var el = $('admTurmaList'); if (!el) return;
-    el.innerHTML = TURMAS_ADM.map(function (t, i) {
-      var c = concursoDe(t.concurso), m = modalidadeDe(t.modalidade);
+    el.innerHTML = TURMAS_LOJA.map(function (t) {
+      var c = concursoDe(t.concurso), m = modalidadeDe(t.tipo);
       return '<div class="adm-bar"><span class="nm">' + t.nome +
-        '<small>' + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.modalidade) + ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) +
-        (t.h1i ? ' · ' + t.h1i.replace(':', 'h') + '–' + t.h1f.replace(':', 'h') + ' e ' + t.h1f.replace(':', 'h') + '–' + t.h2f.replace(':', 'h') : '') + '</small></span>' +
-        '<button class="adm-x" data-rm-turma="' + i + '" aria-label="Remover">✕</button></div>';
+        '<small>' + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.tipo) + ' · ' + t.turno + ' · ' + t.hor +
+        ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) + '</small></span>' +
+        '<button class="adm-x" data-rm-turma="' + t.id + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma cadastrada.</p>';
     el.querySelectorAll('[data-rm-turma]').forEach(function (b) {
-      b.addEventListener('click', function () { var t = TURMAS_ADM[+b.dataset.rmTurma]; TURMAS_ADM.splice(+b.dataset.rmTurma, 1); renderTurmasAdm(); toast('Turma “' + t.nome + '” removida.'); });
+      b.addEventListener('click', function () { removerTurma(b.dataset.rmTurma); });
     });
   }
   function admEstruturaInit() {
-    $('admTurmaConc').innerHTML = CONCURSOS.map(function (c) { return '<option value="' + c.id + '">' + c.nome + '</option>'; }).join('');
-    $('admTurmaMod').innerHTML = MODALIDADES.map(function (m) { return '<option value="' + m.id + '">' + m.nome + '</option>'; }).join('');
     renderConcursos(); renderModalidades(); renderTurmasAdm();
   }
-  $('btnAdmTurma').addEventListener('click', function () {
-    var nome = $('admTurmaNome').value.trim();
-    var conc = $('admTurmaConc').value, mod = $('admTurmaMod').value;
-    var ini = $('admTurmaIni').value, fim = $('admTurmaFim').value;
-    if (!nome) { toast('Dê um nome à turma.'); return; }
-    if (!ini || !fim) { toast('Informe o início e o término provável.'); return; }
-    if (fim < ini) { toast('O término deve ser depois do início.'); return; }
-    TURMAS_ADM.unshift({ nome: nome, concurso: conc, modalidade: mod, inicio: ini, fim: fim });
-    renderTurmasAdm();
-    $('admTurmaNome').value = ''; $('admTurmaIni').value = ''; $('admTurmaFim').value = '';
-    var c = concursoDe(conc);
-    toast('Turma “' + nome + '” aberta — ' + (c ? c.nome : '') + ' · ' + (modalidadeDe(mod) || {}).nome + '.');
+  /* criar turma acontece num lugar só: Painel de controle (com preço, vagas e horário) */
+  if ($('btnEstrIrCriarTurma')) $('btnEstrIrCriarTurma').addEventListener('click', function () {
+    showView('v-adm-controle', 'navAdmin');
+    var alvo = $('admCtApelido');
+    if (alvo) { alvo.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   });
 
   /* ---------- Painel de CONTROLE · criação de turmas ----------
@@ -6628,13 +6724,7 @@
         '<button class="adm-x" data-rm-ct="' + t.id + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta por aqui ainda.</p>';
     el.querySelectorAll('[data-rm-ct]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var t = turmaDe(b.dataset.rmCt); if (!t) return;
-        TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
-        TURMAS_ADM = TURMAS_ADM.filter(function (x) { return x.ctId !== t.id; });
-        renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
-        toast('Turma “' + t.nome + '” removida.');
-      });
+      b.addEventListener('click', function () { removerTurma(b.dataset.rmCt); });
     });
   }
   /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
@@ -6744,9 +6834,12 @@
       TURMAS_LOJA.push({ id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: (modalidadeDe(tipo) || {}).nome || tipo, turno: turno, hor: hor,
         concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vagas - vQdc, vagasQdc: vQdc,
         inicio: ini, fim: fim, edital: arq, professores: profs });
-      TURMAS_ADM.unshift({ ctId: id, nome: nome, concurso: foco.id, focoNome: foco.nome, modalidade: tipo,
-        inicio: ini, fim: fim, h1i: h1i, h1f: h1f, h2f: h2f, edital: arq });
+      sincronizarCronoTurmas();   /* a turma nova já nasce no Cronograma semanal */
       renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+      if (typeof admCronoInit === 'function') admCronoInit();
+      if (typeof relTurmasInit === 'function') relTurmasInit();
+      if (typeof ativInit === 'function') ativInit();
+      if (typeof renderPrecoTurmas === 'function') renderPrecoTurmas();
       if (typeof renderAulaHoje === 'function') renderAulaHoje();   /* horário novo sincroniza a Aula de hoje */
       if (typeof admCronoPrefill === 'function') admCronoPrefill();  /* e o editor de cronograma */
       $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
@@ -6891,6 +6984,8 @@
       if (typeof definirDominio === 'function' && typeof concursoDe === 'function' && concursoDe(t.concurso)) definirDominio(t.concurso);
     }
     renderTurmasLoja();
+    if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+    if (typeof renderRankings === 'function') renderRankings();
     $('turmaLayer').classList.remove('on');
     var ml = $('matLayer'); if (ml) ml.classList.remove('on');
     toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
@@ -7821,22 +7916,29 @@
     $('admCrMat').value = a ? a.m : '';
     $('admCrProf').value = a ? a.p : '';
   }
+  var cronoLigado = false;
   function admCronoInit() {
+    sincronizarCronoTurmas();
+    var atual = $('admCrTurma').value;
     $('admCrTurma').innerHTML = Object.keys(CRONO.turmas).map(function (t) {
-      return '<option>' + t + '</option>';
+      return '<option' + (t === atual ? ' selected' : '') + '>' + t + '</option>';
     }).join('');
     $('admCrDia').innerHTML = CRONO.dias.map(function (d, i) {
       return '<option value="' + i + '">' + d + ' · ' + CRONO.datas[i] + '</option>';
     }).join('');
-    ['admCrTurma', 'admCrDia', 'admCrTempo'].forEach(function (id) {
-      $(id).addEventListener('change', admCronoPrefill);
-    });
+    if (!cronoLigado) {
+      cronoLigado = true;
+      ['admCrTurma', 'admCrDia', 'admCrTempo'].forEach(function (id) {
+        $(id).addEventListener('change', admCronoPrefill);
+      });
+    }
     admCronoPrefill();
   }
   $('btnAdmCrono').addEventListener('click', function () {
     var t = $('admCrTurma').value, d = +$('admCrDia').value, tp = +$('admCrTempo').value;
     var m = $('admCrMat').value.trim(), pr = $('admCrProf').value.trim();
     if (!m || !pr) { toast('Preencha matéria e professor.'); return; }
+    if (!CRONO.turmas[t]) { toast('Turma sem grade — recarregue o cronograma.'); return; }
     var aula = CRONO.turmas[t].aulas[d][tp];
     aula.m = m.toUpperCase(); aula.p = pr;
     renderAulaHoje();   /* o card "Aula de hoje" do aluno muda na hora */
@@ -7855,6 +7957,7 @@
     $('admEvSel').innerHTML = EVENTOS.map(function (ev) {
       return '<option value="' + ev.id + '">' + ev.nome + '</option>';
     }).join('');
+    if (typeof ativInit === 'function') { ativInit(); }   /* evento novo já pode ter os inscritos consultados nas Liberações */
     $('admEvList').querySelectorAll('[data-cancel-ev]').forEach(function (bt) {
       bt.addEventListener('click', function () { cancelarEvento(bt.dataset.cancelEv); });
     });
@@ -8086,22 +8189,56 @@
 
   /* ---------- Inscritos por atividade: banco + lista colapsável (estilo ranking) ---------- */
   var ATIVIDADES = [
-    { id: 'a-patamo', nome: 'Turma PATAMO (Noite)', tipo: 'Turma', n: 42, seed: 5 },
-    { id: 'a-rondesp', nome: 'Turma RONDESP (Noite)', tipo: 'Turma', n: 38, seed: 9 },
     { id: 'a-aulao', nome: 'Aulão de véspera RONDESP', tipo: 'Aulão', n: 73, seed: 13 },
     { id: 'a-isolada', nome: 'Isolada Dir. Administrativo', tipo: 'Isolada', n: 21, seed: 17 },
-    { id: 'a-evento', nome: 'Aniversário do Quad', tipo: 'Evento', n: 128, seed: 23 },
     { id: 'a-simulado', nome: 'Simuladão Quad', tipo: 'Simulado', n: 54, seed: 29 },
     { id: 'a-excursao', nome: 'Excursão concurso PM-BA', tipo: 'Excursão', n: 40, seed: 31 },
     { id: 'a-taf', nome: 'Treinamento TAF', tipo: 'TAF', n: 30, seed: 37 }
   ];
   var ativOpen = false;
-  function ativDe(id) { return ATIVIDADES.filter(function (a) { return a.id === id; })[0]; }
+  /* turmas e eventos entram AUTOMATICAMENTE: o que a coordenação abre hoje
+     já pode ter a lista de inscritos consultada aqui, sem cadastro duplo.  */
+  function turmaInscritos(t) {
+    var base = t.criada ? 0 : (20 + (edHash(t.id) % 25));
+    var meus = (typeof matriculasAtivas === 'function')
+      ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
+    return base + meus;
+  }
+  function turmaRotulo(t) {
+    var tn = (t.turno || '');
+    return t.nome + (t.nome.toLowerCase().indexOf(tn.toLowerCase()) >= 0 ? '' : ' (' + tn + ')');
+  }
+  function ativBank() {
+    var lista = ATIVIDADES.slice();
+    (typeof TURMAS_LOJA !== 'undefined' ? TURMAS_LOJA : []).forEach(function (t) {
+      lista.push({ id: 'at-' + t.id, nome: turmaRotulo(t), tipo: 'Turma',
+        n: turmaInscritos(t), seed: 3 + (edHash(t.id) % 90) });
+    });
+    (typeof EVENTOS !== 'undefined' ? EVENTOS : []).forEach(function (ev) {
+      lista.push({ id: 'at-' + ev.id, nome: ev.nome, tipo: 'Evento',
+        n: (typeof evInscritosCount === 'function' ? evInscritosCount(ev.id) : 0), seed: 3 + (edHash(ev.id) % 90) });
+    });
+    return lista;
+  }
+  function ativDe(id) { return ativBank().filter(function (a) { return a.id === id; })[0]; }
+  function ativInit() {
+    var sel = $('admAtivSel'); if (!sel) return;
+    var atual = sel.value;
+    sel.innerHTML = ativBank().map(function (a) {
+      return '<option value="' + a.id + '"' + (a.id === atual ? ' selected' : '') + '>' + a.tipo + ' · ' + a.nome + '</option>';
+    }).join('');
+    renderAtivInscritos();
+  }
   function renderAtivInscritos() {
     var sel = $('admAtivSel'), el = $('admAtivInscritos'); if (!sel || !el) return;
     var a = ativDe(sel.value); if (!a) { el.innerHTML = ''; return; }
     var CAP = 5;
     var total = a.n, mostra = ativOpen ? total : Math.min(CAP, total);
+    if (!total) {
+      el.innerHTML = '<div class="k-label sub-k" style="margin-top:2px">' + a.tipo + ' · ' + a.nome + ' <span class="tag">sem inscritos</span></div>' +
+        '<p class="sub" style="padding:8px 0">Ninguém inscrito ainda — assim que a primeira matrícula/compra entrar, o nome aparece aqui.</p>';
+      return;
+    }
     var linhas = '';
     for (var i = 1; i <= mostra; i++) linhas += '<div class="mission-row"><div class="cal-date">' + i + 'º</div>' +
       '<div class="grow"><div class="t">' + inscNome(a.seed, i) + '</div>' +
@@ -8113,8 +8250,8 @@
   }
   (function () {
     var sel = $('admAtivSel'); if (!sel) return;
-    sel.innerHTML = ATIVIDADES.map(function (a) { return '<option value="' + a.id + '">' + a.tipo + ' · ' + a.nome + '</option>'; }).join('');
     sel.addEventListener('change', function () { ativOpen = false; renderAtivInscritos(); });
+    ativInit();
   })();
 
   /* ---------- Liberações: inscritos presenciais (liberar entrada e pontuar) ----------
@@ -8329,7 +8466,39 @@
     });
     return itens;
   }
+  /* turma tem DUAS moedas e vagas por moeda: editor próprio, sem recriar a turma */
+  function renderPrecoTurmas() {
+    var el = $('admPrecoTurmas'); if (!el) return;
+    el.innerHTML = TURMAS_LOJA.map(function (t) {
+      return '<div class="adm-bar" style="flex-wrap:wrap"><span class="nm" style="flex-basis:100%">' + t.nome +
+        '<small>' + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + '</small></span>' +
+        '<input class="fld" data-tp-dmn="' + t.id + '" value="' + t.precoDmn + '" inputmode="numeric" title="Preço em Diamantes" style="max-width:76px;text-align:right"> <span class="pct">Dmn</span>' +
+        '<input class="fld" data-tp-qdc="' + t.id + '" value="' + t.precoQdc + '" inputmode="numeric" title="Preço em Quad Coins" style="max-width:76px;text-align:right"> <span class="pct">QdC</span>' +
+        '<input class="fld" data-tv-dmn="' + t.id + '" value="' + t.vagasDmn + '" inputmode="numeric" title="Vagas restantes em Diamantes" style="max-width:58px;text-align:right"> <span class="pct">vg Dmn</span>' +
+        '<input class="fld" data-tv-qdc="' + t.id + '" value="' + t.vagasQdc + '" inputmode="numeric" title="Vagas restantes em Quad Coins" style="max-width:58px;text-align:right"> <span class="pct">vg QdC</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta.</p>';
+  }
+  if ($('btnAdmPrecoTurma')) $('btnAdmPrecoTurma').addEventListener('click', function () {
+    var mudou = 0;
+    TURMAS_LOJA.forEach(function (t) {
+      var pd = $('admPrecoTurmas').querySelector('[data-tp-dmn="' + t.id + '"]');
+      var pq = $('admPrecoTurmas').querySelector('[data-tp-qdc="' + t.id + '"]');
+      var vd = $('admPrecoTurmas').querySelector('[data-tv-dmn="' + t.id + '"]');
+      var vq = $('admPrecoTurmas').querySelector('[data-tv-qdc="' + t.id + '"]');
+      if (!pd || !pq || !vd || !vq) return;
+      var a = parseInt(pd.value, 10), b = parseInt(pq.value, 10);
+      var c = parseInt(vd.value, 10), d = parseInt(vq.value, 10);
+      if (!a || a < 1 || !b || b < 1) return;
+      if (isNaN(c) || c < 0 || isNaN(d) || d < 0) return;
+      if (t.precoDmn !== a || t.precoQdc !== b || t.vagasDmn !== c || t.vagasQdc !== d) mudou++;
+      t.precoDmn = a; t.precoQdc = b; t.vagasDmn = c; t.vagasQdc = d;
+    });
+    renderPrecoTurmas(); renderTurmasLoja();
+    if (typeof renderCtLista === 'function') renderCtLista();
+    toast(mudou ? mudou + (mudou > 1 ? ' turmas atualizadas' : ' turma atualizada') + ' — já vale na Quad Store.' : 'Nada mudou nas turmas.');
+  });
   function renderPrecos() {
+    renderPrecoTurmas();
     $('admPrecosList').innerHTML = lojaPrecosLista().map(function (x) {
       return '<div class="adm-bar"><span class="nm">' + x.nome + '</span>' +
         '<input class="fld" data-preco-item="' + x.nome + '" data-preco-moeda="' + x.moeda + '" value="' + x.preco + '" inputmode="numeric" style="max-width:84px;text-align:right"> <span class="pct">' + moedaTxt(x.moeda) + '</span></div>';
@@ -8495,6 +8664,14 @@
       : '<p class="sub" style="padding:8px 0">Sem compras registradas.</p>';
     $('relIndPedag').innerHTML = d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
   }
+  /* o seletor de turmas do relatório é a lista viva — turma aberta hoje já dá para analisar */
+  function relTurmasInit() {
+    var selT = $('relTurmaSel'); if (!selT) return;
+    var atual = selT.value;
+    selT.innerHTML = (typeof TURMAS_LOJA !== 'undefined' ? TURMAS_LOJA : []).map(function (t) {
+      return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>' + turmaRotulo(t) + '</option>';
+    }).join('') || '<option value="">— nenhuma turma aberta —</option>';
+  }
   function renderRelTurma() {
     renderDificuldades();   /* dificuldades da sala + apoio (mesma árvore) */
     var sel = $('relTurmaSel');
@@ -8543,10 +8720,8 @@
     if (selA) selA.innerHTML = CONTAS.map(function (c) {
       return '<option value="' + c.id + '">' + contaNome(c) + '</option>';
     }).join('');
+    relTurmasInit();
     var selT = $('relTurmaSel');
-    if (selT) selT.innerHTML = ['PATAMO (Noite)', 'RONDESP (Noite)', 'BOPE (Noite)'].map(function (t, i) {
-      return '<option value="t' + i + '">Turma ' + t + '</option>';
-    }).join('');
     tabs.querySelectorAll('.rel-tab').forEach(function (bt) {
       bt.addEventListener('click', function () {
         tabs.querySelectorAll('.rel-tab').forEach(function (x) { x.classList.remove('on'); });
