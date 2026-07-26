@@ -29,12 +29,19 @@
 - **Criar evento também explica o que falta**, com recado fixo e campo
   marcado: *"Para cadastrar o evento falta a **data**"*. Criado, a
   confirmação verde diz a data e onde ele apareceu.
-- **Simulado presencial virou sala com cadeiras**: informa-se **quantas
-  cadeiras** existem e **quantas são pagas** — o resto entra como
-  **gratuitas**, com recompensa em Quad Coins pela presença. O aluno vê
-  quantas sobram de cada tipo, a inscrição gratuita e a compra **dão
-  baixa no estoque**, a sala lota, e o **choque de horário** com turma
-  ou evento aparece na vitrine e pede **confirmação em dois toques**.
+- **Simulado presencial virou sala com vagas por moeda** (mesma régua das
+  turmas): informa-se as **vagas totais** e **quantas ficam em Quad
+  Coins** — o restante fica em **Diamantes** —, mais o **preço em cada
+  moeda**. Ele é **sempre vendido** (o gratuito passou a existir só no
+  digital) e pode premiar a **presença em QdC**. Na Loja o item mostra as
+  vagas de cada moeda e abre o **mesmo pop-up "em qual moeda"** da
+  matrícula; a compra **dá baixa só no estoque daquela moeda**, a sala
+  lota por moeda e o **choque de horário** aparece na vitrine e **avisa
+  sem impedir** — a decisão é do aluno.
+- **Simulado digital sem limite de vagas**: marcado assim na vitrine e no
+  admin, **não trava por choque de horário** e passa a ser **vendido nas
+  duas moedas** (mesmo pop-up, sem contagem de vagas). Gratuito continua
+  valendo só para ele, premiando QdC por acerto.
 - **"Produtos digitais · pré-configurados" saiu**: era porta duplicada —
   "Cadastrar produto ou serviço", na Loja, já publica digital.
 
