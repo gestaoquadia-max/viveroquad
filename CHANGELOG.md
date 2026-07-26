@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Choque de horário visível na vitrine
+
+A regra de agenda trouxe um efeito prático: quase todo evento-semente é
+noturno em dia útil, e o aluno da turma da noite ficava barrado só ao
+clicar. Ajustes:
+
+- **O choque agora é visível antes do clique**: evento e isolada que
+  batem com a agenda aparecem esmaecidos, com a etiqueta
+  **"CHOCA COM SUA AGENDA"** e o preço substituído por
+  **CHOCA COM "Turma PATAMO"** — o aluno entende sem precisar tentar.
+- **Aulão especial** passou para **sábado 9h–12h** e entrou uma
+  **Isolada de Português** aos **sábados 14h–17h** (o exemplo do próprio
+  gestor). Assim a vitrine mostra os dois lados da regra: o que choca e o
+  que dá para comprar.
+
 ## 25/07/2026 — Mochila, estorno que desfaz de verdade, agenda sem choque e expiração
 
 - **Item de combate sai da vitrine** (item 1): comprado, ele deixa a Loja

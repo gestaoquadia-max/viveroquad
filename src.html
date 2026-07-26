@@ -3904,7 +3904,7 @@
       score: [['Desafio concluído', '+5 score por desafio']],
       coins: [['Desafio vencido', '+5 por desafio'], ['Garimpo escondido na gincana', '+15'], ['Top 3 da noite', '+30']] },
     { id: 'aulao-especial', nome: 'Aulão especial', tipo: 'EVENTO PAGO · PRESENCIAL', modalidade: 'presencial', online: false,
-      pago: true, preco: 80, moeda: 'qdc', quando: 'SEX · 31/07 · 19H–22H', dataISO: '2026-07-31', profs: ['Prof.ª Ritha Galvão'],
+      pago: true, preco: 80, moeda: 'qdc', quando: 'SÁB · 01/08 · 9H–12H', dataISO: '2026-08-01', profs: ['Prof.ª Ritha Galvão'],
       cor: 'navy2', meta: '80 QdC · evento presencial',
       desc: 'Aulão de véspera de prova: revisão dirigida dos pontos mais cobrados, com rodada de questões comentadas ao vivo.',
       score: [['Presença confirmada', '+40 score']], coins: [['Check-in no evento', '+10']] },
@@ -3959,7 +3959,9 @@
   function evTileHTML(ev) {
     var st = evState[ev.id] || {};
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
+    var choque = insc ? null : choqueDeAgenda(agendaDoEvento(ev));
     var etiqueta = insc ? '<span class="tag gold">INSCRITO</span>'
+      : choque ? '<span class="tag warn">CHOCA COM SUA AGENDA</span>'
       : (ev.pago ? '<span class="tag gold">NA LOJA</span>' : (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : ''));
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
@@ -4007,12 +4009,13 @@
       g.innerHTML = pagos.map(function (ev) {
         var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
         var comprado = evState[ev.id] && evState[ev.id].comprado;
-        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
-          (comprado ? '<span class="li-estoque">INSCRITO</span>' : '') +
+        var chq = comprado ? null : choqueDeAgenda(agendaDoEvento(ev));
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + (chq ? ' indisponivel' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+          (comprado ? '<span class="li-estoque">INSCRITO</span>' : chq ? '<span class="li-estoque">CHOCA COM SUA AGENDA</span>' : '') +
           '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
           '<span class="li-nome">' + ev.nome + '</span>' +
           '<span class="li-desc">' + (evProfsTxt(ev) || (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal)) + '</span>' +
-          '<span class="li-preco">' + (comprado ? 'INSCRITO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+          '<span class="li-preco">' + (comprado ? 'INSCRITO' : chq ? 'CHOCA COM “' + chq + '”' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
       g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
         bt.addEventListener('click', function () { comprarEvento(bt.dataset.evBuy); });
@@ -7675,6 +7678,8 @@
   var ISOLADAS = [
     { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura',
       dias: ['terça-feira'], hi: '20:00', hf: '22:00', ini: '2026-08-04', fim: '2026-10-20', preco: 350, moeda: 'dmn', vagas: 30 },
+    { id: 'iso-port', materia: 'Língua Portuguesa', nome: 'Isolada de Português', prof: 'Prof.ª Ritha Galvão',
+      dias: ['sábado'], hi: '14:00', hf: '17:00', ini: '2026-08-08', fim: '2026-10-24', preco: 350, moeda: 'dmn', vagas: 25 },
     { id: 'iso-livre', materia: 'qualquer matéria', nome: 'Aula isolada', prof: '',
       dias: [], hi: '', hf: '', ini: '', fim: '', preco: 40, moeda: 'qdc', vagas: 60 }
   ];
@@ -7793,12 +7798,13 @@
     g.innerHTML = ISOLADAS.map(function (iso) {
       var comprado = lojaOwned[iso.nome];
       var mo = iso.moeda === 'dmn' ? 'dmn' : 'qdc';
-      return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
+      var chq = comprado ? null : choqueDeAgenda(agendaDaIsolada(iso));
+      return '<button class="loja-item' + (comprado ? ' comprado' : '') + (chq ? ' indisponivel' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
         (iso.vagas ? '<span class="li-estoque">' + iso.vagas + ' vagas</span>' : '') +
         '<span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>' +
         '<span class="li-nome">' + iso.nome + '</span>' +
         '<span class="li-desc">' + isoDesc(iso) + '</span>' +
-        '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+        '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : chq ? 'CHOCA COM “' + chq + '”' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
     }).join('');
     g.querySelectorAll('.loja-item').forEach(bindLojaItem);
   }
