@@ -1238,6 +1238,10 @@
   .ct-fld { display: flex; flex-direction: column; gap: 3px; }
   .ct-fld span { font: 700 10px var(--ui); letter-spacing: .03em; text-transform: uppercase; color: var(--p-dim); }
   .ct-fld input { width: 100%; }
+  /* data e hora precisam caber por inteiro: espremidos, o navegador esconde
+     o valor e o campo parece vazio mesmo preenchido                      */
+  .fld[type="time"], .fld[type="date"] { min-width: 118px; }
+  .ct-fld input[type="time"], .ct-fld input[type="date"] { min-width: 0; }
   .adm-hint { font-size: 11.5px; line-height: 1.5; color: var(--p-dim); margin: 6px 0 10px;
     padding: 8px 10px; background: #F2F8FF; border: 1px solid var(--p-line); border-radius: 10px; }
 
@@ -2343,7 +2347,7 @@
               <button class="jp" data-jump="msg">Comunicação interna</button>
               <button class="jp" data-jump="gift">Criar Gift cards</button>
               <button class="jp" data-jump="estornos">Estornos e desistências</button>
-              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
 
@@ -2406,18 +2410,16 @@
                 <div class="k-label sub-k" style="margin-top:10px">Professor da isolada</div>
                 <select class="fld" id="admCtIsoProf" style="width:100%"></select>
               </div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admCtIni" type="date" aria-label="Início" title="Início da turma" style="max-width:150px">
-                <span class="pct">até</span>
-                <input class="fld" id="admCtFim" type="date" aria-label="Término" title="Término da turma" style="max-width:150px">
+              <div class="k-label sub-k" style="margin-top:12px">Período</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Início</span><input class="fld" id="admCtIni" type="date" title="Início da turma"></label>
+                <label class="ct-fld"><span>Término</span><input class="fld" id="admCtFim" type="date" title="Término da turma"></label>
               </div>
-              <div class="adm-row" style="margin-top:8px">
-                <span class="pct" id="admCtLbH1">1º tempo</span>
-                <input class="fld" id="admCtH1i" type="time" style="max-width:104px" aria-label="Início do 1º tempo">
-                <span class="pct">→</span>
-                <input class="fld" id="admCtH1f" type="time" style="max-width:104px" aria-label="Fim do 1º tempo e início do 2º" title="Fim do 1º tempo — o 2º começa aqui">
-                <span class="pct" id="admCtLbH2">2º até</span>
-                <input class="fld" id="admCtH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
+              <div class="k-label sub-k" style="margin-top:12px" id="admCtLbHor">Horário dos dois tempos</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span id="admCtLbH1">1º tempo começa</span><input class="fld" id="admCtH1i" type="time"></label>
+                <label class="ct-fld"><span id="admCtLbH1f">1º termina · 2º começa</span><input class="fld" id="admCtH1f" type="time" title="Fim do 1º tempo — o 2º começa aqui"></label>
+                <label class="ct-fld" id="admCtH2Box"><span id="admCtLbH2">2º tempo termina</span><input class="fld" id="admCtH2f" type="time"></label>
               </div>
               <div class="adm-eco" id="admCtEco"></div>
               <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
@@ -2539,7 +2541,7 @@
               <button class="jp" data-jump="eventos">Criar evento</button>
               <button class="jp" data-jump="simulados">Criar simulados</button>
               <button class="jp" data-jump="skins">Skin do personagem</button>
-              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
 
@@ -2614,11 +2616,11 @@
               </div>
               <div class="k-label sub-k" style="margin-top:10px">Professores no evento <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
               <div class="turno-pick" id="admEvProfs"></div>
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admEvNovoData" type="date" aria-label="Data do evento" style="max-width:140px">
-                <input class="fld" id="admEvNovoInicio" type="time" value="19:00" aria-label="Início" style="max-width:100px" title="Início">
-                <span class="pct">até</span>
-                <input class="fld" id="admEvNovoFim" type="time" value="21:00" aria-label="Término" style="max-width:100px" title="Término">
+              <div class="k-label sub-k" style="margin-top:10px">Dia e horário</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Data</span><input class="fld" id="admEvNovoData" type="date" title="Data do evento"></label>
+                <label class="ct-fld"><span>Começa às</span><input class="fld" id="admEvNovoInicio" type="time" value="19:00"></label>
+                <label class="ct-fld"><span>Termina às</span><input class="fld" id="admEvNovoFim" type="time" value="21:00"></label>
               </div>
               <div style="margin-top:8px"><button class="btn ghost small" id="btnAdmEvNovo">Criar evento</button></div>
               <p class="sub" id="admEvNovoPrev" style="margin-top:6px">Escolha a data, o início e o término na agenda.</p>
@@ -2657,19 +2659,12 @@
                 </select>
               </div>
               <div id="admSimPres">
-                <div class="adm-row" style="margin-top:8px">
-                  <input class="fld" id="admSimData" type="date" aria-label="Data do simulado" style="max-width:140px">
-                  <input class="fld" id="admSimIni" type="time" value="08:00" aria-label="Início" title="Início" style="max-width:100px">
-                  <span class="pct">até</span>
-                  <input class="fld" id="admSimFim" type="time" value="12:00" aria-label="Término" title="Término" style="max-width:100px">
-                </div>
-                <div class="k-label sub-k" style="margin-top:10px">Vagas da sala</div>
-                <p class="adm-hint" id="admSimVagasHint">O simulado presencial ocupa <strong>lugar na sede</strong>: as <strong>vagas totais</strong> são o estoque da sala. No <strong>pago</strong>, elas se dividem por moeda — as que você marcar em <strong>Quad Coins</strong> ficam nessa moeda e <strong>o restante fica em Diamantes</strong>.</p>
+                <div class="k-label sub-k" style="margin-top:10px">Dia e horário</div>
                 <div class="ct-grid">
-                  <label class="ct-fld"><span>Vagas totais (lugares)</span><input class="fld" id="admSimVagas" placeholder="ex.: 100" inputmode="numeric"></label>
-                  <label class="ct-fld" id="admSimVagasQdcBox"><span>Dessas, em Quad Coins</span><input class="fld" id="admSimVagasQdc" placeholder="ex.: 30" inputmode="numeric"></label>
+                  <label class="ct-fld"><span>Data</span><input class="fld" id="admSimData" type="date" title="Data do simulado"></label>
+                  <label class="ct-fld"><span>Começa às</span><input class="fld" id="admSimIni" type="time" value="08:00"></label>
+                  <label class="ct-fld"><span>Termina às</span><input class="fld" id="admSimFim" type="time" value="12:00"></label>
                 </div>
-                <div class="adm-eco" id="admSimEco"></div>
               </div>
               <div id="admSimDig" style="display:none">
                 <label class="sd-file" for="admSimPdf"><span class="sd-file-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span><span id="admSimPdfNome">Anexar PDF do simulado</span><input type="file" id="admSimPdf" accept="application/pdf" hidden></label>
@@ -2680,11 +2675,15 @@
                   <input class="fld" id="admSimNq" type="number" min="1" placeholder="questões" inputmode="numeric" style="max-width:90px" title="Nº de questões">
                 </div>
               </div>
-              <div class="ct-grid" id="admSimPrecosBox" style="margin-top:8px">
+              <div class="k-label sub-k" style="margin-top:12px" id="admSimPvLb">Preços e vagas</div>
+              <p class="adm-hint" id="admSimPrecosHint">O simulado é vendido <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são os lugares da sala: as que você marcar em <strong>Quad Coins</strong> ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.</p>
+              <div class="ct-grid" id="admSimPrecosBox">
                 <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admSimPrecoDmn" placeholder="ex.: 150" inputmode="numeric"></label>
                 <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admSimPrecoQdc" placeholder="ex.: 180" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasBox"><span>Vagas totais</span><input class="fld" id="admSimVagas" placeholder="ex.: 100" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasQdcBox"><span>Dessas, em Quad Coins</span><input class="fld" id="admSimVagasQdc" placeholder="ex.: 70" inputmode="numeric"></label>
               </div>
-              <p class="adm-hint" id="admSimPrecosHint">O aluno escolhe a moeda na hora da compra — informe o preço nas duas. Para vender só numa moeda, deixe a outra em branco.</p>
+              <div class="adm-eco" id="admSimEco"></div>
               <div class="adm-row" id="admSimValorBox" style="margin-top:8px">
                 <select class="fld" id="admSimMoeda" title="Moeda de venda (simulado pago)" style="display:none">
                   <option value="dmn">Vender em Diamantes</option>
@@ -2757,7 +2756,7 @@
               <button class="jp" data-jump="fisicos">Liberar produtos físicos</button>
               <button class="jp" data-jump="acessos">Autorizar acesso</button>
               <button class="jp" data-jump="inscritos">Verificar inscritos</button>
-              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
 
@@ -2932,7 +2931,7 @@
               <button class="jp" data-jump="cadastro">Cadastrar produto ou serviço</button>
               <button class="jp" data-jump="precos">Atualização geral da Loja</button>
               <button class="jp" data-jump="precoturmas">Atualização de turmas e simulados</button>
-              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
 
@@ -3873,6 +3872,8 @@
       });
     }
     if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
+    /* área do admin abre limpa (ou no bloco que estava aberto) */
+    if (id.indexOf('v-adm-') === 0 && typeof admJumpRestaura === 'function') admJumpRestaura(id);
     /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
     if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
@@ -7650,9 +7651,10 @@
       $('admCtIsoBox').style.display = iso ? 'block' : 'none';
       $('admCtProfsBox').style.display = iso ? 'none' : 'block';
       $('admCtApelido').placeholder = iso ? 'Matéria (ex.: Língua Portuguesa)' : 'Apelido (ex.: Turma Águia)';
-      $('admCtLbH1').textContent = iso ? 'das' : '1º tempo';
-      $('admCtLbH2').style.display = iso ? 'none' : '';
-      $('admCtH2f').style.display = iso ? 'none' : '';
+      $('admCtLbHor').textContent = iso ? 'Horário da aula' : 'Horário dos dois tempos';
+      $('admCtLbH1').textContent = iso ? 'Começa às' : '1º tempo começa';
+      $('admCtLbH1f').textContent = iso ? 'Termina às' : '1º termina · 2º começa';
+      $('admCtH2Box').style.display = iso ? 'none' : '';
       $('admCtH1f').title = iso ? 'Fim da aula isolada' : 'Fim do 1º tempo — o 2º começa aqui';
       $('btnAdmCtAbrir').textContent = iso ? 'Abrir isolada' : 'Abrir turma';
       if (iso) {
@@ -7807,29 +7809,41 @@
   /* ---------- atalhos das áreas do admin ----------
      Cada botão do cabeçalho abre o seu bloco: os demais somem da tela e a
      área volta ao topo. Tocar de novo (ou em "Ver todos") mostra tudo.   */
+  /* seleção por área: '' = nenhum bloco aberto (tela limpa, só os
+     atalhos) · '*' = todos · uma chave = só aquele bloco             */
+  var admJumpSel = {};
+  var ADM_AREAS = [['jumpControle', 'v-adm-controle'], ['jumpInterno', 'v-adm-hoje'],
+                   ['jumpLiber', 'v-adm-liber'], ['jumpLojaAdm', 'v-adm-loja']];
+  function admJumpPadrao() { return window.__admTudo ? '*' : ''; }   /* '*' é atalho da suíte de testes */
   function admJumpAplica(view, chave) {
     var v = document.getElementById(view); if (!v) return;
+    admJumpSel[view] = chave;
     v.querySelectorAll('[data-bl]').forEach(function (c) {
-      c.style.display = (!chave || c.dataset.bl === chave) ? '' : 'none';
+      c.style.display = (chave === '*' || c.dataset.bl === chave) ? '' : 'none';
     });
     v.querySelectorAll('.adm-jump .jp').forEach(function (b) {
-      b.classList.toggle('on', !!chave && b.dataset.jump === chave);
+      b.classList.toggle('on', b.dataset.jump === chave);
     });
   }
+  function admJumpRestaura(view) {
+    admJumpAplica(view, admJumpSel[view] == null ? admJumpPadrao() : admJumpSel[view]);
+  }
+  window.__admBlocos = admJumpAplica;   /* exposto para a suíte de testes */
   (function () {
-    [['jumpControle', 'v-adm-controle'], ['jumpInterno', 'v-adm-hoje'],
-     ['jumpLiber', 'v-adm-liber'], ['jumpLojaAdm', 'v-adm-loja']].forEach(function (par) {
+    ADM_AREAS.forEach(function (par) {
       var host = document.getElementById(par[0]); if (!host) return;
       host.querySelectorAll('.jp').forEach(function (bt) {
         bt.addEventListener('click', function () {
           var chave = bt.dataset.jump;
-          if (chave && bt.classList.contains('on')) chave = '';   /* tocar de novo abre tudo */
+          /* tocar de novo no bloco aberto o recolhe e devolve a tela limpa */
+          if (bt.classList.contains('on')) chave = '';
           admJumpAplica(par[1], chave);
           var topo = document.getElementById(par[1]);   /* a própria view é quem rola */
           if (topo && topo.scrollTo) topo.scrollTo({ top: 0, behavior: 'smooth' });
           else if (topo) topo.scrollTop = 0;
         });
       });
+      admJumpRestaura(par[1]);   /* a área nasce limpa: só o painel de atalhos */
     });
   })();
   /* ---------- avisos fixos de erro dentro do bloco ----------
@@ -9692,23 +9706,23 @@
   function liberarInscrito(idx) {
     var x = SIM_INSC[idx]; if (!x || x.liberado) return;
     x.liberado = true;
-    if (x.geraQdC) {
-      x.pontuado = true;
-      if (x.euSou) {
-        carreira.scorePatente += x.score; carreira.scoreCarreira += x.score; carreira.scoreTemporada += x.score;
-        if (typeof renderCarreira === 'function') renderCarreira();
-        addScore(x.valor, 'Presença no simulado · +' + x.valor + ' QdC · +' + x.score + ' score');
-      }
-      toast('Entrada liberada — participante pontuado (+' + x.valor + ' QdC · +' + x.score + ' score).');
-    } else {
-      toast('Entrada liberada — bom simulado!');
+    /* a presença no simulado gera SCORE, como a maior parte das
+       interações do app; Quad Coins, só onde a atividade premia      */
+    x.pontuado = true;
+    if (x.euSou) {
+      carreira.scorePatente += x.score; carreira.scoreCarreira += x.score; carreira.scoreTemporada += x.score;
+      if (typeof renderCarreira === 'function') renderCarreira();
+      if (x.geraQdC) addScore(x.valor, 'Presença no simulado · +' + x.valor + ' QdC · +' + x.score + ' score');
     }
+    toast(x.geraQdC
+      ? 'Entrada liberada — participante pontuado (+' + x.valor + ' QdC · +' + x.score + ' score).'
+      : 'Entrada liberada — presença confirmada (+' + x.score + ' score).');
     /* liberado, o simulado do aluno sai da aba Simulados e vai ao histórico */
     if (x.euSou) {
       var sm = null; SIMULADOS.forEach(function (s) { if (s.rot === x.simRot && s.tag === 'PRESENCIAL') sm = s; });
       if (sm && !sm.realizado) {
         sm.realizado = true;
-        SIM_HIST.unshift({ rot: sm.rot, tipo: 'Presencial', resultado: 'presença confirmada' + (x.geraQdC ? ' · +' + x.valor + ' QdC' : '') });
+        SIM_HIST.unshift({ rot: sm.rot, tipo: 'Presencial', resultado: 'presença confirmada · +' + x.score + ' score' + (x.geraQdC ? ' · +' + x.valor + ' QdC' : '') });
         if (typeof renderSimulados === 'function') renderSimulados();
         if (typeof renderSimHist === 'function') renderSimHist();
       }
@@ -9729,12 +9743,16 @@
     $('admSimTipo').disabled = pres;
     $('admSimPres').style.display = pres ? '' : 'none';
     $('admSimDig').style.display = pres ? 'none' : '';
-    /* preços nas duas moedas: valem para o presencial e para o digital pago */
+    /* "Preços e vagas": mesma grade da criação de turmas.
+       Presencial tem sala (vagas divididas por moeda); digital, não.   */
+    $('admSimPvLb').style.display = pago ? '' : 'none';
     $('admSimPrecosBox').style.display = pago ? '' : 'none';
     $('admSimPrecosHint').style.display = pago ? '' : 'none';
+    $('admSimVagasBox').style.display = pres ? '' : 'none';
+    $('admSimVagasQdcBox').style.display = pres ? '' : 'none';
     $('admSimPrecosHint').innerHTML = pres
-      ? 'O aluno escolhe a moeda na compra, dentro das vagas de cada uma. Sem vagas naquela moeda, o preço dela não é cobrado.'
-      : 'O aluno escolhe a moeda na hora da compra — informe o preço nas duas. Para vender só numa moeda, deixe a outra em branco.';
+      ? 'O simulado presencial é vendido <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são os lugares da sala: as que você marcar em <strong>Quad Coins</strong> ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.'
+      : 'O digital <strong>não tem limite de vagas</strong>. Informe o preço nas duas moedas — o aluno escolhe na compra. Para vender só numa, deixe a outra em branco.';
     /* prêmio em Quad Coins é do digital gratuito (por acerto) — o
        presencial é sempre vendido, nunca premiado                      */
     $('admSimValorBox').style.display = (!pres && !pago) ? '' : 'none';

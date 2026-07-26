@@ -1,5 +1,33 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Campo de hora que se lê, área do admin que abre limpa e simulados no padrão das turmas
+
+### O campo de hora escondia o valor (item 1 revisitado)
+- **A causa do "não dá certeza de que foi colocado o horário" não era falta
+  de confirmação: era o campo.** Com 104px de largura, o navegador
+  escondia o valor e mostrava só o ícone do relógio — o horário estava
+  lá e parecia vazio. Antes isso tinha sido contornado com uma linha de
+  confirmação ao lado; agora está **corrigido na raiz**.
+- **Data e hora passaram para a grade rotulada** (a mesma de "Preços e
+  vagas"), com o campo em largura inteira: *Início / Término* e
+  *1º tempo começa / 1º termina · 2º começa / 2º tempo termina*. Mesmo
+  tratamento na **criação de eventos** e no **lançamento de simulados**,
+  onde o defeito era idêntico.
+
+### A área do administrador abre limpa (item 0 revisitado)
+- Ao entrar, aparece **só o painel de atalhos**. Tocar num botão abre o
+  bloco abaixo; **tocar no mesmo botão recolhe** e a tela volta a ficar
+  limpa; tocar em outro troca. "Ver todos os blocos" mostra a área
+  inteira. Sair e voltar mantém o que estava aberto.
+
+### Simulados no padrão "Preços e vagas"
+- O lançamento usa **a mesma grade da criação de turmas**, com os mesmos
+  quatro campos: *Preço em Diamantes · Preço em Quad Coins · Vagas totais
+  · Dessas, em Quad Coins*. No **digital**, as vagas somem (não há
+  limite) e o texto de apoio muda.
+- **A presença no simulado gera score** na liberação da recepção — antes
+  só pontuava quando a atividade também dava Quad Coins.
+
 ## 26/07/2026 — Área do administrador: atalhos por bloco, avisos que ficam na tela, sala do simulado e relatório de compras
 
 ### Navegação (item 0)
