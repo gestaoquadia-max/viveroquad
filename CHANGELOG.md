@@ -40,8 +40,15 @@
   sem impedir** — a decisão é do aluno.
 - **Simulado digital sem limite de vagas**: marcado assim na vitrine e no
   admin, **não trava por choque de horário** e passa a ser **vendido nas
-  duas moedas** (mesmo pop-up, sem contagem de vagas). Gratuito continua
-  valendo só para ele, premiando QdC por acerto.
+  duas moedas** (mesmo pop-up, sem contagem de vagas). **Gratuito é só
+  dele**, premiando QdC por acerto — o presencial não premia nem é
+  gratuito. (Aulões e eventos seguem podendo ser gratuitos e premiar:
+  a regra vale apenas para simulados.)
+- **Vagas e preços dos simulados presenciais editáveis**: o bloco virou
+  **"Preços e vagas · turmas, isoladas e simulados"** e traz cada
+  simulado presencial com **preço em Diamantes, preço em Quad Coins e as
+  vagas restantes de cada moeda** — dá para **abrir ou fechar vagas** sem
+  relançar o simulado.
 - **"Produtos digitais · pré-configurados" saiu**: era porta duplicada —
   "Cadastrar produto ou serviço", na Loja, já publica digital.
 
