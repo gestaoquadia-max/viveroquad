@@ -2690,7 +2690,7 @@
                   <option value="dmn">Vender em Diamantes</option>
                   <option value="qdc">Vender em Quad Coins</option>
                 </select>
-                <input class="fld" id="admSimValor" placeholder="Recompensa QdC por acerto" inputmode="numeric">
+                <input class="fld" id="admSimValor" placeholder="Quad Coins por acerto (padrão: 2)" inputmode="numeric">
                 <span class="pct" id="admSimValorHint">recompensa</span>
               </div>
               <div class="adm-row" style="margin-top:8px">
@@ -6031,7 +6031,8 @@
     if (moeda === 'dmn') return sm.precoDmn != null ? sm.precoDmn : sm.valor;
     return sm.precoQdc != null ? sm.precoQdc : sm.valor;
   }
-  function simRec(sm) { return sm.tag === 'PRESENCIAL' ? 0 : (sm.rec || 0); }   /* prêmio em QdC é do digital */
+  /* prêmio em Quad Coins é do digital (por acerto); presencial não premia */
+  function simRec(sm) { return sm.tag === 'PRESENCIAL' ? 0 : (sm.rec > 0 ? sm.rec : 2); }
   /* baixa no estoque da sala: 'dmn' | 'qdc' | 'gratis' */
   function simTomaVaga(sm, tipo) {
     var vg = simVagas(sm);
@@ -6049,7 +6050,7 @@
         var pv = [sm.precoDmn ? fmt(sm.precoDmn) + ' Dmn' : '', sm.precoQdc ? fmt(sm.precoQdc) + ' QdC' : ''].filter(Boolean).join(' ou ');
         return sm.minutos + ' min · ' + sm.nq + ' questões · ' + (pv || fmt(sm.valor) + ' ' + moedaTxt(sm.moeda)) + ' na Loja';
       }
-      return sm.minutos + ' min · ' + sm.nq + ' questões · score + QdC';
+      return sm.minutos + ' min · ' + sm.nq + ' questões · +10 score e +' + (sm.rec > 0 ? sm.rec : 2) + ' QdC por acerto';
     }
     /* presencial ocupa lugar na sala: o aluno vê o que sobra por moeda */
     var vg = simVagas(sm), partes = [];
@@ -7219,7 +7220,10 @@
     clearInterval(simDig.timer); simDig.timer = null;
     var sm = simDig.sm, total = simDig.qs.length, hits = simDig.hits;
     var scoreG = hits * 10;             /* +10 score por acerto */
-    var coinsG = hits * 2;              /* +2 Quad Coins por acerto */
+    /* Quad Coins por acerto: o que a administração definiu no lançamento
+       (padrão 2, para os simulados que não trazem o campo preenchido)   */
+    var porAcerto = sm ? simRec(sm) : 2;
+    var coinsG = hits * porAcerto;
     if (sm) sm.feito = true;
     carreira.scorePatente += scoreG; carreira.scoreCarreira += scoreG; carreira.scoreTemporada += scoreG;
     if (typeof renderCarreira === 'function') renderCarreira();
@@ -9734,7 +9738,7 @@
     /* prêmio em Quad Coins é do digital gratuito (por acerto) — o
        presencial é sempre vendido, nunca premiado                      */
     $('admSimValorBox').style.display = (!pres && !pago) ? '' : 'none';
-    $('admSimValorHint').textContent = 'por acerto';
+    $('admSimValorHint').textContent = 'QdC por acerto';
     admSimEco();
   }
   /* eco das vagas: mostra o rateio por moeda enquanto se digita */
@@ -9834,12 +9838,13 @@
       if (pago && simFalta(!pDmn && !pQdc, 'admSimPrecoDmn', 'O simulado é <b>pago</b> — informe o preço em pelo menos uma moeda.')) return;
       /* digital não tem limite de vagas nem trava por choque de horário */
       SIMULADOS.unshift({ id: 'sd' + Date.now(), rot: nome, tag: 'DIGITAL', pago: pago,
-        moeda: pDmn ? 'dmn' : 'qdc', valor: pago ? (pDmn || pQdc) : (recDig || 0),
+        moeda: pDmn ? 'dmn' : 'qdc', valor: pago ? (pDmn || pQdc) : 0, rec: recDig > 0 ? recDig : 0,
         precoDmn: pago ? (pDmn || 0) : 0, precoQdc: pago ? (pQdc || 0) : 0,
         pdf: admSimPdfNome, minutos: minutos, nq: nq, dia: dia, feito: false, comprado: false });
       var precoTxt = [pDmn ? fmt(pDmn) + ' Dmn' : '', pQdc ? fmt(pQdc) + ' QdC' : ''].filter(Boolean).join(' ou ');
       admAlerta('admSimErro', 'Simulado digital <b>' + nome + '</b> lançado — ' + minutos + ' min · ' + nq + ' questões · <b>sem limite de vagas</b>' +
-        (pago ? ' · à venda na Loja por ' + precoTxt + '.' : ' · já nos Simulados do aluno, premiando QdC por acerto.'), true);
+        (pago ? ' · à venda na Loja por ' + precoTxt + '.'
+              : ' · já nos Simulados do aluno, premiando <b>+' + (recDig > 0 ? recDig : 2) + ' QdC por acerto</b>.'), true);
       toast(pago ? 'Simulado digital pago — à venda na Loja por ' + precoTxt + '.' : 'Simulado digital grátis — já disponível nos Simulados do aluno (premia QdC por acerto).');
       $('admSimPrecoDmn').value = ''; $('admSimPrecoQdc').value = '';
     }

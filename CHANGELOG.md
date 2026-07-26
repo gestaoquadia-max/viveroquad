@@ -61,6 +61,12 @@
   **entregue e concluído**. Confirmada a entrega na recepção, o item
   **muda de coluna na hora**. Estornos saem do relatório.
 
+### Auditoria posterior
+- **A recompensa por acerto do simulado digital não valia**: o campo era
+  preenchido e o app pagava sempre 2 QdC por acerto. Agora o valor
+  informado vale de verdade (padrão 2 quando em branco), aparece na
+  confirmação do lançamento e na linha do aluno.
+
 ### Loja (item 6)
 - **Mentoria com início e fim** — é turma online: o cadastro pede os dois
   e a Loja mostra o período; comprada, entra no calendário como

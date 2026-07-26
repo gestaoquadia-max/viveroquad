@@ -115,6 +115,10 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 119 | 26/07 | **Relatório de compras** como último bloco da Quad Store: abas semanal/mensal/trimestral/semestral, resumo do período, em andamento (com % de evolução da turma), aguardando retirada e entregue | O aluno precisa saber o que comprou e o que já recebeu |
 | 120 | 26/07 | **Mentoria com início e fim** (turma online) no cadastro da Loja e no calendário de quem compra | Pedido do gestor |
 | 121 | 26/07 | **Isoladas entram no editor "Preços e vagas das turmas e isoladas"** | Faltava caminho para corrigir preço/vagas sem recriar |
+| 122 | 26/07 | **Simulado presencial é sempre vendido** (QdC ou Diamantes), com vagas divididas por moeda; nunca gratuito e nunca premia | Regra do gestor: prêmio em QdC é do digital |
+| 123 | 26/07 | **Simulado digital sem limite de vagas**, vendido nas duas moedas (o aluno escolhe no pop-up) ou gratuito premiando por acerto; não trava por choque de horário | Regra do gestor |
+| 124 | 26/07 | **Vagas e preços dos simulados presenciais editáveis** no bloco "Preços e vagas · turmas, isoladas e simulados" | Os números do lançamento são só o ponto de partida |
+| 125 | 26/07 | **Recompensa por acerto do digital passa a valer** (era campo sem efeito; o app pagava 2 fixo) | Achado na auditoria do próprio trabalho |
 | 105 | 26/07 | **Instrução do QUAD abre em todo acesso**, com botão **"Pular"** oposto ao "Avançar"; pular reproduz o estado final da instrução: boina equipada + 5 QdC (25 ganhos − 20 da boina) + score da Introdução | Antes só abria no 1º acesso; o gestor precisava dela sempre ao testar |
 | 104 | 26/07 | **Choque de horário visível na vitrine** (etiqueta "CHOCA COM SUA AGENDA" + item esmaecido, como já era com turma de turno ocupado); Aulão especial no sábado e nova Isolada de Português aos sábados | A regra barrava no clique e a vitrine não explicava |
 | 103 | 25/07 | **"Mentoria Quad" deixou de ser botão fixo** e virou item de catálogo com data (entra em eventos e no calendário); "Simulado físico" → "Caderno de simulados impresso" | Varredura pedida no item 5, mesma família do Aulão especial |
