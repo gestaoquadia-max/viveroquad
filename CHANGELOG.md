@@ -1,5 +1,60 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Área do administrador: atalhos por bloco, avisos que ficam na tela, sala do simulado e relatório de compras
+
+### Navegação (item 0)
+- **Cada área do admin ganhou botões de atalho** no cabeçalho: tocar em
+  um deles **abre só aquele bloco** e leva a tela ao topo; tocar de novo
+  (ou em **"Ver todos os blocos"**) devolve a área inteira. Vale para
+  **Controle** (7 blocos), **Interno** (5), **Liberações** (3) e
+  **Loja** (3). A área da Loja ganhou também o cabeçalho que faltava.
+
+### Controle (item 1)
+- **O horário agora se vê**: abaixo dos campos de hora, uma linha escreve
+  o que foi entendido — *"Horário: 14h–15h30 e 15h30–17h"* em verde
+  quando os dois tempos estão completos, e o período de início e término
+  do mesmo jeito.
+- **"Abrir turma" explica o que falta**: no lugar do aviso que sumia,
+  um **recado fixo dentro do bloco** ("Para abrir a turma falta a
+  **hora em que o 2º tempo termina**") com o **campo marcado em
+  vermelho**. Aberta a turma, o mesmo espaço confirma em verde onde ela
+  foi parar. Mesma régua para **isoladas**.
+- **Árvore do edital**: anexar o PDF passa a **trocar a origem das
+  matérias** na hora — "Professores por matéria" diz de qual arquivo
+  (ou de qual edital) a lista veio.
+
+### Interno (item 2)
+- **Avisos enviados reorganizados**: título e detalhe em linhas próprias,
+  escopo e ações embaixo — sem texto espremido ou quebrado.
+- **Criar evento também explica o que falta**, com recado fixo e campo
+  marcado: *"Para cadastrar o evento falta a **data**"*. Criado, a
+  confirmação verde diz a data e onde ele apareceu.
+- **Simulado presencial virou sala com cadeiras**: informa-se **quantas
+  cadeiras** existem e **quantas são pagas** — o resto entra como
+  **gratuitas**, com recompensa em Quad Coins pela presença. O aluno vê
+  quantas sobram de cada tipo, a inscrição gratuita e a compra **dão
+  baixa no estoque**, a sala lota, e o **choque de horário** com turma
+  ou evento aparece na vitrine e pede **confirmação em dois toques**.
+- **"Produtos digitais · pré-configurados" saiu**: era porta duplicada —
+  "Cadastrar produto ou serviço", na Loja, já publica digital.
+
+### Liberações (item 4)
+- **Relatório de compras**, novo **último bloco da Quad Store**: abas
+  **semanal, mensal, trimestral e semestral**, resumo do período
+  (compras, Quad Coins, Diamantes, itens a receber) e três listas —
+  **em andamento** (turmas, isoladas e mentorias, com **barra de
+  evolução do curso**), **aguardando retirada ou realização** e
+  **entregue e concluído**. Confirmada a entrega na recepção, o item
+  **muda de coluna na hora**. Estornos saem do relatório.
+
+### Loja (item 6)
+- **Mentoria com início e fim** — é turma online: o cadastro pede os dois
+  e a Loja mostra o período; comprada, entra no calendário como
+  atividade de vários dias.
+- **"Preços e vagas das turmas e isoladas · atualizar"** passa a trazer
+  também as **isoladas**, com preço na moeda em que foram abertas e
+  vagas restantes.
+
 ## 26/07/2026 — Validação do gift card na Quad Store; "+" mais enxuto
 
 - **Quad Store sai do "+"** (item 1): a loja já tem **botão próprio na

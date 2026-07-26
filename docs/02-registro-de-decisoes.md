@@ -104,6 +104,15 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 110 | 26/07 | **Selo "+BÔNUS"** para evento gratuito que premia em score ou Coins | Completa a família NA LOJA / INSCRITO |
 | 111 | 26/07 | **"Quad Store" sai do "+"**: a loja fica só na barra de navegação (mais o card de Coins e o bloco do Início) | Caminho repetido; menu enxuto |
 | 112 | 26/07 | **"Validar pelo QR" migra do "+" para a Quad Store**, ao lado de "Resgatar", no bloco do gift card (código na linha de cima, botões lado a lado) | O leitor é do mesmo assunto do resgate; validação conferida e correta |
+| 113 | 26/07 | **Atalhos por bloco nas quatro áreas do admin**: o botão abre só o seu bloco e volta ao topo; tocar de novo (ou "Ver todos") mostra tudo | Páginas longas demais para rolar no celular |
+| 114 | 26/07 | **Aviso de validação fixo dentro do bloco** (com o campo marcado em vermelho) no lugar do toast que some — turma, isolada, evento, simulado e produto | O gestor clicava e "não acontecia nada": o toast passava despercebido |
+| 115 | 26/07 | **Eco do preenchimento** na criação de turma (período e horário escritos, em verde quando completos) | Campo de hora não dava certeza de que pegou |
+| 116 | 26/07 | **PDF do edital anexado troca a origem das matérias** de "Professores por matéria" na hora | Antes só o seletor de concurso mandava |
+| 117 | 26/07 | **Simulado presencial = sala com cadeiras**: vagas totais divididas em pagas × gratuitas, baixa no estoque a cada inscrição/compra, sala lota e choque de horário pede confirmação em dois toques | "Na sala temos 100 cadeiras: 30 pagas e 70 gratuitas" |
+| 118 | 26/07 | **Bloco "Produtos digitais · pré-configurados" removido** — "Cadastrar produto ou serviço" já é a porta de entrada do digital | Duplicidade |
+| 119 | 26/07 | **Relatório de compras** como último bloco da Quad Store: abas semanal/mensal/trimestral/semestral, resumo do período, em andamento (com % de evolução da turma), aguardando retirada e entregue | O aluno precisa saber o que comprou e o que já recebeu |
+| 120 | 26/07 | **Mentoria com início e fim** (turma online) no cadastro da Loja e no calendário de quem compra | Pedido do gestor |
+| 121 | 26/07 | **Isoladas entram no editor "Preços e vagas das turmas e isoladas"** | Faltava caminho para corrigir preço/vagas sem recriar |
 | 105 | 26/07 | **Instrução do QUAD abre em todo acesso**, com botão **"Pular"** oposto ao "Avançar"; pular reproduz o estado final da instrução: boina equipada + 5 QdC (25 ganhos − 20 da boina) + score da Introdução | Antes só abria no 1º acesso; o gestor precisava dela sempre ao testar |
 | 104 | 26/07 | **Choque de horário visível na vitrine** (etiqueta "CHOCA COM SUA AGENDA" + item esmaecido, como já era com turma de turno ocupado); Aulão especial no sábado e nova Isolada de Português aos sábados | A regra barrava no clique e a vitrine não explicava |
 | 103 | 25/07 | **"Mentoria Quad" deixou de ser botão fixo** e virou item de catálogo com data (entra em eventos e no calendário); "Simulado físico" → "Caderno de simulados impresso" | Varredura pedida no item 5, mesma família do Aulão especial |

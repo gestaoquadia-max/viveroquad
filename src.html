@@ -1035,6 +1035,30 @@
   .ev-rule .r-pts.coin { display: inline-flex; align-items: center; gap: 4px; color: #9A7414; }
   .ev-rule .r-pts svg, .ev-rule .r-pts img { width: 15px; height: 15px; }
 
+  /* ---------- relatório de compras (Quad Store) ---------- */
+  .rc-tabs { display: flex; gap: 6px; margin: 10px 0 4px; }
+  .rc-tab { flex: 1; cursor: pointer; border-radius: 99px; padding: 7px 4px; font: 700 11px var(--ui);
+    background: #FFFFFF; border: 1px solid var(--p-line); color: var(--p-dim); }
+  .rc-tab.on { background: linear-gradient(180deg, #3B8BFF, #135FE0); border-color: #135FE0; color: #fff; }
+  .rc-resumo { display: flex; gap: 8px; margin-top: 10px; }
+  .rc-resumo .rc-kpi { flex: 1; background: linear-gradient(180deg, #FFFFFF, #F3F8FF); border: 1px solid var(--p-line);
+    border-radius: 13px; padding: 9px 8px; text-align: center; }
+  .rc-resumo .rc-kpi b { display: block; font: 800 15px var(--ui); color: var(--p-text); }
+  .rc-resumo .rc-kpi span { font-size: 9.5px; color: var(--p-dim); letter-spacing: .04em; text-transform: uppercase; }
+  .rc-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--p-line); }
+  .rc-row:last-child { border-bottom: none; }
+  .rc-row .rc-nm { flex: 1; min-width: 0; font: 700 12.5px var(--ui); color: var(--p-text); line-height: 1.3; }
+  .rc-nm small { display: block; font: 400 10.5px var(--font); color: var(--p-dim); margin-top: 2px; }
+  .rc-row .rc-val { flex: none; font: 700 11.5px Consolas, monospace; color: var(--p-dim); }
+  .rc-prog { padding: 9px 0; border-bottom: 1px solid var(--p-line); }
+  .rc-prog:last-child { border-bottom: none; }
+  .rc-prog .rc-top { display: flex; align-items: center; gap: 8px; }
+  .rc-prog .rc-top .rc-nm { flex: 1; }
+  .rc-prog .rc-pct { font: 800 12px Consolas, monospace; color: #1976FF; }
+  .rc-track { height: 8px; border-radius: 99px; background: #E4EDFA; margin-top: 7px; overflow: hidden; }
+  .rc-track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3B8BFF, #135FE0); }
+  .rc-vazio { padding: 8px 0; font-size: 11.5px; color: var(--p-dim); }
+
   /* ---------- área do administrador ---------- */
   .adm-form { display: flex; flex-direction: column; gap: 8px; }
   .adm-row { display: flex; gap: 8px; align-items: center; }
@@ -1049,6 +1073,38 @@
   .adm-bar .adm-x { flex: none; width: 24px; height: 24px; border-radius: 8px; border: none; cursor: pointer;
     background: #FBE9E9; color: #C0392B; font-size: 13px; line-height: 1; }
   .adm-bar .adm-x:hover { background: #F5D6D6; }
+  /* ---------- atalhos das áreas do admin: cada botão abre o seu bloco ---------- */
+  .adm-jump { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .adm-jump .jp {
+    flex: 1 1 calc(50% - 4px); min-width: 0; cursor: pointer; text-align: left;
+    background: linear-gradient(180deg, #FFFFFF, #F1F7FF); border: 1px solid var(--p-line); border-radius: 11px;
+    padding: 9px 10px; font: 700 11.5px var(--ui); color: var(--p-text); line-height: 1.25;
+    box-shadow: 0 3px 9px rgba(11,46,115,0.06); transition: transform .12s ease, box-shadow .12s ease; }
+  .adm-jump .jp:hover { transform: translateY(-1px); box-shadow: 0 7px 16px rgba(25,118,255,0.14); border-color: rgba(59,139,255,0.4); }
+  .adm-jump .jp.on { background: linear-gradient(180deg, #3B8BFF, #135FE0); border-color: #135FE0; color: #fff;
+    box-shadow: 0 6px 14px rgba(19,95,224,0.32); }
+  .adm-jump .jp.todos { flex-basis: 100%; text-align: center; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  /* aviso fixo de erro dentro do bloco — não some como o toast */
+  .adm-alerta { display: none; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 10px 11px;
+    background: #FFF5F5; border: 1px solid #F3C6C6; border-radius: 12px; color: #A02B2B;
+    font: 600 11.5px var(--font); line-height: 1.45; }
+  .adm-alerta.on { display: flex; }
+  .adm-alerta.ok { background: #EEFBF3; border-color: #BFE6CE; color: #1E7A46; }
+  .adm-alerta b { font-weight: 800; }
+  .fld.err { border-color: #E07070 !important; box-shadow: 0 0 0 3px rgba(224,112,112,0.16) !important; }
+  /* confirmação do que já foi preenchido (horário, período) */
+  .adm-eco { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .adm-eco .ec { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 999px;
+    font: 700 10.5px var(--ui); background: #F1F5FB; border: 1px solid var(--p-line); color: var(--p-dim); }
+  .adm-eco .ec.ok { background: #EEFBF3; border-color: #BFE6CE; color: #1E7A46; }
+  .adm-eco .ec.ok::before { content: '✓'; font-size: 11px; }
+  /* avisos enviados: título e detalhe em linhas próprias, ações embaixo */
+  .adm-aviso { padding: 9px 0; border-bottom: 1px solid var(--p-line); }
+  .adm-aviso:last-child { border-bottom: none; }
+  .adm-aviso .av-t { font: 700 12.5px var(--ui); color: var(--p-text); line-height: 1.3; }
+  .adm-aviso .av-d { font-size: 11px; color: var(--p-dim); line-height: 1.4; margin-top: 2px; }
+  .adm-aviso .av-acoes { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
+  .adm-aviso .av-acoes .tag { margin-right: auto; }
   /* divisor visual: separa "criar" de "já enviados" dentro do mesmo bloco */
   .adm-sep { display: flex; align-items: center; gap: 8px; margin: 14px 0 8px;
     font: 800 10px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--p-dim); }
@@ -1794,6 +1850,25 @@
             <div id="lojaEstornos"></div>
             <p class="sub" style="margin-top:8px">Compras feitas há até <strong>7 dias</strong> podem ser estornadas — as moedas voltam para a sua conta na hora e a administração é avisada. A contagem regressiva mostra o prazo de cada item.</p>
           </div>
+
+          <!-- ================= RELATÓRIO DE COMPRAS ================= -->
+          <div class="p-card" id="rcCard">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M15 3v5h5"/><path d="M8 13h8M8 17h5"/></svg></span>Relatório de compras</div>
+            <div class="rc-tabs" id="rcTabs">
+              <button class="rc-tab on" data-rc="7">Semanal</button>
+              <button class="rc-tab" data-rc="30">Mensal</button>
+              <button class="rc-tab" data-rc="90">Trimestral</button>
+              <button class="rc-tab" data-rc="180">Semestral</button>
+            </div>
+            <div class="rc-resumo" id="rcResumo"></div>
+            <div class="loja-sec" style="margin-top:14px">Em andamento · turmas, isoladas e mentorias</div>
+            <div id="rcAndamento"></div>
+            <div class="loja-sec" style="margin-top:14px">Comprado · aguardando retirada ou realização</div>
+            <div id="rcPendente"></div>
+            <div class="loja-sec" style="margin-top:14px">Entregue e concluído</div>
+            <div id="rcEntregue"></div>
+            <p class="sub" style="margin-top:10px">Tudo o que você comprou no período escolhido, com a <strong>situação de cada item</strong>: o que ainda espera retirada na recepção, o que já foi entregue e as <strong>turmas em andamento</strong> com a evolução do curso. Compras estornadas saem do relatório.</p>
+          </div>
         </div>
 
         <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
@@ -2260,9 +2335,19 @@
               </div>
             </div>
             <p class="sub">Crédito manual de moedas, bloqueio de contas e mensagens exclusivas — ações diretas na conta do aluno.</p>
+            <div class="adm-jump" id="jumpControle">
+              <button class="jp" data-jump="doc">Corpo docente</button>
+              <button class="jp" data-jump="turmas">Criação de turma e isoladas</button>
+              <button class="jp" data-jump="credito">Inserir crédito</button>
+              <button class="jp" data-jump="contas">Permissões e acessos</button>
+              <button class="jp" data-jump="msg">Comunicação interna</button>
+              <button class="jp" data-jump="gift">Criar Gift cards</button>
+              <button class="jp" data-jump="estornos">Estornos e desistências</button>
+              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+            </div>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="doc">
             <div class="k-label">Banco de professores · corpo docente</div>
             <div class="adm-form">
               <input class="fld" id="admDocNome" placeholder="Nome do professor (ex.: Cap. Silva)">
@@ -2292,7 +2377,7 @@
             <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="turmas">
             <div class="k-label">Criação de turmas e isoladas · matrícula e vagas</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2334,6 +2419,7 @@
                 <span class="pct" id="admCtLbH2">2º até</span>
                 <input class="fld" id="admCtH2f" type="time" style="max-width:104px" aria-label="Fim do 2º tempo">
               </div>
+              <div class="adm-eco" id="admCtEco"></div>
               <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
               <p class="adm-hint">A turma é vendida <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são divididas: as que você marcar em Quad Coins ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.</p>
               <div class="ct-grid">
@@ -2347,16 +2433,18 @@
               </div>
               <div id="admCtProfsBox">
                 <div class="k-label sub-k" style="margin-top:10px">Professores por matéria · árvore do edital</div>
+                <p class="adm-hint" id="admCtArvoreOrigem">Matérias da árvore do concurso escolhido acima.</p>
                 <div id="admCtProfs" style="max-height:180px; overflow:auto"></div>
               </div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmCtAbrir">Abrir turma</button></div>
+              <div class="adm-alerta" id="admCtErro"></div>
             </div>
             <div class="adm-sep"><span>Turmas abertas</span></div>
             <div id="admCtLista"></div>
             <p class="sub" style="margin-top:8px">A turma <strong>nasce aqui</strong> e vai direto para a Quad Store com as <strong>vagas por moeda</strong> (gerais − QdC = Diamantes). O aluno escolhe a moeda num pop-up; comprou, as turmas do <strong>mesmo turno ficam bloqueadas</strong> para ele até o término. A <strong>árvore do edital em PDF</strong> define as matérias <span class="ref">[INTEGRAÇÃO REAL] leitura do arquivo</span>. A turma também aparece na Estrutura.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="credito">
             <div class="k-label">Crédito manual · Quad Coins e Diamantes</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2379,13 +2467,13 @@
             <p class="sub" style="margin-top:8px">A adição de Quad Coins e Diamantes é <strong>livre para a administração</strong> — usada para recargas do site, gift cards presenciais e correções. Cai na conta do aluno <strong>na hora</strong>.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="contas">
             <div class="k-label">Contas · bloquear e desbloquear</div>
             <div id="admContasList"></div>
             <p class="sub" style="margin-top:8px">O bloqueio <strong>suspende o uso do app imediatamente</strong>: o aluno é desconectado e, ao tentar entrar com login e senha, vê o aviso de conta bloqueada com a orientação de procurar a administração.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="msg">
             <div class="k-label">Mensagens individuais</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2405,7 +2493,7 @@
             <p class="sub" style="margin-top:8px">Escolha <strong>aluno ou professor</strong> e envie um recado individual. Para o <strong>aluno</strong>, chega no "+" com contador (estilo WhatsApp); para o <strong>professor</strong>, aparece na <strong>sala dele</strong>, também com contador. O chat ao vivo fica como próxima implementação.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="gift">
             <div class="k-label">Gift cards · lotes com QR code</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2424,7 +2512,7 @@
             <p class="sub" style="margin-top:8px">Cada gift card nasce com <strong>código e QR próprios</strong>, de <strong>liberação única</strong> — usou, invalidou na hora. A arte final dos QR para impressão é <span class="ref">[INTEGRAÇÃO REAL] geração/leitura de QR</span>; na demo o padrão é ilustrativo e o resgate vale pelo código.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="estornos">
             <div class="k-label">Estornos e desistências</div>
             <div id="admEstList"></div>
             <div class="adm-sep"><span>Itens mais estornados</span></div>
@@ -2445,9 +2533,17 @@
             </div>
             <p class="sub">O que o time cria daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e produtos.</p>
             <div style="margin-top:10px"><button class="btn ghost small" id="btnIrEstrutura">Estrutura · turmas, concursos e editais</button></div>
+            <div class="adm-jump" id="jumpInterno">
+              <button class="jp" data-jump="avisos">Avisos gerais</button>
+              <button class="jp" data-jump="crono">Atualizar cronograma</button>
+              <button class="jp" data-jump="eventos">Criar evento</button>
+              <button class="jp" data-jump="simulados">Criar simulados</button>
+              <button class="jp" data-jump="skins">Skin do personagem</button>
+              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+            </div>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="avisos">
             <div class="k-label">Avisos gerais · enviar</div>
             <div class="adm-form">
               <input class="fld" id="admAvTitulo" placeholder="Título (ex.: Aulão de véspera confirmado)">
@@ -2465,7 +2561,7 @@
             <p class="sub" style="margin-top:8px">Mensagens dos professores e do time entram por aqui e aparecem em <strong>Avisos gerais</strong> no Início do aluno, filtradas pelo turno (M · T · N) e pela modalidade (RONDESP nivelamento · PATAMO regular · BOPE questões).</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="crono">
             <div class="k-label">Cronograma semanal · atualizar</div>
             <div class="adm-form">
               <div class="adm-row">
@@ -2486,7 +2582,7 @@
             <div id="admCrLog"></div>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="eventos">
             <div class="k-label">Eventos da semana · regras de score e Coins</div>
             <div class="adm-sep"><span>Criar evento</span></div>
             <div class="adm-form">
@@ -2526,6 +2622,7 @@
               </div>
               <div style="margin-top:8px"><button class="btn ghost small" id="btnAdmEvNovo">Criar evento</button></div>
               <p class="sub" id="admEvNovoPrev" style="margin-top:6px">Escolha a data, o início e o término na agenda.</p>
+              <div class="adm-alerta" id="admEvErro"></div>
             </div>
             <div class="adm-sep"><span>Regras de score e Coins</span></div>
             <div class="adm-form">
@@ -2544,7 +2641,7 @@
             <p class="sub" style="margin-top:8px"><strong>Online/presencial</strong> é a modalidade do evento (não o nome). <strong>Gratuito</strong> entra direto no Início e dá recompensa ao participar; <strong>pago</strong> vai para a Loja (em <strong>QdC ou Diamantes</strong>) e, ao ser comprado, migra para os Eventos do Início. Toque no ✕ para <strong>cancelar</strong> um evento.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="simulados">
             <div class="k-label">Lançamento de simulados</div>
             <div class="adm-sep"><span>Lançar simulado</span></div>
             <div class="adm-form">
@@ -2565,6 +2662,16 @@
                   <input class="fld" id="admSimIni" type="time" value="08:00" aria-label="Início" title="Início" style="max-width:100px">
                   <span class="pct">até</span>
                   <input class="fld" id="admSimFim" type="time" value="12:00" aria-label="Término" title="Término" style="max-width:100px">
+                </div>
+                <div class="k-label sub-k" style="margin-top:10px">Vagas da sala</div>
+                <p class="adm-hint">O simulado presencial ocupa <strong>cadeira na sede</strong>: informe quantas existem e quantas dessas são <strong>pagas</strong>. O restante entra como <strong>gratuitas</strong> (a presença rende Quad Coins).</p>
+                <div class="ct-grid">
+                  <label class="ct-fld"><span>Cadeiras da sala</span><input class="fld" id="admSimVagas" placeholder="ex.: 100" inputmode="numeric"></label>
+                  <label class="ct-fld"><span>Dessas, pagas</span><input class="fld" id="admSimVagasPagas" placeholder="ex.: 30" inputmode="numeric"></label>
+                </div>
+                <div class="adm-eco" id="admSimEco"></div>
+                <div class="adm-row" style="margin-top:8px">
+                  <input class="fld" id="admSimRec" placeholder="Recompensa QdC pela presença (ex.: 100)" inputmode="numeric">
                 </div>
               </div>
               <div id="admSimDig" style="display:none">
@@ -2587,36 +2694,14 @@
               <div class="adm-row" style="margin-top:8px">
                 <button class="btn small" id="btnAdmSimLancar">Lançar simulado</button>
               </div>
+              <div class="adm-alerta" id="admSimErro"></div>
             </div>
             <div class="adm-sep"><span>Simulados lançados</span></div>
             <div id="admSimList"></div>
             <p class="sub" style="margin-top:8px"><strong>Presencial</strong>: liberação na sede pela aba Liberar. <strong>Digital</strong>: o PDF vira <strong>quiz cronometrado</strong> <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. <strong>Pago</strong> entra na <strong>Loja</strong> em <strong>QdC ou Diamantes</strong>; <strong>gratuito</strong> vai direto para os Simulados do aluno e premia em QdC. Toque no ✕ para remover.</p>
           </div>
 
-          <div class="p-card">
-            <div class="k-label">Produtos digitais · pré-configurados</div>
-            <div class="adm-form">
-              <input class="fld" id="admDigNome" placeholder="Nome do produto digital (ex.: E-book · Direito Penal)">
-              <div class="adm-row" style="margin-top:8px">
-                <input class="fld" id="admDigDesc" placeholder="Descrição curta (ex.: material digital do Quad)">
-              </div>
-              <div class="adm-row" style="margin-top:8px">
-                <select class="fld" id="admDigMoeda" title="Moeda de venda">
-                  <option value="qdc">Vender em Quad Coins</option>
-                  <option value="dmn">Vender em Diamantes</option>
-                </select>
-                <input class="fld" id="admDigPreco" placeholder="Preço em Quad Coins" inputmode="numeric" style="max-width:150px">
-              </div>
-              <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
-              <div class="ico-pick" id="admDigIcones"></div>
-              <div style="margin-top:10px"><button class="btn small" id="btnAdmDig">Cadastrar produto digital</button></div>
-            </div>
-            <div class="adm-sep"><span>Catálogo digital</span></div>
-            <div id="admDigList"></div>
-            <p class="sub" style="margin-top:8px">Produtos digitais <strong>não têm estoque</strong>: nascem <strong>indisponíveis</strong> e a administração os torna <strong>disponíveis</strong> na Loja (Itens digitais) quando quiser. Toque no ✕ para tirar do catálogo.</p>
-          </div>
-
-          <div class="p-card">
+          <div class="p-card" data-bl="skins">
             <div class="k-label">Criar skin do personagem</div>
             <div class="adm-form">
               <div class="adm-row" style="margin-bottom:8px">
@@ -2645,7 +2730,7 @@
             <p class="sub" style="margin-top:8px">A <strong>skin</strong> entra em <strong>Itens do personagem</strong> e veste o avatar; o <strong>item de combate</strong> entra em <strong>Itens de combate</strong> e vai para a <strong>mochila</strong> do aluno (sempre em Quad Coins). Toque no ✕ para tirar da Loja.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="quests">
             <div class="k-label">Quests · missões especiais</div>
             <div style="display:flex; align-items:center; gap:10px; margin-top:6px">
               <button class="btn ghost small" id="btnAdmQuests">Criar Quests</button>
@@ -2666,15 +2751,21 @@
               </div>
             </div>
             <p class="sub">Entrega de <strong>itens físicos</strong> na recepção, <strong>autorização de acesso</strong> às atividades presenciais e a <strong>lista de inscritos</strong> por atividade.</p>
+            <div class="adm-jump" id="jumpLiber">
+              <button class="jp" data-jump="fisicos">Liberar produtos físicos</button>
+              <button class="jp" data-jump="acessos">Autorizar acesso</button>
+              <button class="jp" data-jump="inscritos">Verificar inscritos</button>
+              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+            </div>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="fisicos">
             <div class="k-label">Produtos físicos · retirada na recepção</div>
             <div id="admPedidosList"></div>
             <p class="sub" style="margin-top:8px">Garrafinhas, camisas, livros, vade mecum, chaveiros — a compra na Loja gera o pedido aqui. Na retirada, a administração <strong>confirma a entrega</strong> e dá baixa; o item volta ao estoque da Loja.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="acessos">
             <div class="k-label">Autorizações de acesso</div>
             <p class="sub" style="margin-bottom:4px">Portaria das atividades presenciais: libere a entrada de quem chega à sede. Onde a atividade gera QdC na presença, a liberação também pontua.</p>
             <div id="admAcessos"></div>
@@ -2682,7 +2773,7 @@
             <div id="admSpLista"></div>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="inscritos">
             <div class="k-label">Inscritos por atividade</div>
             <select class="fld" id="admAtivSel" style="margin-top:6px"></select>
             <div id="admAtivInscritos" style="margin-top:10px"></div>
@@ -2827,6 +2918,23 @@
         <!-- ============ ADMIN · LOJA (governança) ============ -->
         <div class="view" id="v-adm-loja">
           <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · catálogo e preços</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Loja</h3>
+              </div>
+            </div>
+            <p class="sub">Cadastro de produtos e serviços da Quad Store e a atualização geral de preços — da Loja e das turmas e isoladas.</p>
+            <div class="adm-jump" id="jumpLojaAdm">
+              <button class="jp" data-jump="cadastro">Cadastrar produto ou serviço</button>
+              <button class="jp" data-jump="precos">Atualização geral da Loja</button>
+              <button class="jp" data-jump="precoturmas">Atualização geral das turmas</button>
+              <button class="jp todos" data-jump="">Ver todos os blocos</button>
+            </div>
+          </div>
+
+          <div class="p-card" data-bl="cadastro">
             <div class="k-label">Cadastrar produto ou serviço</div>
             <div class="adm-form">
               <input class="fld" id="admProdNome" placeholder="Nome (ex.: Caneca Quad)">
@@ -2852,9 +2960,12 @@
                 <input class="fld" id="admProdQtd" placeholder="Qtd." inputmode="numeric" style="max-width:70px" title="Estoque (itens presenciais)">
               </div>
               <div class="adm-row" id="admProdDataBox" style="margin-top:8px; display:none">
-                <span class="pct">Data</span>
+                <span class="pct" id="admProdDataLb">Data</span>
                 <input class="fld" id="admProdData" type="date" style="max-width:150px" aria-label="Data da atividade" title="Data — entra no calendário do aluno que comprar">
+                <span class="pct" id="admProdAteLb" style="display:none">até</span>
+                <input class="fld" id="admProdDataFim" type="date" style="max-width:150px; display:none" aria-label="Término" title="Término — a mentoria é como uma turma online, com começo e fim">
               </div>
+              <div class="adm-alerta" id="admProdErro"></div>
               <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
               <div class="ico-pick" id="admProdIcones"></div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
@@ -2863,18 +2974,18 @@
             <p class="sub" style="margin-top:8px">O produto entra <strong>na hora</strong> na seção escolhida da Loja do aluno. Cada coisa nasce no seu lugar: <strong>turmas e isoladas</strong> em “Criação de turmas e isoladas”, <strong>simulados</strong> em “Lançamento de simulados”, <strong>eventos</strong> em “Eventos da semana” e <strong>itens do personagem e de combate</strong> em “Criar skin do personagem” — por isso eles não aparecem aqui. Itens de retirada usam a <strong>quantidade</strong> como estoque e geram <strong>pedido na recepção</strong>; <strong>Excursões, TAF e Mentoria</strong> aceitam <strong>data</strong> e, quando comprados, entram nos <strong>Eventos da semana</strong> e no <strong>calendário</strong> do aluno. Toque no ✕ para remover.</p>
           </div>
 
-          <div class="p-card">
+          <div class="p-card" data-bl="precos">
             <div class="k-label">Preços da Loja · atualizar</div>
             <div id="admPrecosList"></div>
             <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecos">Aplicar preços</button></div>
             <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins. O log de <strong>compradores</strong> agora fica em <strong>Relatórios · Loja</strong>.</p>
           </div>
 
-          <div class="p-card">
-            <div class="k-label">Preços e vagas das turmas · atualizar</div>
+          <div class="p-card" data-bl="precoturmas">
+            <div class="k-label">Preços e vagas das turmas e isoladas · atualizar</div>
             <div id="admPrecoTurmas"></div>
             <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecoTurma">Aplicar nas turmas</button></div>
-            <p class="sub" style="margin-top:8px">Ajuste o valor em <strong>Diamantes</strong> e em <strong>Quad Coins</strong> e as <strong>vagas restantes</strong> de cada moeda <strong>sem apagar a turma</strong> — quem já está matriculado continua matriculado.</p>
+            <p class="sub" style="margin-top:8px">Ajuste o valor em <strong>Diamantes</strong> e em <strong>Quad Coins</strong> e as <strong>vagas restantes</strong> de cada moeda <strong>sem apagar a turma</strong> — quem já está matriculado continua matriculado. As <strong>isoladas</strong> vêm logo abaixo, com o preço na moeda em que foram abertas.</p>
           </div>
 
         </div>
@@ -3764,6 +3875,7 @@
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
     if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
     if (id === 'v-loja' && typeof renderEventosLoja === 'function') renderEventosLoja(); /* e da vitrine */
+    if (id === 'v-loja' && typeof renderRelCompras === 'function') renderRelCompras();   /* relatório de compras sempre atual */
     /* abrir Missões revalida os 7 dias: o que venceu sai de "Hoje" e entra em "Atrasadas" */
     if (id === 'v-missoes') {
       if (typeof renderDia === 'function') renderDia();
@@ -5867,8 +5979,8 @@
      · digital → quiz cronometrado; realizado, vai ao histórico
      Tudo é computado no histórico para fins pedagógicos.                    */
   var SIMULADOS = [
-    { id: 's63', rot: 'Simulado 63 · SD PMBA', det: 'domingo · 8h', tag: 'PRESENCIAL', pago: true,  valor: 120, score: 120, insc: false, comprado: false, realizado: false },
-    { id: 'sq',  rot: 'Simuladão Quad',        det: 'sábado · 8h',  tag: 'PRESENCIAL', pago: false, valor: 20,  score: 100, insc: false, realizado: false },
+    { id: 's63', rot: 'Simulado 63 · SD PMBA', det: 'domingo · 8h', tag: 'PRESENCIAL', pago: true,  valor: 120, rec: 0,  score: 120, vagas: 60, vagasPagas: 60, vagasGratis: 0,  insc: false, comprado: false, realizado: false },
+    { id: 'sq',  rot: 'Simuladão Quad',        det: 'sábado · 8h',  tag: 'PRESENCIAL', pago: false, valor: 20,  rec: 20, score: 100, vagas: 80, vagasPagas: 0,  vagasGratis: 80, insc: false, realizado: false },
     { id: 'sd1', rot: 'Simulado digital · CFO 1ª fase', tag: 'DIGITAL', pago: false, valor: 0, pdf: 'cfo-1fase.pdf', minutos: 30, nq: 10, dia: '', feito: false, comprado: false }
   ];
   /* inscritos presenciais que aguardam liberação (feed da recepção) */
@@ -5903,13 +6015,38 @@
     if (sm.tag === 'DIGITAL' && sm.pago && !sm.comprado) return false;
     return true;
   }
+  /* cadeiras do simulado presencial: pagas e gratuitas, com o que resta */
+  function simVagas(sm) {
+    var pagas = sm.vagasPagas || 0, gratis = sm.vagasGratis || 0;
+    return { pagas: pagas, gratis: gratis,
+             pagasRest: Math.max(0, sm.vagasPagasRest == null ? pagas : sm.vagasPagasRest),
+             gratisRest: Math.max(0, sm.vagasGratisRest == null ? gratis : sm.vagasGratisRest),
+             temSala: pagas + gratis > 0 };
+  }
+  function simRec(sm) { return sm.rec || (!sm.pago ? sm.valor : 0) || 0; }
+  function simTomaVaga(sm, tipo) {
+    var vg = simVagas(sm);
+    if (!vg.temSala) return true;   /* simulado antigo, sem controle de sala */
+    if (tipo === 'paga') {
+      if (vg.pagasRest <= 0) return false;
+      sm.vagasPagasRest = vg.pagasRest - 1;
+    } else {
+      if (vg.gratisRest <= 0) return false;
+      sm.vagasGratisRest = vg.gratisRest - 1;
+    }
+    return true;
+  }
   function simHint(sm) {
     if (sm.tag === 'DIGITAL') {
       if (!simDigDisponivel(sm)) return 'disponível em ' + diaBR(sm.dia);
       return sm.minutos + ' min · ' + sm.nq + ' questões · score + QdC';
     }
-    if (sm.pago) return 'presencial · ' + fmt(sm.valor) + ' ' + moedaTxt(sm.moeda === 'dmn' ? 'dmn' : 'qdc') + ' na Loja';
-    return 'presencial · grátis · +' + sm.valor + ' QdC ao participar';
+    /* presencial ocupa cadeira: o aluno vê quantas sobram de cada tipo */
+    var vg = simVagas(sm), partes = [];
+    if (vg.pagas > 0) partes.push(vg.pagasRest + ' de ' + vg.pagas + ' vagas pagas · ' + fmt(sm.valor) + ' ' + moedaTxt(sm.moeda === 'dmn' ? 'dmn' : 'qdc') + ' na Loja');
+    if (vg.gratis > 0) partes.push(vg.gratisRest + ' de ' + vg.gratis + ' vagas grátis · +' + fmt(simRec(sm)) + ' QdC na presença');
+    if (!partes.length) return sm.pago ? 'presencial · ' + fmt(sm.valor) + ' ' + moedaTxt(sm.moeda === 'dmn' ? 'dmn' : 'qdc') + ' na Loja' : 'presencial · grátis · +' + fmt(simRec(sm)) + ' QdC ao participar';
+    return 'presencial · ' + partes.join(' · ');
   }
   function renderSimulados() {
     var el = $('simuladosList'); if (!el) return;
@@ -5921,7 +6058,13 @@
         if (simDigDisponivel(sm)) { acao = 'Responder o simulado'; }
         else { acao = 'Em breve'; dis = ' disabled'; }
       } else if (sm.insc || sm.comprado) { acao = 'Inscrito'; tagTxt = 'INSCRITO'; dis = ' disabled'; ok = true; }
-      else { acao = 'Inscrever'; tagTxt = 'PRESENCIAL'; }
+      else {
+        var vgs = simVagas(sm);
+        tagTxt = 'PRESENCIAL';
+        if (vgs.temSala && vgs.gratisRest <= 0 && vgs.pagasRest <= 0) { acao = 'Sala lotada'; dis = ' disabled'; }
+        else if (vgs.temSala && vgs.gratisRest <= 0) { acao = 'Comprar vaga na Loja'; }
+        else { acao = 'Inscrever'; }
+      }
       /* leiaute em camadas: título+tag / detalhe em linha inteira / ação à direita */
       return '<div class="sim-row"><div class="sim-top"><div class="m-dot">◈</div>' +
         '<div class="t">' + sm.rot + '</div>' +
@@ -5942,7 +6085,17 @@
     }
     /* presencial */
     if (sm.insc || sm.comprado) { toast('Inscrição já confirmada — apareça na sede para liberarem sua entrada.'); return; }
-    if (sm.pago) {
+    var vg = simVagas(sm);
+    if (vg.temSala && vg.gratisRest <= 0 && vg.pagasRest <= 0) { toast('Sala lotada — as ' + vg.pagas + vg.gratis + ' cadeiras deste simulado já foram tomadas.'); return; }
+    /* sem vaga gratuita sobrando, resta comprar a paga na Loja */
+    if (vg.temSala && vg.gratisRest <= 0 && vg.pagasRest > 0) {
+      showView('v-loja', 'navAluno');
+      renderLojaSimulados();
+      setTimeout(function () { var cc = $('lojaSim-pres'); if (cc) cc.scrollIntoView({ block: 'center' }); }, 60);
+      toast('As vagas gratuitas acabaram — restam ' + vg.pagasRest + ' vagas pagas, na Loja.');
+      return;
+    }
+    if (sm.pago && !vg.gratis) {
       /* pago: a inscrição é a compra na Loja */
       showView('v-loja', 'navAluno');
       renderLojaSimulados();
@@ -5950,11 +6103,29 @@
       toast('Este simulado é pago — conclua a inscrição comprando na Loja.');
       return;
     }
-    /* grátis: inscreve direto e entra na fila de liberação */
+    /* gratuito: confere choque de agenda (decisão do aluno em dois toques) */
+    var chq = simChoque(sm);
+    if (chq && simChoqueArmado !== sm.id) {
+      simChoqueArmado = sm.id;
+      toast('Você já tem “' + chq + '” nesse dia e horário. Se seguir, a escolha de qual atividade frequentar é sua — o Quad não faz reposição nem devolve nada por ausência. Toque em Inscrever de novo para confirmar.');
+      return;
+    }
+    simChoqueArmado = null;
+    if (!simTomaVaga(sm, 'gratis')) { toast('As vagas gratuitas acabaram enquanto você decidia.'); renderSimulados(); return; }
     sm.insc = true;
     simInscrever(sm);
     renderSimulados();
-    toast('Inscrição confirmada · grátis. Sua presença rende +' + sm.valor + ' QdC quando a recepção liberar.');
+    if (typeof renderAdmSimList === 'function') renderAdmSimList();
+    toast('Inscrição confirmada · grátis. Sua presença rende +' + fmt(simRec(sm)) + ' QdC quando a recepção liberar.');
+  }
+  /* choque de agenda do simulado presencial (mesma régua das compras) */
+  var simChoqueArmado = null;
+  function simChoque(sm) {
+    if (sm.tag !== 'PRESENCIAL' || !sm.dataISO) return null;
+    var fs = (sm.hi && sm.hf) ? faixaDe(sm.hi + '–' + sm.hf) : faixaDe(sm.det || '');
+    var ds = diaDaData(sm.dataISO);
+    if (!fs || ds == null) return null;
+    return choqueDeAgenda({ dias: [ds], ini: fs[0], fim: fs[1], rot: sm.rot, de: sm.dataISO, ate: sm.dataISO });
   }
   function simInscrever(sm) {
     SIM_INSC.unshift({ simRot: sm.rot, nome: nomeCurto(), pago: sm.pago, valor: sm.valor, score: sm.score,
@@ -5963,7 +6134,13 @@
   }
   /* ---------- Loja: simulados pagos ---------- */
   var SIM_ICO = '<svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg>';
-  function lojaSimVenda() { return SIMULADOS.filter(function (sm) { return sm.pago && !sm.comprado && !sm.realizado && !sm.feito; }); }
+  function lojaSimVenda() {
+    return SIMULADOS.filter(function (sm) {
+      if (!sm.pago || sm.comprado || sm.realizado || sm.feito) return false;
+      var vg = simVagas(sm);
+      return !(sm.tag === 'PRESENCIAL' && vg.temSala && vg.pagasRest <= 0);   /* pagas esgotadas saem da vitrine */
+    });
+  }
   function renderLojaSimulados() {
     var alvos = { PRESENCIAL: $('lojaSim-pres'), DIGITAL: $('lojaSim-dig') };
     if (!alvos.PRESENCIAL && !alvos.DIGITAL) return;
@@ -5974,11 +6151,15 @@
       g.innerHTML = lista.map(function (sm) {
         var mo = sm.moeda === 'dmn' ? 'dmn' : 'qdc';
         var desc = sm.tag === 'DIGITAL' ? 'digital · ' + sm.minutos + ' min' : 'presencial · ' + (sm.det || 'na sede');
+        var vgl = simVagas(sm);
+        var chqL = sm.tag === 'PRESENCIAL' ? simChoque(sm) : null;
         return '<button class="loja-item" data-sim-buy="' + sm.id + '" data-moeda="' + mo + '">' +
+          (chqL ? '<span class="li-estoque">EM CHOQUE</span>'
+                : (sm.tag === 'PRESENCIAL' && vgl.temSala ? '<span class="li-estoque">' + vgl.pagasRest + ' vagas</span>' : '')) +
           '<span class="li-ico">' + SIM_ICO + '</span>' +
           '<span class="li-nome">' + sm.rot + '</span>' +
           '<span class="li-desc">' + desc + '</span>' +
-          '<span class="li-preco">' + fmt(sm.valor) + ' ' + moedaTxt(mo) + '</span></button>';
+          '<span class="li-preco' + (chqL ? ' em-choque' : '') + '">' + fmt(sm.valor) + ' ' + moedaTxt(mo) + '</span></button>';
       }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum simulado à venda agora.</p>';
       g.querySelectorAll('[data-sim-buy]').forEach(function (bt) {
         bt.addEventListener('click', function () { comprarSimulado(bt.dataset.simBuy); });
@@ -6000,6 +6181,7 @@
     var mo = sm.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: sm.rot, desc: sm.tag === 'DIGITAL' ? 'simulado digital' : 'simulado presencial', preco: sm.valor, moeda: mo, aviso: avisoSim, ico: SIM_ICO }, function () {
       if (saldoDe(mo) < sm.valor) { toast(semSaldoMsg(mo)); return; }
+      if (sm.tag === 'PRESENCIAL' && !simTomaVaga(sm, 'paga')) { toast('Sala lotada — a última vaga paga acabou de ser tomada.'); renderLojaSimulados(); return; }
       debitar(mo, sm.valor, sm.rot + ' · −' + fmt(sm.valor) + ' ' + moedaTxt(mo));
       sm.comprado = true;
       lojaCompraLog(sm.rot, sm.valor, mo, 'simulado', sm.id);
@@ -6012,6 +6194,7 @@
       }
       renderLojaSimulados();
       renderSimulados();
+      if (typeof renderAdmSimList === 'function') renderAdmSimList();
     });
   }
   function renderSimHist() {
@@ -7241,8 +7424,18 @@
     var c = (typeof concursoDe === 'function') ? concursoDe($('admCtConc').value) : null;
     return (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : MATERIAS_GENERICAS;
   }
+  /* árvore do edital anexada no formulário: assim que o PDF entra, as
+     matérias de "Professores por matéria" passam a vir dele.            */
+  var ctArvoreArq = '';
   function renderCtProfs() {
     var el = $('admCtProfs'); if (!el) return;
+    var origem = $('admCtArvoreOrigem');
+    if (origem) {
+      var cNome = ($('admCtConc').selectedOptions[0] || {}).textContent || '';
+      origem.innerHTML = ctArvoreArq
+        ? 'Matérias lidas de <strong>' + ctArvoreArq + '</strong> <span class="ref">[INTEGRAÇÃO REAL] leitura do PDF</span> — na demo valem as do edital de <strong>' + cNome + '</strong>.'
+        : 'Matérias da árvore do edital de <strong>' + cNome + '</strong>. Anexe o PDF acima para ler a árvore do arquivo.';
+    }
     el.innerHTML = ctMaterias().map(function (mat, i) {
       var docs = docentesDaMateria(mat);
       var ops = docs.length
@@ -7433,19 +7626,66 @@
           || '<option value="">— sem professor no banco —</option>';
       }
     }
-    tipoSel.addEventListener('change', admCtIsoToggle);
+    /* ---------- eco do que já foi preenchido ----------
+       O campo de hora não deixa claro se pegou; aqui o horário aparece
+       escrito, em verde, assim que os dois tempos estão completos.     */
+    function hLab(t) { var q = (t || '').split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; }
+    function admCtEco() {
+      var eco = $('admCtEco'); if (!eco) return;
+      var iso = ehIsolada();
+      var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      var chips = [];
+      if (ini && fim) chips.push(['ok', 'Período: ' + dataBRcompleta(ini) + ' → ' + dataBRcompleta(fim)]);
+      else chips.push(['', 'Período: escolha início e término']);
+      if (iso) {
+        if (h1i && h1f && h1i < h1f) chips.push(['ok', 'Horário: ' + hLab(h1i) + '–' + hLab(h1f)]);
+        else chips.push(['', 'Horário: das __ às __']);
+      } else if (h1i && h1f && h2f && h1i < h1f && h1f < h2f) {
+        chips.push(['ok', 'Horário: ' + hLab(h1i) + '–' + hLab(h1f) + ' e ' + hLab(h1f) + '–' + hLab(h2f)]);
+      } else {
+        chips.push(['', 'Horário: 1º e 2º tempos ainda incompletos']);
+      }
+      eco.innerHTML = chips.map(function (c) { return '<span class="ec ' + c[0] + '">' + c[1] + '</span>'; }).join('');
+    }
+    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f'].forEach(function (id) {
+      var el = $(id); if (!el) return;
+      ['input', 'change', 'blur'].forEach(function (ev) { el.addEventListener(ev, admCtEco); });
+    });
+    window.__ctEco = admCtEco;
+    tipoSel.addEventListener('change', function () { admCtIsoToggle(); admCtEco(); });
     $('admCtDias').querySelectorAll('.turno-chip').forEach(function (bt) {
       bt.addEventListener('click', function () { bt.classList.toggle('on'); });
     });
-    admCtIsoToggle();
+    admCtIsoToggle(); admCtEco();
     window.__isoToggle = admCtIsoToggle;
     $('admCtConc').innerHTML = TURMA_FOCOS.map(function (fo) {
       return '<option value="' + fo.id + '">' + fo.nome + '</option>';
     }).join('');
     $('admCtConc').addEventListener('change', renderCtProfs);
+    /* PDF do edital anexado → as matérias passam a sair dele, na hora */
+    var arvIn = $('admCtArvore');
+    if (arvIn) arvIn.addEventListener('change', function () {
+      ctArvoreArq = (this.files && this.files[0]) ? this.files[0].name : '';
+      renderCtProfs();
+      if (ctArvoreArq) toast('Árvore do edital anexada — “Professores por matéria” já está com as matérias desse edital.');
+    });
     renderCtProfs();
+    /* aviso que fica na tela e marca o campo que falta */
+    var CT_CAMPOS = ['admCtApelido', 'admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f',
+                     'admCtPrecoDmn', 'admCtPrecoQdc', 'admCtVagas', 'admCtVagasQdc'];
+    function ctFalta(cond, campo, msg) {
+      if (!cond) return false;
+      admAlerta('admCtErro', msg);
+      if (campo) admMarcaErro(campo);
+      return true;
+    }
+    CT_CAMPOS.forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+    });
     $('btnAdmCtAbrir').addEventListener('click', function () {
       var tipo = tipoSel.value, ape = $('admCtApelido').value.trim();
+      admAlerta('admCtErro', ''); admLimpaErro(CT_CAMPOS);
       /* ---------- MATÉRIAS ISOLADAS: dias fixos + período ---------- */
       if (tipo === 'ISOLADA') {
         var dias = [].slice.call($('admCtDias').querySelectorAll('.turno-chip.on')).map(function (c) { return c.dataset.dia; });
@@ -7453,14 +7693,17 @@
         var iHi = $('admCtH1i').value, iHf = $('admCtH1f').value;
         var iDmn = parseInt($('admCtPrecoDmn').value, 10), iQdc = parseInt($('admCtPrecoQdc').value, 10);
         var iVagas = parseInt($('admCtVagas').value, 10);
-        if (!ape) { toast('Informe a matéria da isolada.'); return; }
-        if (/["<>]/.test(ape)) { toast('Use um nome sem aspas ou sinais.'); return; }
-        if (!dias.length) { toast('Escolha ao menos um dia da semana para a isolada.'); return; }
-        if (!iIni || !iFim) { toast('Informe o período da isolada (início e término).'); return; }
-        if (iFim < iIni) { toast('O término deve ser depois do início.'); return; }
-        if (!iHi || !iHf || !(iHi < iHf)) { toast('Informe o horário da isolada (das __ às __).'); return; }
-        if ((!iDmn || iDmn < 1) && (!iQdc || iQdc < 1)) { toast('Informe o preço da isolada em ao menos uma moeda.'); return; }
-        if (!iVagas || iVagas < 1) { toast('Informe as vagas da isolada.'); return; }
+        if (ctFalta(!ape, 'admCtApelido', 'Para abrir a isolada falta a <b>matéria</b> — escreva-a no campo do topo.')) return;
+        if (ctFalta(/["<>]/.test(ape), 'admCtApelido', 'Use um nome sem aspas ou sinais.')) return;
+        if (ctFalta(!dias.length, '', 'Para abrir a isolada falta marcar <b>ao menos um dia da semana</b>.')) return;
+        if (ctFalta(!iIni, 'admCtIni', 'Para abrir a isolada falta a <b>data de início</b>.')) return;
+        if (ctFalta(!iFim, 'admCtFim', 'Para abrir a isolada falta a <b>data de término</b>.')) return;
+        if (ctFalta(iFim < iIni, 'admCtFim', 'O <b>término</b> precisa ser depois do início.')) return;
+        if (ctFalta(!iHi, 'admCtH1i', 'Para abrir a isolada falta a <b>hora de início</b> da aula.')) return;
+        if (ctFalta(!iHf, 'admCtH1f', 'Para abrir a isolada falta a <b>hora de término</b> da aula.')) return;
+        if (ctFalta(!(iHi < iHf), 'admCtH1f', 'A <b>hora de término</b> precisa ser depois da hora de início.')) return;
+        if (ctFalta((!iDmn || iDmn < 1) && (!iQdc || iQdc < 1), 'admCtPrecoDmn', 'Para abrir a isolada falta o <b>preço</b> em ao menos uma moeda.')) return;
+        if (ctFalta(!iVagas || iVagas < 1, 'admCtVagas', 'Para abrir a isolada faltam as <b>vagas</b>.')) return;
         var usaDmn = !!(iDmn && iDmn >= 1);
         var novaIso = { id: 'iso' + Date.now(), materia: ape, nome: 'Isolada ' + ape,
           prof: $('admCtIsoProf') ? $('admCtIsoProf').value : '', dias: dias, hi: iHi, hf: iHf,
@@ -7472,6 +7715,8 @@
         $('admCtH1i').value = ''; $('admCtH1f').value = '';
         $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = '';
         $('admCtDias').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
+        admCtEco();
+        admAlerta('admCtErro', 'Isolada de <b>' + ape + '</b> aberta — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.', true);
         toast('Isolada de ' + ape + ' aberta — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.');
         return;
       }
@@ -7481,14 +7726,19 @@
       var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
       var pDmn = parseInt($('admCtPrecoDmn').value, 10), pQdc = parseInt($('admCtPrecoQdc').value, 10);
       var vagas = parseInt($('admCtVagas').value, 10), vQdc = parseInt($('admCtVagasQdc').value, 10);
-      if (/["<>]/.test(ape)) { toast('Use um apelido sem aspas ou sinais.'); return; }
-      if (!ini || !fim) { toast('Informe o início e o término da turma.'); return; }
-      if (fim < ini) { toast('O término deve ser depois do início.'); return; }
-      if (!h1i || !h1f || !h2f) { toast('Informe os dois horários seguidos (ex.: 19:00–20:30 e 20:30–22:00).'); return; }
-      if (!(h1i < h1f && h1f < h2f)) { toast('Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.'); return; }
-      if (!pDmn || pDmn < 1 || !pQdc || pQdc < 1) { toast('Informe o preço em Diamantes e em Quad Coins.'); return; }
-      if (!vagas || vagas < 1) { toast('Informe as vagas gerais.'); return; }
-      if (isNaN(vQdc) || vQdc < 0 || vQdc > vagas) { toast('Vagas em QdC deve ser um pedaço das vagas gerais (0 a ' + vagas + ').'); return; }
+      if (ctFalta(/["<>]/.test(ape), 'admCtApelido', 'Use um apelido sem aspas ou sinais.')) return;
+      if (ctFalta(!ini, 'admCtIni', 'Para abrir a turma falta a <b>data de início</b>.')) return;
+      if (ctFalta(!fim, 'admCtFim', 'Para abrir a turma falta a <b>data de término</b>.')) return;
+      if (ctFalta(fim < ini, 'admCtFim', 'O <b>término</b> precisa ser depois do início.')) return;
+      if (ctFalta(!h1i, 'admCtH1i', 'Para abrir a turma falta a <b>hora em que o 1º tempo começa</b>.')) return;
+      if (ctFalta(!h1f, 'admCtH1f', 'Para abrir a turma falta a <b>hora em que o 1º tempo termina</b> — é quando o 2º começa.')) return;
+      if (ctFalta(!h2f, 'admCtH2f', 'Para abrir a turma falta a <b>hora em que o 2º tempo termina</b>.')) return;
+      if (ctFalta(!(h1i < h1f && h1f < h2f), 'admCtH1f', 'Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.')) return;
+      if (ctFalta(!pDmn || pDmn < 1, 'admCtPrecoDmn', 'Para abrir a turma falta o <b>preço em Diamantes</b>.')) return;
+      if (ctFalta(!pQdc || pQdc < 1, 'admCtPrecoQdc', 'Para abrir a turma falta o <b>preço em Quad Coins</b>.')) return;
+      if (ctFalta(!vagas || vagas < 1, 'admCtVagas', 'Para abrir a turma faltam as <b>vagas totais</b>.')) return;
+      if (ctFalta(isNaN(vQdc), 'admCtVagasQdc', 'Para abrir a turma falta dizer <b>quantas dessas vagas são em Quad Coins</b> — escreva 0 se nenhuma.')) return;
+      if (ctFalta(vQdc < 0 || vQdc > vagas, 'admCtVagasQdc', 'As vagas em Quad Coins são um pedaço das vagas totais (0 a ' + vagas + ').')) return;
       var arq = ($('admCtArvore').files && $('admCtArvore').files[0]) ? $('admCtArvore').files[0].name : '';
       var profs = {};
       var mats = ctMaterias();
@@ -7511,10 +7761,59 @@
       $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
       $('admCtH1i').value = ''; $('admCtH1f').value = ''; $('admCtH2f').value = '';
       $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = ''; $('admCtArvore').value = '';
+      ctArvoreArq = ''; renderCtProfs();
+      admCtEco();
+      admAlerta('admCtErro', 'Turma <b>' + nome + '</b> aberta — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + (vagas - vQdc) + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins.', true);
       toast('Turma “' + nome + '” aberta — na Quad Store com ' + (vagas - vQdc) + ' vagas em Dmn e ' + vQdc + ' em QdC.');
     });
     renderCtLista();
   })();
+
+  /* ---------- atalhos das áreas do admin ----------
+     Cada botão do cabeçalho abre o seu bloco: os demais somem da tela e a
+     área volta ao topo. Tocar de novo (ou em "Ver todos") mostra tudo.   */
+  function admJumpAplica(view, chave) {
+    var v = document.getElementById(view); if (!v) return;
+    v.querySelectorAll('[data-bl]').forEach(function (c) {
+      c.style.display = (!chave || c.dataset.bl === chave) ? '' : 'none';
+    });
+    v.querySelectorAll('.adm-jump .jp').forEach(function (b) {
+      b.classList.toggle('on', !!chave && b.dataset.jump === chave);
+    });
+  }
+  (function () {
+    [['jumpControle', 'v-adm-controle'], ['jumpInterno', 'v-adm-hoje'],
+     ['jumpLiber', 'v-adm-liber'], ['jumpLojaAdm', 'v-adm-loja']].forEach(function (par) {
+      var host = document.getElementById(par[0]); if (!host) return;
+      host.querySelectorAll('.jp').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          var chave = bt.dataset.jump;
+          if (chave && bt.classList.contains('on')) chave = '';   /* tocar de novo abre tudo */
+          admJumpAplica(par[1], chave);
+          var topo = document.getElementById(par[1]);   /* a própria view é quem rola */
+          if (topo && topo.scrollTo) topo.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (topo) topo.scrollTop = 0;
+        });
+      });
+    });
+  })();
+  /* ---------- avisos fixos de erro dentro do bloco ----------
+     O toast some sozinho; estes ficam na tela até o problema ser resolvido,
+     e o campo que falta fica marcado em vermelho.                        */
+  function admAlerta(id, msg, ok) {
+    var el = document.getElementById(id); if (!el) return;
+    if (!msg) { el.className = 'adm-alerta'; el.innerHTML = ''; return; }
+    el.className = 'adm-alerta on' + (ok ? ' ok' : '');
+    el.innerHTML = (ok ? '<span aria-hidden="true">✓</span>' : '<span aria-hidden="true">⚠</span>') + '<span>' + msg + '</span>';
+  }
+  function admLimpaErro(ids) {
+    ids.forEach(function (i) { var e = document.getElementById(i); if (e) e.classList.remove('err'); });
+  }
+  function admMarcaErro(id) {
+    var e = document.getElementById(id); if (!e) return;
+    e.classList.add('err');
+    if (e.scrollIntoView) e.scrollIntoView({ block: 'center' });
+  }
 
   /* ---------- admin ---------- */
   $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
@@ -7713,7 +8012,7 @@
     'pres:taf':      { via: 'pres', cat: 'taf',      rot: 'Treinamento para o TAF', estoque: true, data: true },
     'pres:outros':   { via: 'pres', cat: 'outros',   rot: 'Outros · retirada na recepção', estoque: true },
     'dig:cursos':    { via: 'dig',  cat: 'digitais', rot: 'Cursos online' },
-    'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true }
+    'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true, periodo: true }
   };
   function prodDestino(v) { return PROD_DESTINOS[v] || PROD_DESTINOS['pres:outros']; }
   var LOJA_EXTRAS = [
@@ -7729,7 +8028,7 @@
         return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '" data-moeda="' + mo + '">' +
           '<span class="li-ico">' + icoDe(p.icone, cat) + '</span>' +
           '<span class="li-nome">' + p.nome + '</span>' +
-          '<span class="li-desc">' + (p.desc || 'novidade') + '</span>' +
+          '<span class="li-desc">' + (p.ate && p.dataISO ? dataBRcompleta(p.dataISO) + ' → ' + dataBRcompleta(p.ate) : (p.desc || 'novidade')) + '</span>' +
           '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : fmt(p.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('');
       host.querySelectorAll('.loja-item').forEach(bindLojaItem);
@@ -8064,6 +8363,8 @@
     $('admProdDesc').value = p.desc || '';
     $('admProdCat').value = tipo === 'pres' ? ('pres:' + (p.cat || 'outros')) : (p.cat === 'mentoria' ? 'dig:mentoria' : 'dig:cursos');
     admProdDataToggle();
+    if ($('admProdData')) $('admProdData').value = p.dataISO || '';
+    if ($('admProdDataFim')) $('admProdDataFim').value = p.ate || '';
     if ($('admProdMoeda')) $('admProdMoeda').value = p.moeda || 'qdc';
     $('admProdPreco').value = p.preco;
     $('admProdQtd').value = tipo === 'pres' ? p.estoque : '';
@@ -8084,6 +8385,14 @@
     box.style.display = d.data ? 'flex' : 'none';
     if (!d.data && $('admProdData')) $('admProdData').value = '';
     if ($('admProdQtd')) $('admProdQtd').style.display = d.estoque ? '' : 'none';
+    /* mentoria é turma online: tem começo e fim */
+    var per = !!d.periodo;
+    if ($('admProdDataLb')) $('admProdDataLb').textContent = per ? 'De' : 'Data';
+    if ($('admProdAteLb')) $('admProdAteLb').style.display = per ? '' : 'none';
+    if ($('admProdDataFim')) {
+      $('admProdDataFim').style.display = per ? '' : 'none';
+      if (!per) $('admProdDataFim').value = '';
+    }
   }
   if ($('admProdCat')) $('admProdCat').addEventListener('change', admProdDataToggle);
   admProdDataToggle();
@@ -8092,7 +8401,7 @@
   /* itens do catálogo semente que já nascem com data seguem a mesma regra dos criados agora */
   (function () {
     LOJA_EXTRAS.concat(typeof ITENS_PRESENCIAIS !== 'undefined' ? ITENS_PRESENCIAIS : []).forEach(function (p) {
-      if (p.dataISO) { PROD_AGENDA[p.nome] = { dataISO: p.dataISO, rot: p.cat === 'mentoria' ? 'Mentoria' : 'Atividade' }; }
+      if (p.dataISO) { PROD_AGENDA[p.nome] = { dataISO: p.dataISO, ate: p.ate || '', rot: p.cat === 'mentoria' ? 'Mentoria' : 'Atividade' }; }
     });
   })();
   function agendaDoProduto(nome) {
@@ -8105,7 +8414,8 @@
       EVENTOS.push({ id: evId, nome: nome, tipo: a.rot.toUpperCase(), modalidade: 'presencial', online: false,
         pago: false, preco: 0, profs: [],
         quando: DS[dt.getDay()] + ' · ' + pr[2] + '/' + pr[1] + ' · ' + a.rot,
-        dataISO: a.dataISO, cor: 'gold', meta: a.rot,
+        dataISO: a.dataISO, ate: a.ate || '', cor: 'gold',
+        meta: a.ate ? (a.rot + ' · até ' + dataBRcompleta(a.ate)) : a.rot,
         desc: 'Atividade contratada na Quad Store — ' + a.rot + '.',
         score: [['Presença confirmada', '+30 score']], coins: [['Check-in', '+10']] });
     }
@@ -8114,6 +8424,16 @@
     if (typeof renderEvStrip === 'function') renderEvStrip();
     if (typeof renderCalendario === 'function') renderCalendario();
   }
+  var PROD_CAMPOS = ['admProdNome', 'admProdPreco', 'admProdQtd', 'admProdData', 'admProdDataFim'];
+  function prodFalta(cond, campo, msg) {
+    if (!cond) return false;
+    admAlerta('admProdErro', msg);
+    if (campo) admMarcaErro(campo);
+    return true;
+  }
+  PROD_CAMPOS.forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+  });
   var btnAdmProdEl = $('btnAdmProd');
   if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
     var nome = $('admProdNome').value.trim(), desc = $('admProdDesc').value.trim();
@@ -8121,8 +8441,17 @@
     var moeda = $('admProdMoeda') ? $('admProdMoeda').value : 'qdc';
     var qtd = parseInt($('admProdQtd').value, 10);
     var icone = admProdIcone;
-    if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto.'); return; }
-    if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+    var destCat = prodDestino(cat);
+    var dIni = $('admProdData') ? $('admProdData').value : '';
+    var dFim = $('admProdDataFim') ? $('admProdDataFim').value : '';
+    admAlerta('admProdErro', ''); admLimpaErro(PROD_CAMPOS);
+    if (prodFalta(!nome || /["<>]/.test(nome), 'admProdNome', 'Para publicar falta o <b>nome</b> do produto (sem aspas ou sinais).')) return;
+    if (prodFalta(!preco || preco < 1, 'admProdPreco', 'Para publicar falta o <b>preço</b> em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.')) return;
+    if (destCat.periodo) {
+      if (prodFalta(!dIni, 'admProdData', 'A <b>mentoria</b> é como uma turma online — informe a <b>data de início</b>.')) return;
+      if (prodFalta(!dFim, 'admProdDataFim', 'A <b>mentoria</b> precisa também da <b>data de término</b>.')) return;
+      if (prodFalta(dFim < dIni, 'admProdDataFim', 'O <b>término</b> da mentoria precisa ser depois do início.')) return;
+    }
     /* SALVAR EDIÇÃO: atualiza no lugar, sem tirar da Loja */
     if (admProdEdit) {
       var ref = admProdEdit.ref;
@@ -8130,6 +8459,8 @@
         toast('Já existe outro item com esse nome na Loja.'); return;
       }
       ref.nome = nome; ref.desc = desc; ref.preco = preco; ref.moeda = moeda; ref.icone = icone;
+      if (destCat.data) { ref.dataISO = dIni; ref.ate = destCat.periodo ? dFim : ''; }
+      if (destCat.data && dIni) { PROD_AGENDA[nome] = { dataISO: dIni, ate: destCat.periodo ? dFim : '', rot: destCat.rot.split('·')[0].trim() }; }
       if (admProdEdit.tipo === 'pres' && qtd && qtd >= 1) ref.estoque = qtd;
       if (admProdEdit.tipo === 'pres') renderPresenciais(); else renderLojaExtras();
       $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
@@ -8142,22 +8473,27 @@
     if (ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
       toast('Já existe um item com esse nome na Loja.'); return;
     }
-    var dest = prodDestino(cat);
-    var dataAt = $('admProdData') ? $('admProdData').value : '';
-    if (dest.data && dataAt) { PROD_AGENDA[nome] = { dataISO: dataAt, rot: dest.rot.split('·')[0].trim() }; }
+    var dest = destCat;
+    var dataAt = dIni;
+    if (dest.data && dataAt) { PROD_AGENDA[nome] = { dataISO: dataAt, ate: dest.periodo ? dFim : '', rot: dest.rot.split('·')[0].trim() }; }
     if (dest.via === 'pres') {
-      if (!qtd || qtd < 1) { toast('Informe a quantidade em estoque.'); return; }
+      if (prodFalta(!qtd || qtd < 1, 'admProdQtd', 'Item de retirada na recepção precisa de <b>quantidade em estoque</b>.')) return;
       ITENS_PRESENCIAIS.push({ id: 'p' + Date.now(), nome: nome, desc: desc, preco: preco, moeda: moeda, icone: icone, estoque: qtd, cat: dest.cat, estado: 'disp' });
       renderPresenciais();
     } else {
       /* itens digitais não têm estoque — ficam disponíveis até serem removidos */
-      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: dest.cat, preco: preco, moeda: moeda, icone: icone });
+      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: dest.cat, preco: preco, moeda: moeda, icone: icone,
+        dataISO: dest.data ? dataAt : '', ate: dest.periodo ? dFim : '' });
       renderLojaExtras();
     }
     $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
     if ($('admProdData')) $('admProdData').value = '';
+    if ($('admProdDataFim')) $('admProdDataFim').value = '';
     renderAdmProdList();
     if (typeof renderPrecos === 'function') renderPrecos();   /* entra também no editor de preços */
+    admAlerta('admProdErro', '<b>' + nome + '</b> publicado em “' + dest.rot + '”, em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') +
+      (dest.periodo && dFim ? ' — de ' + dataBRcompleta(dataAt) + ' a ' + dataBRcompleta(dFim) + ', no calendário de quem comprar.'
+       : dest.data && dataAt ? ' — com data, entra no calendário de quem comprar.' : '.'), true);
     toast('Publicado em “' + dest.rot + '” · em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') +
       (dest.data && dataAt ? ' — com data, entra no calendário de quem comprar.' : '.'));
   });
@@ -8179,88 +8515,6 @@
     });
   })();
   renderLojaExtras();
-
-  /* ---------- produtos digitais pré-configurados (Painel interno) ----------
-     Sem estoque: disponível ↔ indisponível controla a presença na Loja.   */
-  var PROD_DIG_PRE = [
-    { id: 'ebook',   nome: 'E-book · Direito Constitucional', desc: 'material digital do Quad', preco: 90,  moeda: 'qdc', icone: 'modulo' },
-    { id: 'vadedig', nome: 'Vade Mecum digital',              desc: 'legislação sempre à mão',  preco: 160, moeda: 'qdc', icone: 'vademecum' },
-    { id: 'cursonl', nome: 'Curso online · Direito Penal',    desc: 'videoaulas + questões',    preco: 900, moeda: 'dmn', icone: 'aula' },
-    { id: 'aulaoex', nome: 'Aulão exclusivo gravado',         desc: 'revisão de véspera',       preco: 60,  moeda: 'qdc', icone: 'aulao' }
-  ];
-  PROD_DIG_PRE.forEach(function (d) { d.disp = false; });
-  /* cadastro de novos produtos digitais — a porta de entrada do catálogo */
-  var admDigIco = 'modulo';
-  (function () {
-    var host = $('admDigIcones');
-    if (host) {
-      var ordem = ['modulo', 'vademecum', 'aula', 'aulao', 'simulado', 'evento', 'medalha'];
-      host.innerHTML = ordem.map(function (k) {
-        return '<button type="button" class="ico-opt' + (k === admDigIco ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
-      }).join('');
-      host.querySelectorAll('.ico-opt').forEach(function (bt) {
-        bt.addEventListener('click', function () {
-          admDigIco = bt.dataset.ico;
-          host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
-          bt.classList.add('sel');
-        });
-      });
-    }
-    var moedaSel = $('admDigMoeda');
-    if (moedaSel) moedaSel.addEventListener('change', function () {
-      $('admDigPreco').placeholder = 'Preço em ' + (moedaSel.value === 'dmn' ? 'Diamantes' : 'Quad Coins');
-    });
-    var btn = $('btnAdmDig');
-    if (btn) btn.addEventListener('click', function () {
-      var nome = $('admDigNome').value.trim(), desc = $('admDigDesc').value.trim();
-      var moeda = $('admDigMoeda').value, preco = parseInt($('admDigPreco').value, 10);
-      var moNome = moeda === 'dmn' ? 'Diamantes' : 'Quad Coins';
-      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto digital.'); return; }
-      if (!preco || preco < 1) { toast('Informe o preço em ' + moNome + '.'); return; }
-      if (PROD_DIG_PRE.some(function (d) { return d.nome === nome; }) ||
-          LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) ||
-          document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
-        toast('Já existe um item com esse nome na Loja.'); return;
-      }
-      PROD_DIG_PRE.push({ id: 'dg' + Date.now(), nome: nome, desc: desc || 'material digital do Quad',
-        preco: preco, moeda: moeda, icone: admDigIco, disp: false, criado: true });
-      $('admDigNome').value = ''; $('admDigDesc').value = ''; $('admDigPreco').value = '';
-      renderDigPre();
-      toast('“' + nome + '” entrou no catálogo digital em ' + moNome + ' — marque como disponível para ir à Loja.');
-    });
-  })();
-  function renderDigPre() {
-    var el = $('admDigList'); if (!el) return;
-    el.innerHTML = PROD_DIG_PRE.map(function (d, i) {
-      return '<div class="adm-bar"><span class="nm">' + d.nome +
-        '<small>' + d.desc + ' · ' + fmt(d.preco) + ' ' + moedaTxt(d.moeda) + ' · sem estoque</small></span>' +
-        '<span class="tag' + (d.disp ? ' ok' : '') + '">' + (d.disp ? 'DISPONÍVEL' : 'INDISPONÍVEL') + '</span>' +
-        '<button class="btn ghost small" data-dig="' + i + '">' + (d.disp ? 'Tirar da Loja' : 'Disponibilizar') + '</button>' +
-        (d.criado ? '<button class="adm-x" data-rm-dig="' + d.id + '" aria-label="Remover do catálogo">✕</button>' : '') + '</div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum produto digital no catálogo.</p>';
-    el.querySelectorAll('[data-rm-dig]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var d = PROD_DIG_PRE.filter(function (x) { return x.id === b.dataset.rmDig; })[0]; if (!d) return;
-        PROD_DIG_PRE = PROD_DIG_PRE.filter(function (x) { return x.id !== d.id; });
-        LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== d.nome; });
-        renderLojaExtras(); renderDigPre();
-        if (typeof renderPrecos === 'function') renderPrecos();
-        toast('“' + d.nome + '” removido do catálogo digital.');
-      });
-    });
-    el.querySelectorAll('[data-dig]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var d = PROD_DIG_PRE[+b.dataset.dig];
-        d.disp = !d.disp;
-        if (d.disp) { LOJA_EXTRAS.push({ nome: d.nome, desc: d.desc, cat: 'digitais', preco: d.preco, moeda: d.moeda, icone: d.icone }); }
-        else { LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== d.nome; }); }
-        renderLojaExtras(); renderDigPre();
-        if (typeof renderPrecos === 'function') renderPrecos();
-        toast(d.disp ? '“' + d.nome + '” disponível na Loja — Itens digitais.' : '“' + d.nome + '” fora da Loja.');
-      });
-    });
-  }
-  renderDigPre();
 
   /* ---------- criador de skins (Painel interno) ----------
      A skin publicada entra em Itens do personagem, com confirmação de
@@ -8853,11 +9107,14 @@
     /* lista do administrador (todos, com escopo e remoção) */
     var al = $('admAvisosList');
     if (al) {
+      /* título e detalhe em linhas próprias; escopo e ações embaixo, sem
+         espremer o texto numa linha só */
       al.innerHTML = AVISOS.map(function (av, i) {
-        return '<div class="mission-row"><div class="grow"><div class="t">' + av.t + '</div><div class="d">' + av.d + '</div></div>' +
-          '<span class="tag">' + av.esc.toUpperCase() + '</span>' +
+        return '<div class="adm-aviso"><div class="av-t">' + av.t + '</div>' +
+          (av.d ? '<div class="av-d">' + av.d + '</div>' : '') +
+          '<div class="av-acoes"><span class="tag">' + av.esc.toUpperCase() + '</span>' +
           '<button class="btn ghost small" data-av-ed="' + i + '">Editar</button>' +
-          '<button class="btn ghost small" data-av="' + i + '">Remover</button></div>';
+          '<button class="btn ghost small" data-av="' + i + '">Remover</button></div></div>';
       }).join('') || '<p class="sub" style="padding:8px 0">Nenhum aviso ativo.</p>';
       al.querySelectorAll('[data-av]').forEach(function (bt) {
         bt.addEventListener('click', function () {
@@ -9117,6 +9374,17 @@
     var el = $(id); if (el) el.addEventListener('change', admEvCamposToggle);
   });
   admEvCamposToggle();
+  /* aviso fixo do evento: fica na tela dizendo o que falta */
+  var EV_CAMPOS = ['admEvNovoNome', 'admEvNovoData', 'admEvNovoInicio', 'admEvNovoLink', 'admEvNovoPreco'];
+  function evFalta(cond, campo, msg) {
+    if (!cond) return false;
+    admAlerta('admEvErro', msg);
+    if (campo) admMarcaErro(campo);
+    return true;
+  }
+  EV_CAMPOS.forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+  });
   $('btnAdmEvNovo').addEventListener('click', function () {
     var nome = $('admEvNovoNome').value.trim(), quando = admEvQuando();
     var resumo = $('admEvNovoResumo').value.trim();
@@ -9125,10 +9393,12 @@
     var profs = evProfChipsSel();
     var link = modalidade === 'online' ? $('admEvNovoLink').value.trim() : '';
     var preco = parseInt($('admEvNovoPreco').value, 10);
-    if (!nome) { toast('Dê um nome ao evento.'); return; }
-    if (!quando) { toast('Escolha a data do evento na agenda.'); return; }
-    if (link && link.indexOf('http') !== 0) { toast('O link do evento online deve começar com http.'); return; }
-    if (pago && (!preco || preco < 1)) { toast('Informe o preço do evento pago.'); return; }
+    admAlerta('admEvErro', ''); admLimpaErro(EV_CAMPOS);
+    if (evFalta(!nome, 'admEvNovoNome', 'Para cadastrar o evento falta o <b>nome</b>.')) return;
+    if (evFalta(!$('admEvNovoData').value, 'admEvNovoData', 'Para cadastrar o evento falta a <b>data</b> — escolha o dia na agenda.')) return;
+    if (evFalta(!quando, 'admEvNovoInicio', 'Para cadastrar o evento falta a <b>hora de início</b>.')) return;
+    if (evFalta(!!link && link.indexOf('http') !== 0, 'admEvNovoLink', 'O <b>link</b> do evento online precisa começar com http.')) return;
+    if (evFalta(pago && (!preco || preco < 1), 'admEvNovoPreco', 'O evento é <b>pago</b> — informe o <b>preço</b> de venda na Loja.')) return;
     var online = modalidade === 'online';
     var moedaEv = pago ? ($('admEvNovoMoeda') ? $('admEvNovoMoeda').value : 'qdc') : 'qdc';
     var dataISO = $('admEvNovoData').value || '';
@@ -9163,6 +9433,9 @@
     renderAdmEventos();
     renderEventosLoja();   /* pago → vitrine da Loja */
     renderEvStrip();       /* aparece no carrossel: pago = "Na Loja", grátis = direto */
+    admAlerta('admEvErro', 'Evento <b>' + nome + '</b> criado para ' + quando + ' — ' +
+      (pago ? 'à venda na Loja (' + (modalidade === 'online' ? 'Eventos online' : 'Eventos e aulões') + ') e no carrossel do Início com a tag “NA LOJA”.'
+            : 'já gira no carrossel do Início do aluno.'), true);
     toast(pago
       ? 'Evento pago criado — na Loja e no carrossel do Início com a tag “Na Loja”.'
       : 'Evento gratuito criado — já gira no carrossel do Início.');
@@ -9171,6 +9444,8 @@
   /* ---------- liberações: produtos presenciais (dar baixa) ---------- */
   var PRESENCIAIS = ['Turma presencial', 'Aula isolada', 'Aulão especial', 'Evento presencial'];
   var PEDIDOS = [
+    { aluno: nomeCurto(), item: 'Módulo impresso', presId: 'modulo', quando: 'há 2 dias', status: 'aguardando' },
+    { aluno: nomeCurto(), item: 'Garrafinha Quad', presId: 'garrafinha', quando: 'há 8 dias', status: 'entregue' },
     { aluno: 'AL SGT QUAD SANTIAGO', item: 'Garrafinha Quad', quando: 'ontem · 19h40', status: 'aguardando' },
     { aluno: 'SD QUAD BRANDÃO', item: 'Camiseta Quad', quando: 'hoje · 9h12', status: 'aguardando' },
     { aluno: 'AL CB QUAD NASCIMENTO', item: 'Vade Mecum', quando: 'sexta · 20h05', status: 'entregue' }
@@ -9205,6 +9480,7 @@
           if (p) { p.estado = 'entregue'; if (typeof renderPresenciais === 'function') renderPresenciais(); }
         }
         renderPedidos();
+        if (typeof renderRelCompras === 'function') renderRelCompras();   /* cai no relatório de compras do aluno */
         toast('Entrega confirmada — baixa registrada e item liberado na Loja.');
       });
     });
@@ -9389,6 +9665,7 @@
       }
     }
     renderSimPres();
+    if (typeof renderRelCompras === 'function') renderRelCompras();
   }
   /* ---------- Hoje: lançamento unificado de simulados ---------- */
   var admSimPdfNome = '';
@@ -9401,7 +9678,35 @@
     $('admSimValorHint').style.display = showValor ? '' : 'none';
     $('admSimMoeda').style.display = pago ? '' : 'none';   /* moeda só existe na venda */
     $('admSimValorHint').textContent = pago ? 'preço na Loja' : 'recompensa QdC pela presença';
+    /* presencial ocupa cadeira: o rateio pago × gratuito manda, e não o
+       seletor gratuito/pago (que continua valendo para o digital)        */
+    var pres = $('admSimModal').value === 'presencial';
+    var tipoSel = $('admSimTipo');
+    if (tipoSel) tipoSel.style.display = pres ? 'none' : '';
+    if (pres) {
+      var pg = parseInt($('admSimVagasPagas').value, 10) > 0;
+      $('admSimMoeda').style.display = pg ? '' : 'none';
+      $('admSimValor').style.display = pg ? '' : 'none';
+      $('admSimValorHint').style.display = pg ? '' : 'none';
+      $('admSimValorHint').textContent = 'preço da vaga paga';
+      $('admSimValor').placeholder = 'preço';
+    }
+    admSimEco();
   }
+  /* eco das cadeiras: mostra o rateio pago × gratuito enquanto se digita */
+  function admSimEco() {
+    var eco = $('admSimEco'); if (!eco) return;
+    var tot = parseInt($('admSimVagas').value, 10), pg = parseInt($('admSimVagasPagas').value, 10);
+    if (!tot || tot < 1) { eco.innerHTML = '<span class="ec">Cadeiras: informe quantas a sala tem</span>'; return; }
+    if (isNaN(pg) || pg < 0) pg = 0;
+    if (pg > tot) { eco.innerHTML = '<span class="ec">As vagas pagas não podem passar das ' + tot + ' cadeiras</span>'; return; }
+    eco.innerHTML = '<span class="ec ok">' + tot + ' cadeiras</span>' +
+      '<span class="ec ok">' + pg + ' pagas</span>' +
+      '<span class="ec ok">' + (tot - pg) + ' gratuitas</span>';
+  }
+  ['admSimVagas', 'admSimVagasPagas'].forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); admSimToggle(); });
+  });
   ['admSimModal', 'admSimTipo'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('change', admSimToggle); });
   var admSimPdfEl = $('admSimPdf');
   if (admSimPdfEl) admSimPdfEl.addEventListener('change', function () {
@@ -9414,7 +9719,9 @@
     var el = $('admSimList'); if (!el) return;
     el.innerHTML = SIMULADOS.map(function (sm, i) {
       var tipo = (sm.tag === 'DIGITAL' ? 'Digital' : 'Presencial') + ' · ' + (sm.pago ? 'pago ' + fmt(sm.valor) + ' ' + moedaTxt(sm.moeda === 'dmn' ? 'dmn' : 'qdc') : 'gratuito');
-      var meta = sm.tag === 'DIGITAL' ? (sm.minutos + ' min · ' + sm.nq + ' questões' + (sm.dia ? ' · a partir de ' + diaBR(sm.dia) : '')) : (sm.det || '');
+      var vga = simVagas(sm);
+      var meta = sm.tag === 'DIGITAL' ? (sm.minutos + ' min · ' + sm.nq + ' questões' + (sm.dia ? ' · a partir de ' + diaBR(sm.dia) : ''))
+        : ((sm.det || '') + (vga.temSala ? ' · sala de ' + (vga.pagas + vga.gratis) + ': ' + vga.pagasRest + '/' + vga.pagas + ' pagas e ' + vga.gratisRest + '/' + vga.gratis + ' grátis' : ''));
       var st = sm.realizado || sm.feito ? '<span class="tag ok">REALIZADO</span>' : (sm.pago && !sm.comprado ? '<span class="tag">NA LOJA</span>' : '<span class="tag">ATIVO</span>');
       return '<div class="adm-bar"><span class="nm">' + sm.rot + '<small>' + tipo + ' · ' + meta + '</small></span>' + st +
         '<button class="adm-x" data-rm-sim="' + i + '" aria-label="Remover">✕</button></div>';
@@ -9428,27 +9735,54 @@
       });
     });
   }
+  var SIM_CAMPOS = ['admSimNome', 'admSimData', 'admSimIni', 'admSimFim', 'admSimVagas', 'admSimVagasPagas',
+                    'admSimValor', 'admSimRec', 'admSimMin', 'admSimNq'];
+  function simFalta(cond, campo, msg) {
+    if (!cond) return false;
+    admAlerta('admSimErro', msg);
+    if (campo) admMarcaErro(campo);
+    return true;
+  }
+  SIM_CAMPOS.forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+  });
   $('btnAdmSimLancar').addEventListener('click', function () {
     var nome = $('admSimNome').value.trim();
     var modal = $('admSimModal').value, pago = $('admSimTipo').value === 'pago';
     var moeda = pago ? $('admSimMoeda').value : 'qdc';   /* grátis: recompensa é sempre em QdC */
     var moNome = moeda === 'dmn' ? 'Diamantes' : 'Quad Coins';
-    if (!nome) { toast('Dê um nome ao simulado.'); return; }
+    admAlerta('admSimErro', ''); admLimpaErro(SIM_CAMPOS);
+    if (simFalta(!nome, 'admSimNome', 'Para lançar o simulado falta o <b>nome</b>.')) return;
     if (modal === 'presencial') {
       var d = $('admSimData').value, ini = $('admSimIni').value, fim = $('admSimFim').value;
-      var valor = parseInt($('admSimValor').value, 10);
-      if (!d) { toast('Escolha a data do simulado na agenda.'); return; }
-      if (!valor || valor < 1) { toast(pago ? 'Informe o preço em ' + moNome + '.' : 'Informe a recompensa em QdC.'); return; }
-      SIMULADOS.unshift({ id: 's' + Date.now(), rot: nome, det: simQuando(d, ini, fim), tag: 'PRESENCIAL', pago: pago, moeda: moeda, valor: valor, score: 100, insc: false, comprado: false, realizado: false });
-      toast(pago ? 'Simulado presencial pago — à venda na Loja em ' + moNome + '.' : 'Simulado presencial grátis lançado nos Simulados do aluno.');
+      var vTot = parseInt($('admSimVagas').value, 10), vPg = parseInt($('admSimVagasPagas').value, 10);
+      var valor = parseInt($('admSimValor').value, 10), rec = parseInt($('admSimRec').value, 10);
+      if (simFalta(!d, 'admSimData', 'Para lançar o simulado presencial falta a <b>data</b> — escolha o dia na agenda.')) return;
+      if (simFalta(!ini || !fim || !(ini < fim), 'admSimIni', 'Informe o <b>horário</b> do simulado — o término precisa ser depois do início.')) return;
+      if (simFalta(!vTot || vTot < 1, 'admSimVagas', 'O simulado presencial ocupa cadeira: informe <b>quantas cadeiras</b> a sala tem.')) return;
+      if (isNaN(vPg)) vPg = 0;
+      if (simFalta(vPg < 0 || vPg > vTot, 'admSimVagasPagas', 'As <b>vagas pagas</b> são um pedaço das cadeiras (0 a ' + vTot + ').')) return;
+      if (simFalta(vPg > 0 && (!valor || valor < 1), 'admSimValor', 'Há <b>' + vPg + ' vagas pagas</b> — informe o preço em ' + moNome + '.')) return;
+      if (simFalta((vTot - vPg) > 0 && (!rec || rec < 1), 'admSimRec', 'Há <b>' + (vTot - vPg) + ' vagas gratuitas</b> — informe a recompensa em Quad Coins pela presença.')) return;
+      SIMULADOS.unshift({ id: 's' + Date.now(), rot: nome, det: simQuando(d, ini, fim), tag: 'PRESENCIAL',
+        pago: vPg > 0, moeda: moeda, valor: vPg > 0 ? valor : 0, rec: rec || 0, score: 100,
+        dataISO: d, hi: ini, hf: fim, vagas: vTot, vagasPagas: vPg, vagasGratis: vTot - vPg,
+        insc: false, comprado: false, realizado: false });
+      admAlerta('admSimErro', 'Simulado <b>' + nome + '</b> lançado para ' + simQuando(d, ini, fim) + ' — <b>' + vTot +
+        ' cadeiras</b>: ' + vPg + ' pagas' + (vPg > 0 ? ' (' + fmt(valor) + ' ' + moedaTxt(moeda) + ' na Loja)' : '') +
+        ' e ' + (vTot - vPg) + ' gratuitas' + ((vTot - vPg) > 0 ? ' (+' + fmt(rec) + ' QdC na presença)' : '') + '.', true);
+      toast('Simulado presencial lançado — ' + vTot + ' cadeiras: ' + vPg + ' pagas e ' + (vTot - vPg) + ' gratuitas.');
+      $('admSimVagas').value = ''; $('admSimVagasPagas').value = ''; $('admSimRec').value = '';
     } else {
       var dia = $('admSimDia').value, minutos = parseInt($('admSimMin').value, 10), nq = parseInt($('admSimNq').value, 10);
       var vdig = pago ? parseInt($('admSimValor').value, 10) : 0;
-      if (!admSimPdfNome) { toast('Anexe o PDF do simulado.'); return; }
-      if (!minutos || minutos < 1) { toast('Defina o tempo do simulado (min).'); return; }
-      if (!nq || nq < 1) { toast('Informe o número de questões.'); return; }
-      if (pago && (!vdig || vdig < 1)) { toast('Informe o preço em ' + moNome + '.'); return; }
+      if (simFalta(!admSimPdfNome, '', 'Para lançar o simulado digital falta <b>anexar o PDF</b>.')) return;
+      if (simFalta(!minutos || minutos < 1, 'admSimMin', 'Para lançar o simulado digital falta o <b>tempo em minutos</b>.')) return;
+      if (simFalta(!nq || nq < 1, 'admSimNq', 'Para lançar o simulado digital falta o <b>número de questões</b>.')) return;
+      if (simFalta(pago && (!vdig || vdig < 1), 'admSimValor', 'O simulado é <b>pago</b> — informe o preço em ' + moNome + '.')) return;
       SIMULADOS.unshift({ id: 'sd' + Date.now(), rot: nome, tag: 'DIGITAL', pago: pago, moeda: moeda, valor: vdig, pdf: admSimPdfNome, minutos: minutos, nq: nq, dia: dia, feito: false, comprado: false });
+      admAlerta('admSimErro', 'Simulado digital <b>' + nome + '</b> lançado — ' + minutos + ' min · ' + nq + ' questões' +
+        (pago ? ' · à venda na Loja em ' + moNome + '.' : ' · já nos Simulados do aluno, premiando QdC por acerto.'), true);
       toast(pago ? 'Simulado digital pago — à venda na Loja em ' + moNome + '.' : 'Simulado digital grátis — já disponível nos Simulados do aluno (premia QdC por acerto).');
     }
     $('admSimNome').value = ''; $('admSimData').value = ''; $('admSimValor').value = '';
@@ -9551,6 +9885,16 @@
         '<input class="fld" data-tv-dmn="' + t.id + '" value="' + t.vagasDmn + '" inputmode="numeric" title="Vagas restantes em Diamantes" style="max-width:58px;text-align:right"> <span class="pct">vg Dmn</span>' +
         '<input class="fld" data-tv-qdc="' + t.id + '" value="' + t.vagasQdc + '" inputmode="numeric" title="Vagas restantes em Quad Coins" style="max-width:58px;text-align:right"> <span class="pct">vg QdC</span></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta.</p>';
+    /* as isoladas vendem numa moeda só — preço e vagas no mesmo editor */
+    var isos = (typeof ISOLADAS !== 'undefined') ? ISOLADAS : [];
+    if (isos.length) {
+      el.innerHTML += '<div class="adm-sep"><span>Isoladas</span></div>' + isos.map(function (i) {
+        return '<div class="adm-bar" style="flex-wrap:wrap"><span class="nm" style="flex-basis:100%">' + i.nome +
+          '<small>' + isoDesc(i) + '</small></span>' +
+          '<input class="fld" data-ip="' + i.id + '" value="' + i.preco + '" inputmode="numeric" title="Preço da isolada" style="max-width:80px;text-align:right"> <span class="pct">' + moedaTxt(i.moeda) + '</span>' +
+          '<input class="fld" data-iv="' + i.id + '" value="' + i.vagas + '" inputmode="numeric" title="Vagas restantes" style="max-width:62px;text-align:right"> <span class="pct">vagas</span></div>';
+      }).join('');
+    }
   }
   if ($('btnAdmPrecoTurma')) $('btnAdmPrecoTurma').addEventListener('click', function () {
     var mudou = 0;
@@ -9567,9 +9911,20 @@
       if (t.precoDmn !== a || t.precoQdc !== b || t.vagasDmn !== c || t.vagasQdc !== d) mudou++;
       t.precoDmn = a; t.precoQdc = b; t.vagasDmn = c; t.vagasQdc = d;
     });
+    (typeof ISOLADAS !== 'undefined' ? ISOLADAS : []).forEach(function (i) {
+      var pp = $('admPrecoTurmas').querySelector('[data-ip="' + i.id + '"]');
+      var vv = $('admPrecoTurmas').querySelector('[data-iv="' + i.id + '"]');
+      if (!pp || !vv) return;
+      var a = parseInt(pp.value, 10), b = parseInt(vv.value, 10);
+      if (!a || a < 1 || isNaN(b) || b < 0) return;
+      if (i.preco !== a || i.vagas !== b) mudou++;
+      i.preco = a; i.vagas = b;
+    });
     renderPrecoTurmas(); renderTurmasLoja();
+    if (typeof renderIsoladas === 'function') renderIsoladas();
     if (typeof renderCtLista === 'function') renderCtLista();
-    toast(mudou ? mudou + (mudou > 1 ? ' turmas atualizadas' : ' turma atualizada') + ' — já vale na Quad Store.' : 'Nada mudou nas turmas.');
+    if (typeof renderPrecos === 'function') renderPrecos();
+    toast(mudou ? mudou + (mudou > 1 ? ' itens atualizados' : ' item atualizado') + ' — já vale na Quad Store.' : 'Nada mudou nas turmas e isoladas.');
   });
   function renderPrecos() {
     renderPrecoTurmas();
@@ -9606,14 +9961,114 @@
     { aluno: 'SD QUAD BRANDÃO', item: 'Aula isolada', valor: 40, quando: 'hoje', ts: Date.now() }
   ];
   /* compras anteriores do aluno desta demo — para ver a contagem regressiva */
-  COMPRAS.push({ aluno: nomeCurto(), item: 'Módulo impresso', valor: 150, moeda: 'qdc', quando: 'há 2 dias', ts: Date.now() - 2 * DIA_MS });
-  COMPRAS.push({ aluno: nomeCurto(), item: 'Garrafinha Quad', valor: 90, moeda: 'qdc', quando: 'há 8 dias', ts: Date.now() - 8 * DIA_MS });
+  COMPRAS.push({ aluno: nomeCurto(), item: 'Módulo impresso', valor: 150, moeda: 'qdc', quando: 'há 2 dias', ts: Date.now() - 2 * DIA_MS, tipo: 'pres', ref: 'modulo' });
+  COMPRAS.push({ aluno: nomeCurto(), item: 'Garrafinha Quad', valor: 90, moeda: 'qdc', quando: 'há 8 dias', ts: Date.now() - 8 * DIA_MS, tipo: 'pres', ref: 'garrafinha' });
+  /* a matrícula que veio do site também é compra — abre o relatório com a
+     turma em andamento e a sua evolução                                  */
+  COMPRAS.push({ aluno: nomeCurto(), item: 'Turma PATAMO · matrícula', valor: 2400, moeda: 'qdc', quando: 'há 55 dias', ts: Date.now() - 55 * DIA_MS, tipo: 'matricula', ref: 'patamo-n' });
   function lojaCompraLog(item, valor, moeda, tipo, ref, extra) {
     COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now(),
       tipo: tipo || 'item', ref: ref != null ? ref : item, extra: extra || null });
     renderCompras();
     if (typeof renderEstornos === 'function') renderEstornos();
+    if (typeof renderRelCompras === 'function') renderRelCompras();
   }
+  /* ---------- relatório de compras (último bloco da Quad Store) ----------
+     Junta o log de compras do aluno com a situação de cada coisa: pedido
+     na recepção, inscrição em simulado, evento e matrícula em turma.    */
+  var rcPeriodo = 7;
+  function rcTurmaPct(t) {
+    if (!t || !t.inicio || !t.fim) return null;
+    var ini = new Date(t.inicio).getTime(), fim = new Date(t.fim).getTime(), hj = Date.now();
+    if (!(fim > ini)) return null;
+    return Math.max(0, Math.min(100, Math.round((hj - ini) / (fim - ini) * 100)));
+  }
+  /* situação de uma compra: entregue, aguardando ou em andamento */
+  function rcSituacao(cp) {
+    var tipo = cp.tipo || 'item';
+    if (tipo === 'matricula') {
+      var t = (typeof turmaDe === 'function') ? turmaDe(cp.ref) : null;
+      var pct = rcTurmaPct(t);
+      if (t && t.fim && t.fim < hojeISO()) return { est: 'ok', txt: 'turma concluída em ' + dataBRcompleta(t.fim) };
+      return { est: 'and', pct: pct == null ? 0 : pct,
+               txt: t ? (t.turno + ' · ' + t.hor + (t.fim ? ' · até ' + dataBRcompleta(t.fim) : '')) : 'turma em andamento' };
+    }
+    if (tipo === 'pres') {
+      var pd = PEDIDOS.filter(function (x) { return x.aluno === cp.aluno && x.presId === cp.ref; })[0];
+      if (pd && pd.status === 'entregue') return { est: 'ok', txt: 'entregue na recepção' };
+      return { est: 'pend', txt: 'aguardando retirada na recepção' };
+    }
+    if (tipo === 'simulado') {
+      var sm = null; SIMULADOS.forEach(function (x) { if (x.id === cp.ref) sm = x; });
+      if (sm && (sm.realizado || sm.feito)) return { est: 'ok', txt: 'simulado realizado' };
+      if (sm && sm.tag === 'DIGITAL') return { est: 'pend', txt: 'simulado digital · pronto para responder' };
+      var ins = SIM_INSC.filter(function (x) { return x.euSou && x.simRot === (sm ? sm.rot : cp.item); })[0];
+      if (ins && ins.liberado) return { est: 'ok', txt: 'entrada liberada na sede' };
+      return { est: 'pend', txt: 'inscrito · aguardando liberação na sede' + (sm && sm.det ? ' · ' + sm.det : '') };
+    }
+    if (tipo === 'evento') {
+      var ev = null; EVENTOS.forEach(function (x) { if (x.id === cp.ref) ev = x; });
+      if (ev && typeof evAcabou === 'function' && evAcabou(ev)) return { est: 'ok', txt: 'evento realizado' };
+      /* mentoria e cursos com período viram evento de vários dias */
+      if (ev && ev.ate) return { est: 'and', pct: rcPctPeriodo(ev.dataISO, ev.ate), txt: 'de ' + dataBRcompleta(ev.dataISO) + ' a ' + dataBRcompleta(ev.ate) };
+      return { est: 'pend', txt: 'inscrito · ' + (ev ? ev.quando : 'aguardando a data') };
+    }
+    if (tipo === 'skin') return { est: 'ok', txt: 'no seu personagem' };
+    if (tipo === 'combate') return { est: 'ok', txt: 'na sua mochila de combate' };
+    /* itens digitais entram na hora */
+    var ag = PROD_AGENDA[cp.item];
+    if (ag && ag.ate) return { est: 'and', pct: rcPctPeriodo(ag.dataISO, ag.ate), txt: 'de ' + dataBRcompleta(ag.dataISO) + ' a ' + dataBRcompleta(ag.ate) };
+    return { est: 'ok', txt: 'acesso liberado na hora' };
+  }
+  function rcPctPeriodo(ini, fim) {
+    if (!ini || !fim) return 0;
+    var a = new Date(ini).getTime(), b = new Date(fim).getTime(), h = Date.now();
+    if (!(b > a)) return 0;
+    return Math.max(0, Math.min(100, Math.round((h - a) / (b - a) * 100)));
+  }
+  function rcLinha(cp, sit) {
+    return '<div class="rc-row"><span class="rc-nm">' + cp.item + '<small>' + cp.quando + ' · ' + sit.txt + '</small></span>' +
+      '<span class="rc-val">' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
+  }
+  function renderRelCompras() {
+    var host = $('rcResumo'); if (!host) return;
+    var corte = Date.now() - rcPeriodo * DIA_MS;
+    var minhas = COMPRAS.filter(function (cp) {
+      return cp.aluno === nomeCurto() && !cp.estornado && (cp.ts || 0) >= corte;
+    });
+    var qdc = 0, dmn = 0, andamento = [], pend = [], ok = [];
+    minhas.forEach(function (cp) {
+      if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor;
+      var sit = rcSituacao(cp);
+      (sit.est === 'and' ? andamento : sit.est === 'pend' ? pend : ok).push({ cp: cp, sit: sit });
+    });
+    host.innerHTML =
+      '<div class="rc-kpi"><b>' + minhas.length + '</b><span>compras</span></div>' +
+      '<div class="rc-kpi"><b>' + fmt(qdc) + '</b><span>Quad Coins</span></div>' +
+      '<div class="rc-kpi"><b>' + fmt(dmn) + '</b><span>Diamantes</span></div>' +
+      '<div class="rc-kpi"><b>' + pend.length + '</b><span>a receber</span></div>';
+    $('rcAndamento').innerHTML = andamento.map(function (x) {
+      return '<div class="rc-prog"><div class="rc-top"><span class="rc-nm">' + x.cp.item + '<small>' + x.sit.txt + '</small></span>' +
+        '<span class="rc-pct">' + (x.sit.pct || 0) + '%</span></div>' +
+        '<div class="rc-track"><i style="width:' + (x.sit.pct || 0) + '%"></i></div></div>';
+    }).join('') || '<p class="rc-vazio">Nada em andamento neste período.</p>';
+    $('rcPendente').innerHTML = pend.map(function (x) { return rcLinha(x.cp, x.sit); }).join('')
+      || '<p class="rc-vazio">Nada esperando retirada — tudo em dia.</p>';
+    $('rcEntregue').innerHTML = ok.map(function (x) { return rcLinha(x.cp, x.sit); }).join('')
+      || '<p class="rc-vazio">Nenhuma entrega concluída neste período.</p>';
+  }
+  (function () {
+    var tabs = $('rcTabs'); if (!tabs) return;
+    tabs.querySelectorAll('.rc-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        rcPeriodo = parseInt(bt.dataset.rc, 10);
+        tabs.querySelectorAll('.rc-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        renderRelCompras();
+      });
+    });
+  })();
+
   /* ---------- estornos: até 7 dias, moedas de volta e aviso ao admin ---------- */
   function estornoDias(cp) { return 7 - Math.floor((Date.now() - (cp.ts || 0)) / DIA_MS); }
   function renderEstornos() {
@@ -9740,7 +10195,7 @@
     else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
     desfazerCompra(cp, mo);
     ESTORNOS.push({ aluno: cp.aluno, item: cp.item, valor: cp.valor, moeda: mo, quando: 'agora' });
-    renderEstornos(); renderCompras();
+    renderEstornos(); renderCompras(); renderRelCompras();
     if (typeof renderAdmEstornos === 'function') renderAdmEstornos();
     toast('Estorno concluído — “' + cp.item + '” voltou para a Loja e o valor foi devolvido.');
   }
@@ -9903,7 +10358,7 @@
   renderPedidos(); renderSimPres(); renderAdmSimList();
   if (typeof renderAcessos === 'function') renderAcessos();
   if (typeof renderAtivInscritos === 'function') renderAtivInscritos();
-  renderRelatorios(); renderPrecos(); renderEstornos();
+  renderRelatorios(); renderPrecos(); renderEstornos(); renderRelCompras();
   renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
