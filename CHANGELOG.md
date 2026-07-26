@@ -1,5 +1,38 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — "Em choque" com compra assumida, +Bônus, catálogo digital e moeda da skin
+
+- **Missões · Atrasadas conferido** (item 1): a regra dos 7 dias está
+  correta — bloco sem resposta sai de "Hoje · questões novas" e entra em
+  "Atrasadas", e bloco já respondido não entra. Havia um defeito de
+  atualização: as listas **só recalculavam depois de outra ação**. Agora
+  **abrir a aba Missões revalida** os 7 dias (mesmo defeito da expiração
+  de eventos, corrigido antes).
+- **"EM CHOQUE" no lugar do texto comprido** (item 2): a etiqueta ficou
+  curta e o **preço aparece em laranja**. O item **deixou de ser
+  bloqueado**: ao tocar, um aviso explica que naquele dia e horário já há
+  outro compromisso, que a escolha de qual atividade frequentar é do
+  aluno e que não há reposição de aula nem devolução por ausência —
+  **e a compra segue em frente**. Vale para evento pago, evento gratuito
+  (confirmação em dois toques no botão), isolada e simulado presencial.
+  **Matrícula em turma continua barrada**, por ser compromisso fixo.
+- **Simulado digital gratuito avaliado** (item 3): o fluxo está correto —
+  não pede preço, não vai para a Loja, entra direto nos Simulados do
+  aluno e premia por acerto. Nenhum erro encontrado.
+- **Porta de entrada dos produtos digitais** (item 4): o bloco
+  "Produtos digitais · pré-configurados" **não tinha cadastro** — só dava
+  para ligar/desligar os quatro de fábrica. Agora tem formulário próprio
+  (nome, descrição, moeda, preço e ícone). O produto **nasce
+  indisponível**, vai à Loja quando a administração libera, e pode ser
+  **removido do catálogo** pelo ✕.
+- **Moeda da skin explícita** (item 5): o seletor de moeda já existia, mas
+  o campo dizia só "Preço". Agora ele acompanha a escolha —
+  **"Preço em Quad Coins"** ou **"Preço em Diamantes"** — e volta a Quad
+  Coins quando o tipo é item de combate (que é sempre em QdC).
+- **Selo "+BÔNUS"** (item 6): evento **gratuito que premia** em score ou
+  Quad Coins passa a mostrar **+BÔNUS** no carrossel, ao lado de
+  "NA LOJA" (pago não comprado) e "INSCRITO" (já garantido).
+
 ## 26/07/2026 — Instrução do QUAD com botão "Pular"
 
 - **A instrução do QUAD passa a abrir em todo acesso** — não só no

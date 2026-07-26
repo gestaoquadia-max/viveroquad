@@ -621,6 +621,11 @@
     font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.55);
   }
   .tut-skip:hover { color: #fff; }
+  .compra-aviso { margin: 8px 0 2px; padding: 10px 12px; border-radius: 12px; text-align: left;
+    background: #FFF4E5; border: 1.5px solid #F0A33A; color: #7A4A05;
+    font: 600 11.5px/1.5 var(--font); }
+  .li-preco.em-choque, .tag.em-choque { color: #C2660A; }
+  .ev-tile .tag.em-choque { background: #FFE9CC; color: #8A4B04; border-color: #F0A33A; }
   /* segurar para ampliar a foto do personagem */
   .zoom-layer { position: absolute; inset: 0; z-index: 48; display: none;
     flex-direction: column; align-items: center; justify-content: center; gap: 14px;
@@ -2588,8 +2593,25 @@
 
           <div class="p-card">
             <div class="k-label">Produtos digitais · pré-configurados</div>
+            <div class="adm-form">
+              <input class="fld" id="admDigNome" placeholder="Nome do produto digital (ex.: E-book · Direito Penal)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admDigDesc" placeholder="Descrição curta (ex.: material digital do Quad)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admDigMoeda" title="Moeda de venda">
+                  <option value="qdc">Vender em Quad Coins</option>
+                  <option value="dmn">Vender em Diamantes</option>
+                </select>
+                <input class="fld" id="admDigPreco" placeholder="Preço em Quad Coins" inputmode="numeric" style="max-width:150px">
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
+              <div class="ico-pick" id="admDigIcones"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmDig">Cadastrar produto digital</button></div>
+            </div>
+            <div class="adm-sep"><span>Catálogo digital</span></div>
             <div id="admDigList"></div>
-            <p class="sub" style="margin-top:8px">Produtos digitais <strong>não têm estoque</strong>: ficam <strong>disponíveis</strong> na Loja (Itens digitais) até a administração torná-los <strong>indisponíveis</strong>. O catálogo é pré-configurado — e-books, vade mecum digital, cursos online e aulões exclusivos.</p>
+            <p class="sub" style="margin-top:8px">Produtos digitais <strong>não têm estoque</strong>: nascem <strong>indisponíveis</strong> e a administração os torna <strong>disponíveis</strong> na Loja (Itens digitais) quando quiser. Toque no ✕ para tirar do catálogo.</p>
           </div>
 
           <div class="p-card">
@@ -2610,7 +2632,7 @@
                   <option value="qdc">Vender em Quad Coins</option>
                   <option value="dmn">Vender em Diamantes</option>
                 </select>
-                <input class="fld" id="admSkPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px">
+                <input class="fld" id="admSkPreco" placeholder="Preço em Quad Coins" inputmode="numeric" style="max-width:150px">
               </div>
               <div class="k-label sub-k" style="margin-top:10px">Visual da skin</div>
               <div class="ico-pick" id="admSkIcones"></div>
@@ -3186,6 +3208,7 @@
             <span class="compra-ico" id="compraIco"></span>
             <h3 class="compra-nome" id="compraNome">Item</h3>
             <p class="sub compra-desc" id="compraDesc"></p>
+            <div class="compra-aviso" id="compraAviso" style="display:none"></div>
             <div class="compra-estoque" id="compraEstoque"></div>
             <div class="qtd-row">
               <button class="qtd-btn" id="qtdMenos" aria-label="Menos">−</button>
@@ -3745,6 +3768,11 @@
     if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
     if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
     if (id === 'v-loja' && typeof renderEventosLoja === 'function') renderEventosLoja(); /* e da vitrine */
+    /* abrir Missões revalida os 7 dias: o que venceu sai de "Hoje" e entra em "Atrasadas" */
+    if (id === 'v-missoes') {
+      if (typeof renderDia === 'function') renderDia();
+      if (typeof renderAtrasadas === 'function') renderAtrasadas();
+    }
     if (id === 'v-calendario' && typeof renderCalendario === 'function') renderCalendario();
     if (id.indexOf('v-prof-') === 0 && typeof renderProfTudo === 'function') renderProfTudo();
     /* abrir a Recepção é o que marca os recados como lidos */
@@ -3935,6 +3963,11 @@
   /* professores do evento: alimentam o card do aluno, o painel do admin e,
      mais adiante, a agenda do próprio professor. */
   function evProfs(ev) { return (ev && ev.profs) ? ev.profs.slice() : []; }
+  /* evento gratuito que premia (score e/ou Quad Coins) ganha o selo +BÔNUS */
+  function evTemBonus(ev) {
+    if (!ev || ev.pago) return false;
+    return (ev.score && ev.score.length > 0) || (ev.coins && ev.coins.length > 0);
+  }
   function evProfsTxt(ev) {
     var ps = evProfs(ev);
     if (!ps.length) return '';
@@ -3968,8 +4001,10 @@
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
     var choque = insc ? null : choqueDeAgenda(agendaDoEvento(ev));
     var etiqueta = insc ? '<span class="tag gold">INSCRITO</span>'
-      : choque ? '<span class="tag warn">CHOCA COM SUA AGENDA</span>'
-      : (ev.pago ? '<span class="tag gold">NA LOJA</span>' : (ev.tag ? '<span class="tag gold">' + ev.tag + '</span>' : ''));
+      : choque ? '<span class="tag warn em-choque">EM CHOQUE</span>'
+      : ev.pago ? '<span class="tag gold">NA LOJA</span>'
+      : ev.tag ? '<span class="tag gold">' + ev.tag + '</span>'
+      : evTemBonus(ev) ? '<span class="tag gold">+BÔNUS</span>' : '';
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
       '<span class="ev-name">' + ev.nome + '</span>' +
@@ -4017,12 +4052,12 @@
         var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
         var comprado = evState[ev.id] && evState[ev.id].comprado;
         var chq = comprado ? null : choqueDeAgenda(agendaDoEvento(ev));
-        return '<button class="loja-item' + (comprado ? ' comprado' : '') + (chq ? ' indisponivel' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
-          (comprado ? '<span class="li-estoque">INSCRITO</span>' : chq ? '<span class="li-estoque">CHOCA COM SUA AGENDA</span>' : '') +
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+          (comprado ? '<span class="li-estoque">INSCRITO</span>' : chq ? '<span class="li-estoque">EM CHOQUE</span>' : '') +
           '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
           '<span class="li-nome">' + ev.nome + '</span>' +
           '<span class="li-desc">' + (evProfsTxt(ev) || (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal)) + '</span>' +
-          '<span class="li-preco">' + (comprado ? 'INSCRITO' : chq ? 'CHOCA COM “' + chq + '”' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+          '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'INSCRITO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
       g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
         bt.addEventListener('click', function () { comprarEvento(bt.dataset.evBuy); });
@@ -4041,9 +4076,9 @@
     if (!ev) return;
     if (evState[id] && evState[id].comprado) { toast('Você já está inscrito — o evento segue aqui até o último dia.'); return; }
     var choque = choqueDeAgenda(agendaDoEvento(ev));
-    if (choque) { toast(msgChoque(choque, 'Este evento')); return; }
     var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: ev.nome, desc: 'evento ' + (ev.modalidade === 'online' ? 'online' : 'presencial'), preco: ev.preco, moeda: mo,
+      aviso: choque ? avisoChoque(choque) : '',
       ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.evento : '' }, function () {
       if (saldoDe(mo) < ev.preco) { toast(semSaldoMsg(mo)); return; }
       debitar(mo, ev.preco, ev.nome + ' · −' + fmt(ev.preco) + ' ' + moedaTxt(mo));
@@ -4156,7 +4191,13 @@
     $('btnEvInscrever').onclick = function () {
       if (ev.pago) { comprarEvento(ev.id); return; }   /* pago passa pela compra (e pela agenda) */
       var chq = choqueDeAgenda(agendaDoEvento(ev));
-      if (chq) { toast(msgChoque(chq, 'Este evento')); return; }
+      if (chq && this.dataset.okChoque !== '1') {
+        this.dataset.okChoque = '1';
+        this.textContent = 'Inscrever mesmo assim';
+        this.classList.add('ghost');
+        toast('Você já tem “' + chq + '” nesse horário. Se seguir, a escolha de qual atividade frequentar é sua — sem reposição de aula. Toque de novo para confirmar.');
+        return;
+      }
       st.inscrito = true;
       if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
       if (typeof renderAdmEventos === 'function') renderAdmEventos();   /* contador de inscritos no admin */
@@ -5841,6 +5882,7 @@
     { simRot: 'Simuladão Quad',        nome: 'AL CB QUAD NASCIMENTO',  pago: false, valor: 20,  score: 100, geraQdC: true,  liberado: false, pontuado: false, euSou: false }
   ];
   var SIM_HIST = [];   /* histórico de simulados realizados do aluno */
+  window.__blocos = function () { return { blocos: DIA_BLOCOS, expira: DIA_EXPIRA_DIAS }; };
   function renderAtrasadas() {
     var agora = Date.now();
     var tarde = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
@@ -5950,16 +5992,17 @@
   function comprarSimulado(id) {
     var sm = null; SIMULADOS.forEach(function (s) { if (s.id === id) sm = s; });
     if (!sm || sm.comprado) return;
+    var avisoSim = '';
     if (sm.tag === 'PRESENCIAL' && sm.dataISO) {
       var fs = faixaDe(sm.hi && sm.hf ? (sm.hi + '–' + sm.hf) : (sm.quando || ''));
       var ds = diaDaData(sm.dataISO);
       if (fs && ds != null) {
         var cq = choqueDeAgenda({ dias: [ds], ini: fs[0], fim: fs[1], rot: sm.rot, de: sm.dataISO, ate: sm.dataISO });
-        if (cq) { toast(msgChoque(cq, 'Este simulado')); return; }
+        if (cq) { avisoSim = avisoChoque(cq); }
       }
     }
     var mo = sm.moeda === 'dmn' ? 'dmn' : 'qdc';
-    confirmarCompra({ nome: sm.rot, desc: sm.tag === 'DIGITAL' ? 'simulado digital' : 'simulado presencial', preco: sm.valor, moeda: mo, ico: SIM_ICO }, function () {
+    confirmarCompra({ nome: sm.rot, desc: sm.tag === 'DIGITAL' ? 'simulado digital' : 'simulado presencial', preco: sm.valor, moeda: mo, aviso: avisoSim, ico: SIM_ICO }, function () {
       if (saldoDe(mo) < sm.valor) { toast(semSaldoMsg(mo)); return; }
       debitar(mo, sm.valor, sm.rot + ' · −' + fmt(sm.valor) + ' ' + moedaTxt(mo));
       sm.comprado = true;
@@ -7518,10 +7561,11 @@
     it.addEventListener('click', function () {
       if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
       /* isolada ocupa dia e horário — não entra por cima do que o aluno já tem */
+      var avisoIso = '';
       if (it.dataset.isolada && typeof ISOLADAS !== 'undefined') {
         var isoAlvo = ISOLADAS.filter(function (x) { return x.id === it.dataset.isolada; })[0];
         var chq = isoAlvo ? choqueDeAgenda(agendaDaIsolada(isoAlvo)) : null;
-        if (chq) { toast(msgChoque(chq, 'Esta isolada')); return; }
+        if (chq) { avisoIso = avisoChoque(chq); }
       }
       var preco = parseInt(it.dataset.preco, 10), nome = it.dataset.nome;
       var moeda = it.dataset.moeda === 'dmn' ? 'dmn' : 'qdc';
@@ -7555,7 +7599,7 @@
       if (typeof tutOn !== 'undefined' && tutOn) { executa(); return; }
       var descEl = it.querySelector('.li-desc'), icoEl = it.querySelector('.li-ico');
       confirmarCompra({ nome: nome, desc: descEl ? descEl.textContent : '', preco: preco, moeda: moeda,
-        ico: icoEl ? icoEl.innerHTML : '' }, executa);
+        aviso: avisoIso, ico: icoEl ? icoEl.innerHTML : '' }, executa);
     });
   }
   document.querySelectorAll('.loja-item').forEach(bindLojaItem);
@@ -7607,7 +7651,7 @@
     var t = turmaAberta; if (!t) return;
     var fx = faixaCompleta(t.hor);
     var chq = fx ? choqueDeAgenda({ dias: [1, 2, 3, 4, 5], ini: fx[0], fim: fx[1], rot: t.nome, de: t.inicio, ate: t.fim }) : null;
-    if (chq) { toast(msgChoque(chq, 'Esta turma')); return; }
+    if (chq) { toast('Você já tem “' + chq + '” nesse horário — matrícula em turma não pode se sobrepor.'); return; }
     var preco = moeda === 'dmn' ? t.precoDmn : t.precoQdc;
     if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
     debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda));
@@ -7815,9 +7859,11 @@
     });
     return achado;
   }
-  function msgChoque(rot, oQue) {
-    return 'Choque de horário: nesse dia e horário você já tem “' + rot + '”. ' +
-      (oQue ? oQue + ' não pode ser comprad' + (/a$/.test(oQue) ? 'a' : 'o') + ' por cima.' : '');
+  /* o aluno decide: o app informa o conflito e a escolha continua com ele */
+  function avisoChoque(rot) {
+    return '<strong>Atenção ao horário.</strong> Nesse dia e horário você já tem <strong>' + rot + '</strong>. ' +
+      'Se seguir com a compra, a escolha de qual atividade frequentar é sua — o Quad não faz reposição de aula ' +
+      'nem devolve o valor por ausência. Em caso de dúvida, fale com a recepção antes de confirmar.';
   }
   function isoHorarioTxt(iso) {
     if (!iso.hi || !iso.hf) return '';
@@ -7837,12 +7883,12 @@
       var comprado = lojaOwned[iso.nome];
       var mo = iso.moeda === 'dmn' ? 'dmn' : 'qdc';
       var chq = comprado ? null : choqueDeAgenda(agendaDaIsolada(iso));
-      return '<button class="loja-item' + (comprado ? ' comprado' : '') + (chq ? ' indisponivel' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
-        (iso.vagas ? '<span class="li-estoque">' + iso.vagas + ' vagas</span>' : '') +
+      return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
+        (chq ? '<span class="li-estoque">EM CHOQUE</span>' : iso.vagas ? '<span class="li-estoque">' + iso.vagas + ' vagas</span>' : '') +
         '<span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>' +
         '<span class="li-nome">' + iso.nome + '</span>' +
         '<span class="li-desc">' + isoDesc(iso) + '</span>' +
-        '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : chq ? 'CHOCA COM “' + chq + '”' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+        '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'ADQUIRIDO' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
     }).join('');
     g.querySelectorAll('.loja-item').forEach(bindLojaItem);
   }
@@ -7936,6 +7982,11 @@
     $('compraEstoque').textContent = 'Confirmar esta compra?';
     document.querySelector('.qtd-row').style.display = 'none';
     $('btnCompraOk').firstChild.textContent = 'Confirmar · ';
+    var av = $('compraAviso');
+    if (av) {
+      if (info.aviso) { av.innerHTML = info.aviso; av.style.display = 'block'; }
+      else { av.innerHTML = ''; av.style.display = 'none'; }
+    }
     $('compraTotal').textContent = fmt(info.preco) + ' ' + moedaTxt(info.moeda || 'qdc');
     $('compraLayer').classList.add('on');
   }
@@ -8140,14 +8191,65 @@
     { id: 'aulaoex', nome: 'Aulão exclusivo gravado',         desc: 'revisão de véspera',       preco: 60,  moeda: 'qdc', icone: 'aulao' }
   ];
   PROD_DIG_PRE.forEach(function (d) { d.disp = false; });
+  /* cadastro de novos produtos digitais — a porta de entrada do catálogo */
+  var admDigIco = 'modulo';
+  (function () {
+    var host = $('admDigIcones');
+    if (host) {
+      var ordem = ['modulo', 'vademecum', 'aula', 'aulao', 'simulado', 'evento', 'medalha'];
+      host.innerHTML = ordem.map(function (k) {
+        return '<button type="button" class="ico-opt' + (k === admDigIco ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
+      }).join('');
+      host.querySelectorAll('.ico-opt').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          admDigIco = bt.dataset.ico;
+          host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
+          bt.classList.add('sel');
+        });
+      });
+    }
+    var moedaSel = $('admDigMoeda');
+    if (moedaSel) moedaSel.addEventListener('change', function () {
+      $('admDigPreco').placeholder = 'Preço em ' + (moedaSel.value === 'dmn' ? 'Diamantes' : 'Quad Coins');
+    });
+    var btn = $('btnAdmDig');
+    if (btn) btn.addEventListener('click', function () {
+      var nome = $('admDigNome').value.trim(), desc = $('admDigDesc').value.trim();
+      var moeda = $('admDigMoeda').value, preco = parseInt($('admDigPreco').value, 10);
+      var moNome = moeda === 'dmn' ? 'Diamantes' : 'Quad Coins';
+      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao produto digital.'); return; }
+      if (!preco || preco < 1) { toast('Informe o preço em ' + moNome + '.'); return; }
+      if (PROD_DIG_PRE.some(function (d) { return d.nome === nome; }) ||
+          LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) ||
+          document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+        toast('Já existe um item com esse nome na Loja.'); return;
+      }
+      PROD_DIG_PRE.push({ id: 'dg' + Date.now(), nome: nome, desc: desc || 'material digital do Quad',
+        preco: preco, moeda: moeda, icone: admDigIco, disp: false, criado: true });
+      $('admDigNome').value = ''; $('admDigDesc').value = ''; $('admDigPreco').value = '';
+      renderDigPre();
+      toast('“' + nome + '” entrou no catálogo digital em ' + moNome + ' — marque como disponível para ir à Loja.');
+    });
+  })();
   function renderDigPre() {
     var el = $('admDigList'); if (!el) return;
     el.innerHTML = PROD_DIG_PRE.map(function (d, i) {
       return '<div class="adm-bar"><span class="nm">' + d.nome +
         '<small>' + d.desc + ' · ' + fmt(d.preco) + ' ' + moedaTxt(d.moeda) + ' · sem estoque</small></span>' +
         '<span class="tag' + (d.disp ? ' ok' : '') + '">' + (d.disp ? 'DISPONÍVEL' : 'INDISPONÍVEL') + '</span>' +
-        '<button class="btn ghost small" data-dig="' + i + '">' + (d.disp ? 'Tirar da Loja' : 'Disponibilizar') + '</button></div>';
-    }).join('');
+        '<button class="btn ghost small" data-dig="' + i + '">' + (d.disp ? 'Tirar da Loja' : 'Disponibilizar') + '</button>' +
+        (d.criado ? '<button class="adm-x" data-rm-dig="' + d.id + '" aria-label="Remover do catálogo">✕</button>' : '') + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum produto digital no catálogo.</p>';
+    el.querySelectorAll('[data-rm-dig]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var d = PROD_DIG_PRE.filter(function (x) { return x.id === b.dataset.rmDig; })[0]; if (!d) return;
+        PROD_DIG_PRE = PROD_DIG_PRE.filter(function (x) { return x.id !== d.id; });
+        LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== d.nome; });
+        renderLojaExtras(); renderDigPre();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('“' + d.nome + '” removido do catálogo digital.');
+      });
+    });
     el.querySelectorAll('[data-dig]').forEach(function (b) {
       b.addEventListener('click', function () {
         var d = PROD_DIG_PRE[+b.dataset.dig];
@@ -8208,9 +8310,17 @@
         bt.classList.add('sel');
       });
     });
+    var skMoeda = $('admSkMoeda');
+    function skPrecoLabel() {
+      var comb = $('admSkTipo') && $('admSkTipo').value === 'combate';
+      var mo = comb ? 'qdc' : (skMoeda ? skMoeda.value : 'qdc');
+      $('admSkPreco').placeholder = 'Preço em ' + (mo === 'dmn' ? 'Diamantes' : 'Quad Coins');
+    }
+    if (skMoeda) skMoeda.addEventListener('change', skPrecoLabel);
     var skTipo = $('admSkTipo');
     if (skTipo) skTipo.addEventListener('change', function () {
       var comb = skTipo.value === 'combate';
+      skPrecoLabel();
       $('admSkMoeda').style.display = comb ? 'none' : '';
       $('admSkNome').placeholder = comb ? 'Nome do item (ex.: Rádio comunicador)' : 'Nome da skin (ex.: Boina de instrutor)';
       $('admSkDesc').placeholder = comb ? 'Descrição curta (ex.: comunicação em campo)' : 'Descrição curta (ex.: edição limitada)';

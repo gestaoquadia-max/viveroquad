@@ -97,6 +97,11 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 100 | 25/07 | **Estorno desfaz a aquisição** por tipo (produto, evento, combate, skin, simulado, matrícula), além de devolver a moeda | Antes só devolvia o valor: o aluno ficava com o item |
 | 101 | 25/07 | **Agenda do aluno sem choque de horário**: turma, isolada, evento e simulado presencial ocupam dia + faixa; compra por cima é bloqueada dizendo com o quê choca | Pedido do gestor: "estou em aula, não posso comprar aulão no mesmo horário" |
 | 102 | 25/07 | **Expiração vale também no calendário** e as vitrines revalidam ao abrir a tela; o vencido fica só no histórico | Dois defeitos encontrados na verificação do item 3 |
+| 106 | 26/07 | **Abrir Missões revalida os 7 dias** (bloco vencido sai de "Hoje" e entra em "Atrasadas" na hora) | Mesmo defeito de atualização da expiração de eventos |
+| 107 | 26/07 | **"EM CHOQUE" (laranja) no lugar do bloqueio**: o app informa o conflito num aviso e a decisão fica com o aluno; matrícula em turma segue barrada | Pedido do gestor: responsabilidade do aluno, sem linguagem dura |
+| 108 | 26/07 | **Cadastro de produtos digitais pré-configurados** (nome, descrição, moeda, preço, ícone), nascendo indisponível e removível | Não havia porta de entrada: só os 4 de fábrica |
+| 109 | 26/07 | **Campo de preço da skin diz a moeda escolhida** (QdC/Dmn; combate sempre QdC) | O seletor existia mas o campo não deixava claro |
+| 110 | 26/07 | **Selo "+BÔNUS"** para evento gratuito que premia em score ou Coins | Completa a família NA LOJA / INSCRITO |
 | 105 | 26/07 | **Instrução do QUAD abre em todo acesso**, com botão **"Pular"** oposto ao "Avançar"; pular reproduz o estado final da instrução: boina equipada + 5 QdC (25 ganhos − 20 da boina) + score da Introdução | Antes só abria no 1º acesso; o gestor precisava dela sempre ao testar |
 | 104 | 26/07 | **Choque de horário visível na vitrine** (etiqueta "CHOCA COM SUA AGENDA" + item esmaecido, como já era com turma de turno ocupado); Aulão especial no sábado e nova Isolada de Português aos sábados | A regra barrava no clique e a vitrine não explicava |
 | 103 | 25/07 | **"Mentoria Quad" deixou de ser botão fixo** e virou item de catálogo com data (entra em eventos e no calendário); "Simulado físico" → "Caderno de simulados impresso" | Varredura pedida no item 5, mesma família do Aulão especial |
