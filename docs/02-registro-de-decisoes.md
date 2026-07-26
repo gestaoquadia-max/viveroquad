@@ -102,6 +102,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 108 | 26/07 | **Cadastro de produtos digitais pré-configurados** (nome, descrição, moeda, preço, ícone), nascendo indisponível e removível | Não havia porta de entrada: só os 4 de fábrica |
 | 109 | 26/07 | **Campo de preço da skin diz a moeda escolhida** (QdC/Dmn; combate sempre QdC) | O seletor existia mas o campo não deixava claro |
 | 110 | 26/07 | **Selo "+BÔNUS"** para evento gratuito que premia em score ou Coins | Completa a família NA LOJA / INSCRITO |
+| 111 | 26/07 | **"Quad Store" sai do "+"**: a loja fica só na barra de navegação (mais o card de Coins e o bloco do Início) | Caminho repetido; menu enxuto |
+| 112 | 26/07 | **"Validar pelo QR" migra do "+" para a Quad Store**, ao lado de "Resgatar", no bloco do gift card (código na linha de cima, botões lado a lado) | O leitor é do mesmo assunto do resgate; validação conferida e correta |
 | 105 | 26/07 | **Instrução do QUAD abre em todo acesso**, com botão **"Pular"** oposto ao "Avançar"; pular reproduz o estado final da instrução: boina equipada + 5 QdC (25 ganhos − 20 da boina) + score da Introdução | Antes só abria no 1º acesso; o gestor precisava dela sempre ao testar |
 | 104 | 26/07 | **Choque de horário visível na vitrine** (etiqueta "CHOCA COM SUA AGENDA" + item esmaecido, como já era com turma de turno ocupado); Aulão especial no sábado e nova Isolada de Português aos sábados | A regra barrava no clique e a vitrine não explicava |
 | 103 | 25/07 | **"Mentoria Quad" deixou de ser botão fixo** e virou item de catálogo com data (entra em eventos e no calendário); "Simulado físico" → "Caderno de simulados impresso" | Varredura pedida no item 5, mesma família do Aulão especial |

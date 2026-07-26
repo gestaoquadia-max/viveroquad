@@ -1,5 +1,23 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Validação do gift card na Quad Store; "+" mais enxuto
+
+- **Quad Store sai do "+"** (item 1): a loja já tem **botão próprio na
+  barra de navegação** ("Loja") e ainda é alcançada pelo card de Quad
+  Coins e pelo bloco do Início — a linha no "+" era caminho repetido.
+  O menu ficou com sete linhas.
+- **Validação do gift card conferida** (item 2): o fluxo está correto —
+  a leitura credita **na moeda do lote** (Diamantes ou Quad Coins),
+  **invalida o cartão na hora** (liberação única), atualiza a contagem
+  "N de M resgatados" no Painel de controle e recusa cartão já usado ou
+  código inexistente.
+- **"Validar pelo QR" ao lado de "Resgatar"**: o leitor **saiu do "+"** e
+  passou a morar no bloco do gift card, dentro da própria **Quad Store**.
+  O campo do código ocupa a linha inteira e os dois botões ficam lado a
+  lado logo abaixo: **Resgatar** (código digitado) e **Validar pelo QR**
+  (câmera). É o mesmo leitor de antes, agora no lugar onde o aluno já
+  está quando tem um gift card em mãos.
+
 ## 26/07/2026 — "Em choque" com compra assumida, +Bônus, catálogo digital e moeda da skin
 
 - **Missões · Atrasadas conferido** (item 1): a regra dos 7 dias está

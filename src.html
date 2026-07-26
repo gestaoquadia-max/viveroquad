@@ -1235,8 +1235,9 @@
   .lh-saldos { display: flex; justify-content: center; gap: 8px; position: relative; }
   .loja-saldo.dmn { background: linear-gradient(180deg, #F2F8FF, #DCEBFF); border-color: #A9CCFF; color: #1D55B0; }
   .loja-saldo.dmn img { filter: drop-shadow(0 1px 3px rgba(20,80,200,0.4)); }
-  .lh-gift { display: flex; gap: 8px; margin-top: 12px; position: relative; }
-  .lh-gift .fld { flex: 1; background: rgba(255,255,255,0.94); }
+  .lh-gift { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; position: relative; }
+  .lh-gift .fld { flex: 1 1 100%; background: rgba(255,255,255,0.94); }
+  .lh-gift .btn { flex: 1; }   /* "Resgatar" e "Validar" lado a lado, sob o código */
   .loja-macro { display: flex; align-items: center; gap: 9px; margin: 2px 0 12px;
     font: 800 15px var(--ui); letter-spacing: .05em; text-transform: uppercase; color: var(--p-text); }
   .loja-macro .lm-ico { width: 30px; height: 30px; flex: none; border-radius: 9px; display: grid; place-items: center;
@@ -1692,6 +1693,7 @@
             <div class="lh-gift">
               <input class="fld" id="giftCode" placeholder="Código do gift card (ex.: QG1-4KZ7)" autocomplete="off">
               <button class="btn small" id="btnGift">Resgatar</button>
+              <button class="btn small ghost" id="btnGiftScan">Validar pelo QR</button>
             </div>
           </div>
 
@@ -3065,15 +3067,9 @@
               <span class="p-ico">▤</span>
               <span class="grow"><span class="t">Materiais das aulas</span><span class="d">slides, resumos, listas e vídeos por aula</span></span>
             </button>
-            <button class="plus-row" data-goto="v-loja">
-              <span class="p-ico">◈</span>
-              <span class="grow"><span class="t">Quad Store</span><span class="d">gaste Quad Coins e Diamantes em turmas, eventos e itens</span></span>
-              <span class="tag gold">NOVO</span>
-            </button>
-            <button class="plus-row" id="rowGift">
-              <span class="p-ico"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8c-2.5 0-4.5-1.2-4.5-3S9 2.6 10.4 3.4 12 8 12 8Zm0 0c2.5 0 4.5-1.2 4.5-3S15 2.6 13.6 3.4 12 8 12 8Z"/></svg></span>
-              <span class="grow"><span class="t">Validar Gift Card</span><span class="d">aponte a câmera para o QR code</span></span>
-            </button>
+            <!-- Quad Store e "Validar Gift Card" saíram daqui: a loja tem lugar
+                 próprio na barra de navegação e o leitor de QR mora no bloco do
+                 gift card, dentro da própria Quad Store. -->
             <button class="plus-row" id="rowChat">
               <span class="p-ico">✉</span>
               <span class="grow"><span class="t">Chat · recados da administração</span><span class="d">mensagens exclusivas para você</span></span>
@@ -6465,7 +6461,6 @@
   document.querySelectorAll('.plus-row').forEach(function (row) {
     row.addEventListener('click', function () {
       if (row.id === 'rowChat') { $('plusPop').classList.remove('on'); abrirChat(); return; }
-      if (row.id === 'rowGift') { $('plusPop').classList.remove('on'); $('scanLayer').classList.add('on'); return; }
       if (row.dataset.goto) {
         $('plusPop').classList.remove('on');
         showView(row.dataset.goto, 'navAluno');
@@ -8018,6 +8013,9 @@
   if (btnGiftEl) btnGiftEl.addEventListener('click', function () {
     if (resgatarGift($('giftCode').value)) $('giftCode').value = '';
   });
+  /* validação pelo QR: o leitor abre da própria Quad Store, ao lado do resgate */
+  var btnGiftScanEl = $('btnGiftScan');
+  if (btnGiftScanEl) btnGiftScanEl.addEventListener('click', function () { $('scanLayer').classList.add('on'); });
 
   function renderAdmProdList() {
     var el = document.getElementById('admProdList'); if (!el) return;
