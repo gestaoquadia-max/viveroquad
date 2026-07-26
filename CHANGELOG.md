@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Instrução do QUAD com botão "Pular"
+
+- **A instrução do QUAD passa a abrir em todo acesso** — não só no
+  primeiro. Quem já conhece usa o novo botão **"Pular"**, colocado do
+  lado oposto do "Avançar".
+- **Pular reproduz o estado final de quem concluiu**: a **boina**
+  garantida e equipada, **+5 Quad Coins** (os 25 ganhos na instrução
+  menos os 20 da boina) e o **score da Introdução**. A conta aparece na
+  mensagem, e a Introdução no Quad segue disponível em Missões.
+
 ## 26/07/2026 — Choque de horário visível na vitrine
 
 A regra de agenda trouxe um efeito prático: quase todo evento-semente é

@@ -615,6 +615,12 @@
     font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.75);
   }
   .tut-next:hover { color: #fff; }
+  .tut-skip {
+    position: absolute; left: 12px; bottom: 8px; z-index: 4; pointer-events: auto;
+    background: none; border: none; cursor: pointer;
+    font: 700 10px var(--ui); letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.55);
+  }
+  .tut-skip:hover { color: #fff; }
   /* segurar para ampliar a foto do personagem */
   .zoom-layer { position: absolute; inset: 0; z-index: 48; display: none;
     flex-direction: column; align-items: center; justify-content: center; gap: 14px;
@@ -3152,6 +3158,7 @@
             <div class="tut-opts" id="tutOpts"></div>
           </div>
           <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
+          <button class="tut-skip" id="tutSkip">‹ Pular</button>
           <button class="tut-next" id="tutNext">Avançar ›</button>
         </div>
 
@@ -5207,7 +5214,9 @@
     $('loginLayer').classList.add('off');
     /* a verificação acontece DENTRO da vinheta — uma tela de carregamento só
        (antes: gate "verificando" + vinheta = duas páginas em sequência) */
-    var primeiro = lsGet(TUT_LS.done) !== '1';
+    /* a instrução do QUAD abre em TODO acesso — quem já conhece usa o "Pular".
+       (a suíte automatizada usa a chave vq_tut_skip para entrar direto)        */
+    var primeiro = lsGet('vq_tut_skip') !== '1';
     entrarApp(primeiro);
     var sv = $('splashVerify');
     if (sv) sv.innerHTML = 'Verificando a matrícula de <strong>' + em + '</strong>…';
@@ -5241,8 +5250,7 @@
       checarMatricula();  // sem matrícula ativa → funções bloqueadas + aviso
       daniloWave();       // o QUAD recebe o aluno acenando
       daniloHintMostra(); // "Precisa de ajuda?" fica 10s na tela
-      var tutAberta = lsGet(TUT_LS.done) !== '1' && lsGet(TUT_LS.step) !== null;
-      if (runTour || tutAberta) iniciarTutorial();   /* V0: instrução interrompida recomeça do início */
+      if (runTour) iniciarTutorial();   /* V0: instrução interrompida recomeça do início */
       else toast('Bem-vindo, ' + $('homeNome').textContent + '!');
     });
   }
@@ -6354,8 +6362,38 @@
     $('tutLayer').classList.add('on');
     tutGo(0);
   }
+  /* PULAR: o aluno entra direto no estado de quem concluiu a instrução —
+     boina equipada e os Quad Coins que sobram (25 ganhos − 20 da boina).
+     A Introdução no Quad segue disponível em Missões para ser feita. */
+  function tutPular() {
+    if (!tutOn) return;
+    /* pular reproduz o ESTADO FINAL de quem fez a instrução: ganha os 25 Quad
+       Coins e gasta 20 na boina — sobram 5 —, mais o score da Introdução. */
+    var elBoina = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
+    var precoBoina = elBoina ? (parseInt(elBoina.dataset.preco, 10) || 20) : 20;
+    var pctScore = TUT_REW.score;
+    var pctCoins = Math.max(0, TUT_REW.coins - precoBoina);
+    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
+    tutOn = false; tourOn = false; tutExpect = null;
+    $('tutLayer').classList.remove('on');
+    $('daniloFab').style.display = '';
+    /* estado de quem já passou pela instrução: boina garantida e equipada */
+    lojaOwned['Boina exclusiva'] = true;
+    boinaEquipada = true;
+    var bi = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
+    if (bi) { bi.style.display = 'none'; bi.classList.add('comprado'); }
+    if (typeof aplicarAvatar === 'function') aplicarAvatar();
+    carreira.scorePatente += pctScore; carreira.scoreCarreira += pctScore; carreira.scoreTemporada += pctScore;
+    renderCarreira();
+    addScore(pctCoins, '+' + pctCoins + ' Quad Coins · saldo da instrução');
+    showView('v-inicio', 'navAluno');
+    daniloHintMostra();
+    toast('Instrução pulada — você entrou como quem a concluiu: boina equipada e ' + pctCoins + ' Quad Coins (25 ganhos − ' + precoBoina + ' da boina). A Introdução no Quad segue em Missões.');
+  }
+  var btnTutSkip = $('tutSkip');
+  if (btnTutSkip) btnTutSkip.addEventListener('click', function (e) { e.stopPropagation(); tutPular(); });
   function tutFim() {
-    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0');
+    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
     tutOn = false; tourOn = false; tutExpect = null;
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
@@ -7452,7 +7490,7 @@
   var btnReset = $('btnResetDemo');
   if (btnReset) btnReset.addEventListener('click', function () {
     lsDel(LS.auth); lsDel(LS.sync); lsDel(LS.pend);
-    lsDel(TUT_LS.step); lsDel(TUT_LS.done); lsDel(TUT_LS.rew);
+    lsDel(TUT_LS.step); lsDel(TUT_LS.done); lsDel(TUT_LS.rew); lsDel('vq_tut_skip');
     deviceAuthorized = false; pendingAnswers = 0; online = true;
     updatePending();
     sairConta();
