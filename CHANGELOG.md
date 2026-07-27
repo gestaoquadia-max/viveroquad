@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Reserva de sala unificada: turmas, isoladas, simulados e eventos na mesma régua
+
+- **Tudo o que ocupa a sede passa pela mesma reserva** — turmas,
+  isoladas, **simulados presenciais** e **eventos** (aulões e minicursos
+  entram como eventos). O padrão é o da criação de turmas: seletor que
+  mostra a ocupação, aviso fixo em caso de choque e mapa atualizado.
+- **Evento presencial escolhe a sala**; **evento online reserva o
+  Estúdio automaticamente** — o seletor trava em "Estúdio — reservado
+  para a gravação/transmissão", e duas transmissões no mesmo dia e
+  horário são barradas ("O Estúdio já tem…").
+- **Simulado presencial escolhe a sala** (mesmas 4 salas), com conflito
+  contra turmas, isoladas e eventos daquele dia — inclusive o caso
+  clássico: simulado de sábado à tarde na sala da isolada de sábado.
+- **Mapa de ocupação completo**: eventos e simulados entram nas linhas
+  das salas com dia, data e horário; o Estúdio lista as gravações
+  agendadas. Cores por tipo (turma azul, isolada dourada, evento claro,
+  simulado escuro).
+- Sementes: Aulão de véspera na Sala 4 (23/07 à noite) e Aulão especial
+  na Sala 2 (sáb 01/08 de manhã).
+- Isoladas seguem exigindo sala — na prática funcionam 22h–00h ou aos
+  fins de semana, quando as salas das turmas estão livres; o sistema
+  aceita qualquer horário em que a sala esteja livre.
+
 ## 26/07/2026 — Salas da sede: a turma nasce numa sala, e sala não aceita choque
 
 - **A sede entrou no sistema**: 4 salas para o presencial e o **Estúdio**,

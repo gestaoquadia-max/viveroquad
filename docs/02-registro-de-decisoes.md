@@ -123,6 +123,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 127 | 26/07 | **Área do admin abre limpa**: só o painel de atalhos; o botão abre/recolhe o próprio bloco; "Ver todos" mostra tudo; sair e voltar preserva | Correção do item 1 do gestor |
 | 128 | 26/07 | **Presença no simulado gera score** na liberação da recepção (QdC só onde a atividade premia) | "Como grande parte das interações no APP" |
 | 129 | 26/07 | **Espaço físico da sede no sistema**: Salas 1–4 + Estúdio (gravações/online); turma e isolada nascem numa sala; sala não aceita duas atividades no mesmo dia/horário; mapa de ocupação no Controle | Ex.: "Noite, Sala 1: PATAMO, do dia tal ao dia tal" |
+| 130 | 26/07 | **Reserva de sala unificada**: simulados presenciais e eventos (aulões/minicursos) reservam as mesmas 4 salas, na régua da criação de turmas; atividade de um dia ocupa o dia da semana daquela data | Resumo do gestor: unificar as metodologias |
+| 131 | 26/07 | **Evento online reserva o Estúdio automaticamente** (seletor travado); duas transmissões no mesmo horário são barradas | Estrutura de reserva pedida no item 2 |
 | 126 | 26/07 | **Data e hora em grade rotulada, com largura inteira** (turma, evento e simulado): o campo estreito escondia o valor e parecia vazio | Causa real do "não dá certeza de que foi colocado o horário" |
 | 127 | 26/07 | **Área do admin abre limpa** (só os atalhos); o botão abre o seu bloco e, tocado de novo, recolhe; "Ver todos" mostra a área inteira | Pedido do gestor |
 | 128 | 26/07 | **Lançamento de simulados usa a grade "Preços e vagas" das turmas** (preço Dmn/QdC + vagas totais/em QdC) | Pedido do gestor: "devem parecer com a programação de Preços e vagas" |
