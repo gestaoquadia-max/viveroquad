@@ -1084,6 +1084,19 @@
   .adm-jump .jp.on { background: linear-gradient(180deg, #3B8BFF, #135FE0); border-color: #135FE0; color: #fff;
     box-shadow: 0 6px 14px rgba(19,95,224,0.32); }
   .adm-jump .jp.todos { flex-basis: 100%; text-align: center; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  /* perfil público × privado nos rankings */
+  .priv-box { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px;
+    background: linear-gradient(180deg, #FFFFFF, #F3F8FF); border: 1px solid var(--p-line); border-radius: 13px; }
+  .priv-info { flex: 1; min-width: 0; }
+  .priv-t { font: 700 12px var(--ui); color: var(--p-text); }
+  .priv-d { font-size: 10.5px; color: var(--p-dim); margin-top: 2px; line-height: 1.4; }
+  .priv-switch { flex: none; width: 46px; height: 26px; border-radius: 99px; border: 1px solid var(--p-line);
+    background: #E4EDFA; cursor: pointer; padding: 2px; display: flex; transition: background .18s ease; }
+  .priv-knob { width: 20px; height: 20px; border-radius: 50%; background: #fff;
+    box-shadow: 0 2px 5px rgba(11,46,115,0.25); transition: transform .18s ease; }
+  .priv-switch[aria-checked="true"] { background: linear-gradient(180deg, #3B8BFF, #1976FF); border-color: #135FE0; }
+  .priv-switch[aria-checked="true"] .priv-knob { transform: translateX(20px); }
+
   /* mapa de salas: uma linha por sala, com as atividades dentro */
   .sala-row { padding: 10px 0; border-bottom: 1px solid var(--p-line); }
   .sala-row:last-child { border-bottom: none; }
@@ -1462,6 +1475,10 @@
   .tr-item:last-child { border-bottom: none; }
   .tr-dot { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center;
     font: 700 11px var(--ui); border: 2px solid var(--p-line); color: var(--p-dim); background: #fff; }
+  /* patente ainda não alcançada: círculo vazio com um ponto discreto —
+     sem cadeado; a insígnia acinzentada já diz que está bloqueada     */
+  .tr-item.lock .tr-dot { background: #F6F9FD; }
+  .tr-item.lock .tr-dot::before { content: ''; width: 6px; height: 6px; border-radius: 99px; background: #C7D6E8; }
   .tr-item.done .tr-dot { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
   .tr-item.atual .tr-dot { background: linear-gradient(160deg, #3B8BFF, #1976FF); border-color: #fff; color: #fff; box-shadow: 0 0 8px rgba(25,118,255,0.6); }
   .tr-item.prova .tr-dot { background: #FFF6DF; border-color: #F1D488; color: #9A6B00; }
@@ -1723,6 +1740,13 @@
             <div class="k-label">Minhas turmas · matrículas ativas</div>
             <div id="minhasTurmasList"></div>
             <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A <strong>turma principal</strong> é a que comanda o Início, o Domínio e o ranking da sala.</p>
+            <div class="priv-box" id="privBox">
+              <div class="priv-info">
+                <div class="priv-t">Perfil nos rankings</div>
+                <div class="priv-d" id="privDesc">Público — seu nome de guerra aparece por inteiro.</div>
+              </div>
+              <button class="priv-switch" id="btnPriv" role="switch" aria-checked="false" aria-label="Alternar entre perfil público e privado nos rankings"><span class="priv-knob"></span></button>
+            </div>
           </div>
           <div class="p-card">
             <div class="k-label" id="rankSalaHead">Ranking da sala · 42 alunos</div>
@@ -6947,7 +6971,7 @@
     var html = '', faseAtual = -1;
     GAMI.patentes.forEach(function (p, i) {
       if (p.fase !== faseAtual) { faseAtual = p.fase; html += '<div class="tr-fase">' + GAMI.fases[p.fase].nome + '</div>'; }
-      var cls = 'lock', dot = '🔒', meta = p.pontos ? fmt(p.pontos) + ' pts' : 'máxima';
+      var cls = 'lock', dot = '', meta = p.pontos ? fmt(p.pontos) + ' pts' : 'máxima';
       if (i < carreira.patenteIdx) { cls = 'done'; dot = '✓'; }
       else if (i === carreira.patenteIdx) {
         cls = (carreira.estado === 'disponivel') ? 'prova' : 'atual';
@@ -6963,9 +6987,28 @@
      o nome e o score dele acompanham o estado real do protótipo */
   var RK_NOMES = ['Braga','Nunes','Rocha','Teixeira','Dutra','Farias','Sales','Pires','Ramos','Costa','Lima','Souza','Prado','Viana','Barros','Melo','Freitas','Cunha','Aragão','Tavares','Xavier','Peixoto','Dantas','Moraes','Sampaio','Rezende','Queiroz','Amaral','Fontes','Guedes','Serra','Lacerda','Brandão','Camargo','Siqueira','Torres','Valente','Mattos','Azevedo','Furtado','Neves','Antunes','Ferraz','Galvão','Bastos','Coelho','Duarte','Jardim'];
   var RK_OFF = [38,25,63,41,19,52,30,74,22,47,58,33,29,66,21,44,71,26,55,37,49,60,24,68,31,53,42,77,28,36,64,45,23,59,50,70,27,62,35,48];
-  function rkRow(pos, nome, pts, me, top3) {
+  /* ---------- perfil privado nos rankings ----------
+     Quem escolhe privado tem o nome de guerra mascarado: sobra a última
+     letra ("AL SD QUAD ****A"). No hall dos 10 primeiros a máscara cai —
+     quem chega lá precisa ser visto.                                   */
+  var perfilPrivado = false;
+  function mascararNome(nome) {
+    /* mascara só o nome de guerra (o que vem depois de QUAD) */
+    var m = /^(.*QUAD )(.+)$/.exec(nome);
+    if (!m) return nome;
+    var g = m[2];
+    if (g.length <= 1) return nome;
+    return m[1] + new Array(g.length).join('*') + g.charAt(g.length - 1);
+  }
+  function rkNomeExibido(nome, pos, privado) {
+    if (!privado) return nome;
+    if (pos <= 10) return nome;   /* hall seleto: o top 10 é sempre visto */
+    return mascararNome(nome);
+  }
+  function rkRow(pos, nome, pts, me, top3, privado) {
+    var exibido = rkNomeExibido(nome, pos, me ? perfilPrivado : !!privado);
     return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
-      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + nome + (me ? ' · você' : '') + '</span>' +
+      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
       '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
   }
   function rkScores(total, meuPos, meuScore) {
@@ -7000,6 +7043,27 @@
     return Math.max(12, n);
   }
   function salaPos(total) { return Math.min(total, Math.max(3, Math.round(total * 0.29))); }
+  /* interruptor público × privado (bloco "Minhas turmas") */
+  (function () {
+    var bt = $('btnPriv'); if (!bt) return;
+    function pinta() {
+      bt.setAttribute('aria-checked', perfilPrivado ? 'true' : 'false');
+      var d = $('privDesc');
+      if (d) d.innerHTML = perfilPrivado
+        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong>. Se entrar no hall dos <strong>10 primeiros</strong>, o nome volta a aparecer por inteiro.'
+        : 'Público — seu nome de guerra aparece por inteiro nos rankings.';
+    }
+    bt.addEventListener('click', function () {
+      perfilPrivado = !perfilPrivado;
+      pinta();
+      if (typeof renderRankings === 'function') renderRankings();
+      toast(perfilPrivado
+        ? 'Perfil privado — seu nome fica mascarado nos rankings (menos no top 10).'
+        : 'Perfil público — seu nome aparece por inteiro nos rankings.');
+    });
+    pinta();
+    window.__privPinta = pinta;   /* o nome de guerra pode mudar depois */
+  })();
   var rkOpen = { sala: false, geral: false };
   function renderRankings() {
     var elS = $('rankSalaList'), elG = $('rankGeralList');
@@ -7009,7 +7073,8 @@
     function salaRow(i) {
       if (i === sPos) return rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false);
       var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
-      return rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3);
+      /* parte da sala escolheu o perfil privado (demo: 1 a cada 4) */
+      return rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3, i % 4 === 2);
     }
     var html = '';
     if (rkOpen.sala) {
@@ -7027,12 +7092,13 @@
     function geralRow(v) {
       if (v === gPos) return rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false);
       var pf = (v % 2 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
-      return rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false);
+      return rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false, v % 4 === 2);
     }
     var g = '';
     if (rkOpen.geral) {
       var topBase = 24870;
-      for (var t = 1; t <= 10; t++) g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3);
+      /* hall dos 10 primeiros: a máscara cai mesmo para quem é privado */
+      for (var t = 1; t <= 10; t++) g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3, t % 4 === 2);
       g += '<div class="rk-sep">···</div>';
       for (var v = gPos - 10; v <= gPos + 10; v++) g += geralRow(v);
       g += '<div class="rk-sep">···</div>';

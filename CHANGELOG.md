@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Perfil privado nos rankings e trilha sem cadeados
+
+- **Perfil público × privado** (item 1): o bloco "Minhas turmas ·
+  matrículas ativas" ganhou o interruptor **"Perfil nos rankings"**.
+  No privado, o nome de guerra sai mascarado nos dois rankings —
+  **AL SD QUAD ****A** — preservando a última letra. A descrição mostra
+  exatamente como o aluno vai aparecer antes de ele decidir.
+- **A regra do hall**: quem entra nos **10 primeiros** perde a máscara —
+  chegou lá, precisa ser visto. A demo mostra os dois lados ao mesmo
+  tempo: o aluno é 10º da sala (visível) e 87º no geral (mascarado).
+  Vizinhos privados da demo também aparecem mascarados fora do hall.
+- **Trilha de patentes sem cadeados** (item 2): a coluna de cadeados
+  amarelos repetidos saiu; a patente ainda não alcançada leva um ponto
+  discreto e a insígnia acinzentada segue contando a história. ✓, ● e ★
+  (concluída, atual, prova disponível) ficaram como estavam.
+
 ## 26/07/2026 — Reserva de sala unificada: turmas, isoladas, simulados e eventos na mesma régua
 
 - **Tudo o que ocupa a sede passa pela mesma reserva** — turmas,
