@@ -1084,6 +1084,19 @@
   .adm-jump .jp.on { background: linear-gradient(180deg, #3B8BFF, #135FE0); border-color: #135FE0; color: #fff;
     box-shadow: 0 6px 14px rgba(19,95,224,0.32); }
   .adm-jump .jp.todos { flex-basis: 100%; text-align: center; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  /* mapa de salas: uma linha por sala, com as atividades dentro */
+  .sala-row { padding: 10px 0; border-bottom: 1px solid var(--p-line); }
+  .sala-row:last-child { border-bottom: none; }
+  .sala-top { display: flex; align-items: center; gap: 8px; }
+  .sala-nome { font: 800 13px var(--ui); color: var(--p-text); letter-spacing: .03em; }
+  .sala-top .tag { margin-left: auto; }
+  .sala-oc { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .sala-oc .so { display: flex; align-items: baseline; gap: 7px; font-size: 12px; color: var(--p-text); }
+  .sala-oc .so::before { content: ''; width: 7px; height: 7px; border-radius: 99px; background: #3B8BFF; flex: none; align-self: center; }
+  .sala-oc .so.iso::before { background: #F4B63A; }
+  .sala-oc .so.est::before { background: #7B4DE8; }
+  .sala-oc .so small { color: var(--p-dim); font-size: 10.5px; }
+  .sala-livre { font-size: 11.5px; color: var(--p-dim); margin-top: 4px; }
   /* aviso fixo de erro dentro do bloco — não some como o toast */
   .adm-alerta { display: none; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 10px 11px;
     background: #FFF5F5; border: 1px solid #F3C6C6; border-radius: 12px; color: #A02B2B;
@@ -2342,6 +2355,7 @@
             <div class="adm-jump" id="jumpControle">
               <button class="jp" data-jump="doc">Corpo docente</button>
               <button class="jp" data-jump="turmas">Criação de turma e isoladas</button>
+              <button class="jp" data-jump="salas">Mapa de salas</button>
               <button class="jp" data-jump="credito">Inserir crédito</button>
               <button class="jp" data-jump="contas">Permissões e acessos</button>
               <button class="jp" data-jump="msg">Comunicação interna</button>
@@ -2381,6 +2395,12 @@
             <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
           </div>
 
+          <div class="p-card" data-bl="salas">
+            <div class="k-label">Salas e estúdio · mapa de ocupação</div>
+            <div id="admSalasMapa"></div>
+            <p class="sub" style="margin-top:8px">A sede tem <strong>4 salas</strong> para as atividades presenciais e o <strong>Estúdio</strong>, reservado às gravações e aos eventos online. A sala é escolhida na <strong>criação da turma ou isolada</strong> — e uma sala não aceita duas atividades no mesmo dia e horário.</p>
+          </div>
+
           <div class="p-card" data-bl="turmas">
             <div class="k-label">Criação de turmas e isoladas · matrícula e vagas</div>
             <div class="adm-form">
@@ -2396,6 +2416,10 @@
                   <option value="noite" selected>Noite</option>
                 </select>
               </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCtSala" title="Sala da sede em que a turma vai funcionar"></select>
+              </div>
+              <p class="adm-hint" id="admCtSalaEco" style="display:none"></p>
               <div id="admCtIsoBox" style="display:none">
                 <div class="k-label sub-k" style="margin-top:10px">Dias da semana <span style="opacity:.7; font-weight:600">— toque para marcar (mínimo 1)</span></div>
                 <div class="turno-pick" id="admCtDias">
@@ -3706,11 +3730,11 @@
   }
   sincProfessores();
   var TURMAS_LOJA = [
-    { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'nivelamento · mais teoria', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
-    { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'regular · teoria + questões', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 170, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
-    { id: 'bope-n',    nome: 'Turma BOPE',    tipo: 'BOPE',    tipoDesc: 'questões · alta intensidade', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2600, precoQdc: 2800, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
-    { id: 'rondesp-m', nome: 'Turma RONDESP Manhã', tipo: 'RONDESP', tipoDesc: 'nivelamento · matutina', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 600, precoQdc: 700, vagasDmn: 54, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' },
-    { id: 'bope-m',    nome: 'Turma BOPE Manhã',    tipo: 'BOPE',    tipoDesc: 'questões · matutina',    turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 800, precoQdc: 900, vagasDmn: 44, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' }
+    { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'nivelamento · mais teoria', sala: 'Sala 1', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'regular · teoria + questões', sala: 'Sala 2', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 170, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
+    { id: 'bope-n',    nome: 'Turma BOPE',    tipo: 'BOPE',    tipoDesc: 'questões · alta intensidade', sala: 'Sala 3', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2600, precoQdc: 2800, vagasDmn: 170, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'rondesp-m', nome: 'Turma RONDESP Manhã', tipo: 'RONDESP', tipoDesc: 'nivelamento · matutina', sala: 'Sala 1', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 600, precoQdc: 700, vagasDmn: 54, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'bope-m',    nome: 'Turma BOPE Manhã',    tipo: 'BOPE',    tipoDesc: 'questões · matutina',    sala: 'Sala 2', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 800, precoQdc: 900, vagasDmn: 44, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' }
   ];
   /* o aluno da demo veio do site já matriculado na PATAMO Noite (CFO) */
   var MATRICULAS = [{ turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' }];
@@ -7404,6 +7428,10 @@
   var DIA_SEM_TURMA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   function dataBRcompleta(iso) { if (!iso) return '—'; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
   /* remover turma é uma operação só — vale para a Estrutura e para o Painel de controle */
+  function salasMudaram() {
+    if (typeof renderSalas === 'function') renderSalas();
+    if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+  }
   function removerTurma(id) {
     var t = turmaDe(id); if (!t) return;
     var presos = (typeof matriculasAtivas === 'function')
@@ -7416,6 +7444,7 @@
     if (typeof relTurmasInit === 'function') relTurmasInit();
     if (typeof ativInit === 'function') ativInit();
     if (typeof renderPrecoTurmas === 'function') renderPrecoTurmas();
+    salasMudaram();   /* a sala volta a ficar livre no mapa e no seletor */
     toast('Turma “' + t.nome + '” removida.');
   }
   function renderTurmasAdm() {
@@ -7423,7 +7452,7 @@
     el.innerHTML = TURMAS_LOJA.map(function (t) {
       var c = concursoDe(t.concurso), m = modalidadeDe(t.tipo);
       return '<div class="adm-bar"><span class="nm">' + t.nome +
-        '<small>' + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.tipo) + ' · ' + t.turno + ' · ' + t.hor +
+        '<small>' + (t.sala ? t.sala + ' · ' : '') + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.tipo) + ' · ' + t.turno + ' · ' + t.hor +
         ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) + '</small></span>' +
         '<button class="adm-x" data-rm-turma="' + t.id + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma cadastrada.</p>';
@@ -7488,7 +7517,7 @@
     var isos = (typeof ISOLADAS !== 'undefined') ? ISOLADAS.filter(function (i) { return i.criada; }) : [];
     el.innerHTML = novas.map(function (t) {
       return '<div class="adm-bar"><span class="nm">' + t.nome +
-        '<small>' + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + ' · ' + fmt(t.precoDmn) + ' Dmn/' + fmt(t.precoQdc) + ' QdC · ' +
+        '<small>' + (t.sala ? t.sala + ' · ' : '') + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + ' · ' + fmt(t.precoDmn) + ' Dmn/' + fmt(t.precoQdc) + ' QdC · ' +
         t.vagasDmn + '+' + t.vagasQdc + ' vagas' + (t.edital ? ' · edital anexado' : '') + '</small></span>' +
         '<button class="adm-x" data-rm-ct="' + t.id + '" aria-label="Remover">✕</button></div>';
     }).join('') + isos.map(function (i) {
@@ -7502,6 +7531,7 @@
         ISOLADAS = ISOLADAS.filter(function (x) { return x.id !== i.id; });
         EVENTOS = EVENTOS.filter(function (e) { return e.id !== 'ev-' + i.id; });
         renderIsoladas(); renderCtLista(); renderEvStrip();
+        if (typeof salasMudaram === 'function') salasMudaram();
         if (typeof renderPrecos === 'function') renderPrecos();
         toast('Isolada “' + i.nome + '” removida.');
       });
@@ -7690,6 +7720,35 @@
       ['input', 'change', 'blur'].forEach(function (ev) { el.addEventListener(ev, admCtEco); });
     });
     window.__ctEco = admCtEco;
+    /* seletor de sala: cada opção já diz o que funciona nela; o eco
+       abaixo detalha a ocupação da sala escolhida                     */
+    function ctSalaOpcoes() {
+      var sel = $('admCtSala'); if (!sel) return;
+      var atual = sel.value;
+      sel.innerHTML = '<option value="">Sala da sede — escolha onde a turma vai funcionar</option>' +
+        SALAS.map(function (sl) {
+          var oc = salaResumo(sl);
+          var meta = oc.length ? oc.map(function (o) { return o.rot; }).join(' · ') : 'livre';
+          return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + ' — ' + meta + '</option>';
+        }).join('') +
+        '<option value="" disabled>' + ESTUDIO + ' — reservado às gravações e eventos online</option>';
+    }
+    function ctSalaEco() {
+      var eco = $('admCtSalaEco'); if (!eco) return;
+      var sl = $('admCtSala').value;
+      if (!sl) { eco.style.display = 'none'; return; }
+      var oc = salaResumo(sl);
+      eco.style.display = '';
+      eco.innerHTML = oc.length
+        ? '<strong>' + sl + '</strong> hoje: ' + oc.map(function (o) {
+            return o.rot + ' (' + (o.turno ? o.turno + ' · ' : '') + o.hor + (o.ate ? ' · até ' + dataBRcompleta(o.ate) : '') + ')';
+          }).join(' · ') + '. Horário livre pode ser usado.'
+        : '<strong>' + sl + '</strong> está livre — nenhuma turma ou isolada funciona nela.';
+    }
+    $('admCtSala').addEventListener('change', ctSalaEco);
+    window.__ctSalaRefresh = function () { ctSalaOpcoes(); ctSalaEco(); };
+    /* o preenchimento inicial roda no fim da carga, quando salas, isoladas
+       e turmas já existem (__ctSalaRefresh é chamado junto do renderSalas) */
     tipoSel.addEventListener('change', function () { admCtIsoToggle(); admCtEco(); });
     $('admCtDias').querySelectorAll('.turno-chip').forEach(function (bt) {
       bt.addEventListener('click', function () { bt.classList.toggle('on'); });
@@ -7709,8 +7768,9 @@
     });
     renderCtProfs();
     /* aviso que fica na tela e marca o campo que falta */
-    var CT_CAMPOS = ['admCtApelido', 'admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f',
+    var CT_CAMPOS = ['admCtApelido', 'admCtSala', 'admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f',
                      'admCtPrecoDmn', 'admCtPrecoQdc', 'admCtVagas', 'admCtVagasQdc'];
+    function hl2(t) { return t; }   /* horários já vêm como HH:MM */
     function ctFalta(cond, campo, msg) {
       if (!cond) return false;
       admAlerta('admCtErro', msg);
@@ -7718,7 +7778,8 @@
       return true;
     }
     CT_CAMPOS.forEach(function (id) {
-      var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+      var el = $(id); if (!el) return;
+      ['input', 'change'].forEach(function (ev) { el.addEventListener(ev, function () { el.classList.remove('err'); }); });
     });
     $('btnAdmCtAbrir').addEventListener('click', function () {
       var tipo = tipoSel.value, ape = $('admCtApelido').value.trim();
@@ -7741,8 +7802,14 @@
         if (ctFalta(!(iHi < iHf), 'admCtH1f', 'A <b>hora de término</b> precisa ser depois da hora de início.')) return;
         if (ctFalta((!iDmn || iDmn < 1) && (!iQdc || iQdc < 1), 'admCtPrecoDmn', 'Para abrir a isolada falta o <b>preço</b> em ao menos uma moeda.')) return;
         if (ctFalta(!iVagas || iVagas < 1, 'admCtVagas', 'Para abrir a isolada faltam as <b>vagas</b>.')) return;
+        var salaIso = $('admCtSala').value;
+        if (ctFalta(!salaIso, 'admCtSala', 'Para abrir a isolada falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+        var fxIso = faixaDe(iHi + '–' + iHf);
+        var chIso = salaConflito({ sala: salaIso, dias: dias.map(function (d) { return DIA_IDX[d]; }), ini: fxIso[0], fim: fxIso[1], de: iIni, ate: iFim, id: null });
+        if (chIso && ctFalta(true, 'admCtSala', 'A <b>' + salaIso + '</b> já tem <b>' + chIso.rot + '</b> nesse horário (' + chIso.hor +
+          (chIso.ate ? ', até ' + dataBRcompleta(chIso.ate) : '') + ') — escolha outra sala ou outro horário.')) return;
         var usaDmn = !!(iDmn && iDmn >= 1);
-        var novaIso = { id: 'iso' + Date.now(), materia: ape, nome: 'Isolada ' + ape,
+        var novaIso = { id: 'iso' + Date.now(), materia: ape, nome: 'Isolada ' + ape, sala: salaIso,
           prof: $('admCtIsoProf') ? $('admCtIsoProf').value : '', dias: dias, hi: iHi, hf: iHf,
           ini: iIni, fim: iFim, preco: usaDmn ? iDmn : iQdc, moeda: usaDmn ? 'dmn' : 'qdc', vagas: iVagas, criada: true };
         ISOLADAS.push(novaIso);
@@ -7751,9 +7818,11 @@
         $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
         $('admCtH1i').value = ''; $('admCtH1f').value = '';
         $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = '';
+        $('admCtSala').value = ''; ctSalaOpcoes(); ctSalaEco();
+        if (typeof renderSalas === 'function') renderSalas();
         $('admCtDias').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
         admCtEco();
-        admAlerta('admCtErro', 'Isolada de <b>' + ape + '</b> aberta — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.', true);
+        admAlerta('admCtErro', 'Isolada de <b>' + ape + '</b> aberta na <b>' + salaIso + '</b> — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.', true);
         toast('Isolada de ' + ape + ' aberta — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.');
         return;
       }
@@ -7776,6 +7845,12 @@
       if (ctFalta(!vagas || vagas < 1, 'admCtVagas', 'Para abrir a turma faltam as <b>vagas totais</b>.')) return;
       if (ctFalta(isNaN(vQdc), 'admCtVagasQdc', 'Para abrir a turma falta dizer <b>quantas dessas vagas são em Quad Coins</b> — escreva 0 se nenhuma.')) return;
       if (ctFalta(vQdc < 0 || vQdc > vagas, 'admCtVagasQdc', 'As vagas em Quad Coins são um pedaço das vagas totais (0 a ' + vagas + ').')) return;
+      var sala = $('admCtSala').value;
+      if (ctFalta(!sala, 'admCtSala', 'Para abrir a turma falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+      var fxNova = faixaCompleta(hl2(h1i) + '–' + hl2(h2f));
+      var choqueSala = salaConflito({ sala: sala, dias: [1, 2, 3, 4, 5], ini: fxNova[0], fim: fxNova[1], de: ini, ate: fim, id: null });
+      if (choqueSala && ctFalta(true, 'admCtSala', 'A <b>' + sala + '</b> já tem <b>' + choqueSala.rot + '</b> nesse horário (' + choqueSala.hor +
+        (choqueSala.ate ? ', até ' + dataBRcompleta(choqueSala.ate) : '') + ') — escolha outra sala, outro turno ou espere o período acabar.')) return;
       var arq = ($('admCtArvore').files && $('admCtArvore').files[0]) ? $('admCtArvore').files[0].name : '';
       var profs = {};
       var mats = ctMaterias();
@@ -7784,7 +7859,7 @@
       var hor = hl(h1i) + '–' + hl(h1f) + ' e ' + hl(h1f) + '–' + hl(h2f);
       var id = 'ct' + Date.now();
       var nome = 'Turma ' + tipo + (ape ? ' · ' + ape : '') + (turno !== 'noite' ? ' (' + turno + ')' : '');
-      TURMAS_LOJA.push({ id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: (modalidadeDe(tipo) || {}).nome || tipo, turno: turno, hor: hor,
+      TURMAS_LOJA.push({ id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: (modalidadeDe(tipo) || {}).nome || tipo, sala: sala, turno: turno, hor: hor,
         concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vagas - vQdc, vagasQdc: vQdc,
         inicio: ini, fim: fim, edital: arq, professores: profs });
       sincronizarCronoTurmas();   /* a turma nova já nasce no Cronograma semanal */
@@ -7798,9 +7873,11 @@
       $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
       $('admCtH1i').value = ''; $('admCtH1f').value = ''; $('admCtH2f').value = '';
       $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = ''; $('admCtArvore').value = '';
+      $('admCtSala').value = ''; ctSalaOpcoes(); ctSalaEco();
+      if (typeof renderSalas === 'function') renderSalas();
       ctArvoreArq = ''; renderCtProfs();
       admCtEco();
-      admAlerta('admCtErro', 'Turma <b>' + nome + '</b> aberta — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + (vagas - vQdc) + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins.', true);
+      admAlerta('admCtErro', 'Turma <b>' + nome + '</b> aberta na <b>' + sala + '</b> (' + turno + ') — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + (vagas - vQdc) + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins.', true);
       toast('Turma “' + nome + '” aberta — na Quad Store com ' + (vagas - vQdc) + ' vagas em Dmn e ' + vQdc + ' em QdC.');
     });
     renderCtLista();
@@ -7968,7 +8045,7 @@
         '<span class="li-estoque">' + t.vagasDmn + ' Dmn · ' + t.vagasQdc + ' QdC</span>' +
         '<span class="li-ico">' + TURMA_ICO + '</span>' +
         '<span class="li-nome">' + t.nome + '</span>' +
-        '<span class="li-desc">' + t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + '</span>' +
+        '<span class="li-desc">' + t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + (t.sala ? ' · ' + t.sala : '') + '</span>' +
         '<span class="li-preco">' + preco + '</span></button>';
     }).join('');
     host.querySelectorAll('[data-turma]').forEach(function (bt) {
@@ -8115,9 +8192,9 @@
      Nascem no bloco "Criação de turmas e isoladas". Compradas, viram evento
      recorrente: entram no carrossel do Início e no calendário do aluno.   */
   var ISOLADAS = [
-    { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura',
+    { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura', sala: 'Sala 4',
       dias: ['terça-feira'], hi: '20:00', hf: '22:00', ini: '2026-08-04', fim: '2026-10-20', preco: 350, moeda: 'dmn', vagas: 30 },
-    { id: 'iso-port', materia: 'Língua Portuguesa', nome: 'Isolada de Português', prof: 'Prof.ª Ritha Galvão',
+    { id: 'iso-port', materia: 'Língua Portuguesa', nome: 'Isolada de Português', prof: 'Prof.ª Ritha Galvão', sala: 'Sala 1',
       dias: ['sábado'], hi: '14:00', hf: '17:00', ini: '2026-08-08', fim: '2026-10-24', preco: 350, moeda: 'dmn', vagas: 25 },
     { id: 'iso-livre', materia: 'qualquer matéria', nome: 'Aula isolada', prof: '',
       dias: [], hi: '', hf: '', ini: '', fim: '', preco: 40, moeda: 'qdc', vagas: 60 }
@@ -8147,6 +8224,69 @@
     var f1 = faixaDe(blocos[0]), f2 = faixaDe(blocos[blocos.length - 1]);
     if (!f1) return null;
     return [f1[0], f2 ? f2[1] : f1[1]];
+  }
+
+  /* ---------- espaço físico da sede: 4 salas + estúdio ----------
+     Turma e isolada presenciais funcionam numa das salas; o estúdio é
+     reservado às gravações e eventos online. Uma sala não aceita duas
+     atividades no mesmo dia da semana com horários que se cruzam.     */
+  var SALAS = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4'];
+  var ESTUDIO = 'Estúdio';
+  /* tudo o que ocupa sala, num formato só: dias da semana + faixa de
+     minutos + período de datas                                        */
+  function salaOcupacoes() {
+    var oc = [];
+    TURMAS_LOJA.forEach(function (t) {
+      var fx = faixaCompleta(t.hor); if (!t.sala || !fx) return;
+      oc.push({ sala: t.sala, rot: t.nome, tipo: 'turma', hor: t.hor, turno: t.turno,
+        dias: [1, 2, 3, 4, 5], ini: fx[0], fim: fx[1], de: t.inicio, ate: t.fim, id: t.id });
+    });
+    ISOLADAS.forEach(function (i) {
+      if (!i.sala || !i.dias || !i.dias.length || !i.hi || !i.hf) return;
+      var fx = faixaDe(i.hi + '–' + i.hf); if (!fx) return;
+      oc.push({ sala: i.sala, rot: i.nome, tipo: 'isolada', hor: isoDiasTxt(i) + ' · ' + isoHorarioTxt(i), turno: '',
+        dias: i.dias.map(function (d) { return DIA_IDX[d]; }), ini: fx[0], fim: fx[1], de: i.ini, ate: i.fim, id: i.id });
+    });
+    return oc;
+  }
+  /* choca? mesmos sala + dia da semana + horários cruzados + períodos cruzados */
+  function salaConflito(alvo) {
+    var hits = salaOcupacoes().filter(function (o) {
+      if (o.sala !== alvo.sala || o.id === alvo.id) return false;
+      if (!o.dias.some(function (d) { return alvo.dias.indexOf(d) >= 0; })) return false;
+      if (!(alvo.ini < o.fim && o.ini < alvo.fim)) return false;
+      if (alvo.de && alvo.ate && o.de && o.ate && !(alvo.de <= o.ate && o.de <= alvo.ate)) return false;
+      return true;
+    });
+    return hits.length ? hits[0] : null;
+  }
+  /* resumo de uma sala para o seletor e para o mapa */
+  function salaResumo(sala) {
+    return salaOcupacoes().filter(function (o) { return o.sala === sala; });
+  }
+  var TURNO_ORDEM = { 'manhã': 0, 'tarde': 1, 'noite': 2, '': 3 };
+  function renderSalas() {
+    var el = $('admSalasMapa'); if (!el) return;
+    var html = SALAS.map(function (sl) {
+      var oc = salaResumo(sl).sort(function (a, b) { return (TURNO_ORDEM[a.turno] || 0) - (TURNO_ORDEM[b.turno] || 0) || a.ini - b.ini; });
+      var linhas = oc.map(function (o) {
+        return '<div class="so' + (o.tipo === 'isolada' ? ' iso' : '') + '"><span>' + o.rot + '</span>' +
+          '<small>' + (o.turno ? o.turno + ' · ' : '') + o.hor +
+          (o.de && o.ate ? ' · ' + dataBRcompleta(o.de) + ' → ' + dataBRcompleta(o.ate) : '') + '</small></div>';
+      }).join('');
+      return '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + sl + '</span>' +
+        (oc.length ? '<span class="tag ok">' + oc.length + (oc.length === 1 ? ' ATIVIDADE' : ' ATIVIDADES') + '</span>' : '<span class="tag">LIVRE</span>') + '</div>' +
+        (oc.length ? '<div class="sala-oc">' + linhas + '</div>' : '<p class="sala-livre">Nenhuma turma ou isolada funciona nesta sala.</p>') + '</div>';
+    }).join('');
+    /* estúdio: reservado às gravações — mostra os eventos online que vêm aí */
+    var lives = (typeof EVENTOS !== 'undefined' ? EVENTOS : []).filter(function (ev) {
+      return ev.online && !(typeof evAcabou === 'function' && evAcabou(ev));
+    });
+    html += '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + ESTUDIO + '</span><span class="tag">GRAVAÇÕES · ONLINE</span></div>' +
+      (lives.length ? '<div class="sala-oc">' + lives.map(function (ev) {
+        return '<div class="so est"><span>' + ev.nome + '</span><small>' + ev.quando + '</small></div>';
+      }).join('') + '</div>' : '<p class="sala-livre">Nenhuma gravação ou evento online agendado.</p>') + '</div>';
+    el.innerHTML = html;
   }
   function diaDaData(iso) {
     if (!iso) return null;
@@ -8229,6 +8369,7 @@
   }
   function isoDesc(iso) {
     var p = [];
+    if (iso.sala) p.push(iso.sala);
     if (isoDiasTxt(iso)) p.push(isoDiasTxt(iso) + (isoHorarioTxt(iso) ? ' · ' + isoHorarioTxt(iso) : ''));
     if (iso.prof) p.push('com ' + iso.prof);
     if (iso.ini && iso.fim) p.push(dataBRcompleta(iso.ini) + ' a ' + dataBRcompleta(iso.fim));
@@ -9496,6 +9637,7 @@
     renderAdmEventos();
     renderEventosLoja();   /* pago → vitrine da Loja */
     renderEvStrip();       /* aparece no carrossel: pago = "Na Loja", grátis = direto */
+    if (typeof renderSalas === 'function') renderSalas();   /* evento online entra no Estúdio */
     admAlerta('admEvErro', 'Evento <b>' + nome + '</b> criado para ' + quando + ' — ' +
       (pago ? 'à venda na Loja (' + (modalidade === 'online' ? 'Eventos online' : 'Eventos e aulões') + ') e no carrossel do Início com a tag “NA LOJA”.'
             : 'já gira no carrossel do Início do aluno.'), true);
@@ -10481,6 +10623,8 @@
   if (typeof renderAtivInscritos === 'function') renderAtivInscritos();
   renderRelatorios(); renderPrecos(); renderEstornos(); renderRelCompras();
   renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
+  if (typeof renderSalas === 'function') renderSalas();
+  if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;

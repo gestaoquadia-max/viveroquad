@@ -1,5 +1,27 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 26/07/2026 — Salas da sede: a turma nasce numa sala, e sala não aceita choque
+
+- **A sede entrou no sistema**: 4 salas para o presencial e o **Estúdio**,
+  reservado às gravações e eventos online.
+- **Criar turma ou isolada agora pede a sala.** O seletor já diz o que
+  funciona em cada uma ("Sala 2 — Turma PATAMO · Turma BOPE Manhã") e,
+  escolhida a sala, uma linha mostra a ocupação dela. O Estúdio aparece
+  travado — é só do online.
+- **Sala não aceita duas atividades no mesmo dia e horário**: turma ocupa
+  seg–sex no horário dos dois tempos; isolada, os dias dela. Se cruzar,
+  o aviso fixo diz quem está lá, o horário e até quando — e sugere outra
+  sala, outro turno ou esperar o período acabar.
+- **Mapa de ocupação** (novo bloco no Controle, com atalho próprio): uma
+  linha por sala contando a história — "Sala 2: Turma PATAMO, noite,
+  19h–22h, até 15/12/2026" — e o Estúdio listando os eventos online
+  agendados. Turnos em ordem (manhã → tarde → noite); turma em azul,
+  isolada em dourado.
+- A sala aparece na **lista de turmas abertas**, na **Estrutura**, na
+  descrição das isoladas e na **vitrine do aluno**.
+- As turmas e isoladas da demo já nasceram alocadas (PATAMO na Sala 2 à
+  noite, RONDESP na 1, BOPE na 3, isoladas na 4 e na 1).
+
 ## 26/07/2026 — Campo de hora que se lê, área do admin que abre limpa e simulados no padrão das turmas
 
 ### O campo de hora escondia o valor (item 1 revisitado)

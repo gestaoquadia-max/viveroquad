@@ -119,6 +119,10 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 123 | 26/07 | **Simulado digital sem limite de vagas**, vendido nas duas moedas (o aluno escolhe no pop-up) ou gratuito premiando por acerto; não trava por choque de horário | Regra do gestor |
 | 124 | 26/07 | **Vagas e preços dos simulados presenciais editáveis** no bloco "Preços e vagas · turmas, isoladas e simulados" | Os números do lançamento são só o ponto de partida |
 | 125 | 26/07 | **Recompensa por acerto do digital passa a valer** (era campo sem efeito; o app pagava 2 fixo) | Achado na auditoria do próprio trabalho |
+| 126 | 26/07 | **Data e hora em grade rotulada** (turma, evento e simulado): campo estreito escondia o valor e parecia vazio | Causa real da queixa "não dá certeza de que o horário entrou" |
+| 127 | 26/07 | **Área do admin abre limpa**: só o painel de atalhos; o botão abre/recolhe o próprio bloco; "Ver todos" mostra tudo; sair e voltar preserva | Correção do item 1 do gestor |
+| 128 | 26/07 | **Presença no simulado gera score** na liberação da recepção (QdC só onde a atividade premia) | "Como grande parte das interações no APP" |
+| 129 | 26/07 | **Espaço físico da sede no sistema**: Salas 1–4 + Estúdio (gravações/online); turma e isolada nascem numa sala; sala não aceita duas atividades no mesmo dia/horário; mapa de ocupação no Controle | Ex.: "Noite, Sala 1: PATAMO, do dia tal ao dia tal" |
 | 126 | 26/07 | **Data e hora em grade rotulada, com largura inteira** (turma, evento e simulado): o campo estreito escondia o valor e parecia vazio | Causa real do "não dá certeza de que foi colocado o horário" |
 | 127 | 26/07 | **Área do admin abre limpa** (só os atalhos); o botão abre o seu bloco e, tocado de novo, recolhe; "Ver todos" mostra a área inteira | Pedido do gestor |
 | 128 | 26/07 | **Lançamento de simulados usa a grade "Preços e vagas" das turmas** (preço Dmn/QdC + vagas totais/em QdC) | Pedido do gestor: "devem parecer com a programação de Preços e vagas" |
