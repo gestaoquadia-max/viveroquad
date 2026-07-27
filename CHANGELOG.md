@@ -1,5 +1,30 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 27/07/2026 — Seletor de sala legível e reserva do Estúdio feita à mão
+
+- **A opção do seletor virou só o nome do espaço** (item 1): antes cada
+  linha carregava a agenda inteira da sala ("Sala 1 — Turma RONDESP ·
+  Turma RONDESP Manhã · Isolada de Português"), o que estourava a largura
+  do celular e repetia o aviso de baixo. Agora as opções são a pergunta
+  ("Em qual sala a turma funciona?") e **Sala 1** a **Sala 4** — o
+  Estúdio saiu da lista de turmas, porque turma não funciona nele.
+- **O aviso abaixo do seletor passou a conferir de verdade**: em vez de
+  descrever a sala em geral, ele compara a sala com o **dia e o horário
+  já digitados** — "está livre nesse dia e horário", "já tem Turma
+  PATAMO nesse dia e horário (…, até 15/12/2026)" ou, se ainda faltar
+  dado, "complete o dia e o horário". Mudar só o horário reconfere a
+  sala sozinho, sem tocar no seletor.
+- **O Estúdio agora é escolhido, não atribuído** (item 2): em "Eventos da
+  semana", ao marcar **Online** o seletor fica ativo e **vazio**,
+  oferecendo "Estúdio". Sem selecionar, o evento não é criado — "Evento
+  online ocupa o Estúdio de gravações: selecione-o para reservar o
+  espaço", com o campo em vermelho. Era isso que faltava: antes o
+  sistema reservava sozinho e ainda dizia "o Estúdio está livre" antes de
+  existir data.
+- **Editar um evento online devolve o Estúdio marcado** no seletor, e
+  criar um evento devolve o campo vazio para a próxima reserva.
+- A régua ficou igual em turma, isolada, simulado presencial e evento.
+
 ## 26/07/2026 — Perfil privado nos rankings e trilha sem cadeados
 
 - **Perfil público × privado** (item 1): o bloco "Minhas turmas ·

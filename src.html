@@ -7796,36 +7796,48 @@
       ['input', 'change', 'blur'].forEach(function (ev) { el.addEventListener(ev, admCtEco); });
     });
     window.__ctEco = admCtEco;
-    /* seletor de sala: cada opção já diz o que funciona nela; o eco
-       abaixo detalha a ocupação da sala escolhida                     */
+    /* seletor de sala: a opção diz só o nome da sala; o eco abaixo é que
+       confere a sala contra o dia e o horário já digitados             */
     function ctSalaOpcoes() {
       var sel = $('admCtSala'); if (!sel) return;
-      var atual = sel.value;
-      sel.innerHTML = '<option value="">Sala da sede — escolha onde a turma vai funcionar</option>' +
-        SALAS.map(function (sl) {
-          var oc = salaResumo(sl);
-          var meta = oc.length ? oc.map(function (o) { return o.rot; }).join(' · ') : 'livre';
-          return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + ' — ' + meta + '</option>';
-        }).join('') +
-        '<option value="" disabled>' + ESTUDIO + ' — reservado às gravações e eventos online</option>';
+      var iso = tipoSel.value === 'ISOLADA';
+      sel.innerHTML = salaOpcoesHTML(sel, iso ? 'Em qual sala a isolada funciona?' : 'Em qual sala a turma funciona?');
+    }
+    /* o que a turma/isolada vai ocupar, com o que já foi preenchido;
+       null enquanto faltar dia ou horário                              */
+    function ctSalaAlvo(sala) {
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      if (!ini || !fim || fim < ini) return null;
+      if (tipoSel.value === 'ISOLADA') {
+        var dias = [].slice.call($('admCtDias').querySelectorAll('.turno-chip.on'))
+          .map(function (c) { return DIA_IDX[c.dataset.dia]; });
+        var iHi = $('admCtH1i').value, iHf = $('admCtH1f').value;
+        if (!dias.length || !iHi || !iHf || !(iHi < iHf)) return null;
+        var fxI = faixaDe(iHi + '–' + iHf); if (!fxI) return null;
+        return { sala: sala, dias: dias, ini: fxI[0], fim: fxI[1], de: ini, ate: fim, id: null };
+      }
+      var h1i = $('admCtH1i').value, h2f = $('admCtH2f').value;
+      if (!h1i || !h2f || !(h1i < h2f)) return null;
+      var fxT = faixaCompleta(hl2(h1i) + '–' + hl2(h2f)); if (!fxT) return null;
+      return { sala: sala, dias: [1, 2, 3, 4, 5], ini: fxT[0], fim: fxT[1], de: ini, ate: fim, id: null };
     }
     function ctSalaEco() {
       var eco = $('admCtSalaEco'); if (!eco) return;
       var sl = $('admCtSala').value;
       if (!sl) { eco.style.display = 'none'; return; }
-      var oc = salaResumo(sl);
       eco.style.display = '';
-      eco.innerHTML = oc.length
-        ? '<strong>' + sl + '</strong> hoje: ' + oc.map(function (o) {
-            return o.rot + ' (' + (o.turno ? o.turno + ' · ' : '') + o.hor + (o.ate ? ' · até ' + dataBRcompleta(o.ate) : '') + ')';
-          }).join(' · ') + '. Horário livre pode ser usado.'
-        : '<strong>' + sl + '</strong> está livre — nenhuma turma ou isolada funciona nela.';
+      eco.innerHTML = salaEcoHTML(sl, ctSalaAlvo(sl));
     }
-    $('admCtSala').addEventListener('change', ctSalaEco);
+    $('admCtSala').addEventListener('change', function () { ctSalaEco(); admLimpaErro(['admCtSala']); });
+    /* mudou data, horário ou dia da isolada? o eco reconfere a sala */
+    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f'].forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('change', ctSalaEco);
+    });
+    $('admCtDias').addEventListener('click', function () { setTimeout(ctSalaEco, 0); });
     window.__ctSalaRefresh = function () { ctSalaOpcoes(); ctSalaEco(); };
     /* o preenchimento inicial roda no fim da carga, quando salas, isoladas
        e turmas já existem (__ctSalaRefresh é chamado junto do renderSalas) */
-    tipoSel.addEventListener('change', function () { admCtIsoToggle(); admCtEco(); });
+    tipoSel.addEventListener('change', function () { admCtIsoToggle(); admCtEco(); ctSalaOpcoes(); ctSalaEco(); });
     $('admCtDias').querySelectorAll('.turno-chip').forEach(function (bt) {
       bt.addEventListener('click', function () { bt.classList.toggle('on'); });
     });
@@ -8363,6 +8375,37 @@
   /* resumo de uma sala para o seletor e para o mapa */
   function salaResumo(sala) {
     return salaOcupacoes().filter(function (o) { return o.sala === sala; });
+  }
+  /* ---------- seletor de sala, régua única ----------
+     A opção do seletor diz SÓ o nome do espaço (numa tela de celular o
+     rótulo longo virava uma linha ilegível). Quem conta o que já está
+     reservado é a linha de eco logo abaixo — e ela responde ao dia e ao
+     horário que o administrador acabou de digitar, não à sala em geral. */
+  function salaOpcoesHTML(sel, placeholder, lista) {
+    var atual = sel.value;
+    return '<option value="">' + placeholder + '</option>' +
+      (lista || SALAS).map(function (sl) {
+        return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + '</option>';
+      }).join('');
+  }
+  function salaAgendaTxt(sala, id) {
+    return salaResumo(sala).filter(function (o) { return !id || o.id !== id; })
+      .map(function (o) { return o.rot + ' (' + (o.turno ? o.turno + ' · ' : '') + o.hor + ')'; }).join(' · ');
+  }
+  /* alvo = null quando o dia/horário ainda não estão completos */
+  function salaEcoHTML(sala, alvo) {
+    var agenda = salaAgendaTxt(sala, alvo && alvo.id);
+    if (!alvo) {
+      return 'Espaço escolhido: <strong>' + sala + '</strong>. Complete o <b>dia</b> e o <b>horário</b> para eu conferir se ele está vago nesse momento.' +
+        (agenda ? ' Já ocupam este espaço: ' + agenda + '.' : ' Nada mais está marcado nele.');
+    }
+    var ch = salaConflito(alvo);
+    if (ch) {
+      return '<strong>' + sala + '</strong> já tem <b>' + ch.rot + '</b> nesse dia e horário (' + ch.hor +
+        (ch.ate && !ch.pontual ? ', até ' + dataBRcompleta(ch.ate) : '') + ') — escolha outro espaço ou outro horário.';
+    }
+    return '<strong>' + sala + '</strong> está <b>livre</b> nesse dia e horário — a reserva vale ao confirmar.' +
+      (agenda ? ' Fora dele, o espaço tem: ' + agenda + '.' : '');
   }
   var TURNO_ORDEM = { 'manhã': 0, 'tarde': 1, 'noite': 2, '': 3 };
   function renderSalas() {
@@ -9606,7 +9649,9 @@
     if (ev.hf) $('admEvNovoFim').value = ev.hf;
     renderEvProfChips(evProfs(ev));
     admEvCamposToggle();
-    if (ev.sala && !ev.online) $('admEvSala').value = ev.sala;
+    /* online já ficou com o Estúdio reservado: o seletor volta marcado */
+    $('admEvSala').value = ev.online ? ESTUDIO : (ev.sala || '');
+    admEvSalaEcoRender();
     var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Salvar alterações';
     admEvPreview();
     $('admEvNovoNome').scrollIntoView({ block: 'center' });
@@ -9682,38 +9727,43 @@
     if (!pago) $('admEvNovoPreco').value = '';
     admEvSalaOpcoes();
   }
-  /* reserva do espaço: presencial escolhe a sala (mesma régua das turmas);
-     online reserva o Estúdio de gravações automaticamente               */
+  /* reserva do espaço: presencial escolhe uma das 4 salas; online escolhe
+     o Estúdio — escolhe mesmo, o seletor fica ativo e vazio até que o
+     administrador o selecione, como em qualquer outra reserva          */
   function admEvSalaOpcoes() {
     var sel = $('admEvSala'); if (!sel) return;
     var online = $('admEvNovoModal').value === 'online';
     var lb = $('admEvReservaLb');
     if (lb) lb.textContent = online ? 'Reserva do Estúdio · dia e horário' : 'Reserva de sala · dia e horário';
+    sel.disabled = false;
     if (online) {
-      sel.innerHTML = '<option value="' + ESTUDIO + '" selected>' + ESTUDIO + ' — reservado para a gravação/transmissão</option>';
-      sel.disabled = true;
+      if (sel.value && sel.value !== ESTUDIO) sel.value = '';
+      sel.innerHTML = salaOpcoesHTML(sel, 'Reserve o espaço da transmissão', [ESTUDIO]);
     } else {
-      var atual = sel.value;
-      sel.disabled = false;
-      sel.innerHTML = '<option value="">Sala da sede — escolha onde o evento acontece</option>' +
-        SALAS.map(function (sl) {
-          var oc = salaResumo(sl);
-          return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + ' — ' + (oc.length ? oc.map(function (o) { return o.rot; }).join(' · ') : 'livre') + '</option>';
-        }).join('');
+      if (sel.value === ESTUDIO) sel.value = '';
+      sel.innerHTML = salaOpcoesHTML(sel, 'Em qual sala o evento acontece?');
     }
     admEvSalaEcoRender();
+  }
+  function admEvAlvo(sala) {
+    var d = $('admEvNovoData').value, hi = $('admEvNovoInicio').value, hf = $('admEvNovoFim').value;
+    if (!d || !hi || !hf || !(hi < hf)) return null;
+    return ocPontual(sala, 'novo evento', 'evento', d, hi, hf, evEdit || null);
   }
   function admEvSalaEcoRender() {
     var eco = $('admEvSalaEco'); if (!eco) return;
     var sl = $('admEvSala').value;
     if (!sl) { eco.style.display = 'none'; return; }
-    var oc = salaResumo(sl);
     eco.style.display = '';
-    eco.innerHTML = oc.length
-      ? '<strong>' + sl + '</strong> hoje: ' + oc.map(function (o) { return o.rot + ' (' + o.hor + ')'; }).join(' · ') + '. Horário livre pode ser usado.'
-      : '<strong>' + sl + '</strong> está livre.';
+    eco.innerHTML = salaEcoHTML(sl, admEvAlvo(sl));
   }
-  (function () { var el = $('admEvSala'); if (el) el.addEventListener('change', admEvSalaEcoRender); })();
+  (function () {
+    var el = $('admEvSala');
+    if (el) el.addEventListener('change', function () { admEvSalaEcoRender(); admLimpaErro(['admEvSala']); });
+    ['admEvNovoData', 'admEvNovoInicio', 'admEvNovoFim'].forEach(function (id) {
+      var c = $(id); if (c) c.addEventListener('change', admEvSalaEcoRender);
+    });
+  })();
   window.__evSalaRefresh = admEvSalaOpcoes;
   ['admEvNovoData', 'admEvNovoInicio', 'admEvNovoFim'].forEach(function (id) {
     var el = $(id); if (el) el.addEventListener('change', admEvPreview);
@@ -9754,8 +9804,10 @@
     var evOnline = modalidade === 'online';
     var evData = $('admEvNovoData').value || '';
     var evHi = $('admEvNovoInicio').value, evHf = $('admEvNovoFim').value;
-    var evSala = evOnline ? ESTUDIO : $('admEvSala').value;
-    if (evFalta(!evOnline && !evSala, 'admEvSala', 'Evento presencial ocupa sala: diga <b>em qual sala da sede</b> ele acontece.')) return;
+    var evSala = $('admEvSala').value;
+    if (evFalta(!evSala, 'admEvSala', evOnline
+      ? 'Evento online ocupa o <b>Estúdio</b> de gravações: selecione-o para reservar o espaço.'
+      : 'Evento presencial ocupa sala: diga <b>em qual sala da sede</b> ele acontece.')) return;
     if (evFalta(!evHi || !evHf || !(evHi < evHf), 'admEvNovoInicio', 'Informe o <b>horário</b> do evento — o término precisa ser depois do início.')) return;
     var evOc = ocPontual(evSala, nome, 'evento', evData, evHi, evHf, evEdit || null);
     var evChoque = evOc ? salaConflito(evOc) : null;
@@ -9793,7 +9845,7 @@
       desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
     $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
     $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
-    if (!online) { $('admEvSala').value = ''; }
+    $('admEvSala').value = '';
     admEvSalaOpcoes();
     renderEvProfChips([]);
     admEvPreview();
@@ -10085,24 +10137,27 @@
   /* sala do simulado presencial — mesmas 4 salas das turmas */
   function admSimSalaOpcoes() {
     var sel = $('admSimSala'); if (!sel) return;
-    var atual = sel.value;
-    sel.innerHTML = '<option value="">Sala da sede — escolha onde o simulado acontece</option>' +
-      SALAS.map(function (sl) {
-        var oc = salaResumo(sl);
-        return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + ' — ' + (oc.length ? oc.map(function (o) { return o.rot; }).join(' · ') : 'livre') + '</option>';
-      }).join('');
+    sel.innerHTML = salaOpcoesHTML(sel, 'Em qual sala o simulado acontece?');
+  }
+  function admSimAlvo(sala) {
+    var d = $('admSimData').value, hi = $('admSimIni').value, hf = $('admSimFim').value;
+    if (!d || !hi || !hf || !(hi < hf)) return null;
+    return ocPontual(sala, 'novo simulado', 'simulado', d, hi, hf, null);
   }
   function admSimSalaEcoR() {
     var eco = $('admSimSalaEco'); if (!eco) return;
     var sl = $('admSimSala').value;
     if (!sl) { eco.style.display = 'none'; return; }
-    var oc = salaResumo(sl);
     eco.style.display = '';
-    eco.innerHTML = oc.length
-      ? '<strong>' + sl + '</strong> hoje: ' + oc.map(function (o) { return o.rot + ' (' + o.hor + ')'; }).join(' · ') + '. Horário livre pode ser usado.'
-      : '<strong>' + sl + '</strong> está livre.';
+    eco.innerHTML = salaEcoHTML(sl, admSimAlvo(sl));
   }
-  (function () { var el = $('admSimSala'); if (el) { el.addEventListener('change', admSimSalaEcoR); el.addEventListener('change', function () { el.classList.remove('err'); }); } })();
+  (function () {
+    var el = $('admSimSala');
+    if (el) el.addEventListener('change', function () { admSimSalaEcoR(); el.classList.remove('err'); });
+    ['admSimData', 'admSimIni', 'admSimFim'].forEach(function (id) {
+      var c = $(id); if (c) c.addEventListener('change', admSimSalaEcoR);
+    });
+  })();
   window.__simSalaRefresh = function () { admSimSalaOpcoes(); admSimSalaEcoR(); };
   ['admSimModal', 'admSimTipo'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('change', admSimToggle); });
   var admSimPdfEl = $('admSimPdf');
