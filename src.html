@@ -1774,11 +1774,6 @@
             </div>
             <p class="sub" style="margin-top:10px">A economia (V1) premia constância — nunca volume bruto.</p>
           </div>
-          <div class="p-card">
-            <h3>Quad Store · onde o esforço vira avanço <span class="tag gold">LOJA ABERTA</span></h3>
-            <p class="sub">Troque seus <strong>Quad Coins</strong> e <strong>Diamantes</strong> por turmas, simulados, eventos e itens do personagem.</p>
-            <div style="margin-top:10px"><button class="btn small" id="btnIrLoja">Ir para a Quad Store</button></div>
-          </div>
           <div class="p-card" style="opacity:0.7">
             <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
             <p class="sub" style="font-family:Consolas,monospace; font-size:11px" id="telemetry">origem: OPEN_ORGANIC · eventos: 14 · linha de base: ativa</p>
@@ -2081,39 +2076,12 @@
         <div class="view" id="v-materiais">
           <div class="p-card">
             <div class="k-label">Materiais das aulas · por matéria e assunto</div>
-            <h3>Dir. Administrativo — Poderes <span class="tag gold">NOVO</span></h3>
-            <div class="mission-row">
-              <div class="m-dot">▤</div>
-              <div class="grow"><div class="t">Slides da aula</div><div class="d">PDF · 24 págs</div></div>
-              <button class="btn ghost small mat-dl">Abrir</button>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot">✎</div>
-              <div class="grow"><div class="t">Resumo esquematizado</div><div class="d">PDF · 6 págs</div></div>
-              <button class="btn ghost small mat-dl">Abrir</button>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot">◎</div>
-              <div class="grow"><div class="t">Lista extra · 30 questões</div><div class="d">Responda no app · pontua em Quad Coins</div></div>
-              <button class="btn ghost small mat-dl">Abrir</button>
-            </div>
+            <p class="sub" id="matVazio" style="display:none">Nenhum material publicado ainda para as suas turmas.</p>
           </div>
-          <div class="p-card">
-            <h3>Português — Crase</h3>
-            <div class="mission-row">
-              <div class="m-dot">▶</div>
-              <div class="grow"><div class="t">Vídeo · revisão de crase</div><div class="d">18 min</div></div>
-              <button class="btn ghost small mat-dl">Abrir</button>
-            </div>
-            <div class="mission-row">
-              <div class="m-dot">▤</div>
-              <div class="grow"><div class="t">Mapa mental de crase</div><div class="d">PDF · 1 pág</div></div>
-              <button class="btn ghost small mat-dl">Abrir</button>
-            </div>
-          </div>
+          <div id="matLista"></div>
           <div class="p-card" style="opacity:0.85">
             <h3>Sempre da aula para cá</h3>
-            <p class="sub">O professor libera o material na aula e ele aparece aqui etiquetado por matéria e assunto — mesmo padrão do banco de questões. Sem caçar link em grupo.</p>
+            <p class="sub">O professor entrega o material e a coordenação publica em <strong>Atualizações do dia</strong>; ele chega aqui etiquetado por <strong>matéria e assunto</strong> — mesmo padrão do banco de questões. Sem caçar link em grupo.</p>
           </div>
         </div>
 
@@ -2591,7 +2559,7 @@
             <div style="margin-top:10px"><button class="btn ghost small" id="btnIrEstrutura">Estrutura · turmas, concursos e editais</button></div>
             <div class="adm-jump" id="jumpInterno">
               <button class="jp" data-jump="avisos">Avisos gerais</button>
-              <button class="jp" data-jump="crono">Atualizar cronograma</button>
+              <button class="jp" data-jump="crono">Atualizações do dia</button>
               <button class="jp" data-jump="eventos">Criar evento</button>
               <button class="jp" data-jump="simulados">Criar simulados</button>
               <button class="jp" data-jump="skins">Skin do personagem</button>
@@ -2636,6 +2604,42 @@
             <p class="sub" style="margin-top:8px"><strong>Matéria</strong> e <strong>professor</strong> saem do <strong>Banco de professores</strong> e da árvore do edital da turma — sem digitar nome à mão. Ao trocar, muda na hora o card "Aula de hoje" do aluno, o <strong>calendário e a agenda do professor</strong> e fica registrado no histórico abaixo.</p>
             <div class="adm-sep"><span>Histórico de alterações</span></div>
             <div id="admCrLog"></div>
+          </div>
+
+          <div class="p-card" data-bl="crono">
+            <div class="k-label">Materiais da aula · enviar para os alunos</div>
+            <p class="adm-hint">O professor entrega o material à coordenação; a coordenação publica por aqui e ele aparece em <strong>Materiais das aulas</strong>, dentro do “+” do aluno, etiquetado por matéria e assunto.</p>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admMatTurma" title="Turma que recebe o material"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admMatMateria" title="Matéria — vem da árvore do edital da turma"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admMatAssunto" placeholder="Assunto da aula (ex.: Poderes administrativos)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admMatTipo" title="Tipo do material">
+                  <option value="slides">Slides da aula</option>
+                  <option value="resumo">Resumo esquematizado</option>
+                  <option value="lista">Lista de questões</option>
+                  <option value="mapa">Mapa mental</option>
+                  <option value="video">Vídeo</option>
+                  <option value="outro">Outro arquivo</option>
+                </select>
+                <input class="fld" id="admMatTitulo" placeholder="Título (opcional)">
+              </div>
+              <label class="sd-file" for="admMatArq" id="admMatArqBox"><span class="sd-file-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span><span id="admMatArqNome">Anexar o arquivo do material</span><input type="file" id="admMatArq" hidden></label>
+              <div class="adm-row" id="admMatLinkBox" style="margin-top:8px; display:none">
+                <input class="fld" id="admMatLink" placeholder="Link do vídeo (ex.: https://…)">
+                <input class="fld" id="admMatDur" placeholder="min" inputmode="numeric" style="max-width:80px" title="Duração em minutos">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmMat">Enviar aos alunos</button></div>
+              <div class="adm-alerta" id="admMatErro"></div>
+            </div>
+            <div class="adm-sep"><span>Materiais publicados</span></div>
+            <div id="admMatList"></div>
           </div>
 
           <div class="p-card" data-bl="eventos">
@@ -6765,10 +6769,6 @@
     addPontos(5); // treino registrado também gera score
   });
 
-  /* ---------- materiais ---------- */
-  document.querySelectorAll('.mat-dl').forEach(function (b) {
-    b.addEventListener('click', function () { toast('Material — placeholder do protótipo'); });
-  });
 
   /* ---------- perfil do aluno: avatares da coleção PM ---------- */
   var AVATAR_SPRITE = '__AVATARS__'; // coleção 3D · 6 homens + 6 mulheres (grade 6×2, embutida no build)
@@ -7012,13 +7012,19 @@
     if (g.length <= 1) return nome;
     return m[1] + new Array(g.length).join('*') + g.charAt(g.length - 1);
   }
+  /* a máscara é de MÃO DUPLA: quem se esconde também não enxerga.
+     - top 10: sempre por inteiro, para todo mundo;
+     - eu privado: do 11º em diante NÃO vejo o nome de ninguém;
+     - eu público: vejo quem também é público, e só quem escolheu
+       privado continua mascarado para mim.                            */
   function rkNomeExibido(nome, pos, privado) {
-    if (!privado) return nome;
     if (pos <= 10) return nome;   /* hall seleto: o top 10 é sempre visto */
+    if (!privado) return nome;
     return mascararNome(nome);
   }
   function rkRow(pos, nome, pts, me, top3, privado) {
-    var exibido = rkNomeExibido(nome, pos, me ? perfilPrivado : !!privado);
+    var escondido = me ? perfilPrivado : (perfilPrivado || !!privado);
+    var exibido = rkNomeExibido(nome, pos, escondido);
     return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
       '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
       '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
@@ -7062,16 +7068,16 @@
       bt.setAttribute('aria-checked', perfilPrivado ? 'true' : 'false');
       var d = $('privDesc');
       if (d) d.innerHTML = perfilPrivado
-        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong>. Se entrar no hall dos <strong>10 primeiros</strong>, o nome volta a aparecer por inteiro.'
-        : 'Público — seu nome de guerra aparece por inteiro nos rankings.';
+        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong> e, em troca, <strong>também não vê o nome de ninguém</strong> do 11º lugar em diante. O <strong>hall dos 10 primeiros</strong> continua visível dos dois lados.'
+        : 'Público — seu nome de guerra aparece por inteiro e você <strong>vê o nome de quem também está público</strong>. Quem escolheu privado segue mascarado.';
     }
     bt.addEventListener('click', function () {
       perfilPrivado = !perfilPrivado;
       pinta();
       if (typeof renderRankings === 'function') renderRankings();
       toast(perfilPrivado
-        ? 'Perfil privado — seu nome fica mascarado nos rankings (menos no top 10).'
-        : 'Perfil público — seu nome aparece por inteiro nos rankings.');
+        ? 'Perfil privado — seu nome fica mascarado e você também deixa de ver os outros, do 11º em diante.'
+        : 'Perfil público — seu nome aparece por inteiro e você volta a ver quem também está público.');
     });
     pinta();
     window.__privPinta = pinta;   /* o nome de guerra pode mudar depois */
@@ -7532,6 +7538,12 @@
       ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
     if (presos) { toast('“' + t.nome + '” tem ' + presos + ' matrícula' + (presos > 1 ? 's' : '') + ' ativa' + (presos > 1 ? 's' : '') + ' — estorne antes de remover.'); return; }
     TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
+    /* turma fora do ar leva junto o material publicado para ela */
+    if (typeof MATERIAIS !== 'undefined') {
+      MATERIAIS = MATERIAIS.filter(function (m) { return m.turma !== t.id; });
+      if (typeof renderAdmMat === 'function') renderAdmMat();
+      if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
+    }
     sincronizarCronoTurmas();
     renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
     if (typeof admCronoInit === 'function') admCronoInit();
@@ -7643,6 +7655,8 @@
     el.querySelectorAll('[data-ed-iso]').forEach(function (b) {
       b.addEventListener('click', function () { if (window.__isoEditar) window.__isoEditar(b.dataset.edIso); });
     });
+    /* o envio de materiais escolhe a turma nesta mesma lista */
+    if (typeof admMatTurmasInit === 'function') admMatTurmasInit();
   }
   function nomeConcurso(id) { var c = concursoDe(id); return c ? c.nome : ''; }
   /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
@@ -8288,6 +8302,7 @@
     }
     renderTurmasLoja();
     if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+    if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* turma nova traz o material dela */
     if (typeof renderRankings === 'function') renderRankings();
     $('turmaLayer').classList.remove('on');
     var ml = $('matLayer'); if (ml) ml.classList.remove('on');
@@ -9714,6 +9729,146 @@
     toast('Grade atualizada — ' + m + ' com ' + pr + ' na ' + t + '. Já vale para o aluno e para o professor.');
   });
 
+  /* ---------- materiais da aula: da coordenação para os alunos ----------
+     O professor entrega o material; a coordenação publica aqui e ele
+     aparece em "Materiais das aulas" (no "+" do aluno), etiquetado por
+     matéria e assunto e visível só para quem está na turma.            */
+  var MAT_TIPOS = {
+    slides: { ico: '▤', rot: 'Slides da aula' },
+    resumo: { ico: '✎', rot: 'Resumo esquematizado' },
+    lista:  { ico: '◎', rot: 'Lista de questões' },
+    mapa:   { ico: '▣', rot: 'Mapa mental' },
+    video:  { ico: '▶', rot: 'Vídeo' },
+    outro:  { ico: '▤', rot: 'Material da aula' }
+  };
+  var MATERIAIS = [
+    { id: 'mt1', turma: 'patamo-n', materia: 'Direito Administrativo', assunto: 'Poderes', tipo: 'slides', titulo: 'Slides da aula', det: 'PDF · 24 págs', quando: 'ontem', novo: true },
+    { id: 'mt2', turma: 'patamo-n', materia: 'Direito Administrativo', assunto: 'Poderes', tipo: 'resumo', titulo: 'Resumo esquematizado', det: 'PDF · 6 págs', quando: 'ontem', novo: true },
+    { id: 'mt3', turma: 'patamo-n', materia: 'Direito Administrativo', assunto: 'Poderes', tipo: 'lista', titulo: 'Lista extra · 30 questões', det: 'Responda no app · pontua em Quad Coins', quando: 'ontem', novo: true },
+    { id: 'mt4', turma: 'patamo-n', materia: 'Língua Portuguesa', assunto: 'Crase', tipo: 'video', titulo: 'Vídeo · revisão de crase', det: '18 min', quando: 'há 5 dias' },
+    { id: 'mt5', turma: 'patamo-n', materia: 'Língua Portuguesa', assunto: 'Crase', tipo: 'mapa', titulo: 'Mapa mental de crase', det: 'PDF · 1 pág', quando: 'há 5 dias' }
+  ];
+  function matTurmaNome(id) { var t = (typeof turmaDe === 'function') ? turmaDe(id) : null; return t ? t.nome : id; }
+  /* ---- lado do aluno: só o material das turmas em que ele está ---- */
+  function renderMateriaisAluno() {
+    var el = $('matLista'); if (!el) return;
+    var minhas = (typeof matriculasAtivas === 'function') ? matriculasAtivas().map(function (m) { return m.turmaId; }) : [];
+    var meus = MATERIAIS.filter(function (m) { return minhas.indexOf(m.turma) >= 0; });
+    var vazio = $('matVazio'); if (vazio) vazio.style.display = meus.length ? 'none' : '';
+    var grupos = [], ordem = {};
+    meus.forEach(function (m) {
+      var k = m.materia + '|' + m.assunto;
+      if (!(k in ordem)) { ordem[k] = grupos.length; grupos.push({ materia: m.materia, assunto: m.assunto, itens: [] }); }
+      grupos[ordem[k]].itens.push(m);
+    });
+    el.innerHTML = grupos.map(function (g) {
+      var novo = g.itens.some(function (m) { return m.novo; });
+      return '<div class="p-card"><h3>' + g.materia + ' — ' + g.assunto + (novo ? ' <span class="tag gold">NOVO</span>' : '') + '</h3>' +
+        g.itens.map(function (m) {
+          var tp = MAT_TIPOS[m.tipo] || MAT_TIPOS.outro;
+          return '<div class="mission-row"><div class="m-dot">' + tp.ico + '</div>' +
+            '<div class="grow"><div class="t">' + (m.titulo || tp.rot) + '</div><div class="d">' + m.det + ' · ' + m.quando + '</div></div>' +
+            '<button class="btn ghost small mat-dl" data-mat="' + m.id + '">Abrir</button></div>';
+        }).join('') + '</div>';
+    }).join('');
+    el.querySelectorAll('.mat-dl').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = MATERIAIS.filter(function (x) { return x.id === b.dataset.mat; })[0];
+        if (m) m.novo = false;
+        toast('Abrindo “' + (m ? m.titulo : 'material') + '” <span class="ref">[INTEGRAÇÃO REAL] arquivo do material</span>');
+      });
+    });
+  }
+  /* ---- lado do admin: publicar ---- */
+  function admMatTurmasInit() {
+    var sel = $('admMatTurma'); if (!sel) return;
+    var atual = sel.value;
+    sel.innerHTML = TURMAS_LOJA.map(function (t) {
+      return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>' + t.nome + '</option>';
+    }).join('') || '<option value="">— nenhuma turma aberta —</option>';
+    admMatMateriasInit();
+  }
+  function admMatMateriasInit() {
+    var sel = $('admMatMateria'); if (!sel) return;
+    var t = (typeof turmaDe === 'function') ? turmaDe($('admMatTurma').value) : null;
+    var c = (t && typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
+    var mats = (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : MATERIAS_GENERICAS;
+    var atual = sel.value;
+    sel.innerHTML = mats.map(function (m) {
+      return '<option' + (m === atual ? ' selected' : '') + '>' + m + '</option>';
+    }).join('');
+  }
+  function admMatTipoToggle() {
+    var v = $('admMatTipo').value;
+    $('admMatLinkBox').style.display = v === 'video' ? '' : 'none';
+    $('admMatArqBox').style.display = v === 'video' ? 'none' : '';
+  }
+  var admMatArqNome = '';
+  function renderAdmMat() {
+    var el = $('admMatList'); if (!el) return;
+    el.innerHTML = MATERIAIS.map(function (m) {
+      var tp = MAT_TIPOS[m.tipo] || MAT_TIPOS.outro;
+      return '<div class="adm-bar col"><span class="nm">' + (m.titulo || tp.rot) +
+        '<small>' + matTurmaNome(m.turma) + ' · ' + m.materia + ' — ' + m.assunto + ' · ' + m.det + ' · ' + m.quando + '</small></span>' +
+        '<span class="bar-acoes"><button class="adm-x" data-rm-mat="' + m.id + '" aria-label="Tirar do ar">✕</button></span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum material publicado ainda.</p>';
+    el.querySelectorAll('[data-rm-mat]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = MATERIAIS.filter(function (x) { return x.id === b.dataset.rmMat; })[0]; if (!m) return;
+        MATERIAIS = MATERIAIS.filter(function (x) { return x.id !== m.id; });
+        renderAdmMat(); renderMateriaisAluno();
+        toast('“' + (m.titulo || 'Material') + '” saiu do ar — os alunos não veem mais.');
+      });
+    });
+  }
+  (function () {
+    var sel = $('admMatTurma'); if (!sel) return;
+    sel.addEventListener('change', admMatMateriasInit);
+    $('admMatTipo').addEventListener('change', admMatTipoToggle);
+    var arq = $('admMatArq');
+    if (arq) arq.addEventListener('change', function () {
+      admMatArqNome = (this.files && this.files[0]) ? this.files[0].name : '';
+      $('admMatArqNome').textContent = admMatArqNome || 'Anexar o arquivo do material';
+    });
+    ['admMatAssunto', 'admMatLink'].forEach(function (id) {
+      var e = $(id); if (e) e.addEventListener('input', function () { e.classList.remove('err'); });
+    });
+    $('btnAdmMat').addEventListener('click', function () {
+      admAlerta('admMatErro', ''); admLimpaErro(['admMatAssunto', 'admMatLink']);
+      var turma = $('admMatTurma').value, materia = $('admMatMateria').value;
+      var assunto = $('admMatAssunto').value.trim(), tipo = $('admMatTipo').value;
+      var titulo = $('admMatTitulo').value.trim();
+      var link = $('admMatLink').value.trim(), dur = parseInt($('admMatDur').value, 10);
+      function falta(cond, campo, msg) {
+        if (!cond) return false;
+        admAlerta('admMatErro', msg); if (campo) admMarcaErro(campo);
+        return true;
+      }
+      if (falta(!turma, '', 'Não há turma aberta para receber o material — abra uma turma antes.')) return;
+      if (falta(!assunto, 'admMatAssunto', 'Diga o <b>assunto da aula</b> — é por ele que o aluno acha o material.')) return;
+      if (falta(/["<>]/.test(assunto), 'admMatAssunto', 'Use um assunto sem aspas ou sinais.')) return;
+      if (tipo === 'video') {
+        if (falta(!link, 'admMatLink', 'Vídeo precisa do <b>link</b> onde o aluno vai assistir.')) return;
+        if (falta(!/^https?:\/\//i.test(link), 'admMatLink', 'O link do vídeo precisa começar com <b>http</b> ou <b>https</b>.')) return;
+      } else if (falta(!admMatArqNome, '', 'Anexe o <b>arquivo</b> do material antes de enviar.')) return;
+      var tp = MAT_TIPOS[tipo] || MAT_TIPOS.outro;
+      var det = tipo === 'video'
+        ? (dur > 0 ? dur + ' min' : 'vídeo') + ' <span class="ref">[INTEGRAÇÃO REAL] ' + link + '</span>'
+        : admMatArqNome;
+      MATERIAIS.unshift({ id: 'mt' + Date.now(), turma: turma, materia: materia, assunto: assunto,
+        tipo: tipo, titulo: titulo || tp.rot, det: det, quando: 'agora', novo: true, link: link });
+      $('admMatAssunto').value = ''; $('admMatTitulo').value = '';
+      $('admMatLink').value = ''; $('admMatDur').value = '';
+      $('admMatArq').value = ''; admMatArqNome = ''; $('admMatArqNome').textContent = 'Anexar o arquivo do material';
+      renderAdmMat(); renderMateriaisAluno();
+      admAlerta('admMatErro', '<b>' + (titulo || tp.rot) + '</b> publicado em <b>' + materia + ' — ' + assunto +
+        '</b> para a <b>' + matTurmaNome(turma) + '</b>. Já está em “Materiais das aulas” para os alunos dessa turma.', true);
+      toast('Material enviado aos alunos da ' + matTurmaNome(turma) + '.');
+    });
+    admMatTurmasInit(); admMatTipoToggle(); renderAdmMat();
+  })();
+  window.__matRefresh = function () { admMatTurmasInit(); renderAdmMat(); renderMateriaisAluno(); };
+
   /* ---------- eventos da semana: regras e novos eventos ---------- */
   function renderAdmEventos() {
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
@@ -10733,6 +10888,7 @@
         if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
         if (typeof checarMatricula === 'function') checarMatricula();
         if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+        if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* estornou: o material sai junto */
       }
       return;
     }
@@ -10991,6 +11147,7 @@
   /* "Turmas abertas" só fica completa aqui: ISOLADAS é declarada depois
      do bloco de criação, e a primeira pintura ainda não a enxergava   */
   if (typeof renderCtLista === 'function') renderCtLista();
+  if (typeof window.__matRefresh === 'function') window.__matRefresh();
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;

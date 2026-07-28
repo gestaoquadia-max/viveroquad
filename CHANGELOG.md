@@ -1,5 +1,32 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Quadrômetro sem eco da loja, privacidade de mão dupla e canal de materiais da aula
+
+- **O card "Quad Store · onde o esforço vira avanço" saiu do Quadrômetro**
+  (item 1): ele só levava para a loja, que já tem aba própria na barra de
+  navegação. O resto do Quadrômetro ficou como estava.
+- **A privacidade do ranking virou de mão dupla** (item 2): quem escolhe
+  **privado** deixa de ser visto **e deixa de ver** — do **11º lugar em
+  diante** nenhum nome aparece para ele. Quem está **público** vê o nome
+  de quem também está público, e só quem escolheu privado continua
+  mascarado. O **hall dos 10 primeiros** segue visível dos dois lados, e
+  os pontos de todo mundo continuam à vista. O texto do interruptor
+  explica a troca antes de o aluno decidir.
+- **Materiais da aula ganharam entrada** (item 3): o bloco "Materiais das
+  aulas" mostrava conteúdo fixo, sem nenhum lugar para publicar. Agora há
+  **"Materiais da aula · enviar para os alunos"**, logo abaixo de
+  "Cronograma semanal · atualizar" e aberto pelo mesmo atalho. O
+  administrador escolhe **turma → matéria (da árvore do edital dela) →
+  assunto → tipo** (slides, resumo, lista, mapa mental, vídeo, outro) e
+  anexa o arquivo — ou informa o link e a duração, se for vídeo.
+- O material chega **etiquetado por matéria e assunto** em "Materiais das
+  aulas", **só para quem está naquela turma**, com selo NOVO. Há lista de
+  publicados com **✕ para tirar do ar**, e o material acompanha a turma:
+  matrícula nova traz o material dela, estorno e remoção da turma o levam
+  embora.
+- **O atalho "Atualizar cronograma" passou a se chamar "Atualizações do
+  dia"** e abre os dois blocos — a grade e o envio de materiais.
+
 ## 28/07/2026 — Ficha do professor, tipo de turma com nome de verdade, turno lido do horário e "Turmas abertas" completa
 
 - **Banco de professores em duas alturas** (item 1): o nome, o status e a
