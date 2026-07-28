@@ -1,5 +1,26 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — O seletor de turma sai do fundo do Quadrômetro
+
+- **O problema**: a troca de turma existia, mas só em "Minhas turmas",
+  dentro do Quadrômetro — três toques de distância e ausente justo nas
+  telas onde a pergunta nasce (Início e **Domínio**, que é literalmente a
+  estrutura da turma). Quem comprava uma turma nova ia parar na estrutura
+  dela sem caminho visível de volta.
+- **O nome da turma no topo virou o seletor.** A linha de turma da barra
+  de identidade — visível em toda tela do aluno — passa a ser um botão
+  quando há **mais de uma matrícula**, com destaque azul e seta. Com uma
+  turma só, continua sendo texto simples.
+- **O Domínio diz de quem é a estrutura na tela**: faixa com *"Esta é a
+  estrutura da Turma C.O.R.E. — você tem 2 turmas"* e o botão **"Trocar
+  de turma"** ali mesmo. Trocar por ali **não joga o aluno para o
+  Início** — a árvore do edital muda na frente dele.
+- **O mesmo pop-up serve aos dois momentos**: na matrícula abre como
+  *"Matrícula confirmada"*; chamado pelo topo ou pelo Domínio, abre como
+  *"Suas turmas — qual delas o app deve abrir?"*.
+- Correção: a barra do topo não se repintava depois da 2ª matrícula, e o
+  seletor só aparecia na recarga seguinte.
+
 ## 28/07/2026 — Turma ativa: o aluno escolhe por qual matrícula o app fala
 
 - **O problema**: matriculado numa 2ª turma, o aluno continuava vendo tudo

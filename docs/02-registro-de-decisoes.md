@@ -145,6 +145,9 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 149 | 28/07 | **Aviso tem turma-alvo por id** ("Todas as turmas" ou uma da lista) — antes era texto comparado com o nome da turma, e turma de nome novo nunca recebia nada | Achado ao apurar o relato do gestor sobre a C.O.R.E. |
 | 150 | 28/07 | **Evento tem turma-alvo** ("Quem vê este evento": todas ou uma) | Sem isso, "eventos da semana desta turma" não existia |
 | 151 | 28/07 | **Aula de hoje mostra o nome e a sala da turma matriculada**; turma sem grade lançada diz "A definir", em vez de "Encontro 00 · Prof." em branco | A grade segue por tipo + turno; o título, não |
+| 152 | 28/07 | **O nome da turma no topo é o seletor** — vira botão quando há 2+ matrículas, em toda tela do aluno | "Não tem um seletor que me faça escolher em qual estrutura eu desejo verificar" — a troca existia, mas só no fundo do Quadrômetro |
+| 153 | 28/07 | **Faixa no Domínio** dizendo de qual turma é a estrutura, com "Trocar de turma" ali; trocar por ali **não sai da tela** | O Domínio É a estrutura — a pergunta nasce nele |
+| 154 | 28/07 | **Um pop-up, dois momentos**: "Matrícula confirmada" no ato da compra; "Suas turmas" quando chamado pelo topo ou pelo Domínio | Mesma peça, sem duplicar tela |
 | 126 | 26/07 | **Data e hora em grade rotulada, com largura inteira** (turma, evento e simulado): o campo estreito escondia o valor e parecia vazio | Causa real do "não dá certeza de que foi colocado o horário" |
 | 127 | 26/07 | **Área do admin abre limpa** (só os atalhos); o botão abre o seu bloco e, tocado de novo, recolhe; "Ver todos" mostra a área inteira | Pedido do gestor |
 | 128 | 26/07 | **Lançamento de simulados usa a grade "Preços e vagas" das turmas** (preço Dmn/QdC + vagas totais/em QdC) | Pedido do gestor: "devem parecer com a programação de Preços e vagas" |
