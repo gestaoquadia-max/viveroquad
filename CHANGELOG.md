@@ -1,5 +1,36 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Ficha do professor, tipo de turma com nome de verdade, turno lido do horário e "Turmas abertas" completa
+
+- **Banco de professores em duas alturas** (item 1): o nome, o status e a
+  ficha (matérias, turnos, graduação, telefone) ocupam a largura inteira,
+  e **Desligar / Bloquear / ✕** descem para a própria faixa, alinhados à
+  direita. Antes os três botões dividiam a linha com o texto e espremiam
+  o nome do professor.
+- **O tipo da turma passou a ter nome de verdade** (item 2): o seletor
+  agora diz **Turma de nivelamento · Turma regular · Turma de questões ·
+  Matérias isoladas**. RONDESP, PATAMO e BOPE voltaram a ser o que são —
+  **apelidos**, digitados no campo "Apelido", que é de onde sai o nome da
+  turma. O código interno da modalidade não mudou.
+- **O turno saiu do horário** (item 3): o seletor de turno foi **removido**.
+  Não há mais como marcar "noite" e digitar 8h — o turno é lido da hora de
+  início (antes das 12h manhã, até 18h tarde, depois noite) e aparece no
+  eco: *"Turno: manhã (pelo horário)"*, mudando junto com o horário.
+- **Matérias × árvore do edital conferidas** (item 3): "Professores por
+  matéria" repete exatamente a árvore do concurso escolhido. A auditoria
+  achou um furo — **GCM** e **PF · Polícia Federal** eram oferecidos na
+  criação de turmas mas **não existiam na Estrutura**, e caíam calados em
+  5 matérias genéricas. Agora a lista de concursos é **derivada da
+  Estrutura**: só aparece quem tem árvore de edital cadastrada.
+- **"Turmas abertas" mostra tudo** (item 4): as turmas e isoladas que já
+  vinham da coordenação apareciam no mapa de salas mas **não na lista**.
+  Agora todas estão lá, com **Editar** e **✕** em cada uma. Editar traz
+  apelido, período, os dois tempos, preços, vagas, sala e tipo para o
+  formulário; o botão vira **"Salvar alterações"** e a gravação é feita no
+  lugar — mesmo id, matrículas preservadas, sem duplicar. Há **"Cancelar
+  edição"**, a turma com matrícula ativa segue protegida contra remoção e
+  a ficha mostra quantos alunos ela tem.
+
 ## 27/07/2026 — Seletor de sala legível e reserva do Estúdio feita à mão
 
 - **A opção do seletor virou só o nome do espaço** (item 1): antes cada
