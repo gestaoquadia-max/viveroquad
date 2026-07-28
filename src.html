@@ -7805,6 +7805,7 @@
     TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
     /* turma fora do ar leva junto o material publicado para ela */
     if (typeof MATERIAIS !== 'undefined') {
+      MATERIAIS.forEach(function (m) { if (m.turma === t.id && m.arqUrl) URL.revokeObjectURL(m.arqUrl); });
       MATERIAIS = MATERIAIS.filter(function (m) { return m.turma !== t.id; });
       if (typeof renderAdmMat === 'function') renderAdmMat();
       if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
@@ -9301,7 +9302,11 @@
       b.addEventListener('click', function () {
         var it = ITENS_COMBATE.filter(function (x) { return x.id === b.dataset.rmComb; })[0];
         ITENS_COMBATE = ITENS_COMBATE.filter(function (x) { return x.id !== b.dataset.rmComb; });
+        /* item fora do catálogo sai também das mochilas — senão a mochila
+           tenta desenhar um item que não existe mais e quebra           */
+        if (typeof MOCHILA !== 'undefined') MOCHILA = MOCHILA.filter(function (x) { return x !== b.dataset.rmComb; });
         renderLojaCombate(); renderSkinsAdm();
+        if (typeof renderMochila === 'function') renderMochila();
         toast('Item de combate “' + (it ? it.nome : '') + '” removido da Loja.');
       });
     });
@@ -9396,13 +9401,20 @@
   ];
   var MOCHILA = [];   /* ids dos itens guardados */
   function itemDe(id) { return ITENS_COMBATE.filter(function (x) { return x.id === id; })[0]; }
+  /* o sinal do item: os de fábrica têm desenho próprio; os criados no
+     painel guardam a escolha da paleta em .ico — a mochila e o pop-up
+     liam só o dicionário fixo e imprimiam "undefined"                 */
+  function itemIcoHtml(it) {
+    if (!it) return '';
+    return ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '');
+  }
   function renderLojaCombate() {
     var g = $('combatGrid'); if (!g) return;
     /* item comprado sai da vitrine — o lugar dele agora é a mochila */
     var aVenda = ITENS_COMBATE.filter(function (it) { return MOCHILA.indexOf(it.id) < 0; });
     g.innerHTML = aVenda.map(function (it) {
       return '<button class="loja-item" data-combate="' + it.id + '">' +
-        '<span class="li-ico">' + (ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '')) + '</span>' +
+        '<span class="li-ico">' + itemIcoHtml(it) + '</span>' +
         '<span class="li-nome">' + it.nome + '</span>' +
         '<span class="li-desc">' + it.desc + '</span>' +
         '<span class="li-preco">' + it.preco + ' QdC</span></button>';
@@ -9416,7 +9428,7 @@
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
     if (MOCHILA.indexOf(id) >= 0) { toast('Este item já está na sua mochila.'); return; }
     var it = itemDe(id);
-    confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila', preco: it.preco, moeda: 'qdc', ico: ITEM_ICO[id] || '' }, function () {
+    confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila', preco: it.preco, moeda: 'qdc', ico: itemIcoHtml(it) }, function () {
       if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
       addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
       MOCHILA.push(id);
@@ -9436,9 +9448,9 @@
     var html = '';
     for (var i = 0; i < slots; i++) {
       var id = MOCHILA[i];
-      if (id) {
-        var it = itemDe(id);
-        html += '<div class="st-slot cheio" title="' + it.nome + '"><span class="st-ico">' + ITEM_ICO[id] + '</span><span class="st-nome">' + it.nome + '</span></div>';
+      var it = id ? itemDe(id) : null;
+      if (it) {
+        html += '<div class="st-slot cheio" title="' + it.nome + '"><span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span></div>';
       } else {
         html += '<div class="st-slot vazio"></div>';
       }
@@ -10070,14 +10082,28 @@
           var deTurma = (minhas.length > 1) ? ' · ' + matTurmaNome(m.turma) : '';
           return '<div class="mission-row"><div class="m-dot">' + tp.ico + '</div>' +
             '<div class="grow"><div class="t">' + (m.titulo || tp.rot) + '</div><div class="d">' + m.det + ' · ' + m.quando + deTurma + '</div></div>' +
-            '<button class="btn ghost small mat-dl" data-mat="' + m.id + '">Abrir</button></div>';
+            '<button class="btn ghost small mat-dl" data-mat="' + m.id + '">' + (m.arqUrl ? 'Baixar' : 'Abrir') + '</button></div>';
         }).join('') + '</div>';
     }).join('');
     el.querySelectorAll('.mat-dl').forEach(function (b) {
       b.addEventListener('click', function () {
         var m = MATERIAIS.filter(function (x) { return x.id === b.dataset.mat; })[0];
-        if (m) m.novo = false;
-        toast('Abrindo “' + (m ? m.titulo : 'material') + '” — [INTEGRAÇÃO REAL] arquivo do material.');
+        if (!m) return;
+        m.novo = false;
+        /* vídeo abre o link; arquivo anexado baixa de verdade */
+        if (m.tipo === 'video' && m.link) {
+          window.open(m.link, '_blank', 'noopener');
+          toast('Abrindo o vídeo “' + m.titulo + '”.');
+          return;
+        }
+        if (m.arqUrl) {
+          var a = document.createElement('a');
+          a.href = m.arqUrl; a.download = m.arqNome || (m.titulo + '.pdf'); a.rel = 'noopener';
+          document.body.appendChild(a); a.click(); a.remove();
+          toast('Baixando “' + (m.arqNome || m.titulo) + '”.');
+          return;
+        }
+        toast('“' + m.titulo + '” — material de exemplo, sem arquivo anexado.');
       });
     });
   }
@@ -10105,7 +10131,7 @@
     $('admMatLinkBox').style.display = v === 'video' ? '' : 'none';
     $('admMatArqBox').style.display = v === 'video' ? 'none' : '';
   }
-  var admMatArqNome = '';
+  var admMatArqNome = '', admMatArqFile = null;   /* o arquivo em si, para o aluno baixar */
   function renderAdmMat() {
     var el = $('admMatList'); if (!el) return;
     el.innerHTML = MATERIAIS.map(function (m) {
@@ -10117,6 +10143,7 @@
     el.querySelectorAll('[data-rm-mat]').forEach(function (b) {
       b.addEventListener('click', function () {
         var m = MATERIAIS.filter(function (x) { return x.id === b.dataset.rmMat; })[0]; if (!m) return;
+        if (m.arqUrl) URL.revokeObjectURL(m.arqUrl);   /* solta o arquivo da memória */
         MATERIAIS = MATERIAIS.filter(function (x) { return x.id !== m.id; });
         renderAdmMat(); renderMateriaisAluno();
         toast('“' + (m.titulo || 'Material') + '” saiu do ar — os alunos não veem mais.');
@@ -10129,7 +10156,8 @@
     $('admMatTipo').addEventListener('change', admMatTipoToggle);
     var arq = $('admMatArq');
     if (arq) arq.addEventListener('change', function () {
-      admMatArqNome = (this.files && this.files[0]) ? this.files[0].name : '';
+      admMatArqFile = (this.files && this.files[0]) || null;
+      admMatArqNome = admMatArqFile ? admMatArqFile.name : '';
       $('admMatArqNome').textContent = admMatArqNome || 'Anexar o arquivo do material';
     });
     ['admMatAssunto', 'admMatLink'].forEach(function (id) {
@@ -10158,10 +10186,13 @@
         ? (dur > 0 ? dur + ' min' : 'vídeo') + ' <span class="ref">[INTEGRAÇÃO REAL] ' + link + '</span>'
         : admMatArqNome;
       MATERIAIS.unshift({ id: 'mt' + Date.now(), turma: turma, materia: materia, assunto: assunto,
-        tipo: tipo, titulo: titulo || tp.rot, det: det, quando: 'agora', novo: true, link: link });
+        tipo: tipo, titulo: titulo || tp.rot, det: det, quando: 'agora', novo: true, link: link,
+        arqNome: tipo === 'video' ? '' : admMatArqNome,
+        arqUrl: (tipo !== 'video' && admMatArqFile) ? URL.createObjectURL(admMatArqFile) : '' });
       $('admMatAssunto').value = ''; $('admMatTitulo').value = '';
       $('admMatLink').value = ''; $('admMatDur').value = '';
-      $('admMatArq').value = ''; admMatArqNome = ''; $('admMatArqNome').textContent = 'Anexar o arquivo do material';
+      $('admMatArq').value = ''; admMatArqNome = ''; admMatArqFile = null;
+      $('admMatArqNome').textContent = 'Anexar o arquivo do material';
       renderAdmMat(); renderMateriaisAluno();
       admAlerta('admMatErro', '<b>' + (titulo || tp.rot) + '</b> publicado em <b>' + materia + ' — ' + assunto +
         '</b> para a <b>' + matTurmaNome(turma) + '</b>. Já está em “Materiais das aulas” para os alunos dessa turma.', true);
