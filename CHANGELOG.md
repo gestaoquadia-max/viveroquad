@@ -1,5 +1,37 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Turma ativa: o aluno escolhe por qual matrícula o app fala
+
+- **O problema**: matriculado numa 2ª turma, o aluno continuava vendo tudo
+  da primeira — Aula de hoje, avisos, ranking da sala e Domínio ficavam
+  presos à matrícula mais antiga. Não havia falta de tela, e sim de
+  conceito: o app tinha **um único lugar** para dizer "a turma do aluno",
+  preenchido só na primeiríssima matrícula.
+- **Turma ativa, trocável a qualquer hora**: uma das matrículas comanda a
+  tela e o aluno troca em **"Minhas turmas"** — a que vale leva o selo
+  **EM USO**, as outras ganham **"Usar esta"**. A troca é instantânea e
+  arrasta junto **Aula de hoje, avisos gerais, ranking da sala, Domínio,
+  quiz da aula e carrossel de eventos**.
+- **Pop-up no momento da matrícula**: da 2ª turma em diante, confirmada a
+  compra, aparece *"Você entrou na C.O.R.E. e já tinha outra turma. Qual
+  delas o app deve abrir agora?"*, com um botão por turma —
+  **"Abrir o perfil da Turma …"** — e a marcação de qual está em uso.
+  Sem deslogar: a sessão continua e a escolha fica disponível depois.
+- **Aula de hoje mostra a turma de verdade** (nome e sala da matrícula),
+  com o turno e o tipo dela. Turma recém-aberta, ainda sem grade, passa a
+  dizer **"A definir · a coordenação ainda não lançou a grade desta
+  turma"** no lugar de "Encontro 00 · Prof." em branco.
+- **Avisos ganharam turma-alvo de verdade**: o escopo era um texto
+  (`PATAMO`, `RONDESP`) comparado com o nome da turma — uma turma chamada
+  C.O.R.E. **nunca casaria com nenhum escopo**. Agora o administrador
+  escolhe **"Todas as turmas"** ou uma turma da lista, e o aluno vê os
+  avisos da turma que estiver usando.
+- **Eventos ganharam turma-alvo**: na criação, "Quem vê este evento" —
+  todas as turmas ou uma só. A lista do admin marca os restritos com
+  "só a Turma …".
+- O rótulo do topo e o cabeçalho do ranking passaram a exibir o **nome da
+  turma ativa** em vez do par tipo + turno.
+
 ## 28/07/2026 — Quadrômetro sem eco da loja, privacidade de mão dupla e canal de materiais da aula
 
 - **O card "Quad Store · onde o esforço vira avanço" saiu do Quadrômetro**

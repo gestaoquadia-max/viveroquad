@@ -1247,6 +1247,17 @@
   .tu-opt .to-rot { flex: 1; font: 800 12px var(--ui); text-transform: uppercase; letter-spacing: .05em; }
   .tu-opt b { font: 800 14px Consolas, monospace; }
   .tu-opt small { font: 700 10px var(--ui); opacity: .75; }
+  /* escolher por qual turma o app fala (pop-up da matrícula e Minhas turmas) */
+  .troca-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .troca-opt { display: block; width: 100%; text-align: left; padding: 12px 14px; cursor: pointer;
+    border: 1.5px solid var(--p-line); border-radius: 14px; background: #fff; color: var(--p-text); }
+  .troca-opt b { display: block; font: 800 13px var(--ui); }
+  .troca-opt small { display: block; margin-top: 2px; font: 600 10.5px var(--ui); color: var(--p-dim); }
+  .troca-opt.on { border-color: #7FB2FF; background: linear-gradient(180deg, #F3F8FF, #E7F1FF); }
+  .troca-opt.on b { color: #1D63C8; }
+  .tu-troca { margin-left: 6px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--p-line);
+    background: #fff; color: var(--p-dim); font: 700 9.5px var(--ui); cursor: pointer; text-transform: uppercase; letter-spacing: .04em; }
+  .tu-troca:hover { border-color: #7FB2FF; color: #1D63C8; }
   .tu-opt:disabled { opacity: .45; cursor: not-allowed; }
 
   /* ---------- Controle: banco de professores + criação de turmas ---------- */
@@ -1745,7 +1756,7 @@
           <div class="p-card">
             <div class="k-label">Minhas turmas · matrículas ativas</div>
             <div id="minhasTurmasList"></div>
-            <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A <strong>turma principal</strong> é a que comanda o Início, o Domínio e o ranking da sala.</p>
+            <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A turma marcada <strong>EM USO</strong> é a que comanda o Início, os avisos, o Domínio, o quiz e o ranking da sala — toque em <strong>“Usar esta”</strong> na outra para trocar, sem sair da conta.</p>
             <div class="priv-box" id="privBox">
               <div class="priv-info">
                 <div class="priv-t">Perfil nos rankings</div>
@@ -2573,16 +2584,13 @@
               <input class="fld" id="admAvTitulo" placeholder="Título (ex.: Aulão de véspera confirmado)">
               <input class="fld" id="admAvDet" placeholder="Detalhe (ex.: quinta 19h · traga o material impresso)">
               <div class="adm-row">
-                <select class="fld" id="admAvEsc">
-                  <option>Todas</option><option>Manhã</option><option>Tarde</option><option>Noite</option>
-                  <option>RONDESP</option><option>PATAMO</option><option>BOPE</option>
-                </select>
+                <select class="fld" id="admAvEsc" title="Quem recebe o aviso"></select>
                 <button class="btn small" id="btnAdmAviso">Enviar</button>
               </div>
             </div>
             <div class="adm-sep"><span>Avisos enviados</span></div>
             <div id="admAvisosList"></div>
-            <p class="sub" style="margin-top:8px">Mensagens dos professores e do time entram por aqui e aparecem em <strong>Avisos gerais</strong> no Início do aluno, filtradas pelo turno (M · T · N) e pela modalidade (RONDESP nivelamento · PATAMO regular · BOPE questões).</p>
+            <p class="sub" style="margin-top:8px">Mensagens dos professores e do time entram por aqui e aparecem em <strong>Avisos gerais</strong> no Início do aluno. O aviso vai para <strong>todas as turmas</strong> ou para <strong>uma turma escolhida na lista</strong> — o aluno vê os avisos da turma que ele estiver usando no momento.</p>
           </div>
 
           <div class="p-card" data-bl="crono">
@@ -2671,6 +2679,10 @@
                   <option value="qdc">Vender em Quad Coins</option>
                 </select>
                 <input class="fld" id="admEvNovoPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px" disabled>
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Quem vê este evento</div>
+              <div class="adm-row">
+                <select class="fld" id="admEvAlvo" title="Turma que vê o evento no Início"></select>
               </div>
               <div class="k-label sub-k" style="margin-top:10px">Professores no evento <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
               <div class="turno-pick" id="admEvProfs"></div>
@@ -3428,6 +3440,17 @@
           </div>
         </div>
 
+        <!-- matriculou numa 2ª turma: por qual delas o app vai falar agora? -->
+        <div class="compra-layer" id="trocaLayer" style="z-index:69">
+          <div class="compra-box">
+            <span class="compra-ico"><svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></span>
+            <h3 class="compra-nome">Matrícula confirmada</h3>
+            <p class="sub compra-desc" id="trocaDesc">Você tem mais de uma turma. Qual delas o app deve abrir agora?</p>
+            <div class="troca-opts" id="trocaOpts"></div>
+            <p class="sub" style="margin-top:10px; font-size:11px">Início, avisos, ranking da sala, Domínio e quiz seguem a turma escolhida. Dá para trocar quando quiser em <strong>Minhas turmas</strong>.</p>
+          </div>
+        </div>
+
         <!-- validar gift card: leitor de QR (câmera simulada na demo) -->
         <div class="compra-layer" id="scanLayer" style="z-index:67">
           <div class="compra-box">
@@ -3783,6 +3806,43 @@
   function turmaDe(id) { return TURMAS_LOJA.filter(function (t) { return t.id === id; })[0]; }
   function hojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
   function matriculasAtivas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return !m.fim || m.fim >= h; }); }
+  /* ---------- turma ATIVA: por qual matrícula o app fala ----------
+     O aluno pode ter mais de uma turma. Uma delas comanda a tela —
+     Aula de hoje, avisos, ranking da sala, Domínio e quiz — e ele troca
+     quando quiser, sem sair da conta. Antes valia sempre a matrícula
+     mais antiga, e a turma nova entrava muda.                        */
+  var turmaAtivaId = 'patamo-n';
+  function turmaAtiva() {
+    var ats = matriculasAtivas();
+    if (!ats.length) { turmaAtivaId = null; return null; }
+    var m = ats.filter(function (x) { return x.turmaId === turmaAtivaId; })[0] || ats[0];
+    turmaAtivaId = m.turmaId;
+    return turmaDe(m.turmaId) || null;
+  }
+  function definirTurmaAtiva(id, silencioso) {
+    var m = matriculasAtivas().filter(function (x) { return x.turmaId === id; })[0];
+    if (!m) return false;
+    turmaAtivaId = id;
+    var t = turmaDe(id);
+    if (t) {
+      /* a chave do cronograma continua sendo tipo + turno; o nome e a
+         sala mostrados na Aula de hoje saem da turma de verdade      */
+      if (typeof cronoKey === 'function') ALUNO_TURMA = cronoKey(t);
+      if (typeof definirDominio === 'function' && typeof concursoDe === 'function' && concursoDe(t.concurso)) definirDominio(t.concurso);
+    }
+    if (typeof renderCarreira === 'function') renderCarreira();
+    if (typeof renderAulaHoje === 'function') renderAulaHoje();
+    if (typeof renderAvisos === 'function') renderAvisos();
+    if (typeof renderRankings === 'function') renderRankings();
+    if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+    if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
+    if (typeof refreshQuizAula === 'function') refreshQuizAula();
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderCalendario === 'function') renderCalendario();
+    if (!silencioso && t) toast('Você está na ' + t.nome + ' — Início, avisos, ranking e Domínio passam a ser desta turma.');
+    return true;
+  }
+  window.__turmaAtiva = function () { return turmaAtivaId; };
   function turnoOcupadoPor(turno) {
     var at = matriculasAtivas().filter(function (m) { return m.turno === turno; })[0];
     return at ? ('Turma ' + at.tipo) : null;
@@ -4198,10 +4258,17 @@
   /* eventos no Início: gratuitos + pagos ainda não vencidos.
      Pago não comprado aparece com "Na Loja" (clique leva à Loja);
      comprado vira "Inscrito"; vencido some do carrossel e da Loja. */
+  /* o evento pode ser de todas as turmas ou de uma turma específica —
+     no carrossel do Início vale a turma que o aluno está usando        */
+  function evVisivel(ev) {
+    if (!ev.alvo || ev.alvo === 'todas') return true;
+    if (typeof turmaAtivaId === 'undefined' || !turmaAtivaId) return true;
+    return ev.alvo === turmaAtivaId;
+  }
   function eventosInicio() {
     return EVENTOS.filter(function (ev) {
       if (evAcabou(ev)) return false;
-      return true;
+      return evVisivel(ev);
     });
   }
   var evNoInicioLen = 0;
@@ -4621,6 +4688,13 @@
     renderAulaHoje();   /* Aula de hoje segue o cronograma da turma */
   }
   function turmaLabel() {
+    /* o rótulo é o nome da turma ATIVA, com a letra do turno; só cai no
+       formato antigo (tipo + turno) se não houver matrícula ativa      */
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    if (ta) {
+      var l = { 'noite': 'N', 'manhã': 'M', 'tarde': 'T' }[ta.turno];
+      return ta.nome + (l ? ' (' + l + ')' : '');
+    }
     if (typeof ALUNO_TURMA === 'undefined' || !ALUNO_TURMA) { return ''; }
     var partes = ALUNO_TURMA.split(' ');
     var turno = partes[partes.length - 1];
@@ -4663,11 +4737,14 @@
     var idx = agora.getDay() - 1;              /* seg=0 … sex=4 */
     var temHoje = idx >= 0 && idx <= 4;
     var showIdx = temHoje ? idx : 0;           /* sáb/dom → mostra segunda */
-    $('aulaTurma').textContent = ALUNO_TURMA + ' · ' + t.sala;
+    /* o título traz a turma DE VERDADE (nome e sala da matrícula ativa);
+       a grade continua vindo do cronograma por tipo + turno            */
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    $('aulaTurma').textContent = ta ? (ta.nome + ' · ' + (ta.sala || t.sala)) : (ALUNO_TURMA + ' · ' + t.sala);
     $('aulaDia').textContent =
       (temHoje ? 'Hoje · ' : 'Sem aula da sua turma hoje · próxima: ') +
       CRONO.dias[showIdx] + ' · ' + CRONO.datas[showIdx] +
-      ' · ' + CRONO.turno + ' · ' + t.tipo;
+      ' · ' + (ta ? ta.turno.toUpperCase() : CRONO.turno) + ' · ' + (ta ? ta.tipoDesc : t.tipo);
     var mins = agora.getHours() * 60 + agora.getMinutes();
     var faixasDin = slotsFaixas(slots);
     var faixas = [faixasDin[0] || [19 * 60, 20 * 60 + 30], faixasDin[1] || [20 * 60 + 30, 22 * 60]];
@@ -4677,10 +4754,14 @@
         if (mins >= faixas[i][1]) { cls = ' done'; st = 'ENCERRADO'; }
         else if (mins >= faixas[i][0]) { cls = ' now'; st = 'AGORA'; }
       }
+      /* turma recém-aberta ainda não tem grade lançada — dizer isso é
+         melhor do que mostrar "Encontro 00 · Prof." em branco        */
+      var vazio = !a.m;
       return '<div class="aula-slot' + cls + '"><span class="a-hr">' + (slots[i] || CRONO.slots[i]) + '</span>' +
-        '<div class="a-info"><b>' + a.m + '</b><span>Encontro ' + String(a.e).padStart(2, '0') +
-        ' · Prof. ' + a.p + '</span></div>' +
-        (st ? '<span class="a-st">' + st + '</span>' : '') + '</div>';
+        '<div class="a-info"><b>' + (vazio ? 'A definir' : a.m) + '</b><span>' +
+        (vazio ? 'A coordenação ainda não lançou a grade desta turma'
+               : 'Encontro ' + String(a.e).padStart(2, '0') + ' · Prof. ' + a.p) + '</span></div>' +
+        (st && !vazio ? '<span class="a-st">' + st + '</span>' : '') + '</div>';
     }).join('');
     $('aulaFonte').textContent = 'Aula presencial · Cronograma semanal · Semana ' + CRONO.semana +
       ' — atualizado pela planilha da coordenação.';
@@ -7040,21 +7121,51 @@
   function renderMinhasTurmas() {
     var el = $('minhasTurmasList'); if (!el) return;
     var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
-    el.innerHTML = ats.map(function (m, i) {
+    var ativa = (typeof turmaAtiva === 'function' && turmaAtiva()) ? turmaAtivaId : null;
+    el.innerHTML = ats.map(function (m) {
       var t = (typeof turmaDe === 'function') ? turmaDe(m.turmaId) : null;
       var nome = t ? t.nome : ('Turma ' + m.tipo);
-      var det = [(t && t.focoNome) || '', m.turno, t ? t.hor : ''].filter(Boolean).join(' · ');
+      var det = [(t && (t.focoNome || nomeConcurso(t.concurso))) || '', m.turno, t ? t.hor : ''].filter(Boolean).join(' · ');
       var per = (t && t.inicio) ? (dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim)) : ('até ' + (m.fim ? dataBRcompleta(m.fim) : '—'));
+      var eh = m.turmaId === ativa;
       return '<div class="mission-row"><div class="m-dot">◉</div>' +
         '<div class="grow"><div class="t">' + nome + '</div><div class="d">' + det + '<br>' + per + '</div></div>' +
-        '<span class="tag' + (i === 0 ? ' ok' : '') + '">' + (i === 0 ? 'PRINCIPAL' : 'ATIVA') + '</span></div>';
+        (eh ? '<span class="tag ok">EM USO</span>'
+            : '<button class="tu-troca" data-usar="' + m.turmaId + '">Usar esta</button>') + '</div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matrícula ativa — abra a Quad Store para entrar numa turma.</p>';
+    el.querySelectorAll('[data-usar]').forEach(function (b) {
+      b.addEventListener('click', function () { definirTurmaAtiva(b.dataset.usar); });
+    });
   }
-  /* quantos alunos a sala tem de verdade: sai da turma principal do aluno */
-  function turmaPrincipal() {
-    var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
-    return (ats.length && typeof turmaDe === 'function') ? turmaDe(ats[0].turmaId) : null;
+  /* pop-up logo depois da matrícula: por qual turma o app fala agora? */
+  function abrirTrocaTurma(novaId) {
+    var box = $('trocaOpts'), lay = $('trocaLayer');
+    if (!box || !lay) return false;
+    var ats = matriculasAtivas();
+    if (ats.length < 2) return false;
+    var nova = turmaDe(novaId);
+    var d = $('trocaDesc');
+    if (d && nova) d.innerHTML = 'Você entrou na <strong>' + nova.nome + '</strong> e já tinha outra turma. Qual delas o app deve abrir agora?';
+    box.innerHTML = ats.map(function (m) {
+      var t = turmaDe(m.turmaId); if (!t) return '';
+      var eh = m.turmaId === turmaAtivaId;
+      return '<button class="troca-opt' + (eh ? ' on' : '') + '" data-abrir="' + m.turmaId + '">' +
+        '<b>Abrir o perfil da ' + t.nome + '</b>' +
+        '<small>' + [(t.focoNome || nomeConcurso(t.concurso)), t.turno, t.hor, t.sala].filter(Boolean).join(' · ') +
+        (eh ? ' · em uso agora' : '') + '</small></button>';
+    }).join('');
+    box.querySelectorAll('[data-abrir]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        lay.classList.remove('on');
+        definirTurmaAtiva(b.dataset.abrir);
+        showView('v-inicio', 'navAluno');
+      });
+    });
+    lay.classList.add('on');
+    return true;
   }
+  /* quantos alunos a sala tem de verdade: sai da turma ATIVA do aluno */
+  function turmaPrincipal() { return (typeof turmaAtiva === 'function') ? turmaAtiva() : null; }
   function salaTotal() {
     var t = turmaPrincipal();
     var n = (t && typeof turmaInscritos === 'function') ? turmaInscritos(t) : 0;
@@ -7655,8 +7766,10 @@
     el.querySelectorAll('[data-ed-iso]').forEach(function (b) {
       b.addEventListener('click', function () { if (window.__isoEditar) window.__isoEditar(b.dataset.edIso); });
     });
-    /* o envio de materiais escolhe a turma nesta mesma lista */
+    /* o envio de materiais e o alvo dos avisos escolhem a turma nesta lista */
     if (typeof admMatTurmasInit === 'function') admMatTurmasInit();
+    if (typeof admAvEscInit === 'function') admAvEscInit();
+    if (typeof admEvTurmasInit === 'function') admEvTurmasInit();
   }
   function nomeConcurso(id) { var c = concursoDe(id); return c ? c.nome : ''; }
   /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
@@ -8293,21 +8406,25 @@
     var primeira = matriculasAtivas().length === 0;
     MATRICULAS.push({ turmaId: t.id, rot: t.tipo.toUpperCase() + ' ' + t.turno.toUpperCase(), tipo: t.tipo, turno: t.turno, concurso: t.concurso, fim: t.fim });
     if (typeof lojaCompraLog === 'function') lojaCompraLog(t.nome + ' · matrícula', preco, moeda, 'matricula', t.id);
+    $('turmaLayer').classList.remove('on');
+    var ml = $('matLayer'); if (ml) ml.classList.remove('on');
+    turmaAberta = null;
     if (primeira) {
-      /* primeira matrícula ativa → vira a turma do app inteiro (Início, ranking, Domínio) */
+      /* primeira matrícula ativa → ela comanda o app sem perguntar nada */
       appLock = false;
-      var letra = { 'noite': 'N', 'manhã': 'M', 'tarde': 'T' }[t.turno] || 'N';
-      if (typeof sincronizarTurma === 'function') sincronizarTurma('TURMA ' + t.tipo.toUpperCase() + ' (' + letra + ')');
-      if (typeof definirDominio === 'function' && typeof concursoDe === 'function' && concursoDe(t.concurso)) definirDominio(t.concurso);
+      definirTurmaAtiva(t.id, true);
+      renderTurmasLoja();
+      toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
+      return;
     }
     renderTurmasLoja();
     if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
     if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* turma nova traz o material dela */
     if (typeof renderRankings === 'function') renderRankings();
-    $('turmaLayer').classList.remove('on');
-    var ml = $('matLayer'); if (ml) ml.classList.remove('on');
-    toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
-    turmaAberta = null;
+    /* 2ª turma em diante: quem decide por qual delas o app fala é o aluno */
+    if (!abrirTrocaTurma(t.id)) {
+      toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
+    }
   }
   $('btnTuDmn').addEventListener('click', function () { escolheuMoeda('dmn'); });
   $('btnTuQdc').addEventListener('click', function () { escolheuMoeda('qdc'); });
@@ -9564,13 +9681,29 @@
   admContasSelects(); renderAdmCred(); renderAdmContas(); renderAdmMsgs(); renderChatBadge();
 
   /* ---------- avisos gerais (professores e time → aluno) ---------- */
+  /* o alvo do aviso é o ID de uma turma (ou 'todas') — antes era um texto
+     comparado com o nome da turma, e turma de nome novo nunca casava   */
   var AVISOS = [
-    { t: 'Simulado presencial — domingo 8h', d: 'Inscrição pela área de Simulados. Presença pontua em Quad Coins.', esc: 'Todas' },
-    { t: 'Material de Poderes liberado', d: 'Leia antes do quiz de quinta.', esc: 'PATAMO' }
+    { t: 'Simulado presencial — domingo 8h', d: 'Inscrição pela área de Simulados. Presença pontua em Quad Coins.', alvo: 'todas' },
+    { t: 'Material de Poderes liberado', d: 'Leia antes do quiz de quinta.', alvo: 'patamo-n' }
   ];
+  function avisoAlvoNome(alvo) {
+    if (!alvo || alvo === 'todas') return 'Todas as turmas';
+    var t = (typeof turmaDe === 'function') ? turmaDe(alvo) : null;
+    return t ? t.nome : 'Turma encerrada';
+  }
   function avisoVisivel(av) {
-    if (av.esc === 'Todas') return true;
-    return (ALUNO_TURMA || '').toUpperCase().indexOf(av.esc.toUpperCase()) >= 0;
+    if (!av.alvo || av.alvo === 'todas') return true;
+    return av.alvo === turmaAtivaId;
+  }
+  function admAvEscInit() {
+    var sel = $('admAvEsc'); if (!sel) return;
+    var atual = sel.value;
+    sel.innerHTML = '<option value="todas">Todas as turmas</option>' +
+      TURMAS_LOJA.map(function (t) {
+        return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>' + t.nome + '</option>';
+      }).join('');
+    if (atual) sel.value = atual;
   }
   function renderAvisos() {
     /* card do aluno (filtrado pela turma dele: turno + modalidade) */
@@ -9586,7 +9719,7 @@
       al.innerHTML = AVISOS.map(function (av, i) {
         return '<div class="adm-aviso"><div class="av-t">' + av.t + '</div>' +
           (av.d ? '<div class="av-d">' + av.d + '</div>' : '') +
-          '<div class="av-acoes"><span class="tag">' + av.esc.toUpperCase() + '</span>' +
+          '<div class="av-acoes"><span class="tag">' + avisoAlvoNome(av.alvo).toUpperCase() + '</span>' +
           '<button class="btn ghost small" data-av-ed="' + i + '">Editar</button>' +
           '<button class="btn ghost small" data-av="' + i + '">Remover</button></div></div>';
       }).join('') || '<p class="sub" style="padding:8px 0">Nenhum aviso ativo.</p>';
@@ -9608,7 +9741,8 @@
   function editarAviso(i) {
     var av = AVISOS[i]; if (!av) return;
     avisoEdit = i;
-    $('admAvTitulo').value = av.t; $('admAvDet').value = av.d === '—' ? '' : av.d; $('admAvEsc').value = av.esc;
+    $('admAvTitulo').value = av.t; $('admAvDet').value = av.d === '—' ? '' : av.d;
+    admAvEscInit(); $('admAvEsc').value = av.alvo || 'todas';
     var btn = $('btnAdmAviso'); if (btn) btn.textContent = 'Salvar aviso';
     $('admAvTitulo').focus();
     toast('Editando o aviso — ele segue no ar até você salvar.');
@@ -9618,17 +9752,17 @@
     var t = $('admAvTitulo').value.trim(), d = $('admAvDet').value.trim();
     if (!t) { toast('Escreva o título do aviso.'); return; }
     if (avisoEdit !== null && AVISOS[avisoEdit]) {
-      AVISOS[avisoEdit] = { t: t, d: d || '—', esc: $('admAvEsc').value };
+      AVISOS[avisoEdit] = { t: t, d: d || '—', alvo: $('admAvEsc').value };
       avisoEditReset();
       $('admAvTitulo').value = ''; $('admAvDet').value = '';
       renderAvisos();
       toast('Aviso atualizado no app dos alunos.');
       return;
     }
-    AVISOS.unshift({ t: t, d: d || '—', esc: $('admAvEsc').value });
+    AVISOS.unshift({ t: t, d: d || '—', alvo: $('admAvEsc').value });
     $('admAvTitulo').value = ''; $('admAvDet').value = '';
     renderAvisos();
-    toast('Aviso enviado — já está no Início dos alunos (' + $('admAvEsc').value + ').');
+    toast('Aviso enviado para ' + avisoAlvoNome($('admAvEsc').value) + ' — já está no Início desses alunos.');
   });
 
   /* ---------- cronograma: admin atualiza, turma sincroniza ---------- */
@@ -9775,7 +9909,7 @@
       b.addEventListener('click', function () {
         var m = MATERIAIS.filter(function (x) { return x.id === b.dataset.mat; })[0];
         if (m) m.novo = false;
-        toast('Abrindo “' + (m ? m.titulo : 'material') + '” <span class="ref">[INTEGRAÇÃO REAL] arquivo do material</span>');
+        toast('Abrindo “' + (m ? m.titulo : 'material') + '” — [INTEGRAÇÃO REAL] arquivo do material.');
       });
     });
   }
@@ -9872,7 +10006,8 @@
   /* ---------- eventos da semana: regras e novos eventos ---------- */
   function renderAdmEventos() {
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
-      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS');
+      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS') +
+        (ev.alvo && ev.alvo !== 'todas' ? ' · só a ' + avisoAlvoNome(ev.alvo) : '');
       var insc = evInscritosCount(ev.id);
       var quem = evProfsTxt(ev);
       return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (quem ? ' · ' + quem : '') + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
@@ -9911,6 +10046,7 @@
     if (ev.hf) $('admEvNovoFim').value = ev.hf;
     renderEvProfChips(evProfs(ev));
     admEvCamposToggle();
+    admEvTurmasInit(); $('admEvAlvo').value = ev.alvo || 'todas';
     /* online já ficou com o Estúdio reservado: o seletor volta marcado */
     $('admEvSala').value = ev.online ? ESTUDIO : (ev.sala || '');
     admEvSalaEcoRender();
@@ -9992,6 +10128,16 @@
   /* reserva do espaço: presencial escolhe uma das 4 salas; online escolhe
      o Estúdio — escolhe mesmo, o seletor fica ativo e vazio até que o
      administrador o selecione, como em qualquer outra reserva          */
+  /* quem vê o evento: todas as turmas ou uma delas */
+  function admEvTurmasInit() {
+    var sel = $('admEvAlvo'); if (!sel) return;
+    var atual = sel.value;
+    sel.innerHTML = '<option value="todas">Todas as turmas</option>' +
+      TURMAS_LOJA.map(function (t) {
+        return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>Só a ' + t.nome + '</option>';
+      }).join('');
+    if (atual) sel.value = atual;
+  }
   function admEvSalaOpcoes() {
     var sel = $('admEvSala'); if (!sel) return;
     var online = $('admEvNovoModal').value === 'online';
@@ -10085,7 +10231,7 @@
       if (ev) {
         ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link; ev.profs = profs;
         ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
-        ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf;
+        ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf; ev.alvo = $('admEvAlvo').value;
         ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
         ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
       }
@@ -10100,7 +10246,7 @@
     }
     EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
       tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
-      quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf,
+      quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf, alvo: $('admEvAlvo').value,
       modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
@@ -10108,6 +10254,7 @@
     $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
     $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
     $('admEvSala').value = '';
+    admEvTurmasInit(); $('admEvAlvo').value = 'todas';
     admEvSalaOpcoes();
     renderEvProfChips([]);
     admEvPreview();
@@ -11148,6 +11295,9 @@
      do bloco de criação, e a primeira pintura ainda não a enxergava   */
   if (typeof renderCtLista === 'function') renderCtLista();
   if (typeof window.__matRefresh === 'function') window.__matRefresh();
+  if (typeof admAvEscInit === 'function') admAvEscInit();
+  if (typeof admEvTurmasInit === 'function') admEvTurmasInit();
+  if (typeof definirTurmaAtiva === 'function' && turmaAtivaId) definirTurmaAtiva(turmaAtivaId, true);
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
   var daniloHintT = null;
