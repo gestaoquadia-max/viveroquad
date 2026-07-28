@@ -1,5 +1,27 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Edição do cadastro no Banco de professores
+
+- **"Editar" em cada professor cadastrado**: o mesmo formulário do bloco
+  serve para cadastrar e para corrigir. Editar traz **nome, matérias,
+  turnos, graduação e telefone** para os campos, o botão vira **"Salvar
+  alterações"** e aparece **"Cancelar edição"** — mesmo padrão já usado em
+  turmas, avisos e eventos.
+- **O nome é a chave do professor em todo o app**, então renomear
+  **propaga**: turmas (professor por matéria), isoladas, eventos, a grade
+  do cronograma, os recados da administração e a sessão aberta, se for o
+  próprio professor logado. Sem isso ele sumiria das aulas dele.
+- **O e-mail de acesso acompanha o nome** — ele é derivado do sobrenome.
+  O aviso de edição mostra o e-mail atual e alerta que trocar o nome muda
+  o login; o antigo deixa de valer na hora.
+- **Validação no próprio bloco** (não mais só em toast efêmero): nome
+  vazio ou repetido de outro professor, nenhuma matéria e nenhum turno
+  são barrados com aviso fixo. Manter o próprio nome ao salvar **não** é
+  tratado como duplicidade.
+- Quando o professor perde uma matéria na edição, a confirmação avisa
+  quais saíram, para a coordenação conferir quem assume nas turmas.
+- Apagar o professor que está aberto no formulário fecha o modo edição.
+
 ## 28/07/2026 — Item de combate se repete; o carrossel leva direto ao item na Loja
 
 - **Item de combate não é de compra única** (item 1): a regra de "sumir da

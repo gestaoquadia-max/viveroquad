@@ -2432,12 +2432,16 @@
               </div>
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admDocFone" placeholder="Telefone (ex.: (71) 9 8888-0000)" inputmode="tel" style="max-width:200px">
-                <button class="btn small" id="btnAdmDoc">Cadastrar professor</button>
               </div>
+              <div class="adm-row" style="margin-top:10px">
+                <button class="btn small" id="btnAdmDoc">Cadastrar professor</button>
+                <button class="btn small ghost" id="btnAdmDocCancelar" style="display:none">Cancelar edição</button>
+              </div>
+              <div class="adm-alerta" id="admDocErro"></div>
             </div>
             <div class="adm-sep"><span>Professores cadastrados</span></div>
             <div id="admDocList"></div>
-            <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
+            <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Editar</strong> corrige nome, matérias, turnos, graduação e telefone — e a mudança segue para as turmas, isoladas, eventos e cronograma onde ele está. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
           </div>
 
           <div class="p-card" data-bl="salas">
@@ -8002,10 +8006,14 @@
       return '<div class="adm-bar col"><span class="nm">' + d.nome + ' ' + st +
         '<small>' + d.materias.join(', ') + ' · ' + d.turnos.join('/') + ' · ' + (d.grad || 'sem graduação') + ' · ' + (d.fone || '—') + '</small></span>' +
         '<span class="bar-acoes">' +
+        '<button class="btn ghost small" data-doc-ed="' + i + '">Editar</button>' +
         '<button class="btn ghost small" data-doc-desl="' + i + '">' + (d.desligado ? 'Readmitir' : 'Desligar') + '</button>' +
         '<button class="btn ghost small" data-doc-bloq="' + i + '">' + (d.bloqueado ? 'Liberar' : 'Bloquear') + '</button>' +
         '<button class="adm-x" data-doc-rm="' + i + '" aria-label="Apagar cadastro de ' + d.nome + '" title="Apagar o cadastro">✕</button></span></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhum professor cadastrado.</p>';
+    el.querySelectorAll('[data-doc-ed]').forEach(function (b) {
+      b.addEventListener('click', function () { editarDocente(+b.dataset.docEd); });
+    });
     el.querySelectorAll('[data-doc-desl]').forEach(function (b) {
       b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docDesl]; d.desligado = !d.desligado; if (d.desligado) d.bloqueado = false; docentesMudaram(d.desligado ? '“' + d.nome + '” desligado — saiu das listas.' : '“' + d.nome + '” readmitido.'); });
     });
@@ -8050,6 +8058,10 @@
      turmas, eventos e a própria sessão dele, se estiver logado. */
   function apagarDocente(d) {
     var nome = d.nome;
+    /* apagou quem estava aberto no formulário: sai do modo edição */
+    if (typeof docEdit !== 'undefined' && docEdit >= 0 && DOCENTES[docEdit] === d) {
+      docEditReset(); docLimpaCampos(); admAlerta('admDocErro', '');
+    }
     DOCENTES = DOCENTES.filter(function (x) { return x !== d; });
     if (typeof TURMAS_LOJA !== 'undefined') {
       TURMAS_LOJA.forEach(function (t) {
@@ -8080,23 +8092,112 @@
     if (typeof admMsgSelects === 'function') admMsgSelects();
     if (msg) toast(msg);
   }
+  /* ---------- editar o cadastro do professor ----------
+     O mesmo formulário serve para cadastrar e para corrigir. O NOME é a
+     chave do professor em todo o app (turmas, isoladas, eventos, grade e
+     recados), então renomear propaga a troca — senão o professor sumiria
+     das aulas dele.                                                     */
+  var docEdit = -1;
+  function docBotao(txt) {
+    var b = $('btnAdmDoc'); if (b) b.textContent = txt;
+    var c = $('btnAdmDocCancelar'); if (c) c.style.display = (docEdit < 0 ? 'none' : '');
+  }
+  function docLimpaCampos() {
+    $('admDocNome').value = ''; $('admDocGrad').value = ''; $('admDocFone').value = '';
+    $('admDocSemGrad').checked = false; $('admDocGrad').disabled = false;
+    $('admDocMat1').selectedIndex = 0; $('admDocMat2').value = ''; $('admDocMat3').value = '';
+    $('admDocTurnos').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
+  }
+  function docEditReset() { docEdit = -1; docBotao('Cadastrar professor'); }
+  function editarDocente(i) {
+    var d = DOCENTES[i]; if (!d) return;
+    docEdit = i;
+    $('admDocNome').value = d.nome;
+    $('admDocMat1').value = d.materias[0] || '';
+    $('admDocMat2').value = d.materias[1] || '';
+    $('admDocMat3').value = d.materias[2] || '';
+    $('admDocTurnos').querySelectorAll('.turno-chip').forEach(function (c) {
+      c.classList.toggle('on', d.turnos.indexOf(c.dataset.turno) >= 0);
+    });
+    $('admDocSemGrad').checked = !d.grad;
+    $('admDocGrad').value = d.grad || '';
+    $('admDocGrad').disabled = !d.grad;
+    $('admDocFone').value = d.fone || '';
+    docBotao('Salvar alterações');
+    admAlerta('admDocErro', 'Editando <b>' + d.nome + '</b>. O e-mail de acesso dele é <b>' + emailDoProf(d.nome) +
+      '</b> — trocar o nome muda esse e-mail e atualiza as turmas, isoladas, eventos e a grade onde ele aparece.', true);
+    $('admDocNome').scrollIntoView({ block: 'center' });
+  }
+  /* o nome é chave: renomear tem de alcançar tudo o que aponta para ele */
+  function renomearDocente(de, para) {
+    if (de === para) return;
+    if (typeof TURMAS_LOJA !== 'undefined') {
+      TURMAS_LOJA.forEach(function (t) {
+        if (!t.professores) return;
+        Object.keys(t.professores).forEach(function (m) { if (t.professores[m] === de) t.professores[m] = para; });
+      });
+    }
+    if (typeof ISOLADAS !== 'undefined') {
+      ISOLADAS.forEach(function (i) { if (i.prof === de) i.prof = para; });
+    }
+    if (typeof EVENTOS !== 'undefined') {
+      EVENTOS.forEach(function (ev) {
+        if (ev.profs) ev.profs = ev.profs.map(function (n) { return n === de ? para : n; });
+      });
+    }
+    if (typeof CRONO !== 'undefined' && CRONO.turmas) {
+      Object.keys(CRONO.turmas).forEach(function (k) {
+        (CRONO.turmas[k].aulas || []).forEach(function (dia) {
+          dia.forEach(function (a) { if (a && a.p === de) a.p = para; });
+        });
+      });
+    }
+    if (typeof RECADOS_PROF !== 'undefined' && RECADOS_PROF[de]) {
+      RECADOS_PROF[para] = RECADOS_PROF[de]; delete RECADOS_PROF[de];
+    }
+    if (typeof PROF_ATUAL !== 'undefined' && PROF_ATUAL === de) PROF_ATUAL = para;
+  }
   var btnAdmDocEl = $('btnAdmDoc');
   if (btnAdmDocEl) btnAdmDocEl.addEventListener('click', function () {
+    admAlerta('admDocErro', '');
+    var editando = docEdit >= 0 ? DOCENTES[docEdit] : null;
     var nome = $('admDocNome').value.trim();
-    if (!nome || /["<>]/.test(nome)) { toast('Informe um nome válido para o professor.'); return; }
-    if (docenteDe(nome)) { toast('Já existe um professor com esse nome.'); return; }
+    function falta(cond, msg) { if (!cond) return false; admAlerta('admDocErro', msg); return true; }
+    if (falta(!nome || /["<>]/.test(nome), 'Informe um <b>nome válido</b> para o professor.')) return;
+    var homonimo = docenteDe(nome);
+    if (falta(homonimo && homonimo !== editando, 'Já existe um professor com esse nome.')) return;
     var mats = ['admDocMat1', 'admDocMat2', 'admDocMat3'].map(function (id) { return $(id).value; }).filter(function (m) { return m; });
     mats = mats.filter(function (m, i) { return mats.indexOf(m) === i; });   /* sem repetidas */
-    if (!mats.length) { toast('Escolha ao menos uma matéria.'); return; }
+    if (falta(!mats.length, 'Escolha <b>ao menos uma matéria</b>.')) return;
     var turnos = [];
     $('admDocTurnos').querySelectorAll('.turno-chip.on').forEach(function (c) { turnos.push(c.dataset.turno); });
-    if (!turnos.length) { toast('Marque ao menos um turno de disponibilidade.'); return; }
+    if (falta(!turnos.length, 'Marque <b>ao menos um turno</b> de disponibilidade.')) return;
     var semGrad = $('admDocSemGrad').checked;
     var grad = semGrad ? '' : $('admDocGrad').value.trim();
-    DOCENTES.push({ nome: nome, materias: mats, turnos: turnos, grad: grad, fone: $('admDocFone').value.trim(), desligado: false, bloqueado: false });
-    $('admDocNome').value = ''; $('admDocGrad').value = ''; $('admDocFone').value = ''; $('admDocSemGrad').checked = false; $('admDocGrad').disabled = false;
-    $('admDocMat2').value = ''; $('admDocMat3').value = '';
+    var fone = $('admDocFone').value.trim();
+    if (editando) {
+      var antes = editando.nome;
+      var perdidas = editando.materias.filter(function (m) { return mats.indexOf(m) < 0; });
+      editando.nome = nome; editando.materias = mats; editando.turnos = turnos;
+      editando.grad = grad; editando.fone = fone;
+      renomearDocente(antes, nome);
+      docEditReset(); docLimpaCampos();
+      var aviso = '<b>' + nome + '</b> atualizado' + (antes !== nome ? ' (era “' + antes + '”)' : '') +
+        '. Vale nas turmas, isoladas, eventos e no cronograma.' +
+        (perdidas.length ? ' Ele deixou de dar <b>' + perdidas.join(', ') + '</b> — confira quem assume nas turmas.' : '');
+      admAlerta('admDocErro', aviso, true);
+      docentesMudaram('Cadastro de “' + nome + '” atualizado.');
+      return;
+    }
+    DOCENTES.push({ nome: nome, materias: mats, turnos: turnos, grad: grad, fone: fone, desligado: false, bloqueado: false });
+    docLimpaCampos();
+    admAlerta('admDocErro', 'Professor <b>' + nome + '</b> cadastrado — acesso por <b>' + emailDoProf(nome) +
+      '</b>, senha inicial <b>' + PROF_SENHA_DEMO + '</b>.', true);
     docentesMudaram('Professor “' + nome + '” cadastrado — já aparece nas matérias que ministra.');
+  });
+  if ($('btnAdmDocCancelar')) $('btnAdmDocCancelar').addEventListener('click', function () {
+    docEditReset(); docLimpaCampos();
+    admAlerta('admDocErro', 'Edição cancelada — nada foi alterado.', true);
   });
   preencheMatSelects(); renderDocList();
 
