@@ -1,5 +1,50 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Cada turma com a sua vida: vagas por moeda, Missões e calendário por turma, eventos do Quad
+
+- **Vagas por moeda na criação** (item 1): o relato "coloquei vagas em
+  quadcoins e vagas em diamante e não tinha como comprar por diamante"
+  não era bug de código — era o formulário. Ele pedia "Vagas totais" +
+  "dessas em Quad Coins" e derivava Diamantes por subtração: digitando
+  20 e 20, as vagas em Dmn viravam **0 em silêncio**. Os campos agora são
+  **"Vagas em Diamantes"** e **"Vagas em Quad Coins"** (a soma é o total),
+  como o editor de preços e o modelo do gestor sempre foram. O eco soma em
+  voz alta ("20 em Dmn + 20 em QdC = 40 no total"). A mesma régua foi
+  aplicada ao **lançamento de simulados presenciais**.
+- **A aba Missões inteira fala pela turma ativa** (item 2): os blocos de
+  "Hoje · questões novas", o progresso 0/8, as Atrasadas, o bônus do dia
+  e o rodízio do Treinamento Rápido viraram estado **por turma** — fazer
+  2 blocos na C.O.R.E. não move o 0/8 da PATAMO, e voltar reencontra tudo
+  onde parou. Turma nova nasce com o dia zero (sem atrasadas herdadas) e
+  com as rápidas da aula **no horário dela** (8h, não 19h). O card diz de
+  qual turma são as questões.
+- **O herói "Bloco da noite" fala a língua da turma**: turma da manhã vê
+  **"Bloco da manhã"**, com subtítulo e bônus no mesmo tom.
+- **A crise da "Introdução no Quad" resolvida**: ela é **da conta**, não
+  da turma — feita uma vez (no tutorial do 1º acesso, inclusive ao pular,
+  que já entregava as recompensas), fica registrada para sempre: a linha
+  não some, vira "✓ concluída no seu 1º acesso — vale para todas as
+  turmas", e persiste entre sessões. Nunca reaparece pendente em turma
+  nova.
+- **O rodízio de flashcards segue o edital da turma ativa** (lia o edital
+  do CFO fixo), e o **ajuste de Domínio é por concurso**: acerto na turma
+  da PC-BA não move a barra homônima do CFO.
+- **Calendário por turma** (item 2): a linha de aula era um texto fixo da
+  PATAMO. Agora a semana de aulas é gerada da **grade da turma ativa**
+  (matérias, horários e sala; "grade a definir" quando a coordenação
+  ainda não lançou), os marcos do Quad (corte de missões, Pré-TAF) valem
+  para todos, e o que a conta comprou (eventos, isoladas, mentoria)
+  aparece com qualquer turma.
+- **Eventos voltaram a ser do Quad** (decisão do gestor): a segmentação
+  "Quem vê este evento" foi removida — todo evento vigente aparece para
+  qualquer aluno, em qualquer turma. Avisos continuam por turma.
+- **Auditoria embutida**: a classificação do perfil ("#12 · de 42
+  alunos") e a posição no Quadrômetro eram números decorativos — agora
+  são calculados da turma ativa; com 2+ matrículas cada material diz de
+  qual turma veio; o quiz ao vivo desempata pela turma ativa; o placar do
+  professor usa a lotação real da turma; estornar a turma em uso passa o
+  app para a matrícula restante.
+
 ## 28/07/2026 — O seletor de turma sai do fundo do Quadrômetro
 
 - **O problema**: a troca de turma existia, mas só em "Minhas turmas",

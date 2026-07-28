@@ -1665,8 +1665,8 @@
                 <div class="k-label grow">Missão de hoje</div>
                 <span class="hm-status"><i class="dot" aria-hidden="true"></i><span id="missRestam">FALTAM 8</span></span>
               </div>
-              <h2 class="mil hero-title">Bloco da noite</h2>
-              <p class="hero-sub">Complete as missões desta noite para ganhar score e Quad Coins. Avante!</p>
+              <h2 class="mil hero-title" id="heroTitulo">Bloco da noite</h2>
+              <p class="hero-sub" id="heroSub">Complete as missões desta noite para ganhar score e Quad Coins. Avante!</p>
               <div class="hero-prog">
                 <div class="hseg-track" id="missSegs" aria-hidden="true"></div>
                 <div class="hero-count-wrap"><span class="hero-count" id="missCount">0/8</span><span class="hero-count-lbl">missões</span></div>
@@ -1709,16 +1709,16 @@
           </div>
 
           <div class="p-card">
-            <div class="k-label">Hoje · questões novas</div>
+            <div class="k-label">Hoje · questões novas <span class="tag" id="diaTurma" style="display:none"></span></div>
             <div class="dia-scroll">
             <div class="mission-row" id="blocoIntroRow">
               <div class="m-dot" id="biDot">1</div>
               <div class="grow">
                 <div class="t">Introdução no Quad</div>
-                <div class="d">3 questões · o seu primeiro score</div>
+                <div class="d" id="biDesc">3 questões · o seu primeiro score · vale uma vez, para a conta</div>
               </div>
               <button class="btn small" id="btnBlocoIntro">Iniciar</button>
-              <span class="tag" id="biFeito" style="display:none">FEITO</span>
+              <span class="tag ok" id="biFeito" style="display:none">FEITA · DA CONTA</span>
             </div>
             <div id="diaList"></div>
             </div>
@@ -1767,7 +1767,7 @@
             <div class="k-label">Quadrômetro · sua jornada em números</div>
             <h3 id="quadNome">Aluno Soldado Quad Moura</h3>
             <div class="turma-line" id="quadTurma" style="margin:2px 0 6px"></div>
-            <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong>#12</strong> da turma · presença 9/10.</p>
+            <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong id="qPos">#12</strong> da turma · presença 9/10.</p>
           </div>
           <div class="p-card">
             <div class="k-label">Minhas turmas · matrículas ativas</div>
@@ -2469,12 +2469,12 @@
               </div>
               <div class="adm-eco" id="admCtEco"></div>
               <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
-              <p class="adm-hint">A turma é vendida <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são divididas: as que você marcar em Quad Coins ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.</p>
+              <p class="adm-hint">A turma é vendida <strong>nas duas moedas</strong> — informe o preço e as <strong>vagas de cada moeda</strong> (escreva 0 na moeda que não terá vagas). A soma é o total da turma.</p>
               <div class="ct-grid">
                 <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admCtPrecoDmn" placeholder="ex.: 1800" inputmode="numeric"></label>
                 <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admCtPrecoQdc" placeholder="ex.: 2000" inputmode="numeric"></label>
-                <label class="ct-fld"><span>Vagas totais</span><input class="fld" id="admCtVagas" placeholder="ex.: 180" inputmode="numeric"></label>
-                <label class="ct-fld"><span>Dessas, em Quad Coins</span><input class="fld" id="admCtVagasQdc" placeholder="ex.: 10" inputmode="numeric"></label>
+                <label class="ct-fld"><span id="admCtLbVagas">Vagas em Diamantes</span><input class="fld" id="admCtVagas" placeholder="ex.: 170" inputmode="numeric"></label>
+                <label class="ct-fld" id="admCtVagasQdcBox"><span>Vagas em Quad Coins</span><input class="fld" id="admCtVagasQdc" placeholder="ex.: 10" inputmode="numeric"></label>
               </div>
               <div class="adm-row" style="margin-top:8px">
                 <input class="fld" id="admCtArvore" type="file" accept=".pdf" title="Árvore do edital · PDF">
@@ -2696,10 +2696,6 @@
                 </select>
                 <input class="fld" id="admEvNovoPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px" disabled>
               </div>
-              <div class="k-label sub-k" style="margin-top:10px">Quem vê este evento</div>
-              <div class="adm-row">
-                <select class="fld" id="admEvAlvo" title="Turma que vê o evento no Início"></select>
-              </div>
               <div class="k-label sub-k" style="margin-top:10px">Professores no evento <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
               <div class="turno-pick" id="admEvProfs"></div>
               <div class="k-label sub-k" style="margin-top:10px" id="admEvReservaLb">Reserva de sala · dia e horário</div>
@@ -2770,12 +2766,12 @@
                 </div>
               </div>
               <div class="k-label sub-k" style="margin-top:12px" id="admSimPvLb">Preços e vagas</div>
-              <p class="adm-hint" id="admSimPrecosHint">O simulado é vendido <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são os lugares da sala: as que você marcar em <strong>Quad Coins</strong> ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.</p>
+              <p class="adm-hint" id="admSimPrecosHint">O simulado é vendido <strong>nas duas moedas</strong> — informe o preço e as <strong>vagas de cada moeda</strong> (0 vale). A soma é a lotação da sala.</p>
               <div class="ct-grid" id="admSimPrecosBox">
                 <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admSimPrecoDmn" placeholder="ex.: 150" inputmode="numeric"></label>
                 <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admSimPrecoQdc" placeholder="ex.: 180" inputmode="numeric"></label>
-                <label class="ct-fld" id="admSimVagasBox"><span>Vagas totais</span><input class="fld" id="admSimVagas" placeholder="ex.: 100" inputmode="numeric"></label>
-                <label class="ct-fld" id="admSimVagasQdcBox"><span>Dessas, em Quad Coins</span><input class="fld" id="admSimVagasQdc" placeholder="ex.: 70" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasBox"><span>Vagas em Diamantes</span><input class="fld" id="admSimVagas" placeholder="ex.: 30" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasQdcBox"><span>Vagas em Quad Coins</span><input class="fld" id="admSimVagasQdc" placeholder="ex.: 70" inputmode="numeric"></label>
               </div>
               <div class="adm-eco" id="admSimEco"></div>
               <div class="adm-row" id="admSimValorBox" style="margin-top:8px">
@@ -3853,9 +3849,12 @@
     if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
     if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
     if (typeof refreshQuizAula === 'function') refreshQuizAula();
-    if (typeof renderEvStrip === 'function') renderEvStrip();
     if (typeof renderCalendario === 'function') renderCalendario();
     if (typeof renderDomTurma === 'function') renderDomTurma();
+    /* a aba Missões inteira fala pela turma ativa */
+    if (typeof trTrocaTurma === 'function') trTrocaTurma();
+    if (typeof renderDia === 'function') renderDia();          /* + heroSync */
+    if (typeof renderAtrasadas === 'function') renderAtrasadas();
     if (!silencioso && t) toast('Você está na ' + t.nome + ' — Início, avisos, ranking e Domínio passam a ser desta turma.');
     return true;
   }
@@ -4115,7 +4114,7 @@
   var trAj = {};   /* 'matéria|assunto' → deslocamento vindo do Treinamento Rápido */
   function edSubPct(mi, mat, ass, sub) {
     var base = (ED_BASE[mi] != null) ? ED_BASE[mi] : (40 + (edHash(mat) % 40));
-    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[mat + '|' + ass] || 0);
+    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[CONCURSO_ATUAL_ID + '|' + mat + '|' + ass] || 0);
     return Math.max(0, Math.min(100, v));
   }
   function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
@@ -4275,18 +4274,10 @@
   /* eventos no Início: gratuitos + pagos ainda não vencidos.
      Pago não comprado aparece com "Na Loja" (clique leva à Loja);
      comprado vira "Inscrito"; vencido some do carrossel e da Loja. */
-  /* o evento pode ser de todas as turmas ou de uma turma específica —
-     no carrossel do Início vale a turma que o aluno está usando        */
-  function evVisivel(ev) {
-    if (!ev.alvo || ev.alvo === 'todas') return true;
-    if (typeof turmaAtivaId === 'undefined' || !turmaAtivaId) return true;
-    return ev.alvo === turmaAtivaId;
-  }
+  /* eventos são do QUAD, não de uma turma (dec. do gestor, 28/07):
+     todo evento vigente aparece para qualquer aluno                   */
   function eventosInicio() {
-    return EVENTOS.filter(function (ev) {
-      if (evAcabou(ev)) return false;
-      return evVisivel(ev);
-    });
+    return EVENTOS.filter(function (ev) { return !evAcabou(ev); });
   }
   var evNoInicioLen = 0;
   function evPeriod(st) {
@@ -4485,9 +4476,12 @@
     $('evLayer').style.display = 'flex';
   }
   $('btnEvVoltar').addEventListener('click', function () { $('evLayer').style.display = 'none'; });
-  /* ---------- calendário do aluno: base + eventos inscritos ---------- */
+  /* ---------- calendário do aluno ----------
+     Três camadas: as AULAS da semana vêm da grade da TURMA ATIVA (trocar
+     de turma troca o calendário); os marcos do Quad (prazo de missões,
+     TAF) são de todos; e o que a CONTA comprou/inscreveu (eventos,
+     isoladas, mentoria) aparece com qualquer turma ativa.             */
   var CAL_BASE = [
-    { dia: 'HOJE', dsem: 'TER', t: 'Aula · Dir. Administrativo — Poderes', d: '19h–22h · presencial · quiz ao vivo', tag: 'AULA', cls: '' },
     { dia: '18', dsem: 'SÁB', t: 'Corte das missões da semana', d: '23h59 · recupere as atrasadas antes', tag: 'PRAZO', cls: 'warn' },
     { dia: '28', dsem: 'TER', t: 'Pré-TAF · teste de corrida 12 min', d: '6h30 · pista do quartel · atualiza suas marcas', tag: 'TAF', cls: '' }
   ];
@@ -4496,9 +4490,27 @@
       '<div class="grow"><div class="t">' + t + '</div><div class="d">' + d + '</div></div>' +
       '<span class="tag ' + (cls || '') + '">' + tag + '</span></div>';
   }
+  function calAulasDaTurma() {
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    if (!ta || typeof CRONO === 'undefined') return [];
+    var g = CRONO.turmas[cronoKey(ta)];
+    if (!g) return [];
+    var slots = (typeof horSlots === 'function' && ta.hor ? horSlots(ta.hor) : null) || CRONO.slots;
+    var hoje = new Date().getDay() - 1;   /* seg=0 … sex=4 */
+    return CRONO.dias.map(function (dnome, di) {
+      var partes = g.aulas[di].map(function (a, i) {
+        return a.m ? ((slots[i] || '').split('–')[0].trim() + ' ' + a.m) : null;
+      }).filter(Boolean);
+      var det = partes.length ? partes.join(' · ') + ' · ' + (ta.sala || g.sala)
+                              : 'grade a definir pela coordenação · ' + (ta.sala || g.sala);
+      return calRow(CRONO.datas[di].split('/')[0], dnome.slice(0, 3).toUpperCase(),
+        'Aula · ' + ta.nome, det, di === hoje ? 'HOJE' : 'AULA', di === hoje ? 'live' : '');
+    });
+  }
   function renderCalendario() {
     var el = $('calList'); if (!el) return;
-    var rows = CAL_BASE.map(function (c) { return calRow(c.dia, c.dsem, c.t, c.d, c.tag, c.cls); });
+    var rows = calAulasDaTurma()
+      .concat(CAL_BASE.map(function (c) { return calRow(c.dia, c.dsem, c.t, c.d, c.tag, c.cls); }));
     EVENTOS.forEach(function (ev) {
       var st = evState[ev.id];
       if (!st || !st.inscrito) return;
@@ -4696,14 +4708,6 @@
   var ALUNO_TURMA = 'PATAMO NOITE';   /* vem da matrícula do aluno */
   // [INTEGRAÇÃO REAL] a turma vem do cadastro geral do site; aqui, o valor
   // confirmado no cadastro ("TURMA PATAMO (N)") vira a turma do app inteiro
-  function sincronizarTurma(rotulo) {
-    var m = /^TURMA\s+(.+?)\s*\(([NMT])\)$/i.exec((rotulo || '').trim());
-    if (!m) { return; }
-    ALUNO_TURMA = m[1].toUpperCase() + ' ' +
-      ({ N: 'NOITE', M: 'MANHÃ', T: 'TARDE' })[m[2].toUpperCase()];
-    renderCarreira();   /* card do Início, Quadrômetro, perfil, ranking da sala */
-    renderAulaHoje();   /* Aula de hoje segue o cronograma da turma */
-  }
   function turmaLabel() {
     /* o rótulo é o nome da turma ATIVA, com a letra do turno; só cai no
        formato antigo (tipo + turno) se não houver matrícula ativa      */
@@ -5217,10 +5221,21 @@
     return '<strong>Quiz encerrado</strong> — relatório consolidado abaixo. O aluno não pontua: o quiz é leitura pedagógica da sala.';
   }
   /* o "respondendo agora" pertence ao quiz da sala aberta — nunca vaza de uma turma para outra */
+  /* o placar da sala usa a LOTAÇÃO REAL da turma do quiz — e a última
+     vaga só é reservada ao aluno da demo se ele estiver matriculado nela */
+  function pollTotal(q) {
+    var t = (q && typeof turmaDe === 'function') ? turmaDe(q.turmaId) : null;
+    return Math.max(12, (t && typeof turmaInscritos === 'function') ? turmaInscritos(t) : 42);
+  }
+  function pollDoAluno(q) {
+    return !!(q && typeof matriculasAtivas === 'function' &&
+      matriculasAtivas().some(function (m) { return m.turmaId === q.turmaId; }));
+  }
   function pollPinta(q) {
+    var tot = pollTotal(q);
     var n = q ? q.pollN : 0, extra = (q && q.alunoFez) ? 1 : 0;
-    if ($('pollCount')) $('pollCount').textContent = Math.min(42, n + extra) + '/42';
-    if ($('pollBar')) $('pollBar').style.width = (n / 42 * 100) + '%';
+    if ($('pollCount')) $('pollCount').textContent = Math.min(tot, n + extra) + '/' + tot;
+    if ($('pollBar')) $('pollBar').style.width = Math.min(100, n / tot * 100) + '%';
   }
   function pollParar() { clearInterval(pollTimer); pollTimer = null; }
   function pollRodar(q) {
@@ -5228,7 +5243,8 @@
     if (!q || q.status !== 'ativo') { return; }
     pollPinta(q);
     pollTimer = setInterval(function () {
-      var alvo = q.alunoFez ? 42 : 41;   /* a última vaga é do aluno desta demo */
+      var tot = pollTotal(q);
+      var alvo = (q.alunoFez || !pollDoAluno(q)) ? tot : tot - 1;   /* vaga do aluno só na turma dele */
       q.pollN = Math.min(alvo, q.pollN + Math.ceil(Math.random() * 5));
       pollPinta(q);
       if (q.pollN >= alvo) { pollParar(); }
@@ -5345,7 +5361,12 @@
     ativas.forEach(function (m) { if (QUIZZES[m.turmaId]) cands.push(QUIZZES[m.turmaId]); });
     if (!cands.length) return null;
     var ordem = { ativo: 0, criado: 1, encerrado: 2 };
-    cands.sort(function (a, b) { return (ordem[a.status] || 9) - (ordem[b.status] || 9); });
+    cands.sort(function (a, b) {
+      var d = (ordem[a.status] || 9) - (ordem[b.status] || 9);
+      if (d) return d;
+      /* empate de status: vence o quiz da TURMA ATIVA */
+      return (b.turmaId === turmaAtivaId ? 1 : 0) - (a.turmaId === turmaAtivaId ? 1 : 0);
+    });
     return cands[0];
   }
   function refreshQuizAula() {
@@ -6141,6 +6162,34 @@
     b.criadoEm = Date.now() - (b.idadeDias ? b.idadeDias * 864e5 : 0);
     b.feito = false;
   });
+  /* ---------- os blocos do dia são POR TURMA ----------
+     Cada matrícula tem a sua fila de missões: o progresso numa turma não
+     conta na outra. A demo nasce com a agenda cheia da PATAMO; turma nova
+     começa do dia zero (sem atrasadas), com as rápidas da aula no horário
+     DELA. As questões em si são o banco único da demo.                  */
+  var BLOCOS_TURMA = { 'patamo-n': DIA_BLOCOS };
+  function novosBlocosDia(t) {
+    var slots = (t && t.hor && typeof horSlots === 'function') ? horSlots(t.hor) : null;
+    var h1 = slots && slots[0] ? slots[0].split('–')[0].trim() : '19h';
+    var h2 = slots && slots[1] ? slots[1].split('–')[0].trim() : '20h30';
+    var bl = [
+      { rot: 'Bloco 1 · Dir. Constitucional', det: 'aula de hoje · ' + h1, m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+      { rot: 'Bloco 2 · Matemática', det: 'aula de hoje · ' + h2, m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem', fonte: 'aula', ini: 0 },
+      { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'semana passada', fonte: 'aula', ini: 10 },
+      { rot: 'Revisão · Língua Inglesa', det: 'semana passada', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'mês passado', fonte: 'aula', ini: 20 },
+      { rot: 'Revisão · Informática', det: 'mês passado', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
+    ];
+    bl.forEach(function (b) { b.criadoEm = Date.now(); b.feito = false; });
+    return bl;
+  }
+  function diaBlocos() {
+    var id = (typeof turmaAtivaId !== 'undefined' && turmaAtivaId) ? turmaAtivaId : 'patamo-n';
+    if (!BLOCOS_TURMA[id]) BLOCOS_TURMA[id] = novosBlocosDia(typeof turmaDe === 'function' ? turmaDe(id) : null);
+    return BLOCOS_TURMA[id];
+  }
   /* simulados chegam do admin e aparecem aqui */
   /* Simulados — presencial (grátis gera QdC · pago custa QdC) ou digital.
      Presencial: o aluno se inscreve aqui e a administração libera a entrada
@@ -6165,10 +6214,10 @@
     { simRot: 'Simuladão Quad',        nome: 'AL CB QUAD NASCIMENTO',  pago: true,  valor: 20,  score: 100, geraQdC: false, liberado: false, pontuado: false, euSou: false }
   ];
   var SIM_HIST = [];   /* histórico de simulados realizados do aluno */
-  window.__blocos = function () { return { blocos: DIA_BLOCOS, expira: DIA_EXPIRA_DIAS }; };
+  window.__blocos = function () { return { blocos: diaBlocos(), expira: DIA_EXPIRA_DIAS }; };
   function renderAtrasadas() {
     var agora = Date.now();
-    var tarde = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+    var tarde = diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
       return !x.b.feito && (agora - x.b.criadoEm) >= DIA_EXPIRA_DIAS * 864e5;
     });
     $('atrasadasList').innerHTML = tarde.map(function (x) {
@@ -6415,13 +6464,21 @@
   /* missões da noite = blocos vigentes do "Hoje" (nada de atrasadas/simulados) */
   function missoesDaNoite() {
     var agora = Date.now();
-    return DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+    return diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
       return (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
     });
   }
   /* cartão herói "Bloco da noite": concluídas/total da NOITE; cada missão
      registrada como concluída acende mais um segmento da trilha */
+  function heroTurno() {
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    return (ta && ta.turno) || 'noite';
+  }
   function heroSync() {
+    /* o herói fala a língua da turma ativa: Bloco da manhã/tarde/noite */
+    var tn = heroTurno();
+    var ht = $('heroTitulo'); if (ht) ht.textContent = 'Bloco da ' + tn;
+    var hs = $('heroSub'); if (hs) hs.textContent = 'Complete as missões desta ' + tn + ' para ganhar score e Quad Coins. Avante!';
     var noite = missoesDaNoite();
     var total = noite.length;      /* a Introdução (instrução) fica fora da conta */
     var feitas = noite.filter(function (x) { return x.b.feito; }).length;
@@ -6436,7 +6493,7 @@
     btn.dataset.reward = '';
     if (total > 0 && feitas >= total) {
       btn.disabled = false;
-      if (noiteBonusResgatado) {
+      if (noiteResgatada()) {
         /* já retirou: estado calmo, sem nova recompensa */
         wrap.classList.add('claimed');
         btn.innerHTML = 'Benefícios retirados <svg class="hb-chev" viewBox="0 0 24 24" style="stroke:#2C5E1F"><path d="m5 12 5 5L20 7"/></svg>';
@@ -6456,12 +6513,13 @@
      Cada bloco de questões da noite vale +1 de Score de carreira; a noite
      inteira concluída ainda rende +1 Quad Coin. Um efeito de moeda voa até
      o contador para reforçar positivamente a conquista.                    */
-  var noiteBonusResgatado = false;
+  var NOITE_RESG = {};   /* bônus do dia completo — retirado POR TURMA */
+  function noiteResgatada() { return !!NOITE_RESG[(typeof turmaAtivaId !== 'undefined' && turmaAtivaId) || 'patamo-n']; }
   function resgatarBeneficios(ev) {
-    if (noiteBonusResgatado) { return; }
+    if (noiteResgatada()) { return; }
     var total = missoesDaNoite().length;
     if (total <= 0 || missoesDaNoite().filter(function (x) { return x.b.feito; }).length < total) { return; }
-    noiteBonusResgatado = true;
+    NOITE_RESG[(typeof turmaAtivaId !== 'undefined' && turmaAtivaId) || 'patamo-n'] = true;
     var scoreBonus = total;   /* +1 de Score por bloco concluído na noite */
     carreira.scorePatente += scoreBonus;
     carreira.scoreCarreira += scoreBonus;
@@ -6470,7 +6528,7 @@
     /* efeito visual + a moeda entra no saldo ao "aterrissar" */
     var origem = ev && ev.currentTarget ? ev.currentTarget : $('btnMissaoHome');
     animarMoedaConquista(origem, function () {
-      addScore(1, 'Noite concluída! +1 Quad Coin · +' + scoreBonus + ' de Score');
+      addScore(1, 'Bloco da ' + heroTurno() + ' completo! +1 Quad Coin · +' + scoreBonus + ' de Score');
     });
     heroSync();
   }
@@ -6512,7 +6570,7 @@
   }
   function renderDia() {
     var agora = Date.now();
-    var vivos = DIA_BLOCOS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+    var vivos = diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
       return !x.b.feito && (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
     });
     $('diaList').innerHTML = vivos.map(function (x) {
@@ -6523,15 +6581,34 @@
     $('diaList').querySelectorAll('[data-dia]').forEach(function (bt) {
       bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
     });
+    /* o cartão diz de qual turma são as questões do dia */
+    var dt = $('diaTurma');
+    if (dt) {
+      var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+      dt.style.display = ta ? '' : 'none';
+      if (ta) dt.textContent = ta.nome.toUpperCase();
+    }
     heroSync();   /* o cartão herói acompanha as missões da noite */
   }
 
   /* ---------- motor do treinamento ---------- */
   var trTab = 'gerais', trFila = { gerais: [], esp: [] }, trPos = { gerais: 0, esp: 0 };
-  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trDia = -1;
+  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trDia = -1, trDiaArr = null;
+  /* o rodízio (fila + posição) é POR TURMA: trocar de turma troca o
+     baralho em andamento e o traz de volta intacto ao retornar        */
+  var TR_ST = {}, trTurmaDoEstado = null;
+  function trTrocaTurma() {
+    if (trTurmaDoEstado) TR_ST[trTurmaDoEstado] = { fila: trFila, pos: trPos };
+    var id = (typeof turmaAtivaId !== 'undefined' && turmaAtivaId) ? turmaAtivaId : 'patamo-n';
+    var st = TR_ST[id] || { fila: { gerais: trMontarFila('gerais'), esp: trMontarFila('esp') }, pos: { gerais: 0, esp: 0 } };
+    trFila = st.fila; trPos = st.pos;
+    trTurmaDoEstado = id;
+  }
   function trEhGeral(m) { return TR_GERAIS.indexOf(m) >= 0; }
   function trMontarFila(tab) {
-    var mats = EDITAL_CFO.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
+    /* o rodízio segue o edital da turma ativa (o Domínio já trocou junto) */
+    var arvore = (typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO;
+    var mats = arvore.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
     var fila = [], maxA = 0;
     mats.forEach(function (m) { maxA = Math.max(maxA, m[1].length); });
     for (var r = 0; r < maxA; r++) {
@@ -6586,8 +6663,8 @@
     });
   }
   function trAbrirBloco(i) {
-    var b = DIA_BLOCOS[i];
-    trDia = i;
+    var b = diaBlocos()[i];
+    trDia = i; trDiaArr = diaBlocos();   /* trocar de turma no meio não desvia o crédito */
     if (b.fonte === 'aula') {
       trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
       trCards = AULA_DEMO.cards.slice(b.ini, b.ini + 10).map(function (r) {
@@ -6642,13 +6719,16 @@
     carreira.scoreTemporada += trAcertos * TR_REW.scorePorAcerto;
     renderCarreira();
     addScore(TR_REW.coinsPorBloco, '+' + TR_REW.coinsPorBloco + ' Quad Coins · bloco de flashcards');
-    var chave = trDeck.m + '|' + trDeck.a;
+    /* o ajuste do Domínio é POR CONCURSO — acerto na turma da PC-BA não
+       mexe na barra homônima do CFO                                    */
+    var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
     trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
     if (typeof renderEdital === 'function') renderEdital();
     var deDia = trDia >= 0;
     if (deDia) {
-      DIA_BLOCOS[trDia].feito = true;
-      if (DIA_BLOCOS[trDia].fonte === 'aula') {
+      var arrDia = trDiaArr || diaBlocos();
+      arrDia[trDia].feito = true;
+      if (arrDia[trDia].fonte === 'aula') {
         /* respondidas, as cartas do PDF 01 entram no banco do Treinamento Rápido */
         trCards.forEach(function (c) { TR_BANK.push(c); });
         trFila.esp = trMontarFila('esp');
@@ -6684,6 +6764,7 @@
   $('btnTrSair').addEventListener('click', function () { $('trLayer').style.display = 'none'; });
   $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
   $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
+  trTrocaTurma();   /* registra o rodízio da turma inicial */
   renderDia();
   renderAtrasadas();
   renderSimulados();
@@ -6696,10 +6777,21 @@
   ];
   var TUT_REW = { score: 30, coins: 25 };
   var tqI = 0, tqAcertos = 0, tqLock = false, blocoIntroFeito = false;
+  /* a Introdução no Quad é DA CONTA: feita uma vez (no tutorial do 1º
+     acesso), fica concluída para sempre — em qualquer turma. A linha
+     não some: vira o registro visível de que já foi feita.            */
   function blocoIntroMarca(feito) {
     blocoIntroFeito = feito;
-    $('blocoIntroRow').style.display = feito ? 'none' : '';   /* concluída, some da lista */
+    $('biDot').textContent = feito ? '✓' : '1';
+    $('biDot').classList.toggle('done', !!feito);
+    $('btnBlocoIntro').style.display = feito ? 'none' : '';
+    $('biFeito').style.display = feito ? '' : 'none';
+    $('biDesc').textContent = feito
+      ? 'concluída no seu 1º acesso — vale para todas as turmas'
+      : '3 questões · o seu primeiro score · vale uma vez, para a conta';
+    if (feito) lsSet('vq_intro_done', '1');
   }
+  if (lsGet('vq_intro_done') === '1') blocoIntroMarca(true);
   $('btnBlocoIntro').addEventListener('click', function () {
     if (blocoIntroFeito) return;
     tqAbrir();
@@ -6813,9 +6905,10 @@
     carreira.scorePatente += pctScore; carreira.scoreCarreira += pctScore; carreira.scoreTemporada += pctScore;
     renderCarreira();
     addScore(pctCoins, '+' + pctCoins + ' Quad Coins · saldo da instrução');
+    blocoIntroMarca(true);   /* pular reproduz o estado final: a Introdução conta como feita */
     showView('v-inicio', 'navAluno');
     daniloHintMostra();
-    toast('Instrução pulada — você entrou como quem a concluiu: boina equipada e ' + pctCoins + ' Quad Coins (25 ganhos − ' + precoBoina + ' da boina). A Introdução no Quad segue em Missões.');
+    toast('Instrução pulada — você entrou como quem a concluiu: boina equipada, ' + pctCoins + ' Quad Coins (25 ganhos − ' + precoBoina + ' da boina) e a Introdução no Quad registrada como feita.');
   }
   var btnTutSkip = $('tutSkip');
   if (btnTutSkip) btnTutSkip.addEventListener('click', function (e) { e.stopPropagation(); tutPular(); });
@@ -7055,6 +7148,12 @@
     renderMinhasTurmas();
     if (typeof renderDomTurma === 'function') renderDomTurma();
     var rh = $('rankSalaHead'); if (rh) rh.textContent = 'Ranking da sala · ' + turmaLabel().replace('Turma ', '') + ' · ' + salaTotal() + ' alunos';
+    /* classificação viva: os tiles do perfil e a linha do Quadrômetro
+       seguem a turma ativa (eram números decorativos fixos)          */
+    var sT = salaTotal(), sP = salaPos(sT);
+    var e1 = $('rankSala'); if (e1) e1.textContent = '#' + sP;
+    var e2 = $('rankSalaTotal'); if (e2) e2.textContent = 'de ' + sT + ' alunos';
+    var e3 = $('qPos'); if (e3) e3.textContent = '#' + sP;
     $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
     $('xpFill').style.width = pct + '%';
     $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
@@ -7330,9 +7429,9 @@
   window.__prova = prova;   /* exposto para a suíte de testes */
   /* internos da "Bloco da noite" expostos para a suíte de testes */
   window.__noite = {
-    blocos: DIA_BLOCOS, missoes: missoesDaNoite, heroSync: heroSync, renderDia: renderDia,
+    blocos: diaBlocos, missoes: missoesDaNoite, heroSync: heroSync, renderDia: renderDia,
     concluirTudo: function () { missoesDaNoite().forEach(function (x) { x.b.feito = true; }); renderDia(); heroSync(); },
-    resgatado: function () { return noiteBonusResgatado; }
+    resgatado: function () { return noiteResgatada(); }
   };
   function embaralhar(arr) { return arr.map(function (x) { return [Math.random(), x]; }).sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; }); }
   function provaNorm(c) { return { t: c.t, c: c.c, o: c.o }; }
@@ -7824,7 +7923,6 @@
     /* o envio de materiais e o alvo dos avisos escolhem a turma nesta lista */
     if (typeof admMatTurmasInit === 'function') admMatTurmasInit();
     if (typeof admAvEscInit === 'function') admAvEscInit();
-    if (typeof admEvTurmasInit === 'function') admEvTurmasInit();
   }
   function nomeConcurso(id) { var c = concursoDe(id); return c ? c.nome : ''; }
   /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
@@ -7970,6 +8068,8 @@
       $('admCtProfsBox').style.display = iso ? 'none' : 'block';
       $('admCtApelido').placeholder = iso ? 'Matéria (ex.: Língua Portuguesa)' : 'Apelido (ex.: Turma Águia)';
       $('admCtLbHor').textContent = iso ? 'Horário da aula' : 'Horário dos dois tempos';
+      $('admCtLbVagas').textContent = iso ? 'Vagas' : 'Vagas em Diamantes';
+      $('admCtVagasQdcBox').style.display = iso ? 'none' : '';
       $('admCtLbH1').textContent = iso ? 'Começa às' : '1º tempo começa';
       $('admCtLbH1f').textContent = iso ? 'Termina às' : '1º termina · 2º começa';
       $('admCtH2Box').style.display = iso ? 'none' : '';
@@ -8004,9 +8104,18 @@
       /* o turno é consequência do horário — mostrado aqui, nunca escolhido */
       var tn = turnoDoHorario(h1i);
       chips.push(tn ? ['ok', 'Turno: ' + tn + ' (pelo horário)'] : ['', 'Turno: sai do horário que você digitar']);
+      /* vagas por moeda: a soma é o total — dito em voz alta */
+      if (!iso) {
+        var evd = parseInt($('admCtVagas').value, 10), evq = parseInt($('admCtVagasQdc').value, 10);
+        if (!isNaN(evd) && !isNaN(evq)) {
+          chips.push([(evd + evq) > 0 ? 'ok' : '', 'Vagas: ' + evd + ' em Dmn + ' + evq + ' em QdC = ' + (evd + evq) + ' no total']);
+        } else {
+          chips.push(['', 'Vagas: informe as de cada moeda (0 vale)']);
+        }
+      }
       eco.innerHTML = chips.map(function (c) { return '<span class="ec ' + c[0] + '">' + c[1] + '</span>'; }).join('');
     }
-    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f'].forEach(function (id) {
+    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f', 'admCtVagas', 'admCtVagasQdc'].forEach(function (id) {
       var el = $(id); if (!el) return;
       ['input', 'change', 'blur'].forEach(function (ev) { el.addEventListener(ev, admCtEco); });
     });
@@ -8117,7 +8226,7 @@
       var hs = horEmCampos(t.hor);
       $('admCtH1i').value = hs[0] || ''; $('admCtH1f').value = hs[1] || ''; $('admCtH2f').value = hs[3] || hs[2] || '';
       $('admCtPrecoDmn').value = t.precoDmn || ''; $('admCtPrecoQdc').value = t.precoQdc || '';
-      $('admCtVagas').value = (t.vagasDmn || 0) + (t.vagasQdc || 0); $('admCtVagasQdc').value = t.vagasQdc || 0;
+      $('admCtVagas').value = t.vagasDmn || 0; $('admCtVagasQdc').value = t.vagasQdc || 0;
       ctSalaOpcoes(); $('admCtSala').value = t.sala || ''; ctSalaEco();
       admCtEco(); ctBotao('Salvar alterações');
       admAlerta('admCtErro', 'Editando <b>' + t.nome + '</b> — as mudanças valem na Quad Store e para quem já está matriculado.', true);
@@ -8201,7 +8310,8 @@
       var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
       var turno = turnoDoHorario(h1i);   /* o turno vem do horário, não de um seletor à parte */
       var pDmn = parseInt($('admCtPrecoDmn').value, 10), pQdc = parseInt($('admCtPrecoQdc').value, 10);
-      var vagas = parseInt($('admCtVagas').value, 10), vQdc = parseInt($('admCtVagasQdc').value, 10);
+      var vDmn = parseInt($('admCtVagas').value, 10), vQdc = parseInt($('admCtVagasQdc').value, 10);
+      var vagas = (vDmn || 0) + (vQdc || 0);   /* total = soma das moedas */
       if (ctFalta(/["<>]/.test(ape), 'admCtApelido', 'Use um apelido sem aspas ou sinais.')) return;
       if (ctFalta(!ini, 'admCtIni', 'Para abrir a turma falta a <b>data de início</b>.')) return;
       if (ctFalta(!fim, 'admCtFim', 'Para abrir a turma falta a <b>data de término</b>.')) return;
@@ -8212,9 +8322,10 @@
       if (ctFalta(!(h1i < h1f && h1f < h2f), 'admCtH1f', 'Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.')) return;
       if (ctFalta(!pDmn || pDmn < 1, 'admCtPrecoDmn', 'Para abrir a turma falta o <b>preço em Diamantes</b>.')) return;
       if (ctFalta(!pQdc || pQdc < 1, 'admCtPrecoQdc', 'Para abrir a turma falta o <b>preço em Quad Coins</b>.')) return;
-      if (ctFalta(!vagas || vagas < 1, 'admCtVagas', 'Para abrir a turma faltam as <b>vagas totais</b>.')) return;
-      if (ctFalta(isNaN(vQdc), 'admCtVagasQdc', 'Para abrir a turma falta dizer <b>quantas dessas vagas são em Quad Coins</b> — escreva 0 se nenhuma.')) return;
-      if (ctFalta(vQdc < 0 || vQdc > vagas, 'admCtVagasQdc', 'As vagas em Quad Coins são um pedaço das vagas totais (0 a ' + vagas + ').')) return;
+      if (ctFalta(isNaN(vDmn), 'admCtVagas', 'Diga as <b>vagas em Diamantes</b> — escreva 0 se todas forem em Quad Coins.')) return;
+      if (ctFalta(isNaN(vQdc), 'admCtVagasQdc', 'Diga as <b>vagas em Quad Coins</b> — escreva 0 se todas forem em Diamantes.')) return;
+      if (ctFalta(vDmn < 0 || vQdc < 0, 'admCtVagas', 'Vagas não podem ser negativas.')) return;
+      if (ctFalta(vagas < 1, 'admCtVagas', 'A turma precisa de <b>ao menos 1 vaga</b> — informe as vagas de cada moeda.')) return;
       var sala = $('admCtSala').value;
       if (ctFalta(!sala, 'admCtSala', 'Para abrir a turma falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
       var fxNova = faixaCompleta(hl2(h1i) + '–' + hl2(h2f));
@@ -8234,7 +8345,7 @@
       var mod = modalidadeDe(tipo) || {};
       var nome = ape ? (/^turma\b/i.test(ape) ? ape : 'Turma ' + ape) : (mod.nome || ('Turma ' + tipo));
       var novaTurma = { id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: mod.nome || tipo, sala: sala, turno: turno, hor: hor,
-        concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vagas - vQdc, vagasQdc: vQdc,
+        concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vDmn, vagasQdc: vQdc,
         inicio: ini, fim: fim, edital: arq, professores: profs };
       if (editando) {
         TURMAS_LOJA = TURMAS_LOJA.map(function (x) { return x.id === editando ? novaTurma : x; });
@@ -8254,8 +8365,8 @@
       $('admCtArvore').value = '';
       if (typeof renderSalas === 'function') renderSalas();
       ctArvoreArq = ''; renderCtProfs();
-      admAlerta('admCtErro', '<b>' + nome + '</b> ' + (editando ? 'atualizada' : 'aberta') + ' na <b>' + sala + '</b> (' + turno + ') — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + (vagas - vQdc) + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins.', true);
-      toast('“' + nome + '” ' + (editando ? 'atualizada' : 'aberta') + ' — na Quad Store com ' + (vagas - vQdc) + ' vagas em Dmn e ' + vQdc + ' em QdC.');
+      admAlerta('admCtErro', '<b>' + nome + '</b> ' + (editando ? 'atualizada' : 'aberta') + ' na <b>' + sala + '</b> (' + turno + ') — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + vDmn + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins (' + vagas + ' no total).', true);
+      toast('“' + nome + '” ' + (editando ? 'atualizada' : 'aberta') + ' — na Quad Store com ' + vDmn + ' vagas em Dmn e ' + vQdc + ' em QdC.');
     });
     renderCtLista();
   })();
@@ -9955,8 +10066,10 @@
       return '<div class="p-card"><h3>' + g.materia + ' — ' + g.assunto + (novo ? ' <span class="tag gold">NOVO</span>' : '') + '</h3>' +
         g.itens.map(function (m) {
           var tp = MAT_TIPOS[m.tipo] || MAT_TIPOS.outro;
+          /* com 2+ matrículas, cada material diz de qual turma veio */
+          var deTurma = (minhas.length > 1) ? ' · ' + matTurmaNome(m.turma) : '';
           return '<div class="mission-row"><div class="m-dot">' + tp.ico + '</div>' +
-            '<div class="grow"><div class="t">' + (m.titulo || tp.rot) + '</div><div class="d">' + m.det + ' · ' + m.quando + '</div></div>' +
+            '<div class="grow"><div class="t">' + (m.titulo || tp.rot) + '</div><div class="d">' + m.det + ' · ' + m.quando + deTurma + '</div></div>' +
             '<button class="btn ghost small mat-dl" data-mat="' + m.id + '">Abrir</button></div>';
         }).join('') + '</div>';
     }).join('');
@@ -10061,8 +10174,7 @@
   /* ---------- eventos da semana: regras e novos eventos ---------- */
   function renderAdmEventos() {
     $('admEvList').innerHTML = EVENTOS.map(function (ev) {
-      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS') +
-        (ev.alvo && ev.alvo !== 'todas' ? ' · só a ' + avisoAlvoNome(ev.alvo) : '');
+      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS');
       var insc = evInscritosCount(ev.id);
       var quem = evProfsTxt(ev);
       return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (quem ? ' · ' + quem : '') + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
@@ -10101,7 +10213,6 @@
     if (ev.hf) $('admEvNovoFim').value = ev.hf;
     renderEvProfChips(evProfs(ev));
     admEvCamposToggle();
-    admEvTurmasInit(); $('admEvAlvo').value = ev.alvo || 'todas';
     /* online já ficou com o Estúdio reservado: o seletor volta marcado */
     $('admEvSala').value = ev.online ? ESTUDIO : (ev.sala || '');
     admEvSalaEcoRender();
@@ -10183,16 +10294,6 @@
   /* reserva do espaço: presencial escolhe uma das 4 salas; online escolhe
      o Estúdio — escolhe mesmo, o seletor fica ativo e vazio até que o
      administrador o selecione, como em qualquer outra reserva          */
-  /* quem vê o evento: todas as turmas ou uma delas */
-  function admEvTurmasInit() {
-    var sel = $('admEvAlvo'); if (!sel) return;
-    var atual = sel.value;
-    sel.innerHTML = '<option value="todas">Todas as turmas</option>' +
-      TURMAS_LOJA.map(function (t) {
-        return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>Só a ' + t.nome + '</option>';
-      }).join('');
-    if (atual) sel.value = atual;
-  }
   function admEvSalaOpcoes() {
     var sel = $('admEvSala'); if (!sel) return;
     var online = $('admEvNovoModal').value === 'online';
@@ -10208,7 +10309,7 @@
     }
     admEvSalaEcoRender();
   }
-  function admEvAlvo(sala) {
+  function admEvOcupacao(sala) {
     var d = $('admEvNovoData').value, hi = $('admEvNovoInicio').value, hf = $('admEvNovoFim').value;
     if (!d || !hi || !hf || !(hi < hf)) return null;
     return ocPontual(sala, 'novo evento', 'evento', d, hi, hf, evEdit || null);
@@ -10218,7 +10319,7 @@
     var sl = $('admEvSala').value;
     if (!sl) { eco.style.display = 'none'; return; }
     eco.style.display = '';
-    eco.innerHTML = salaEcoHTML(sl, admEvAlvo(sl));
+    eco.innerHTML = salaEcoHTML(sl, admEvOcupacao(sl));
   }
   (function () {
     var el = $('admEvSala');
@@ -10286,7 +10387,7 @@
       if (ev) {
         ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link; ev.profs = profs;
         ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
-        ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf; ev.alvo = $('admEvAlvo').value;
+        ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf;
         ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
         ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
       }
@@ -10301,7 +10402,7 @@
     }
     EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
       tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
-      quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf, alvo: $('admEvAlvo').value,
+      quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf,
       modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
@@ -10309,7 +10410,6 @@
     $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
     $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
     $('admEvSala').value = '';
-    admEvTurmasInit(); $('admEvAlvo').value = 'todas';
     admEvSalaOpcoes();
     renderEvProfChips([]);
     admEvPreview();
@@ -10575,7 +10675,7 @@
     $('admSimVagasBox').style.display = pres ? '' : 'none';
     $('admSimVagasQdcBox').style.display = pres ? '' : 'none';
     $('admSimPrecosHint').innerHTML = pres
-      ? 'O simulado presencial é vendido <strong>nas duas moedas</strong> — informe o preço em cada uma. As <strong>vagas totais</strong> são os lugares da sala: as que você marcar em <strong>Quad Coins</strong> ficam nessa moeda, e <strong>o restante fica em Diamantes</strong>.'
+      ? 'O simulado presencial é vendido <strong>nas duas moedas</strong> — informe o preço e as <strong>vagas de cada moeda</strong> (0 vale). A soma é a lotação da sala.'
       : 'O digital <strong>não tem limite de vagas</strong>. Informe o preço nas duas moedas — o aluno escolhe na compra. Para vender só numa, deixe a outra em branco.';
     /* prêmio em Quad Coins é do digital gratuito (por acerto) — o
        presencial é sempre vendido, nunca premiado                      */
@@ -10587,12 +10687,12 @@
   function admSimEco() {
     var eco = $('admSimEco'); if (!eco) return;
     if ($('admSimModal').value !== 'presencial') { eco.innerHTML = ''; return; }
-    var tot = parseInt($('admSimVagas').value, 10), vq = parseInt($('admSimVagasQdc').value, 10);
-    if (!tot || tot < 1) { eco.innerHTML = '<span class="ec">Vagas: informe quantos lugares a sala tem</span>'; return; }
-    if (isNaN(vq) || vq < 0) { eco.innerHTML = '<span class="ec ok">' + tot + ' vagas</span><span class="ec">Diga quantas ficam em Quad Coins</span>'; return; }
-    if (vq > tot) { eco.innerHTML = '<span class="ec">As vagas em Quad Coins não podem passar das ' + tot + ' totais</span>'; return; }
-    eco.innerHTML = '<span class="ec ok">' + tot + ' vagas</span>' +
-      '<span class="ec ok">' + (tot - vq) + ' em Diamantes</span>' +
+    var vd = parseInt($('admSimVagas').value, 10), vq = parseInt($('admSimVagasQdc').value, 10);
+    if (isNaN(vd) && isNaN(vq)) { eco.innerHTML = '<span class="ec">Vagas: informe as de cada moeda (0 vale)</span>'; return; }
+    if (isNaN(vd)) { eco.innerHTML = '<span class="ec ok">' + vq + ' em Quad Coins</span><span class="ec">Diga as vagas em Diamantes (0 vale)</span>'; return; }
+    if (isNaN(vq)) { eco.innerHTML = '<span class="ec ok">' + vd + ' em Diamantes</span><span class="ec">Diga as vagas em Quad Coins (0 vale)</span>'; return; }
+    eco.innerHTML = '<span class="ec ok">' + (vd + vq) + ' vagas</span>' +
+      '<span class="ec ok">' + vd + ' em Diamantes</span>' +
       '<span class="ec ok">' + vq + ' em Quad Coins</span>';
   }
   ['admSimVagas', 'admSimVagasQdc'].forEach(function (id) {
@@ -10678,13 +10778,15 @@
     if (simFalta(!nome, 'admSimNome', 'Para lançar o simulado falta o <b>nome</b>.')) return;
     if (modal === 'presencial') {
       var d = $('admSimData').value, ini = $('admSimIni').value, fim = $('admSimFim').value;
-      var vTot = parseInt($('admSimVagas').value, 10), vQdc = parseInt($('admSimVagasQdc').value, 10);
+      var vDmnS = parseInt($('admSimVagas').value, 10), vQdc = parseInt($('admSimVagasQdc').value, 10);
+      var vTot = (vDmnS || 0) + (vQdc || 0);
       if (simFalta(!d, 'admSimData', 'Para lançar o simulado presencial falta a <b>data</b> — escolha o dia na agenda.')) return;
       if (simFalta(!ini || !fim || !(ini < fim), 'admSimIni', 'Informe o <b>horário</b> do simulado — o término precisa ser depois do início.')) return;
-      if (simFalta(!vTot || vTot < 1, 'admSimVagas', 'O simulado presencial ocupa lugar na sala: informe as <b>vagas totais</b>.')) return;
-      if (simFalta(isNaN(vQdc), 'admSimVagasQdc', 'Diga <b>quantas dessas vagas são em Quad Coins</b> — escreva 0 se todas forem em Diamantes.')) return;
-      if (simFalta(vQdc < 0 || vQdc > vTot, 'admSimVagasQdc', 'As vagas em Quad Coins são um pedaço das vagas totais (0 a ' + vTot + ').')) return;
-      if (simFalta((vTot - vQdc) > 0 && (!pDmn || pDmn < 1), 'admSimPrecoDmn', 'Há <b>' + (vTot - vQdc) + ' vagas em Diamantes</b> — informe o preço em Diamantes.')) return;
+      if (simFalta(isNaN(vDmnS), 'admSimVagas', 'Diga as <b>vagas em Diamantes</b> — escreva 0 se todas forem em Quad Coins.')) return;
+      if (simFalta(isNaN(vQdc), 'admSimVagasQdc', 'Diga as <b>vagas em Quad Coins</b> — escreva 0 se todas forem em Diamantes.')) return;
+      if (simFalta(vDmnS < 0 || vQdc < 0, 'admSimVagas', 'Vagas não podem ser negativas.')) return;
+      if (simFalta(vTot < 1, 'admSimVagas', 'O simulado presencial ocupa lugar na sala: informe <b>ao menos 1 vaga</b>.')) return;
+      if (simFalta(vDmnS > 0 && (!pDmn || pDmn < 1), 'admSimPrecoDmn', 'Há <b>' + vDmnS + ' vagas em Diamantes</b> — informe o preço em Diamantes.')) return;
       if (simFalta(vQdc > 0 && (!pQdc || pQdc < 1), 'admSimPrecoQdc', 'Há <b>' + vQdc + ' vagas em Quad Coins</b> — informe o preço em Quad Coins.')) return;
       /* sala por último, na mesma ordem da criação de turmas */
       var salaSim = $('admSimSala').value;
@@ -10694,14 +10796,14 @@
       if (chSim && simFalta(true, 'admSimSala', 'A <b>' + salaSim + '</b> já tem <b>' + chSim.rot + '</b> nesse dia e horário (' + chSim.hor + ') — escolha outra sala ou outro horário.')) return;
       SIMULADOS.unshift({ id: 's' + Date.now(), rot: nome, det: simQuando(d, ini, fim), tag: 'PRESENCIAL', sala: salaSim,
         pago: true, valor: pDmn || pQdc, precoDmn: pDmn || 0, precoQdc: pQdc || 0,
-        moeda: (vTot - vQdc) ? 'dmn' : 'qdc', rec: 0, score: 100,
+        moeda: vDmnS ? 'dmn' : 'qdc', rec: 0, score: 100,
         dataISO: d, hi: ini, hf: fim, vagas: vTot,
-        vagasDmn: vTot - vQdc, vagasQdc: vQdc, vagasGratis: 0,
+        vagasDmn: vDmnS, vagasQdc: vQdc, vagasGratis: 0,
         insc: false, comprado: false, realizado: false });
       admAlerta('admSimErro', 'Simulado <b>' + nome + '</b> lançado para ' + simQuando(d, ini, fim) + ' na <b>' + salaSim + '</b> — <b>' + vTot + ' vagas</b>: ' +
-        (vTot - vQdc) + ' em Diamantes' + (pDmn ? ' (' + fmt(pDmn) + ' Dmn)' : '') + ' e ' + vQdc + ' em Quad Coins' + (pQdc ? ' (' + fmt(pQdc) + ' QdC)' : '') +
+        vDmnS + ' em Diamantes' + (pDmn ? ' (' + fmt(pDmn) + ' Dmn)' : '') + ' e ' + vQdc + ' em Quad Coins' + (pQdc ? ' (' + fmt(pQdc) + ' QdC)' : '') +
         ', à venda na Loja.', true);
-      toast('Simulado presencial lançado — ' + vTot + ' vagas: ' + (vTot - vQdc) + ' em Dmn e ' + vQdc + ' em QdC.');
+      toast('Simulado presencial lançado — ' + vTot + ' vagas: ' + vDmnS + ' em Dmn e ' + vQdc + ' em QdC.');
       $('admSimVagas').value = ''; $('admSimVagasQdc').value = '';
       $('admSimPrecoDmn').value = ''; $('admSimPrecoQdc').value = '';
       $('admSimSala').value = '';
@@ -11089,6 +11191,9 @@
         MATRICULAS = MATRICULAS.filter(function (m) { return m.turmaId !== t.id; });
         if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
         if (typeof checarMatricula === 'function') checarMatricula();
+        /* estornou a turma que estava EM USO? o app passa a falar pela
+           matrícula restante — turmaAtiva() se autocorrige e tudo redesenha */
+        if (typeof definirTurmaAtiva === 'function' && typeof turmaAtivaId !== 'undefined') definirTurmaAtiva(turmaAtivaId, true);
         if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
         if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* estornou: o material sai junto */
       }
@@ -11351,7 +11456,6 @@
   if (typeof renderCtLista === 'function') renderCtLista();
   if (typeof window.__matRefresh === 'function') window.__matRefresh();
   if (typeof admAvEscInit === 'function') admAvEscInit();
-  if (typeof admEvTurmasInit === 'function') admEvTurmasInit();
   if (typeof definirTurmaAtiva === 'function' && turmaAtivaId) definirTurmaAtiva(turmaAtivaId, true);
 
   /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
