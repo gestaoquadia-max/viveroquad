@@ -7164,6 +7164,16 @@
     lay.classList.add('on');
     return true;
   }
+  /* tocar fora não prende ninguém: fica na turma que já estava em uso */
+  (function () {
+    var lay = $('trocaLayer'); if (!lay) return;
+    lay.addEventListener('click', function (e) {
+      if (e.target !== lay) return;
+      lay.classList.remove('on');
+      var t = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+      if (t) toast('Você segue na ' + t.nome + ' — dá para trocar em “Minhas turmas” quando quiser.');
+    });
+  })();
   /* quantos alunos a sala tem de verdade: sai da turma ATIVA do aluno */
   function turmaPrincipal() { return (typeof turmaAtiva === 'function') ? turmaAtiva() : null; }
   function salaTotal() {
