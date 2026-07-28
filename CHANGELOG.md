@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Item de combate se repete; o carrossel leva direto ao item na Loja
+
+- **Item de combate não é de compra única** (item 1): a regra de "sumir da
+  vitrine ao comprar" valia para os itens da mochila, e não devia — não há
+  limitação física neles. Agora o item **fica sempre na Loja** e pode ser
+  comprado quantas vezes o aluno quiser; o card mostra **"N na mochila"**
+  quando ele já tem unidades, o pop-up de compra avisa quantas já tem, e a
+  mochila conta **unidades e tipos** ("3 unidades · 1 tipo") em vez de
+  "N de M do catálogo". A regra de estoque decrescente continua valendo
+  só para os **produtos físicos** da recepção.
+- **O carrossel leva direto ao item** (item 2): tocar num evento marcado
+  **"NA LOJA"** abria a Quad Store na seção certa, mas o aluno ainda tinha
+  de caçar o card. Agora ele é levado **ao item exato**, que entra
+  centralizado na tela e **pisca em azul** por dois segundos. O mesmo vale
+  para o **simulado presencial**, que usava o mesmo caminho pela metade.
+
 ## 28/07/2026 — Material que baixa, grade por turma, estoque de verdade e mais seis ajustes
 
 - **O material da aula baixa** (item 1): o PDF anexado no painel era

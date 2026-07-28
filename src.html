@@ -1360,6 +1360,13 @@
   .loja-macro .lm-ico { width: 30px; height: 30px; flex: none; border-radius: 9px; display: grid; place-items: center;
     background: linear-gradient(160deg, #1E7DFF, #135FE0); }
   .loja-macro .lm-ico svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  /* item para o qual o aluno foi levado: pisca em azul por um instante,
+     para ele não ter de caçar o que veio comprar */
+  @keyframes lojaPisca {
+    0%, 100% { box-shadow: 0 5px 14px rgba(11,46,115,0.07); border-color: var(--p-line); }
+    18%, 62% { box-shadow: 0 0 0 4px rgba(29,99,200,0.22), 0 8px 20px rgba(11,46,115,0.18); border-color: #1D63C8; }
+  }
+  .loja-item.achei { animation: lojaPisca 2.1s ease-in-out 1; }
   .loja-item { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
     background: linear-gradient(180deg, #FFFFFF, #F4F9FF); border: 1px solid var(--p-line); border-radius: 16px;
     padding: 13px 10px 11px; cursor: pointer; font: inherit; color: var(--p-text); position: relative;
@@ -4417,19 +4424,31 @@
     var id = tile.dataset.ev, ev = null;
     EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
     var st = evState[id] || {};
-    /* pago ainda não comprado: a inscrição é na Loja → leva o aluno pra lá */
+    /* pago ainda não comprado: a inscrição é na Loja → leva o aluno
+       DIRETO ao item, não só à aba (dec. 173)                         */
     if (ev && ev.pago && !(st.comprado || st.inscrito)) {
       showView('v-loja', 'navAluno');
       if (typeof renderEventosLoja === 'function') renderEventosLoja();
-      setTimeout(function () {
-        var alvo = $(ev.modalidade === 'online' ? 'lojaEventos-dig' : 'lojaEventos-pres');
-        if (alvo) alvo.scrollIntoView({ block: 'center' });
-      }, 60);
-      toast('Inscrição pela Loja — este evento é pago.');
+      lojaLevarAte('[data-ev-buy="' + id + '"]');
+      toast('Este evento é pago — a inscrição é aqui na Loja.');
       return;
     }
     openEvento(id);
   });
+  /* leva o aluno até o item exato dentro da Loja e o faz piscar — vale
+     para eventos pagos, simulados e o que mais mandar alguém "à Loja"  */
+  function lojaLevarAte(seletor) {
+    setTimeout(function () {
+      var alvo = document.querySelector('#v-loja ' + seletor);
+      if (!alvo) return;
+      var card = alvo.closest('.p-card') || alvo;
+      card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      alvo.classList.remove('achei');
+      void alvo.offsetWidth;          /* reinicia a animação se repetirem o clique */
+      alvo.classList.add('achei');
+      setTimeout(function () { alvo.classList.remove('achei'); }, 2400);
+    }, 80);
+  }
   function coinSvg() { return '<img class="coin-img" src="' + QUAD_COIN_SRC + '" alt="" aria-hidden="true">'; }
   var QUAD_COIN_SRC = '__QUAD_COIN__';
   function openEvento(id) {
@@ -6349,7 +6368,7 @@
        compra na Loja, em Quad Coins ou Diamantes                        */
     showView('v-loja', 'navAluno');
     renderLojaSimulados();
-    setTimeout(function () { var c = $('lojaSim-pres'); if (c) c.scrollIntoView({ block: 'center' }); }, 60);
+    lojaLevarAte('[data-sim-buy="' + sm.id + '"]');   /* direto no item, não só na aba */
     toast('Simulado presencial — a inscrição é a compra da vaga na Loja, em Quad Coins ou Diamantes.');
   }
   /* choque de agenda do simulado presencial (mesma régua das compras) */
@@ -9442,15 +9461,18 @@
   }
   function renderLojaCombate() {
     var g = $('combatGrid'); if (!g) return;
-    /* item comprado sai da vitrine — o lugar dele agora é a mochila */
-    var aVenda = ITENS_COMBATE.filter(function (it) { return MOCHILA.indexOf(it.id) < 0; });
-    g.innerHTML = aVenda.map(function (it) {
+    /* item de combate NÃO acaba e NÃO é de compra única: fica sempre na
+       vitrine e pode ser comprado quantas vezes o aluno quiser (dec. 172).
+       Quantas unidades ele já tem aparece como etiqueta.               */
+    g.innerHTML = ITENS_COMBATE.map(function (it) {
+      var meus = MOCHILA.filter(function (x) { return x === it.id; }).length;
       return '<button class="loja-item" data-combate="' + it.id + '">' +
+        (meus ? '<span class="li-estoque meu">' + meus + ' na mochila</span>' : '') +
         '<span class="li-ico">' + itemIcoHtml(it) + '</span>' +
         '<span class="li-nome">' + it.nome + '</span>' +
         '<span class="li-desc">' + it.desc + '</span>' +
         '<span class="li-preco">' + it.preco + ' QdC</span></button>';
-    }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Todos os itens de combate já estão na sua mochila.</p>';
+    }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum item de combate na Loja.</p>';
     g.querySelectorAll('[data-combate]').forEach(function (bt) {
       bt.addEventListener('click', function () { mochilaComprar(bt.dataset.combate); });
     });
@@ -9458,23 +9480,30 @@
   }
   function mochilaComprar(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
-    if (MOCHILA.indexOf(id) >= 0) { toast('Este item já está na sua mochila.'); return; }
-    var it = itemDe(id);
-    confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila', preco: it.preco, moeda: 'qdc', ico: itemIcoHtml(it) }, function () {
+    var it = itemDe(id); if (!it) return;
+    var jaTem = MOCHILA.filter(function (x) { return x === id; }).length;
+    confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila' + (jaTem ? ' (você já tem ' + jaTem + ')' : ''),
+      preco: it.preco, moeda: 'qdc', ico: itemIcoHtml(it) }, function () {
       if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
       addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
       MOCHILA.push(id);
       if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
       renderLojaCombate();
       renderMochila();
-      toast(it.nome + ' foi para a mochila de combate!');
+      var n = MOCHILA.filter(function (x) { return x === id; }).length;
+      toast(it.nome + ' foi para a mochila' + (n > 1 ? ' — agora você tem ' + n : '') + '!');
     });
   }
   function renderMochila() {
     var mq = $('mochilaQtd');
     if (mq) mq.textContent = MOCHILA.length + (MOCHILA.length === 1 ? ' item guardado' : ' itens guardados');
     var sub = $('mochilaSub');
-    if (sub) sub.textContent = MOCHILA.length ? MOCHILA.length + ' de ' + ITENS_COMBATE.length + ' itens' : 'nenhum item guardado ainda';
+    if (sub) {
+      var tipos = MOCHILA.filter(function (x, i) { return MOCHILA.indexOf(x) === i; }).length;
+      sub.textContent = MOCHILA.length
+        ? MOCHILA.length + (MOCHILA.length === 1 ? ' unidade' : ' unidades') + ' · ' + tipos + (tipos === 1 ? ' tipo' : ' tipos')
+        : 'nenhum item guardado ainda';
+    }
     var grid = $('storageGrid'); if (!grid) return;
     var slots = Math.max(9, Math.ceil((MOCHILA.length + 1) / 3) * 3);
     var html = '';
