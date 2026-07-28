@@ -7511,7 +7511,10 @@
   function renderModalidades() {
     var el = $('admModList'); if (!el) return;
     el.innerHTML = MODALIDADES.map(function (m) {
-      return '<div class="mod-row"><div class="mod-top"><span class="mod-nome">' + m.nome + '</span><span class="mod-desc">' + m.desc + '</span></div>' +
+      /* o apelido em uso fica ao lado do tipo — é por ele que a casa
+         chama a turma, mas quem nomeia a modalidade é o tipo          */
+      return '<div class="mod-row"><div class="mod-top"><span class="mod-nome">' + m.nome + '</span>' +
+        '<span class="mod-desc">apelido: ' + m.apelido + ' · ' + m.desc + '</span></div>' +
         '<div class="mod-bar"><span class="mod-teo" style="width:' + m.teoria + '%">' + m.teoria + '% teoria</span>' +
         '<span class="mod-que" style="width:' + m.questoes + '%">' + m.questoes + '% questões</span></div></div>';
     }).join('');
