@@ -1,5 +1,42 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Pronome da personagem, estorno consumido, lotação por sala, portaria sincronizada e mensagens por público
+
+- **"Essa Mulher…", não "Esse Mulher…"** (item 1): a pergunta de
+  confirmação do avatar no tutorial agora concorda com a personagem —
+  rótulo que começa com "Mulher" recebe **"Essa"**; homem segue com
+  "Esse". O botão passou a dizer **"Sim, sou eu!"**.
+- **A Introdução no Quad some quando feita** (item 2): a linha fixa
+  "FEITA · DA CONTA" saiu de "Hoje · questões novas". Ela é da conta e
+  foi feita no tutorial — concluída, **desaparece do bloco** em vez de
+  ocupar lugar.
+- **Consumo mata o estorno** (item 3): a compra ficava 7 dias em
+  "Estornos · até 7 dias" mesmo depois de o aluno **entrar no aulão** ou
+  **retirar o produto** — dava para participar e estornar depois. Agora,
+  **liberar a entrada** na portaria, **liberar o inscrito** do simulado ou
+  **entregar o pedido físico** marca a compra como consumida e ela **sai
+  da janela de estorno** na hora, com aviso na liberação.
+- **Lotação por sala** (item 4): Sala 1 = **155**, Sala 2 = **85**,
+  Sala 3 = **125**, Sala 4 = **185** lugares. O mapa de salas mostra a
+  lotação; turma, isolada e simulado **não abrem com mais vagas que a
+  sala comporta** (barrado com o número na cara); o **evento presencial
+  herda a lotação da sala** — o card da Loja diz os lugares e, lotado,
+  vira **LOTADO**: indisponível na vitrine, no carrossel e na compra.
+- **"Autorizações de acesso" de verdade** (item 5): o bloco listava
+  atividades fictícias ("Aniversário do Quad") e ignorava as compras
+  reais. Agora os grupos **são os eventos presenciais vigentes** — com
+  quando, sala e lugares — e a lista de cada um acompanha a vida real: o
+  aluno **entra ao comprar** (ou se inscrever) e sai ao cancelar; liberar
+  a entrada consome a compra (item 3). Evento cancelado leva o grupo
+  junto.
+- **Comunicação interna por público** (item 6): além de aluno e
+  professor, o bloco de mensagens agora fala com **inscritos na turma, na
+  isolada, no simulado, no evento** e com **todos os alunos da
+  plataforma**. O seletor diz o alcance de cada público ("Turma PATAMO ·
+  N alunos"), o envio confirma **"alcança N alunos"**, o log registra o
+  público e a mensagem chega no chat do aluno com o público na frente
+  ("[Turma PATAMO] Aula antecipada…").
+
 ## 28/07/2026 — Edição do cadastro no Banco de professores
 
 - **"Editar" em cada professor cadastrado**: o mesmo formulário do bloco

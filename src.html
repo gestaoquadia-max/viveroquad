@@ -2547,12 +2547,17 @@
           </div>
 
           <div class="p-card" data-bl="msg">
-            <div class="k-label">Mensagens individuais</div>
+            <div class="k-label">Comunicação interna · mensagens</div>
             <div class="adm-form">
               <div class="adm-row">
-                <select class="fld" id="admMsgTipo" title="Destinatário" style="max-width:130px">
-                  <option value="aluno">Para aluno</option>
-                  <option value="prof">Para professor</option>
+                <select class="fld" id="admMsgTipo" title="Público da mensagem" style="max-width:160px">
+                  <option value="aluno">Um aluno</option>
+                  <option value="prof">Um professor</option>
+                  <option value="turma">Inscritos numa turma</option>
+                  <option value="isolada">Inscritos numa isolada</option>
+                  <option value="simulado">Inscritos num simulado</option>
+                  <option value="evento">Inscritos num evento</option>
+                  <option value="todos">Todos os alunos</option>
                 </select>
                 <select class="fld" id="admMsgAluno"></select>
               </div>
@@ -2563,7 +2568,7 @@
             </div>
             <div class="adm-sep"><span>Mensagens enviadas</span></div>
             <div id="admMsgList"></div>
-            <p class="sub" style="margin-top:8px">Escolha <strong>aluno ou professor</strong> e envie um recado individual. Para o <strong>aluno</strong>, chega no "+" com contador (estilo WhatsApp); para o <strong>professor</strong>, aparece na <strong>sala dele</strong>, também com contador. O chat ao vivo fica como próxima implementação.</p>
+            <p class="sub" style="margin-top:8px">Fale com <strong>um aluno</strong>, <strong>um professor</strong> ou com um <strong>público inteiro</strong>: os inscritos de uma turma, isolada, simulado ou evento — ou <strong>todos os alunos da plataforma</strong>. Para o aluno, chega no "+" com contador (estilo WhatsApp); para o professor, na sala dele. O chat ao vivo fica como próxima implementação.</p>
           </div>
 
           <div class="p-card" data-bl="gift">
@@ -4055,6 +4060,7 @@
       if (typeof renderAtrasadas === 'function') renderAtrasadas();
     }
     if (id === 'v-adm-loja' && typeof renderPrecos === 'function') renderPrecos();   /* editores nunca com preço velho */
+    if (id === 'v-adm-liber' && typeof renderAcessos === 'function') renderAcessos(); /* portaria sempre sincronizada */
     if (id === 'v-calendario') {
       if (typeof renderCalendario === 'function') renderCalendario();
       /* os simulados moraram em Missões até 28/07; a casa deles é a agenda */
@@ -4296,6 +4302,7 @@
     var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
     var choque = insc ? null : choqueDeAgenda(agendaDoEvento(ev));
     var etiqueta = insc ? '<span class="tag gold">INSCRITO</span>'
+      : (typeof evLotado === 'function' && evLotado(ev)) ? '<span class="tag warn">LOTADO</span>'
       : choque ? '<span class="tag warn em-choque">EM CHOQUE</span>'
       : ev.pago ? '<span class="tag gold">NA LOJA</span>'
       : ev.tag ? '<span class="tag gold">' + ev.tag + '</span>'
@@ -4346,12 +4353,15 @@
         var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
         var comprado = evState[ev.id] && evState[ev.id].comprado;
         var chq = comprado ? null : choqueDeAgenda(agendaDoEvento(ev));
-        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
-          (comprado ? '<span class="li-estoque">INSCRITO</span>' : chq ? '<span class="li-estoque">EM CHOQUE</span>' : '') +
+        var lot = evLot(ev), rest = lot ? Math.max(0, lot - evOcupados(ev)) : 0;
+        var lotado = !comprado && evLotado(ev);
+        var estq = comprado ? 'INSCRITO' : lotado ? 'LOTADO' : chq ? 'EM CHOQUE' : (lot ? rest + ' lugares' : '');
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + (lotado ? ' indisponivel' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+          (estq ? '<span class="li-estoque">' + estq + '</span>' : '') +
           '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
           '<span class="li-nome">' + ev.nome + '</span>' +
           '<span class="li-desc">' + (evProfsTxt(ev) || (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal)) + '</span>' +
-          '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'INSCRITO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+          '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'INSCRITO' : lotado ? 'LOTADO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
       }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
       g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
         bt.addEventListener('click', function () { comprarEvento(bt.dataset.evBuy); });
@@ -4359,6 +4369,27 @@
     });
   }
   function evHojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  /* lotação do evento presencial = as cadeiras da sala escolhida.
+     ocup = inscritos simulados da demo; o aluno desta sessão entra pela
+     evState. Online (Estúdio) não tem limite físico.                  */
+  function evLot(ev) {
+    if (!ev || ev.online || ev.modalidade === 'online') return 0;
+    return ev.lot || (typeof salaCap === 'function' ? salaCap(ev.sala) : 0) || 0;
+  }
+  function evOcupados(ev) {
+    return (ev.ocup || 0) + (typeof evInscritosCount === 'function' ? evInscritosCount(ev.id) : 0);
+  }
+  function evLotado(ev) {
+    var l = evLot(ev);
+    return l > 0 && evOcupados(ev) >= l;
+  }
+  window.__evLotar = function (id, n) {   /* para a suíte de testes */
+    var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    ev.ocup = n;
+    renderEventosLoja(); renderEvStrip();
+    if (typeof renderAcessos === 'function') renderAcessos();
+  };
   function evAcabou(ev) {
     var lim = ev.ate || ev.dataISO;   /* multi-dia usa 'ate'; pontual usa a própria data */
     if (!lim) return false;
@@ -4369,6 +4400,7 @@
     var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
     if (!ev) return;
     if (evState[id] && evState[id].comprado) { toast('Você já está inscrito — o evento segue aqui até o último dia.'); return; }
+    if (evLotado(ev)) { toast('Lotado — a ' + (ev.sala || 'sala') + ' comporta ' + evLot(ev) + ' pessoas e as vagas acabaram.'); return; }
     var choque = choqueDeAgenda(agendaDoEvento(ev));
     var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
     confirmarCompra({ nome: ev.nome, desc: 'evento ' + (ev.modalidade === 'online' ? 'online' : 'presencial'), preco: ev.preco, moeda: mo,
@@ -4380,6 +4412,7 @@
       st.comprado = true; st.inscrito = true;   /* comprou o acesso = já está dentro */
       if (typeof renderAdmEventos === 'function') renderAdmEventos();
       if (typeof lojaCompraLog === 'function') lojaCompraLog(ev.nome, ev.preco, mo, 'evento', id);
+      if (typeof renderAcessos === 'function') renderAcessos();   /* entra na portaria na hora */
       renderEventosLoja();
       renderEvStrip();                                  /* entra no carrossel do Início */
       if (typeof renderCalendario === 'function') renderCalendario();
@@ -4472,9 +4505,11 @@
       ev.coins.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts coin">' + coinSvg() + r[1] + '</span></div>'; }).join('') + '</div>';
     h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
     var jaTem = st.inscrito || st.comprado;
-    var rotInsc = ev.pago ? (jaTem ? 'Comprado ✓ · no seu calendário' : 'Comprado — acesso liberado')
+    var lotadoEv = !jaTem && (typeof evLotado === 'function') && evLotado(ev);
+    var rotInsc = lotadoEv ? ('Lotado — ' + (ev.sala || 'sala') + ' com ' + evLot(ev) + ' lugares')
+                : ev.pago ? (jaTem ? 'Comprado ✓ · no seu calendário' : 'Comprado — acesso liberado')
                           : (jaTem ? 'Inscrito ✓ · no seu calendário' : 'Confirmar inscrição');
-    h += '<button class="btn" id="btnEvInscrever"' + (jaTem ? ' disabled' : '') + '>' + rotInsc + '</button>';
+    h += '<button class="btn" id="btnEvInscrever"' + (jaTem || lotadoEv ? ' disabled' : '') + '>' + rotInsc + '</button>';
     /* evento online: o link de acesso aparece para quem está inscrito */
     if (ev.online && ev.link) {
       h += '<button class="btn ghost" id="btnEvLink"' + (st.inscrito ? '' : ' disabled') + '>' +
@@ -4495,6 +4530,9 @@
     }
     if (st.inscrito) evAplicaLink();
     $('btnEvInscrever').onclick = function () {
+      if (!(st.inscrito || st.comprado) && typeof evLotado === 'function' && evLotado(ev)) {
+        toast('Lotado — a ' + (ev.sala || 'sala') + ' comporta ' + evLot(ev) + ' pessoas.'); return;
+      }
       if (ev.pago) { comprarEvento(ev.id); return; }   /* pago passa pela compra (e pela agenda) */
       var chq = choqueDeAgenda(agendaDoEvento(ev));
       if (chq && this.dataset.okChoque !== '1') {
@@ -4505,6 +4543,7 @@
         return;
       }
       st.inscrito = true;
+      if (typeof renderAcessos === 'function') renderAcessos();   /* entra na portaria na hora */
       if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
       if (typeof renderAdmEventos === 'function') renderAdmEventos();   /* contador de inscritos no admin */
       this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
@@ -5711,6 +5750,17 @@
 
   /* mood: gesto do QUAD conforme o assunto · bot: canto onde ele aparece
      Cada operação é contada em beats curtos — o QUAD conversa, não palestra. */
+  /* pergunta de confirmação do avatar — o pronome acompanha a personagem
+     (Mulher → "Essa"); extraída do passo para a suíte conferir os 12    */
+  function avPerguntaDe(i) {
+    var lb = (i >= 0 && AV_LABELS[i]) ? AV_LABELS[i] : '';
+    var nm = lb ? ' <b>' + lb + '</b>' : '';
+    return (/^Mulher/.test(lb) ? 'Essa' : 'Esse') + nm + ' é o personagem que você <b>escolheu</b>?';
+  }
+  var AV_BOTAO_OK = 'Sim, sou eu!';
+  window.__avLabel = function (i) { return AV_LABELS[i] || ''; };   /* para a suíte de testes */
+  window.__avPergunta = avPerguntaDe;                               /* para a suíte de testes */
+  window.__avBotao = function () { return AV_BOTAO_OK; };           /* para a suíte de testes */
   var TUT = [
     { view: 'v-inicio', sel: null, mood: 'wave', bot: 'br',
       txt: 'Oi! Eu sou o <b>QUAD</b>.' },
@@ -5724,12 +5774,9 @@
       onEnter: function () { $('avGrid').style.display = 'grid'; if (tutAvatarOk) return 'skip'; },
       txt: 'Escolhe aí: <b>qual desses é a sua cara?</b> Dica: <b>segura</b> em um personagem pra ampliar antes de decidir.' },
     { sel: function () { return document.querySelector('.avatar-preview'); }, expect: 'confirma-avatar', mood: 'talk', bot: 'br',
-      txt: function () {
-        var nm = tutAvatarPend >= 0 && AV_LABELS[tutAvatarPend] ? ' <b>' + AV_LABELS[tutAvatarPend] + '</b>' : '';
-        return 'Esse' + nm + ' é o personagem que você <b>escolheu</b>?';
-      },
+      txt: function () { return avPerguntaDe(tutAvatarPend); },
       opts: [
-        { rotulo: 'Sim, é esse!', cls: 'sim', acao: function () {
+        { rotulo: AV_BOTAO_OK, cls: 'sim', acao: function () {
             if (tutAvatarPend >= 0) avatarIdx = tutAvatarPend;
             aplicarAvatar();
             $('avGrid').style.display = 'none';
@@ -6829,16 +6876,16 @@
      não some: vira o registro visível de que já foi feita.            */
   function blocoIntroMarca(feito) {
     blocoIntroFeito = feito;
-    $('biDot').textContent = feito ? '✓' : '1';
-    $('biDot').classList.toggle('done', !!feito);
-    $('btnBlocoIntro').style.display = feito ? 'none' : '';
-    $('biFeito').style.display = feito ? '' : 'none';
-    $('biDesc').textContent = feito
-      ? 'concluída no seu 1º acesso — vale para todas as turmas'
-      : '3 questões · o seu primeiro score · vale uma vez, para a conta';
+    /* concluída (no tutorial), a linha SOME do bloco — ela é da conta e
+       já foi feita; ficar ali só ocupava lugar (dec. do gestor, 28/07) */
+    $('blocoIntroRow').style.display = feito ? 'none' : '';
     if (feito) lsSet('vq_intro_done', '1');
   }
   if (lsGet('vq_intro_done') === '1') blocoIntroMarca(true);
+  window.__introFeita = function (v) {   /* para a suíte de testes */
+    blocoIntroMarca(v);
+    if (!v) lsSet('vq_intro_done', '');
+  };
   $('btnBlocoIntro').addEventListener('click', function () {
     if (blocoIntroFeito) return;
     tqAbrir();
@@ -8423,6 +8470,7 @@
         if (ctFalta(!iVagas || iVagas < 1, 'admCtVagas', 'Para abrir a isolada faltam as <b>vagas</b>.')) return;
         var salaIso = $('admCtSala').value;
         if (ctFalta(!salaIso, 'admCtSala', 'Para abrir a isolada falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+        if (ctFalta(salaCap(salaIso) && iVagas > salaCap(salaIso), 'admCtVagas', 'A <b>' + salaIso + '</b> comporta <b>' + salaCap(salaIso) + '</b> pessoas — você pediu ' + iVagas + ' vagas.')) return;
         var fxIso = faixaDe(iHi + '–' + iHf);
         var chIso = salaConflito({ sala: salaIso, dias: dias.map(function (d) { return DIA_IDX[d]; }), ini: fxIso[0], fim: fxIso[1], de: iIni, ate: iFim, id: ctEditIso });
         if (chIso && ctFalta(true, 'admCtSala', 'A <b>' + salaIso + '</b> já tem <b>' + chIso.rot + '</b> nesse horário (' + chIso.hor +
@@ -8473,6 +8521,7 @@
       if (ctFalta(vagas < 1, 'admCtVagas', 'A turma precisa de <b>ao menos 1 vaga</b> — informe as vagas de cada moeda.')) return;
       var sala = $('admCtSala').value;
       if (ctFalta(!sala, 'admCtSala', 'Para abrir a turma falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+      if (ctFalta(salaCap(sala) && vagas > salaCap(sala), 'admCtVagas', 'A <b>' + sala + '</b> comporta <b>' + salaCap(sala) + '</b> pessoas — você pediu ' + vagas + ' vagas. Reduza as vagas ou escolha uma sala maior.')) return;
       var fxNova = faixaCompleta(hl2(h1i) + '–' + hl2(h2f));
       var choqueSala = salaConflito({ sala: sala, dias: [1, 2, 3, 4, 5], ini: fxNova[0], fim: fxNova[1], de: ini, ate: fim, id: ctEdit });
       if (choqueSala && ctFalta(true, 'admCtSala', 'A <b>' + sala + '</b> já tem <b>' + choqueSala.rot + '</b> nesse horário (' + choqueSala.hor +
@@ -8869,6 +8918,13 @@
      reservado às gravações e eventos online. Uma sala não aceita duas
      atividades no mesmo dia da semana com horários que se cruzam.     */
   var SALAS = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4'];
+  /* lotação máxima de cada sala (cadeiras) — definida pelo gestor */
+  var SALA_CAP = { 'Sala 1': 155, 'Sala 2': 85, 'Sala 3': 125, 'Sala 4': 185 };
+  function salaCap(sala) {
+    /* o boot chama renders antes desta região rodar — sem a tabela ainda,
+       responda 0 (sem limite) em vez de quebrar o carregamento         */
+    return (typeof SALA_CAP !== 'undefined' && SALA_CAP && SALA_CAP[sala]) || 0;
+  }
   var ESTUDIO = 'Estúdio';
   /* tudo o que ocupa sala, num formato só: dias da semana + faixa de
      minutos + período de datas                                        */
@@ -8946,7 +9002,7 @@
   function salaEcoHTML(sala, alvo) {
     var agenda = salaAgendaTxt(sala, alvo && alvo.id);
     if (!alvo) {
-      return 'Espaço escolhido: <strong>' + sala + '</strong>. Complete o <b>dia</b> e o <b>horário</b> para eu conferir se ele está vago nesse momento.' +
+      return 'Espaço escolhido: <strong>' + sala + '</strong>' + (salaCap(sala) ? ' (' + salaCap(sala) + ' lugares)' : '') + '. Complete o <b>dia</b> e o <b>horário</b> para eu conferir se ele está vago nesse momento.' +
         (agenda ? ' Já ocupam este espaço: ' + agenda + '.' : ' Nada mais está marcado nele.');
     }
     var ch = salaConflito(alvo);
@@ -8954,7 +9010,7 @@
       return '<strong>' + sala + '</strong> já tem <b>' + ch.rot + '</b> nesse dia e horário (' + ch.hor +
         (ch.ate && !ch.pontual ? ', até ' + dataBRcompleta(ch.ate) : '') + ') — escolha outro espaço ou outro horário.';
     }
-    return '<strong>' + sala + '</strong> está <b>livre</b> nesse dia e horário — a reserva vale ao confirmar.' +
+    return '<strong>' + sala + '</strong>' + (salaCap(sala) ? ' (' + salaCap(sala) + ' lugares)' : '') + ' está <b>livre</b> nesse dia e horário — a reserva vale ao confirmar.' +
       (agenda ? ' Fora dele, o espaço tem: ' + agenda + '.' : '');
   }
   var TURNO_ORDEM = { 'manhã': 0, 'tarde': 1, 'noite': 2, '': 3 };
@@ -8968,7 +9024,7 @@
           '<small>' + (o.turno ? o.turno + ' · ' : '') + o.hor +
           (!o.pontual && o.de && o.ate ? ' · ' + dataBRcompleta(o.de) + ' → ' + dataBRcompleta(o.ate) : '') + '</small></div>';
       }).join('');
-      return '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + sl + '</span>' +
+      return '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + sl + ' · ' + salaCap(sl) + ' lugares</span>' +
         (oc.length ? '<span class="tag ok">' + oc.length + (oc.length === 1 ? ' ATIVIDADE' : ' ATIVIDADES') + '</span>' : '<span class="tag">LIVRE</span>') + '</div>' +
         (oc.length ? '<div class="sala-oc">' + linhas + '</div>' : '<p class="sala-livre">Nenhuma turma ou isolada funciona nesta sala.</p>') + '</div>';
     }).join('');
@@ -9768,6 +9824,24 @@
     if (tipo === 'prof') {
       sel.innerHTML = docentesAtivos().map(function (d) { return '<option value="prof:' + d.nome + '">' + d.nome + '</option>'; }).join('') ||
         '<option value="">— nenhum professor ativo —</option>';
+    } else if (tipo === 'turma') {
+      sel.innerHTML = (typeof TURMAS_LOJA !== 'undefined' ? TURMAS_LOJA : []).map(function (t) {
+        return '<option value="' + t.id + '">' + t.nome + ' · ' + turmaInscritos(t) + ' alunos</option>';
+      }).join('') || '<option value="">— nenhuma turma aberta —</option>';
+    } else if (tipo === 'isolada') {
+      sel.innerHTML = (typeof ISOLADAS !== 'undefined' ? ISOLADAS : []).filter(function (i) { return i.dias && i.dias.length; })
+        .map(function (i) { return '<option value="' + i.id + '">' + i.nome + '</option>'; }).join('') ||
+        '<option value="">— nenhuma isolada em andamento —</option>';
+    } else if (tipo === 'simulado') {
+      sel.innerHTML = (typeof SIMULADOS !== 'undefined' ? SIMULADOS : []).filter(function (sm) { return !sm.realizado && !sm.feito; })
+        .map(function (sm) { return '<option value="' + sm.id + '">' + sm.rot + '</option>'; }).join('') ||
+        '<option value="">— nenhum simulado de pé —</option>';
+    } else if (tipo === 'evento') {
+      sel.innerHTML = (typeof EVENTOS !== 'undefined' ? EVENTOS : []).filter(function (ev) { return !(typeof evAcabou === 'function' && evAcabou(ev)); })
+        .map(function (ev) { return '<option value="' + ev.id + '">' + ev.nome + '</option>'; }).join('') ||
+        '<option value="">— nenhum evento vigente —</option>';
+    } else if (tipo === 'todos') {
+      sel.innerHTML = '<option value="todos">Todos os alunos da plataforma · 1.286</option>';
     } else {
       var extra = msgAlvoExtra ? '<option value="apoio:' + msgAlvoExtra + '">' + msgAlvoExtra + ' · apoio</option>' : '';
       sel.innerHTML = extra + CONTAS.map(function (c) { return '<option value="' + c.id + '">' + contaNome(c) + '</option>'; }).join('');
@@ -9871,11 +9945,60 @@
   var RECADOS_PROF = {};   /* nome do professor → lista de recados da administração */
   var tipoMsgEl = $('admMsgTipo');
   if (tipoMsgEl) tipoMsgEl.addEventListener('change', admMsgSelects);
+  /* mensagem para um PÚBLICO: resolve o alvo, conta o alcance e — se o
+     aluno desta demo estiver dentro — entrega no chat dele            */
+  function msgPublico(tipo, val, texto) {
+    var alvo = null, alcance = 0, euDentro = false;
+    if (tipo === 'turma') {
+      var t = (typeof turmaDe === 'function') ? turmaDe(val) : null; if (!t) return null;
+      alvo = t.nome; alcance = turmaInscritos(t);
+      euDentro = (typeof matriculasAtivas === 'function') && matriculasAtivas().some(function (m) { return m.turmaId === t.id; });
+    } else if (tipo === 'isolada') {
+      var iso = (typeof ISOLADAS !== 'undefined') ? ISOLADAS.filter(function (x) { return x.id === val; })[0] : null; if (!iso) return null;
+      var stI = (typeof evState !== 'undefined') ? evState['ev-' + iso.id] : null;
+      euDentro = !!(stI && (stI.inscrito || stI.comprado));
+      alvo = iso.nome; alcance = 6 + (edHash(iso.id) % 14) + (euDentro ? 1 : 0);
+    } else if (tipo === 'simulado') {
+      var sm = null; SIMULADOS.forEach(function (x) { if (x.id === val) sm = x; }); if (!sm) return null;
+      euDentro = !!(sm.comprado || sm.insc);
+      var insc = (typeof SIM_INSC !== 'undefined') ? SIM_INSC.filter(function (x) { return x.simRot === sm.rot; }).length : 0;
+      alvo = sm.rot; alcance = insc || (5 + (edHash(sm.id) % 20) + (euDentro ? 1 : 0));
+    } else if (tipo === 'evento') {
+      var ev = null; EVENTOS.forEach(function (x) { if (x.id === val) ev = x; }); if (!ev) return null;
+      var stE = evState[ev.id];
+      euDentro = !!(stE && (stE.comprado || stE.inscrito));
+      alcance = (!ev.online && typeof acessoListaDe === 'function') ? acessoListaDe(ev).length
+              : 6 + (edHash(ev.id) % 40) + (euDentro ? 1 : 0);
+      alvo = ev.nome;
+    } else if (tipo === 'todos') {
+      alvo = 'Todos os alunos da plataforma'; alcance = 1286; euDentro = true;
+    }
+    if (!alvo) return null;
+    return { alvo: alvo, alcance: alcance, euDentro: euDentro };
+  }
   var btnAdmMsgEl = $('btnAdmMsg');
   if (btnAdmMsgEl) btnAdmMsgEl.addEventListener('click', function () {
     var texto = $('admMsgTexto').value.trim();
     if (!texto) { toast('Escreva a mensagem.'); return; }
     var val = $('admMsgAluno').value, tipo = $('admMsgTipo') ? $('admMsgTipo').value : 'aluno';
+    if (['turma', 'isolada', 'simulado', 'evento', 'todos'].indexOf(tipo) >= 0) {
+      if (!val) { toast('Escolha o público da mensagem.'); return; }
+      var pub = msgPublico(tipo, val, texto);
+      if (!pub) { toast('Público não encontrado — recarregue a lista.'); return; }
+      var msgG = { nome: pub.alvo + ' · ' + fmt(pub.alcance) + ' aluno' + (pub.alcance === 1 ? '' : 's'), texto: texto, quando: 'agora', lida: false, grupo: true };
+      ADM_MSGS.unshift(msgG);
+      if (pub.euDentro) {
+        /* o aluno desta demo faz parte do público: chega no chat dele */
+        RECADOS.unshift({ texto: '[' + pub.alvo + '] ' + texto, quando: 'agora', lida: false, admRef: msgG });
+        renderChatBadge();
+        if (typeof renderChat === 'function') renderChat();
+      }
+      $('admMsgTexto').value = '';
+      renderAdmMsgs();
+      toast('Mensagem enviada — ' + pub.alvo + ', alcança ' + fmt(pub.alcance) + ' aluno' + (pub.alcance === 1 ? '' : 's') +
+        (pub.euDentro ? ' (o aluno desta demo está dentro: chegou no chat dele).' : '.'));
+      return;
+    }
     if (tipo === 'prof') {
       var nomeP = val.replace(/^prof:/, '');
       if (!nomeP) { toast('Escolha um professor.'); return; }
@@ -10430,6 +10553,8 @@
     if (typeof renderCalendario === 'function') renderCalendario();   /* e do calendário do aluno */
     if (typeof renderSalas === 'function') renderSalas();             /* a sala/Estúdio volta a ficar livre */
     if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+    delete ACESSO_ST[id];                                              /* o grupo sai da portaria */
+    if (typeof renderAcessos === 'function') renderAcessos();
     toast('Evento “' + ev.nome + '” cancelado — saiu do carrossel, da Loja e dos calendários.');
   }
   $('btnAdmEvRegra').addEventListener('click', function () {
@@ -10584,6 +10709,7 @@
         ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link; ev.profs = profs;
         ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
         ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf;
+        ev.lot = online ? 0 : salaCap(evSala);   /* trocou de sala? a lotação acompanha */
         ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
         ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
       }
@@ -10592,6 +10718,7 @@
       $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
       renderEvProfChips([]);
       admEvPreview(); renderAdmEventos(); renderEventosLoja(); renderEvStrip();
+      if (typeof renderAcessos === 'function') renderAcessos();
       if (typeof renderCalendario === 'function') renderCalendario();
       toast('Evento “' + nome + '” atualizado — vale para todos, inclusive quem já está inscrito.');
       return;
@@ -10599,6 +10726,7 @@
     EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
       tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
       quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf,
+      lot: online ? 0 : salaCap(evSala), ocup: 0,   /* lotação = cadeiras da sala */
       modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
@@ -10616,7 +10744,7 @@
     if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
     if (typeof window.__simSalaRefresh === 'function') window.__simSalaRefresh();
     admAlerta('admEvErro', 'Evento <b>' + nome + '</b> criado para ' + quando + ' — ' +
-      (online ? '<b>Estúdio reservado</b>' : '<b>' + evSala + ' reservada</b>') + ' · ' +
+      (online ? '<b>Estúdio reservado</b>' : '<b>' + evSala + ' reservada</b> (' + salaCap(evSala) + ' lugares)') + ' · ' +
       (pago ? 'à venda na Loja (' + (modalidade === 'online' ? 'Eventos online' : 'Eventos e aulões') + ') e no carrossel do Início com a tag “NA LOJA”.'
             : 'já gira no carrossel do Início do aluno.'), true);
     toast(pago
@@ -10657,6 +10785,8 @@
       bt.addEventListener('click', function () {
         var pd = PEDIDOS[parseInt(bt.dataset.ped, 10)];
         pd.status = 'entregue';
+        /* entregue = consumido: sai da janela de estorno do aluno */
+        if (pd.aluno === nomeCurto() && typeof compraConsumida === 'function') compraConsumida('pres', pd.presId);
         /* o item presencial volta a ficar disponível na Loja do aluno, marcado como ENTREGUE */
         if (pd.presId && typeof presDe === 'function') {
           var p = presDe(pd.presId);
@@ -10681,46 +10811,66 @@
     for (var i = 0; i < n; i++) out.push({ nome: (euNoPrimeiro && i === 0) ? nomeCurto() : inscNome(seed, i), liberado: false, euSou: euNoPrimeiro && i === 0 });
     return out;
   }
-  var ACESSOS = {
-    eventos:   { rot: 'Eventos no Quad', det: 'Aniversário do Quad · sábado 15h', seed: 3, n: 5, eu: true, lista: null },
-    auloes:    { rot: 'Aulões', det: 'Aulão de véspera · quinta 19h', seed: 11, n: 6, eu: false, lista: null },
-    excursoes: { rot: 'Excursões', det: 'Excursão concurso PM-BA · domingo 6h', seed: 19, n: 4, eu: false, lista: null },
-    isoladas:  { rot: 'Isoladas', det: 'Isolada Dir. Administrativo · terça 20h', seed: 27, n: 3, eu: false, lista: null },
-    taf:       { rot: 'Treinamento TAF', det: 'Pré-TAF · pista do quartel · sábado 7h', seed: 31, n: 5, eu: false, lista: null }
-  };
-  function ensureAcessos() {
-    Object.keys(ACESSOS).forEach(function (k) {
-      var g = ACESSOS[k];
-      if (!g.lista) g.lista = inscritosSeed(g.seed, g.n, g.eu);
+  /* ---------- Autorizações de acesso SINCRONIZADAS ----------
+     Os grupos saem das ATIVIDADES REAIS: todo evento presencial vigente
+     (aulão, minicurso, isolada em andamento…) vira um grupo de portaria,
+     com os inscritos da demo e — quando o aluno desta sessão comprou ou
+     se inscreveu — ele junto. Nada de atividade fictícia. Simulados
+     presenciais têm a própria recepção, no bloco ao lado.              */
+  var ACESSO_ST = {};   /* ev.id → lista de inscritos da portaria */
+  function acessoListaDe(ev) {
+    var st = ACESSO_ST[ev.id];
+    if (!st) {
+      var n = 2 + (edHash(ev.id) % 4);   /* inscritos-semente da demo */
+      st = ACESSO_ST[ev.id] = inscritosSeed(3 + (edHash(ev.id) % 90), n, false);
+    }
+    /* o aluno desta sessão entra e sai conforme a compra/inscrição dele */
+    var eu = evState[ev.id] && (evState[ev.id].comprado || evState[ev.id].inscrito);
+    var tem = st.some(function (p) { return p.euSou; });
+    if (eu && !tem) st.unshift({ nome: nomeCurto(), liberado: false, euSou: true });
+    if (!eu && tem) for (var i = st.length - 1; i >= 0; i--) { if (st[i].euSou) st.splice(i, 1); }
+    return st;
+  }
+  function acessosGrupos() {
+    return (typeof EVENTOS !== 'undefined' ? EVENTOS : []).filter(function (ev) {
+      if (ev.online || ev.modalidade === 'online') return false;   /* online não passa na portaria */
+      if (typeof evAcabou === 'function' && evAcabou(ev)) return false;
+      return true;
     });
   }
   function renderAcessos() {
     var el = $('admAcessos'); if (!el) return;
-    ensureAcessos();
-    var ordem = ['eventos', 'auloes', 'excursoes', 'isoladas', 'taf'];
-    el.innerHTML = ordem.map(function (k) {
-      var g = ACESSOS[k];
-      var faltam = g.lista.filter(function (p) { return !p.liberado; }).length;
-      /* o detalhe da atividade é da CATEGORIA — repeti-lo em cada nome só
-         engrossava a lista e apagava a hierarquia                       */
-      var linhas = g.lista.map(function (p, i) {
+    var grupos = acessosGrupos();
+    el.innerHTML = grupos.map(function (ev) {
+      var lista = acessoListaDe(ev);
+      var faltam = lista.filter(function (p) { return !p.liberado; }).length;
+      var lot = (typeof evLot === 'function') ? evLot(ev) : 0;
+      var linhas = lista.map(function (p, i) {
         var right = p.liberado
           ? '<span class="tag ok">ENTRADA LIBERADA</span>'
-          : '<button class="btn small" data-ac="' + k + ':' + i + '">Liberar entrada</button>';
+          : '<button class="btn small" data-ac="' + ev.id + ':' + i + '">Liberar entrada</button>';
         return '<div class="mission-row"><div class="grow"><div class="t">' + p.nome + (p.euSou ? ' · você' : '') + '</div></div>' + right + '</div>';
       }).join('');
-      return '<div class="ac-cat">' + g.rot +
+      return '<div class="ac-cat">' + ev.nome +
         '<span class="tag' + (faltam ? '' : ' ok') + '">' + (faltam ? faltam + ' a liberar' : 'tudo liberado') + '</span></div>' +
-        '<p class="sub" style="margin:0 0 4px">' + g.det + '</p>' +
+        '<p class="sub" style="margin:0 0 4px">' + ev.quando + (ev.sala ? ' · ' + ev.sala : '') + (lot ? ' · ' + lot + ' lugares' : '') + '</p>' +
         '<div class="ac-grupo">' + linhas + '</div>';
-    }).join('');
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma atividade presencial vigente — os grupos aparecem aqui quando um evento, aulão ou isolada estiver de pé.</p>';
     el.querySelectorAll('[data-ac]').forEach(function (bt) {
       bt.addEventListener('click', function () {
-        var pr = bt.dataset.ac.split(':'), g = ACESSOS[pr[0]], p = g.lista[+pr[1]];
+        var pr = bt.dataset.ac.split(':');
+        var ev = null; EVENTOS.forEach(function (x) { if (x.id === pr[0]) ev = x; });
+        if (!ev) return;
+        var p = acessoListaDe(ev)[+pr[1]];
         if (!p || p.liberado) return;
         p.liberado = true;
+        /* liberou a entrada = consumiu: a compra sai da janela de estorno */
+        if (p.euSou) {
+          compraConsumida('evento', ev.id);
+          compraConsumida('item', ev.nome);   /* isolada comprada é logada pelo nome */
+        }
         renderAcessos();
-        toast('Entrada liberada — ' + p.nome + ' · ' + g.rot + '.');
+        toast('Entrada liberada — ' + p.nome + ' · ' + ev.nome + (p.euSou ? '. A compra saiu da janela de estorno.' : '.'));
       });
     });
   }
@@ -10881,6 +11031,7 @@
       var sm = null; SIMULADOS.forEach(function (s) { if (s.rot === x.simRot && s.tag === 'PRESENCIAL') sm = s; });
       if (sm && !sm.realizado) {
         sm.realizado = true;
+        if (typeof compraConsumida === 'function') compraConsumida('simulado', sm.id);   /* entrou na sala: sem estorno */
         SIM_HIST.unshift({ rot: sm.rot, tipo: 'Presencial', resultado: 'presença confirmada · +' + x.score + ' score' + (x.geraQdC ? ' · +' + x.valor + ' QdC' : '') });
         if (typeof renderSimulados === 'function') renderSimulados();
         if (typeof renderSimHist === 'function') renderSimHist();
@@ -11027,6 +11178,7 @@
       /* sala por último, na mesma ordem da criação de turmas */
       var salaSim = $('admSimSala').value;
       if (simFalta(!salaSim, 'admSimSala', 'O simulado presencial ocupa sala: diga <b>em qual sala da sede</b> ele acontece.')) return;
+      if (simFalta(salaCap(salaSim) && vTot > salaCap(salaSim), 'admSimVagas', 'A <b>' + salaSim + '</b> comporta <b>' + salaCap(salaSim) + '</b> pessoas — você pediu ' + vTot + ' vagas.')) return;
       var ocSim = ocPontual(salaSim, nome, 'simulado', d, ini, fim, null);
       var chSim = ocSim ? salaConflito(ocSim) : null;
       if (chSim && simFalta(true, 'admSimSala', 'A <b>' + salaSim + '</b> já tem <b>' + chSim.rot + '</b> nesse dia e horário (' + chSim.hor + ') — escolha outra sala ou outro horário.')) return;
@@ -11290,6 +11442,19 @@
   /* a matrícula que veio do site também é compra — abre o relatório com a
      turma em andamento e a sua evolução                                  */
   COMPRAS.push({ aluno: nomeCurto(), item: 'Turma PATAMO · matrícula', valor: 2400, moeda: 'qdc', quando: 'há 55 dias', ts: Date.now() - 55 * DIA_MS, tipo: 'matricula', ref: 'patamo-n' });
+  /* consumiu (retirou o produto, entrou na sala)? A compra sai da janela
+     de estorno — participar do aulão e estornar depois lesaria a casa. */
+  function compraConsumida(tipo, ref) {
+    var cp = COMPRAS.filter(function (x) {
+      return x.aluno === nomeCurto() && !x.estornado && !x.consumido &&
+        ((x.tipo === tipo && String(x.ref) === String(ref)) || (tipo === 'item' && x.item === ref));
+    })[0];
+    if (!cp) return false;
+    cp.consumido = true;
+    if (typeof renderEstornos === 'function') renderEstornos();
+    if (typeof renderRelCompras === 'function') renderRelCompras();
+    return true;
+  }
   function lojaCompraLog(item, valor, moeda, tipo, ref, extra) {
     COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now(),
       tipo: tipo || 'item', ref: ref != null ? ref : item, extra: extra || null });
@@ -11397,7 +11562,8 @@
   function estornoDias(cp) { return 7 - Math.floor((Date.now() - (cp.ts || 0)) / DIA_MS); }
   function renderEstornos() {
     var el = $('lojaEstornos'); if (!el) return;
-    var minhas = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto() && !cp.estornado; });
+    /* consumida (entregue na recepção ou entrada liberada) sai daqui */
+    var minhas = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto() && !cp.estornado && !cp.consumido; });
     el.innerHTML = minhas.map(function (cp) {
       var dias = estornoDias(cp), i = COMPRAS.indexOf(cp);
       var prazo = dias > 0
