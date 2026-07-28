@@ -22,6 +22,9 @@
   sala comporta** (barrado com o número na cara); o **evento presencial
   herda a lotação da sala** — o card da Loja diz os lugares e, lotado,
   vira **LOTADO**: indisponível na vitrine, no carrossel e na compra.
+  As turmas da demo foram ajustadas à regra: RONDESP 145+10 vagas
+  (Sala 1 · 155), PATAMO 75+10 (Sala 2 · 85), BOPE 115+10 (Sala 3 · 125)
+  — antes todas diziam 170+10, o que já não caberia em sala nenhuma.
 - **"Autorizações de acesso" de verdade** (item 5): o bloco listava
   atividades fictícias ("Aniversário do Quad") e ignorava as compras
   reais. Agora os grupos **são os eventos presenciais vigentes** — com
