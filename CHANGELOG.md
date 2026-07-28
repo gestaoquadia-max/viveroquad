@@ -1,5 +1,56 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 28/07/2026 — Material que baixa, grade por turma, estoque de verdade e mais seis ajustes
+
+- **O material da aula baixa** (item 1): o PDF anexado no painel era
+  descartado — só o nome sobrevivia — e o botão do aluno era um aviso
+  vazio. Agora o arquivo vira link guardado no material, o botão diz
+  **"Baixar"** e entrega o arquivo; vídeo abre o link. A memória é
+  liberada quando o material sai do ar ou a turma fecha.
+- **A grade do cronograma passou a ser da TURMA** (item 2): a chave era
+  **tipo + turno**, então a C.O.R.E. (RONDESP, manhã) colidia com a
+  "Turma RONDESP Manhã" e nascia sem grade própria. Pior: lançada a grade
+  de uma, a outra passaria a exibir **aula alheia**. Agora a chave é o id
+  da turma. Junto vieram: o seletor mostra o **nome real** da turma (era
+  "RONDESP MANHÃ"), as matérias saem da **árvore do edital dela** (a
+  C.O.R.E. recebia as do Soldado, não as da PC-BA), o professor é gravado
+  na turma certa, o horário deixa de ser sequestrado pela turma criada
+  por último e o histórico registra o nome da turma.
+  *A justificativa do gestor estava parcialmente certa: o sintoma era
+  real, mas a árvore da PC-BA sempre existiu — o problema era a colisão.*
+- **Simulados mudaram de casa** (item 3): saíram da aba Missões e foram
+  para o **Calendário**, logo abaixo da agenda, com o histórico junto.
+  Missões ficou com flashcards, "Hoje · questões novas" e Atrasadas.
+- **O item de combate leva o sinal escolhido** (item 4): a mochila lia só
+  o dicionário dos itens de fábrica e imprimia **"undefined"** no lugar do
+  ícone. Agora usa o sinal da paleta, igual à vitrine e ao pop-up de
+  compra. Item removido do catálogo sai também das mochilas (antes
+  quebrava o grid).
+- **Pedagógico por turma** (item 5): card novo com **um bloco por turma
+  aberta**, cada um lido na **árvore do edital daquela turma** — a PATAMO
+  pelo CFO, a turma da Polícia Civil pelo PC-BA. O card individual segue
+  como estava.
+- **Autorizações de acesso reorganizadas** (item 6): a categoria era
+  menor e mais apagada que os nomes que agrupava. Agora tem barra azul,
+  peso próprio, contador de **"N a liberar"** e cada grupo ganhou
+  contorno. O detalhe da atividade saiu de cada linha e subiu para o
+  cabeçalho, encurtando a lista.
+- **Lista de conferência em PDF** (item 7): botão em "Inscritos por
+  atividade" que abre a folha pronta para impressão ou "Salvar como PDF",
+  com nomes numerados e **coluna de presença em branco** para assinar.
+- **Estoque de verdade na Loja** (item 9): comprar uma unidade travava o
+  item inteiro em "ADQUIRIDO" — com 24 peças em estoque. Agora o pedido
+  em aberto é uma **etiqueta** ("seu pedido"), o preço continua à vista, o
+  estoque **decresce**, e o item **some da Loja quando a última unidade
+  acaba**. Curso online e material digital seguem sem limite físico.
+- **Preço do simulado nasce sincronizado** (item 10): o simulado
+  presencial entrava na Loja do aluno mas **não aparecia no editor de
+  preços** até algum outro evento repintar a tela. Corrigido no
+  lançamento e na remoção, com rede de segurança ao abrir a aba. Turma,
+  isolada e produto já nasciam certos. Os dois atalhos da Loja passaram a
+  ter o nome do card que abrem — eram nomes diferentes para o mesmo
+  bloco, origem da dúvida.
+
 ## 28/07/2026 — Cada turma com a sua vida: vagas por moeda, Missões e calendário por turma, eventos do Quad
 
 - **Vagas por moeda na criação** (item 1): o relato "coloquei vagas em

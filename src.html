@@ -1461,6 +1461,17 @@
   .li-estoque { position: absolute; top: 8px; right: 8px; font: 700 9px var(--ui); color: var(--p-dim);
     background: #EEF4FF; border-radius: 999px; padding: 2px 6px; }
   .li-estoque.baixo { color: #A15A00; background: #FFF3DC; }
+  .li-estoque.meu { left: 8px; right: auto; color: #1D63C8; background: #E7F1FF; }
+  /* liberações: cada categoria com contorno e cabeçalho próprios — antes
+     o rótulo era menor e mais claro que os nomes que ele agrupava      */
+  .ac-grupo { border: 1px solid var(--p-line); border-radius: 12px; padding: 2px 10px; margin-top: 10px; background: #FBFDFF; }
+  .ac-grupo .mission-row:last-child { border-bottom: none; }
+  .ac-cat { display: flex; align-items: center; gap: 8px; margin: 10px 0 2px;
+    font: 700 12.5px var(--ui); color: var(--p-text); }
+  .ac-cat::before { content: ''; width: 4px; height: 15px; border-radius: 3px; flex: none;
+    background: linear-gradient(180deg, #3B8BFF, #135FE0); }
+  .ac-cat small { font: 600 10.5px var(--ui); color: var(--p-dim); }
+  .ac-cat .tag { margin-left: auto; }
   .loja-item.esgotado { opacity: 0.6; }
   /* overlay de compra com quantidade */
   .compra-layer { position: absolute; inset: 0; z-index: 47; display: none; align-items: center; justify-content: center;
@@ -1728,16 +1739,6 @@
             <div class="dia-scroll">
               <div id="atrasadasList"></div>
             </div>
-          </div>
-          <div class="p-card">
-            <div class="k-label">Simulados</div>
-            <div class="dia-scroll">
-              <div id="simuladosList"></div>
-            </div>
-          </div>
-          <div class="p-card" id="simHistCard" style="display:none">
-            <div class="k-label">Histórico de simulados realizados</div>
-            <div id="simHistList"></div>
           </div>
         </div>
 
@@ -2092,6 +2093,16 @@
           <div class="p-card">
             <div class="k-label">Calendário · agendamentos e momentos importantes</div>
             <div id="calList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Simulados</div>
+            <div class="dia-scroll">
+              <div id="simuladosList"></div>
+            </div>
+          </div>
+          <div class="p-card" id="simHistCard" style="display:none">
+            <div class="k-label">Histórico de simulados realizados</div>
+            <div id="simHistList"></div>
           </div>
           <div class="p-card" style="opacity:0.85">
             <h3>Sincronizado com a plataforma</h3>
@@ -2860,7 +2871,7 @@
             <div class="k-label">Autorizações de acesso</div>
             <p class="sub" style="margin-bottom:4px">Portaria das atividades presenciais: libere a entrada de quem chega à sede. Onde a atividade gera QdC na presença, a liberação também pontua.</p>
             <div id="admAcessos"></div>
-            <div class="k-label sub-k" style="margin-top:12px">Simulados</div>
+            <div class="ac-cat">Simulados presenciais</div>
             <div id="admSpLista"></div>
           </div>
 
@@ -2868,7 +2879,8 @@
             <div class="k-label">Inscritos por atividade</div>
             <select class="fld" id="admAtivSel" style="margin-top:6px"></select>
             <div id="admAtivInscritos" style="margin-top:10px"></div>
-            <p class="sub" style="margin-top:8px">Escolha qualquer atividade presencial do banco (turmas, aulões, isoladas, eventos, simulados, excursões, TAF) para ver <strong>quem está inscrito</strong>. Listas grandes abrem com <strong>“ver todos”</strong>.</p>
+            <button class="btn ghost small" id="btnAtivPdf" style="width:100%; margin-top:10px">Gerar lista de conferência (PDF)</button>
+            <p class="sub" style="margin-top:8px">Escolha qualquer atividade presencial do banco (turmas, aulões, isoladas, eventos, simulados, excursões, TAF) para ver <strong>quem está inscrito</strong>. Listas grandes abrem com <strong>“ver todos”</strong>. A <strong>lista de conferência</strong> sai com todos os nomes e uma coluna de presença para assinar no papel.</p>
           </div>
         </div>
 
@@ -2915,6 +2927,11 @@
               <div class="k-label">Pedagógico · pontos fracos no Domínio</div>
               <div id="relIndPedag"></div>
               <p class="sub" style="margin-top:8px">Vem da mesma árvore de Domínio e dos blocos de questões respondidos.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Pedagógico por turma · pontos fracos no Domínio</div>
+              <div id="relPedagTurmas"></div>
+              <p class="sub" style="margin-top:8px">Um bloco por turma aberta, cada um lido na <strong>árvore do edital daquela turma</strong> — a PATAMO pelo CFO, a turma da Polícia Civil pelo PC-BA, e assim por diante.</p>
             </div>
             <div class="p-card">
               <div class="k-label">Reclamações e atendimentos</div>
@@ -3019,8 +3036,8 @@
             <p class="sub">Cadastro de produtos e serviços da Quad Store e a atualização geral de preços — da Loja e das turmas e isoladas.</p>
             <div class="adm-jump" id="jumpLojaAdm">
               <button class="jp" data-jump="cadastro">Cadastrar produto ou serviço</button>
-              <button class="jp" data-jump="precos">Atualização geral da Loja</button>
-              <button class="jp" data-jump="precoturmas">Atualização de turmas e simulados</button>
+              <button class="jp" data-jump="precos">Preços da Loja</button>
+              <button class="jp" data-jump="precoturmas">Preços e vagas · turmas e simulados</button>
               <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
@@ -3263,7 +3280,7 @@
             </button>
             <button class="plus-row" data-goto="v-calendario">
               <span class="p-ico">▦</span>
-              <span class="grow"><span class="t">Calendário</span><span class="d">agendamentos e momentos importantes</span></span>
+              <span class="grow"><span class="t">Calendário</span><span class="d">agendamentos, simulados e momentos importantes</span></span>
             </button>
             <button class="plus-row" data-goto="v-materiais">
               <span class="p-ico">▤</span>
@@ -4026,7 +4043,13 @@
       if (typeof renderDia === 'function') renderDia();
       if (typeof renderAtrasadas === 'function') renderAtrasadas();
     }
-    if (id === 'v-calendario' && typeof renderCalendario === 'function') renderCalendario();
+    if (id === 'v-adm-loja' && typeof renderPrecos === 'function') renderPrecos();   /* editores nunca com preço velho */
+    if (id === 'v-calendario') {
+      if (typeof renderCalendario === 'function') renderCalendario();
+      /* os simulados moraram em Missões até 28/07; a casa deles é a agenda */
+      if (typeof renderSimulados === 'function') renderSimulados();
+      if (typeof renderSimHist === 'function') renderSimHist();
+    }
     if (id.indexOf('v-prof-') === 0 && typeof renderProfTudo === 'function') renderProfTudo();
     /* abrir a Recepção é o que marca os recados como lidos */
     if (id === 'v-prof-chat' && typeof renderProfRecados === 'function') renderProfRecados();
@@ -4664,21 +4687,21 @@
     dias: ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'],
     datas: ['20/07', '21/07', '22/07', '23/07', '24/07'],
     turmas: {
-      'RONDESP NOITE': { sala: 'SALA 1', tipo: 'teoria', aulas: [
+      'rondesp-n': { sala: 'SALA 1', tipo: 'teoria', aulas: [
         [{ e: 10, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 9, m: 'REDAÇÃO', p: 'Rodrigo' }],
         [{ e: 10, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 11, m: 'DIR. PENAL', p: 'Marcello Esquivel' }],
         [{ e: 2, m: 'NAC', p: 'Danilo Moura' }, { e: 2, m: 'ATUALIDADES', p: 'Moab Kigran' }],
         [{ e: 10, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 8, m: 'IGUALDADE', p: 'Bruno Araújo' }],
         [{ e: 13, m: 'PORTUGUÊS', p: 'Alisson Lopes' }, { e: 4, m: 'PENAL MILITAR', p: 'Minho' }]
       ] },
-      'PATAMO NOITE': { sala: 'SALA 4', tipo: 'teoria + questões', aulas: [
+      'patamo-n': { sala: 'SALA 4', tipo: 'teoria + questões', aulas: [
         [{ e: 7, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 4, m: 'MATEMÁTICA', p: 'Dan Reis' }],
         [{ e: 3, m: 'DIR. PENAL', p: 'Marcello Esquivel' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
         [{ e: 3, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }],
         [{ e: 7, m: 'GEOGRAFIA', p: 'Noelice' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
         [{ e: 5, m: 'PENAL MILITAR', p: 'Minho' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }]
       ] },
-      'BOPE NOITE': { sala: 'SALA 3', tipo: 'questões', aulas: [
+      'bope-n': { sala: 'SALA 3', tipo: 'questões', aulas: [
         [{ e: 2, m: 'MATEMÁTICA', p: 'Dan Reis' }, { e: 1, m: 'HISTÓRIA', p: 'Moab Kigran' }],
         [{ e: 1, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 2, m: 'IGUALDADE', p: 'Bruno Araújo' }],
         [{ e: 2, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 2, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }],
@@ -4690,7 +4713,10 @@
   /* A grade do cronograma segue as TURMAS REAIS (as mesmas da Quad Store):
      turma nova nasce com a grade em branco para a coordenação preencher, e
      turma que não existe mais some daqui — nada de turma-fantasma.        */
-  function cronoKey(t) { return (t.tipo || '').toUpperCase() + ' ' + (t.turno || 'noite').toUpperCase(); }
+  /* a grade é da TURMA, pelo id. Enquanto a chave era tipo+turno, duas
+     turmas do mesmo tipo no mesmo turno dividiam a mesma grade — a turma
+     nova nascia muda e podia exibir a aula da outra.                   */
+  function cronoKey(t) { return (t && t.id) ? t.id : ''; }
   function sincronizarCronoTurmas() {
     if (typeof TURMAS_LOJA === 'undefined') return;
     var vivas = {};
@@ -4705,7 +4731,7 @@
     Object.keys(CRONO.turmas).forEach(function (k) { if (!vivas[k]) { delete CRONO.turmas[k]; } });
   }
   sincronizarCronoTurmas();
-  var ALUNO_TURMA = 'PATAMO NOITE';   /* vem da matrícula do aluno */
+  var ALUNO_TURMA = 'patamo-n';   /* chave do cronograma = id da turma ativa */
   // [INTEGRAÇÃO REAL] a turma vem do cadastro geral do site; aqui, o valor
   // confirmado no cadastro ("TURMA PATAMO (N)") vira a turma do app inteiro
   function turmaLabel() {
@@ -4730,14 +4756,12 @@
     var ps = hor.split(' e ').map(function (x) { return x.trim().replace('–', ' – '); });
     return ps.length === 2 ? ps : null;
   }
-  function turmaCronoSlots(cronoNome) {
-    if (!cronoNome || typeof TURMAS_LOJA === 'undefined') return null;
-    var partes = cronoNome.split(' ');
-    var tipo = partes[0];
-    var turno = ({ 'NOITE': 'noite', 'MANHÃ': 'manhã', 'MANHA': 'manhã', 'TARDE': 'tarde' })[partes[partes.length - 1]] || 'noite';
-    var ms = TURMAS_LOJA.filter(function (x) { return x.tipo === tipo && x.turno === turno && x.hor; });
-    var t = ms.filter(function (x) { return x.criada; })[0] || ms[0];   /* nova turma criada substitui o horário */
-    return t ? horSlots(t.hor) : null;
+  /* o horário sai da própria turma dona da grade — antes vinha do par
+     tipo+turno e a turma criada por último sequestrava o horário alheio */
+  function turmaCronoSlots(chave) {
+    if (!chave || typeof TURMAS_LOJA === 'undefined') return null;
+    var t = TURMAS_LOJA.filter(function (x) { return x.id === chave; })[0];
+    return (t && t.hor) ? horSlots(t.hor) : null;
   }
   function slotMinutos(slot) {
     var m = /(\d{1,2})h(?:\s*(\d{2}))?/.exec(slot || '');
@@ -6232,7 +6256,7 @@
   function hojeISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function diaBR(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1]; }
   function simDigDisponivel(sm) { return !sm.dia || sm.dia <= hojeISO(); }
-  /* está ativo na aba Simulados do aluno? (realizados vão ao histórico;
+  /* está ativo na lista de simulados do aluno? (realizados vão ao histórico;
      digital pago só entra depois de comprado na Loja) */
   function simAtivo(sm) {
     if (sm.realizado || sm.feito) return false;
@@ -6444,7 +6468,7 @@
         simInscrever(sm);
         toast(sm.rot + ' comprado — inscrição confirmada. Apareça na sede para liberarem sua entrada.');
       } else {
-        toast(sm.rot + ' comprado — já pode responder na aba Simulados.');
+        toast(sm.rot + ' comprado — já pode responder no Calendário.');
       }
       renderLojaSimulados();
       renderSimulados();
@@ -7624,7 +7648,7 @@
     $('btnSimDigNext').textContent = 'Concluir';
     $('btnSimDigNext').disabled = false;
     simDig.idx = 'done';
-    /* realizado, o digital sai da aba Simulados e entra no histórico */
+    /* realizado, o digital sai da lista e entra no histórico */
     if (sm) SIM_HIST.unshift({ rot: sm.rot, tipo: 'Digital', resultado: hits + '/' + total + ' · +' + coinsG + ' QdC' });
     renderSimulados();
     if (typeof renderSimHist === 'function') renderSimHist();
@@ -8975,20 +8999,20 @@
       var g = document.getElementById('lojaPres-' + cat); if (!g) return;
       var itens = ITENS_PRESENCIAIS.filter(function (p) { return (p.cat || 'outros') === cat; });
       g.innerHTML = itens.map(function (p) {
-        var esgotado = p.estoque <= 0 && p.estado !== 'aguardando';
-        if (esgotado && p.estado !== 'entregue') return '';   /* esgotou → desaparece do sistema */
+        /* item físico só sai da vitrine quando ACABA de verdade. Ter um
+           pedido em aberto não fecha a loja: sobrando peça, dá para
+           comprar de novo — o "seu pedido" vira etiqueta, não preço.   */
+        if (p.estoque <= 0) return '';
         var mo = moedaTxt(p.moeda || 'qdc');
-        var precoTxt, precoCls = '';
-        if (p.estado === 'aguardando') { precoTxt = 'ADQUIRIDO'; }
-        else if (p.estado === 'entregue') { precoTxt = 'ENTREGUE ✓'; precoCls = ' entregue'; }
-        else { precoTxt = fmt(p.preco) + ' ' + mo; }
-        var badge = (p.estado !== 'aguardando' && p.estoque > 0) ? '<span class="li-estoque' + (p.estoque <= 5 ? ' baixo' : '') + '">' + p.estoque + ' em estoque</span>' : '';
+        var meus = pedidosMeus(p.id);
+        var selo = meus ? '<span class="li-estoque meu">' + (meus > 1 ? meus + ' seus' : 'seu pedido') + '</span>' : '';
+        var badge = '<span class="li-estoque' + (p.estoque <= 5 ? ' baixo' : '') + '">' + p.estoque + (p.estoque === 1 ? ' restante' : ' em estoque') + '</span>';
         return '<button class="loja-item" data-nome="' + p.nome + '" data-preco="' + p.preco + '" data-moeda="' + (p.moeda || 'qdc') + '" data-presencial="1" data-pres-id="' + p.id + '">' +
-          badge +
+          badge + selo +
           '<span class="li-ico">' + icoDe(p.icone, 'presencial') + '</span>' +
           '<span class="li-nome">' + p.nome + '</span>' +
           '<span class="li-desc">' + p.desc + '</span>' +
-          '<span class="li-preco' + precoCls + '">' + precoTxt + '</span></button>';
+          '<span class="li-preco">' + fmt(p.preco) + ' ' + mo + '</span></button>';
       }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nada disponível nesta área agora.</p>';
       g.querySelectorAll('[data-pres-id]').forEach(function (bt) {
         bt.addEventListener('click', function () { presClick(bt.dataset.presId); });
@@ -8996,16 +9020,24 @@
     });
     if (typeof queueSync === 'function') queueSync();
   }
+  /* quantos pedidos MEUS deste item ainda estão em aberto — é isso que
+     vira a etiqueta "seu pedido"; o estoque continua livre para todos  */
+  function pedidosMeus(presId) {
+    if (typeof PEDIDOS === 'undefined') return 0;
+    var eu = nomeCurto();
+    return PEDIDOS.filter(function (pd) {
+      return pd.presId === presId && pd.aluno === eu && pd.status === 'aguardando';
+    }).reduce(function (n, pd) { return n + (pd.qtd || 1); }, 0);
+  }
   function presClick(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;
     var p = presDe(id); if (!p) return;
-    if (p.estado === 'aguardando') { toast('Pedido em aberto — aguarde a retirada na recepção.'); return; }
-    if (p.estoque <= 0) { toast('Item fora de estoque no momento.'); return; }
+    if (p.estoque <= 0) { toast('“' + p.nome + '” acabou — o item saiu da Loja.'); renderPresenciais(); return; }
     abrirCompra(p);
   }
   /* ---------- overlay de compra: quantidade (estoque) OU confirmação simples ---------- */
   var compraAtual = null, compraQtd = 1;
-  function compraMax() { return Math.min(compraAtual ? compraAtual.estoque : 1, 10); }
+  function compraMax() { return compraAtual ? Math.max(1, compraAtual.estoque) : 1; }
   function compraMoeda() { return (compraAtual && compraAtual.moeda) === 'dmn' ? 'dmn' : 'qdc'; }
   function compraAtualiza() {
     $('qtdVal').textContent = compraQtd;
@@ -9056,14 +9088,14 @@
     if (saldoDe(mo) < total) { toast(semSaldoMsg(mo)); return; }
     debitar(mo, total, compraQtd + '× ' + p.nome + ' · −' + fmt(total) + ' ' + moedaTxt(mo));
     p.estoque -= compraQtd;
-    p.estado = 'aguardando';
     lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo, 'pres', p.id, { qtd: compraQtd });
     pedidoPresencial(p, compraQtd);
     if (typeof agendaDoProduto === 'function') { agendaDoProduto(p.nome); }
-    var q = compraQtd;
+    var q = compraQtd, resta = p.estoque;
     fecharCompra();
     renderPresenciais();
-    toast(q + '× ' + p.nome + ' — pedido gerado para retirada na recepção.');
+    toast(q + '× ' + p.nome + ' — pedido gerado para retirada na recepção.' +
+      (resta > 0 ? ' Restam ' + resta + ' na Loja.' : ' Era a última unidade — o item saiu da Loja.'));
   });
   /* gift card: liberação única de Diamantes */
   var btnGiftEl = $('btnGift');
@@ -9945,9 +9977,9 @@
 
   /* ---------- cronograma: admin atualiza, turma sincroniza ---------- */
   var CRONO_LOG = [];   /* histórico das trocas de aula */
-  function turmaDoCrono(cronoNome) {
-    if (!cronoNome || typeof TURMAS_LOJA === 'undefined') return null;
-    return TURMAS_LOJA.filter(function (t) { return cronoKey(t) === cronoNome; })[0] || null;
+  function turmaDoCrono(chave) {
+    if (!chave || typeof TURMAS_LOJA === 'undefined') return null;
+    return TURMAS_LOJA.filter(function (t) { return t.id === chave; })[0] || null;
   }
   /* matérias possíveis daquela turma: as da árvore do edital dela */
   function materiasDaTurma(cronoNome) {
@@ -10004,9 +10036,12 @@
   function admCronoInit() {
     sincronizarCronoTurmas();
     var atual = $('admCrTurma').value;
-    $('admCrTurma').innerHTML = Object.keys(CRONO.turmas).map(function (t) {
-      return '<option' + (t === atual ? ' selected' : '') + '>' + t + '</option>';
-    }).join('');
+    /* o seletor lista as turmas pelo nome de verdade; o value é o id  */
+    $('admCrTurma').innerHTML = Object.keys(CRONO.turmas).map(function (k) {
+      var t = turmaDoCrono(k);
+      var rot = t ? (t.nome + ' · ' + (t.turno || '')) : k;
+      return '<option value="' + k + '"' + (k === atual ? ' selected' : '') + '>' + rot + '</option>';
+    }).join('') || '<option value="">— nenhuma turma aberta —</option>';
     $('admCrDia').innerHTML = CRONO.dias.map(function (d, i) {
       return '<option value="' + i + '">' + d + ' · ' + CRONO.datas[i] + '</option>';
     }).join('');
@@ -10032,13 +10067,13 @@
     /* a troca vale também para o corpo docente da turma — fonte única */
     var tur = turmaDoCrono(t);
     if (tur) { tur.professores = tur.professores || {}; tur.professores[m] = pr; }
-    CRONO_LOG.unshift({ turma: t, dia: CRONO.dias[d], tempo: (tp + 1) + 'º tempo',
+    CRONO_LOG.unshift({ turma: (tur ? tur.nome : t), dia: CRONO.dias[d], tempo: (tp + 1) + 'º tempo',
       de: antes, para: m.toUpperCase() + ' · ' + pr, quando: 'agora' });
     renderCronoLog();
     renderAulaHoje();   /* o card "Aula de hoje" do aluno muda na hora */
     if (typeof renderProfTudo === 'function') renderProfTudo();   /* agenda e calendário do professor */
     if (typeof renderProfTurmas === 'function' && typeof PROF_ATUAL !== 'undefined' && PROF_ATUAL) renderProfTurmas();
-    toast('Grade atualizada — ' + m + ' com ' + pr + ' na ' + t + '. Já vale para o aluno e para o professor.');
+    toast('Grade atualizada — ' + m + ' com ' + pr + ' na ' + (tur ? tur.nome : t) + '. Já vale para o aluno e para o professor.');
   });
 
   /* ---------- materiais da aula: da coordenação para os alunos ----------
@@ -10495,7 +10530,7 @@
         /* o item presencial volta a ficar disponível na Loja do aluno, marcado como ENTREGUE */
         if (pd.presId && typeof presDe === 'function') {
           var p = presDe(pd.presId);
-          if (p) { p.estado = 'entregue'; if (typeof renderPresenciais === 'function') renderPresenciais(); }
+          if (p && typeof renderPresenciais === 'function') renderPresenciais();
         }
         renderPedidos();
         if (typeof renderRelCompras === 'function') renderRelCompras();   /* cai no relatório de compras do aluno */
@@ -10535,14 +10570,19 @@
     var ordem = ['eventos', 'auloes', 'excursoes', 'isoladas', 'taf'];
     el.innerHTML = ordem.map(function (k) {
       var g = ACESSOS[k];
+      var faltam = g.lista.filter(function (p) { return !p.liberado; }).length;
+      /* o detalhe da atividade é da CATEGORIA — repeti-lo em cada nome só
+         engrossava a lista e apagava a hierarquia                       */
       var linhas = g.lista.map(function (p, i) {
         var right = p.liberado
           ? '<span class="tag ok">ENTRADA LIBERADA</span>'
           : '<button class="btn small" data-ac="' + k + ':' + i + '">Liberar entrada</button>';
-        return '<div class="mission-row"><div class="grow"><div class="t">' + p.nome + (p.euSou ? ' · você' : '') + '</div>' +
-          '<div class="d">' + g.det + '</div></div>' + right + '</div>';
+        return '<div class="mission-row"><div class="grow"><div class="t">' + p.nome + (p.euSou ? ' · você' : '') + '</div></div>' + right + '</div>';
       }).join('');
-      return '<div class="k-label sub-k" style="margin-top:12px">' + g.rot + ' <span class="tag">' + g.lista.length + '</span></div>' + linhas;
+      return '<div class="ac-cat">' + g.rot +
+        '<span class="tag' + (faltam ? '' : ' ok') + '">' + (faltam ? faltam + ' a liberar' : 'tudo liberado') + '</span></div>' +
+        '<p class="sub" style="margin:0 0 4px">' + g.det + '</p>' +
+        '<div class="ac-grupo">' + linhas + '</div>';
     }).join('');
     el.querySelectorAll('[data-ac]').forEach(function (bt) {
       bt.addEventListener('click', function () {
@@ -10616,6 +10656,40 @@
     el.innerHTML = html;
     if ($('ativBtn')) $('ativBtn').onclick = function () { ativOpen = !ativOpen; renderAtivInscritos(); };
   }
+  /* ---------- lista de conferência em PDF ----------
+     Abre uma folha limpa numa janela nova e chama a impressão do próprio
+     navegador — no diálogo dá para "Salvar como PDF" ou imprimir para
+     conferir na portaria, no papel, com a coluna de presença em branco. */
+  function ativListaPdf() {
+    var sel = $('admAtivSel'); if (!sel) return;
+    var a = ativDe(sel.value); if (!a) return;
+    if (!a.n) { toast('“' + a.nome + '” ainda não tem inscritos para listar.'); return; }
+    var esc = function (x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+    var linhas = '';
+    for (var i = 1; i <= a.n; i++) {
+      linhas += '<tr><td class="n">' + i + '</td><td>' + esc(inscNome(a.seed, i)) + '</td><td class="ck"></td></tr>';
+    }
+    var doc = '<!doctype html><meta charset="utf-8"><title>Inscritos · ' + esc(a.nome) + '</title>' +
+      '<style>body{font:12px/1.45 Arial,Helvetica,sans-serif;color:#111;margin:24px}' +
+      'h1{font-size:16px;margin:0 0 2px}.meta{font-size:11px;color:#555;margin-bottom:14px}' +
+      'table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ccc;padding:6px 4px;text-align:left}' +
+      'th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#555}' +
+      'td.n{width:34px;color:#666}td.ck{width:90px}thead{display:table-header-group}tr{break-inside:avoid}' +
+      '@media print{body{margin:0}}</style>' +
+      '<h1>' + esc(a.tipo) + ' · ' + esc(a.nome) + '</h1>' +
+      '<div class="meta">' + a.n + ' inscritos · lista de conferência · Quad Concursos</div>' +
+      '<table><thead><tr><th>#</th><th>Nome de guerra</th><th>Presença</th></tr></thead><tbody>' +
+      linhas + '</tbody></table>';
+    var w = window.open('', '_blank');
+    if (!w) { toast('Libere os pop-ups para gerar a lista de conferência.'); return; }
+    w.document.write(doc); w.document.close(); w.focus();
+    setTimeout(function () { try { w.print(); } catch (e) {} }, 300);
+    toast('Lista de ' + a.n + ' inscritos aberta para impressão ou PDF.');
+  }
+  (function () {
+    var bp = $('btnAtivPdf');
+    if (bp) bp.addEventListener('click', ativListaPdf);
+  })();
   (function () {
     var sel = $('admAtivSel'); if (!sel) return;
     sel.addEventListener('change', function () { ativOpen = false; renderAtivInscritos(); });
@@ -10672,7 +10746,7 @@
     toast(x.geraQdC
       ? 'Entrada liberada — participante pontuado (+' + x.valor + ' QdC · +' + x.score + ' score).'
       : 'Entrada liberada — presença confirmada (+' + x.score + ' score).');
-    /* liberado, o simulado do aluno sai da aba Simulados e vai ao histórico */
+    /* liberado, o simulado do aluno sai da lista e vai ao histórico */
     if (x.euSou) {
       var sm = null; SIMULADOS.forEach(function (s) { if (s.rot === x.simRot && s.tag === 'PRESENCIAL') sm = s; });
       if (sm && !sm.realizado) {
@@ -10783,6 +10857,7 @@
         var sm = SIMULADOS[+bt.dataset.rmSim]; if (!sm) return;
         SIMULADOS.splice(+bt.dataset.rmSim, 1);
         renderAdmSimList(); renderSimulados(); renderLojaSimulados();
+        if (typeof renderPrecos === 'function') renderPrecos();   /* some do editor de preços junto */
         if (typeof renderSalas === 'function') renderSalas();
         if (typeof window.__simSalaRefresh === 'function') window.__simSalaRefresh();
         toast('Simulado “' + sm.rot + '” removido.');
@@ -10864,6 +10939,7 @@
     admSimPdfNome = ''; if ($('admSimPdfNome')) $('admSimPdfNome').textContent = 'Anexar PDF do simulado';
     var lbl = admSimPdfEl && admSimPdfEl.closest('.sd-file'); if (lbl) lbl.classList.remove('ok');
     renderAdmSimList(); renderSimulados(); renderLojaSimulados();
+    if (typeof renderPrecos === 'function') renderPrecos();   /* o preço nasce no editor junto com o simulado */
   });
   admSimToggle();
 
@@ -10873,14 +10949,18 @@
       '<span class="mini-track"><i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i></span>' +
       '<span class="pct" style="color:' + edPcColor(pct) + '">' + Math.round(pct) + '%</span></div>';
   }
-  function relComputeDif() {
+  /* opts.arvore troca o edital lido; opts.desloc dá a cara de uma sala
+     (mesma semente estável que os relatórios já usam por aluno)       */
+  function relComputeDif(opts) {
+    opts = opts || {};
+    var desloc = opts.desloc || 0;
     var subs = [], assMap = [], matMap = [];
-    var arvore = (typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO;
+    var arvore = opts.arvore || ((typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO);
     arvore.forEach(function (mat, mi) {
       var matPcts = [];
       mat[1].forEach(function (ass) {
         var pcts = ass[1].map(function (sub) {
-          var pc = edSubPct(mi, mat[0], ass[0], sub);
+          var pc = Math.max(4, Math.min(98, edSubPct(mi, mat[0], ass[0], sub) + desloc));
           subs.push({ n: sub, det: mat[0] + ' · ' + ass[0], pct: pc });
           return pc;
         });
@@ -10953,7 +11033,7 @@
     var el = $('admPrecoTurmas'); if (!el) return;
     el.innerHTML = TURMAS_LOJA.map(function (t) {
       return '<div class="adm-bar" style="flex-wrap:wrap"><span class="nm" style="flex-basis:100%">' + t.nome +
-        '<small>' + (t.focoNome || '') + ' · ' + t.turno + ' · ' + t.hor + '</small></span>' +
+        '<small>' + [t.focoNome || (typeof nomeConcurso === 'function' ? nomeConcurso(t.concurso) : ''), t.turno, t.hor].filter(Boolean).join(' · ') + '</small></span>' +
         '<input class="fld" data-tp-dmn="' + t.id + '" value="' + t.precoDmn + '" inputmode="numeric" title="Preço em Diamantes" style="max-width:76px;text-align:right"> <span class="pct">Dmn</span>' +
         '<input class="fld" data-tp-qdc="' + t.id + '" value="' + t.precoQdc + '" inputmode="numeric" title="Preço em Quad Coins" style="max-width:76px;text-align:right"> <span class="pct">QdC</span>' +
         '<input class="fld" data-tv-dmn="' + t.id + '" value="' + t.vagasDmn + '" inputmode="numeric" title="Vagas restantes em Diamantes" style="max-width:58px;text-align:right"> <span class="pct">vg Dmn</span>' +
@@ -11277,7 +11357,7 @@
     if (tipo === 'pres') {
       var pr = (typeof presDe === 'function') ? presDe(ref) : null;
       var qtd = (cp.extra && cp.extra.qtd) ? cp.extra.qtd : 1;
-      if (pr) { pr.estoque += qtd; pr.estado = null; }
+      if (pr) { pr.estoque += qtd; }
       if (typeof PEDIDOS !== 'undefined') {
         var achou = false;
         PEDIDOS = PEDIDOS.filter(function (pd) {
@@ -11393,6 +11473,28 @@
       : '<p class="sub" style="padding:8px 0">Sem compras registradas.</p>';
     $('relIndPedag').innerHTML = d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
   }
+  /* ---------- pedagógico POR TURMA ----------
+     Cada turma é lida na árvore do edital DELA (t.concurso), com uma
+     semente estável por turma — o mesmo truque que os relatórios já
+     usam por aluno. Um bloco por turma aberta, como o gestor pediu.  */
+  function relDadosTurma(turmaId) {
+    var t = (typeof turmaDe === 'function') ? turmaDe(turmaId) : null; if (!t) return null;
+    var c = (typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
+    var h = edHash(t.id);
+    var d = relComputeDif({ arvore: (c && c.arvore) || null, desloc: (h % 21) - 10 });
+    return { turma: t, concurso: c, fracos: d.subs.slice(0, 5) };
+  }
+  function renderRelPedagTurmas() {
+    var el = $('relPedagTurmas'); if (!el) return;
+    var turmas = (typeof TURMAS_LOJA !== 'undefined') ? TURMAS_LOJA : [];
+    el.innerHTML = turmas.map(function (t) {
+      var d = relDadosTurma(t.id); if (!d) return '';
+      var edital = d.concurso ? d.concurso.nome + (d.concurso.edital && d.concurso.edital !== '—' ? ' · ' + d.concurso.edital : '') : 'sem árvore de edital';
+      return '<div class="ac-cat" style="margin-top:14px">' + t.nome + '<span class="tag">' + (t.turno || '') + '</span></div>' +
+        '<p class="sub" style="margin:0 0 6px">Árvore lida: <strong>' + edital + '</strong></p>' +
+        d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta para analisar.</p>';
+  }
   /* o seletor de turmas do relatório é a lista viva — turma aberta hoje já dá para analisar */
   function relTurmasInit() {
     var selT = $('relTurmaSel'); if (!selT) return;
@@ -11440,7 +11542,7 @@
     renderCompras();
   }
   function renderRelatorios() {
-    renderRelInd(); renderRelTurma(); renderRelGeral(); renderRelLoja();
+    renderRelInd(); renderRelPedagTurmas(); renderRelTurma(); renderRelGeral(); renderRelLoja();
   }
   (function () {
     var tabs = $('relTabs'); if (!tabs) return;
