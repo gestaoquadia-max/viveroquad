@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 30/07/2026 — Auditoria e especificação do protótipo (docs/auditoria/)
+
+- **14 documentos novos em `docs/auditoria/`** (00-resumo-executivo a
+  13-guia-para-o-desenvolvedor, mais um índice): auditoria integral do
+  protótipo para transformá-lo em especificação funcional e técnica —
+  inventário de telas e fluxos, matriz de funcionalidades com status,
+  61 regras de negócio com evidência de linha, dados locais e
+  persistência, mapa do ecossistema, matriz de fontes oficiais, 22
+  contratos lógicos de integração, divergências e perguntas ao produto,
+  avaliação de reaproveitamento, plano de transformação em 20 fases e
+  guia do desenvolvedor.
+- **Nenhuma linha de código foi alterada** nesta execução: o `src.html`,
+  o build e o comportamento do protótipo permanecem exatamente como
+  estavam. A auditoria apenas lê, confronta e documenta.
+
 ## 28/07/2026 — Pronome da personagem, estorno consumido, lotação por sala, portaria sincronizada e mensagens por público
 
 - **"Essa Mulher…", não "Esse Mulher…"** (item 1): a pergunta de
