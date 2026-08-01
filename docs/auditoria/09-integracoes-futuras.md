@@ -13,7 +13,7 @@ A Consolidação Arquitetural v1.0, determinada pelo gestor Danilo Moura em 01/0
 
 1. **A maioria dos 22 contratos deixa de ser integração com SISTEMA EXTERNO** e passa a ser **CONTRATO INTERNO** entre o front do app e módulos da própria plataforma. A **forma** de cada contrato interno — API interna, serviço, biblioteca — **fica para a fase de especificação**; as fichas continuam registrando apenas o contrato lógico, e as **entradas/saídas lógicas não mudaram**.
 2. O campo **"Sistema fornecedor"** de cada ficha (e a coluna correspondente da tabela-resumo) foi atualizado para o módulo interno correspondente, sempre marcado **[PLANEJADO]**. A mudança é **exclusivamente arquitetural**: nada foi implementado, e todo módulo interno citado é "Módulo Planejado".
-3. Permanecem **fornecedores EXTERNOS** apenas: **pagamentos/checkout do site** (dinheiro real), a **plataforma de cursos** (legado em avaliação) e o **canal de notificações push/e-mail**.
+3. Permanecem **fora da plataforma** (integrações a definir), conforme a lista oficial de cinco itens da arquitetura (`docs/arquitetura/00-arquitetura-oficial.md`, seção 3): **site e checkout** (vitrine/venda), **pagamentos/financeiro** (dinheiro real, gateway), **plataforma de cursos** (legado em avaliação), **canal de notificações push/e-mail** e **telemetria como serviço de dados** (a decidir).
 4. A **dec. 21 foi revogada**: o cadastro passa a pertencer à arquitetura do app (Módulo de Cadastro). O fluxo novo **não foi implementado** — o protótipo mantém o portão "Cadastro no site do Quad" como demonstração até a especificação do módulo (afeta principalmente as Fichas 1, 2 e 3).
 5. As **regras econômicas** (loja, Quad Coins, Diamantes, gift cards) **seguem indefinidas** — as Fichas 14–17 registram a indefinição; nenhuma regra nova foi criada.
 6. Os campos **"Estado atual"**, os rótulos (inclusive "DEPENDE DE SISTEMA EXTERNO"), as evidências de código e o texto da seção "Como ler" foram **mantidos como registro da auditoria de 30/07/2026** sobre o monolito `src.html`. As referências "src.html l.N" valem para o monolito auditado; a correspondência com a divisão do fonte em 20 partes (commits de 01/08/2026) está em `src/README.md`.
@@ -56,7 +56,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 | 7 | Obter questões | Módulo de Banco de Questões [PLANEJADO] | Simulação local (bancos demo com gabarito no cliente) |
 | 8 | Enviar respostas | Módulos de Inteligência Pedagógica e Banco de Questões [PLANEJADOS] | Simulação local (correção no cliente) |
 | 9 | Calcular desempenho (Domínio/score) | Módulo de Inteligência Pedagógica [PLANEJADO] + gamificação interna (módulo a definir) | Mock (percentuais por hash) + simulação local (score) |
-| 10 | Registrar eventos comportamentais | Módulo de Relatórios [PLANEJADO] (telemetria como serviço de dados: a decidir) | Mock (linha de telemetria decorativa) |
+| 10 | Registrar eventos comportamentais | A definir — telemetria/coleta permanece fora da plataforma, "a decidir" (Relatórios [PLANEJADO] consome as leituras) | Mock (linha de telemetria decorativa) |
 | 11 | Operar quiz ao vivo | Módulos de Simulados e Banco de Questões [PLANEJADOS] | Simulação local (polling randômico no mesmo navegador) |
 | 12 | Consultar ranking | Módulo de Relatórios [PLANEJADO] + gamificação interna (módulo a definir) | Mock (posições por fórmula/hash) |
 | 13 | Listar materiais | Módulo de Produção de Materiais [PLANEJADO] (+ plataforma de cursos, externa) | Simulação local (dataURL em memória) |
@@ -74,7 +74,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 
 ## Ficha 1 — Autenticar aluno
 
-- **Necessidade**: validar e-mail+senha do aluno, abrir sessão e recusar conta bloqueada; "Criar conta" redireciona ao site (a conta nasce no checkout, junto da matrícula — dec. 21).
+- **Necessidade**: validar e-mail+senha do aluno, abrir sessão e recusar conta bloqueada; "Criar conta" redireciona ao site (a conta nasce no checkout, junto da matrícula — dec. 21; **dec. 21 revogada em 01/08 pela Consolidação v1.0** — o portão do site é mantido apenas como demonstração até a especificação do Módulo de Cadastro).
 - **Sistema fornecedor**: Módulo de Autenticação do Viver o Quad [PLANEJADO] + Módulo de Cadastro do Viver o Quad [PLANEJADO]. A criação de conta passa a pertencer ao Módulo de Cadastro (dec. 21 revogada na Consolidação v1.0); o protótipo, porém, mantém o portão "Cadastro no site do Quad" como demonstração até a especificação do módulo.
 - **Entrada lógica**: e-mail, senha, identificação do dispositivo/app; no redirecionamento de cadastro, retorno ao app após concluir no site.
 - **Saída lógica**: sessão válida (com identidade do aluno e perfis/permissões) ou recusa tipada: credencial inválida, **conta bloqueada** ("procure a administração"), conta inexistente (encaminhar ao site).
@@ -183,7 +183,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 10 — Registrar eventos comportamentais (telemetria)
 
 - **Necessidade**: registrar origem da sessão (taxonomia ORGANIC/CLASS/PUSH/MENTOR/NOTICE/CAMPAIGN), tempo por questão, padrões de resposta, abandono e constância — a "linha de base comportamental" que o docs/01 define como pré-requisito da V0 e insumo do futuro IRA (Índice de Risco de Abandono); métrica-mãe do produto é o retorno espontâneo `OPEN_ORGANIC`.
-- **Sistema fornecedor**: Módulo de Relatórios do Viver o Quad [PLANEJADO] (coletor de eventos/analytics); a hipótese de telemetria como serviço de dados apartado segue em avaliação na Consolidação v1.0 (a decidir).
+- **Sistema fornecedor**: **a definir** — a arquitetura oficial (v1.0, seção 3) separa o módulo interno de **Relatórios** do serviço de **telemetria/coleta de eventos**, que permanece **fora da plataforma e "a decidir"**; atribuir a coleta a um módulo interno anteciparia decisão não tomada. O Módulo de Relatórios [PLANEJADO] é candidato a consumidor das leituras agregadas, não dono declarado da coleta.
 - **Entrada lógica**: eventos com carimbo de tempo, tipo, contexto (tela, turma, atividade) e **identificador pseudonimizado** do aluno.
 - **Saída lógica**: em princípio nenhuma para o app (fire-and-forget); leituras agregadas voltam pelos relatórios (Ficha do ecossistema de BI, fora deste app).
 - **Frequência e momento**: contínua, desde o dia 1 ("eventos logados desde o dia 1" — docs/01).

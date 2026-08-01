@@ -20,10 +20,10 @@ Este guia é o ponto de partida para o desenvolvedor que nunca viu o "Viver o Qu
 | 3 | `docs/auditoria/00-resumo-executivo.md` | Visão geral honesta do que o protótipo é e não é | Atual (30/07) |
 | 4 | **Este guia** (13) | Mapa de chegada | Atualizado (01/08) |
 | 5 | `docs/Viver-o-Quad-Relatorio-rev2-3.pdf` | Documento-base de produto: visão, faseamento V0→V1→V2, economia Quadcoin (Anexo A), métrica-mãe. **Leia sabendo que está defasado em pontos importantes** (ver doc 10) e que a premissa "app satélite de uma plataforma-base" foi **superada pela Consolidação** | Canônico em produto, aguarda rev. 2.4; superado em arquitetura |
-| 6 | `docs/02-registro-de-decisoes.md` | Decisões 1–181 do gestor — é o documento de produto mais vivo. Atenção: números 126–129 duplicados e ordenação quebrada no fim do arquivo; **dec. 21 revogada em 01/08** | Atual (28/07), com defeitos de numeração |
+| 6 | `docs/02-registro-de-decisoes.md` | Decisões 1–188 do gestor — é o documento de produto mais vivo. As decisões **182–188 (01/08)** registram a Consolidação v1.0 (inclusive a revogação da dec. 21 e a divisão do fonte). Atenção: números 126–129 duplicados e ordenação quebrada no trecho final 46–181 | Atual (01/08), com defeitos de numeração |
 | 7 | `CHANGELOG.md` | 116 entradas (13/07→28/07), uma por rodada, com causas-raiz. É a fonte histórica mais confiável — a única que acompanhou o código até o fim | Atual (28/07) |
-| 8 | `docs/auditoria/01` a `12` | Mapa do protótipo, telas, fluxos, funcionalidades, regras (RN-01–RN-61), dados, ecossistema, fontes, integrações, divergências, reaproveitamento e o plano de transformação (doc 12 — as 20 fases; atualizado em 01/08 com a Consolidação). Atenção: docs 07/08 têm a matriz de propriedade **superada** onde atribuía os 11 módulos a sistemas externos | Atuais (30/07; 12 atualizado em 01/08) |
-| 9 | `README.md`, `docs/00-comece-aqui-danilo.md`, `docs/01-visao-e-escopo.md`, `docs/03-guia-de-build-e-publicacao.md` | Leia por último e **com desconfiança**: congelados em ~18/07, contêm URL antiga do artefato, roteiro de demonstração que não funciona mais, tamanhos irreais e árvore de arquivos incompleta (DIVERGÊNCIA DOCUMENTAL — detalhe no doc 10) | Desatualizados |
+| 8 | `docs/auditoria/01` a `12` | Mapa do protótipo, telas, fluxos, funcionalidades, regras (RN-01–RN-61), dados, ecossistema, fontes, integrações, divergências, reaproveitamento e o plano de transformação (doc 12 — as 20 fases). Os docs **00, 01, 07, 08, 09, 10, 11 e 12** receberam seções de Atualização em 01/08 com a Consolidação. Atenção: docs 07/08 têm a matriz de propriedade **superada** onde atribuía os 11 módulos a sistemas externos (as Atualizações explicam) | Atuais (retrato de 30/07; 00/01/07–12 anotados em 01/08) |
+| 9 | `README.md`, `docs/00-comece-aqui-danilo.md`, `docs/01-visao-e-escopo.md`, `docs/03-guia-de-build-e-publicacao.md` | **Reescritos em 01/08 contra a Consolidação v1.0**: URL vigente do artefato, fonte em `src/`, os dois builds, tamanhos e árvore reais; docs/01 registra a revogação da dec. 21. (A versão de ~18/07 que a auditoria criticou — DIVERGÊNCIA DOCUMENTAL do doc 10 — foi substituída) | Atuais (01/08) |
 | 10 | `src/README.md` + as 20 partes em `src/` | A fonte única, agora em 20 fatias contíguas (`NN-descricao.html`; a concatenação na ordem reproduz o monolito). Em conflito de comportamento, **o código é a verdade final** | Atual (01/08) |
 
 ---
@@ -87,7 +87,7 @@ Limitações que **permanecem** (aceitas para um protótipo):
 - **Órfãos versionados:** ✅ **resolvido em 01/08** — `Viver o Quad.rar` (9 MB) e `quad-coin.png` (904 KB) foram **removidos do repositório** no commit da divisão do fonte.
 - **Não versionados por design:** `index.html` e `artifact.html` (no `.gitignore`) — regenere localmente.
 - **Ausentes do repositório:** as **suítes Playwright de desenvolvimento** citadas em todo o CHANGELOG (`vtut`, `vfasea`–`vfaseh`, `vdmn`…). **O repositório continua sem nenhum teste automatizado versionado** — a regressão de 56 suítes que validou a limpeza de 01/08 rodou fora do repo; os 31 hooks `window.__*` no fonte são a única memória delas.
-- **A corrigir (ainda):** README/docs/00/docs/03 (URL antiga do artefato `4d06ad26-…` — a vigente informada à auditoria é `945e81a8-9ca3-4d55-9169-c4fc9f6f3703`, HIPÓTESE por não constar em nenhum arquivo do repo; árvore do README desatualizada — não reflete `src/` nem `docs/arquitetura/`; tamanhos "70 KB/4 MB" vs. reais ~9,4 MB).
+- **Docs de entrada:** ✅ **resolvido em 01/08** — README, docs/00, docs/01 e docs/03 foram **reescritos contra a Consolidação**: a URL vigente `945e81a8-9ca3-4d55-9169-c4fc9f6f3703` está registrada em quatro arquivos do repo (README, docs/00, docs/02 e docs/03 — deixou de ser HIPÓTESE, restando só a validação formal do gestor), a árvore reflete `src/` e `docs/arquitetura/`, e os tamanhos citados são os reais (~9,4 MB).
 
 ---
 
@@ -162,8 +162,8 @@ Regra de leitura (detalhe no doc 08 — matriz de fontes; hierarquia atualizada 
 2. **Comportamento vigente** → o fonte em `src/` (o código é a verdade final do que o protótipo faz; `src/README.md` explica a correspondência com o monolito auditado).
 3. **Intenção de produto vigente** → `docs/02-registro-de-decisoes.md` (decisão mais recente vence; cuidado com 126–129 duplicadas; **dec. 21 revogada em 01/08**) + `CHANGELOG.md` (contexto e datas).
 4. **Visão, faseamento e economia-alvo** → `docs/Viver-o-Quad-Relatorio-rev2-3.pdf` (canônico em produto, mas **pendente da rev. 2.4** e **superado em arquitetura** pela Consolidação; diverge do protótipo em economia, moedas e escopo V0/V1; ver doc 10).
-5. **docs/auditoria/00–13** → fotografia verificada de 30/07 (docs 12 e 13 atualizados em 01/08). A matriz de propriedade dos docs 07/08 fica superada onde atribuía os 11 módulos internos a sistemas externos.
-6. **README, docs/00, docs/01, docs/03** → registros históricos de ~18/07; não confie sem conferir.
+5. **docs/auditoria/00–13** → fotografia verificada de 30/07 (docs 00, 01, 07, 08, 09, 10, 11, 12 e 13 anotados/atualizados em 01/08). A matriz de propriedade dos docs 07/08 fica superada onde atribuía os 11 módulos internos a sistemas externos.
+6. **README, docs/00, docs/01, docs/03** → **reescritos em 01/08 contra a Consolidação** — voltaram a ser documentos de entrada confiáveis (URL vigente, `src/`, builds, árvore e roteiro atuais).
 
 ## 9. Decisões vigentes mais importantes (top 20, com nº)
 
@@ -196,7 +196,7 @@ Também relevantes: 136 (Estúdio selecionado manualmente, revoga 131), 141 (lis
 
 ## 10. Divergências abertas
 
-**Leia o doc `10-divergencias-e-decisoes-pendentes.md` na íntegra antes de codificar qualquer coisa.** As dez mais impactantes, em resumo: economia ativa na V0 × "sem economia ativa" da rev. 2.3 (**as regras econômicas seguem indefinidas** — a Consolidação registrou, não resolveu); Diamante sem cobertura no documento-base; `var score` = moeda (armadilha de nomenclatura); mascote QUAD × resíduos "Danilo" (assets, ids e um texto no app, l.3637); tutorial 9×19×29 passos; dec. 105 × comportamento real do `vq_tut_skip`; README/docs/00/03 com URL antiga (a parte "build.ps1 como único build" foi resolvida em 01/08 — os dois builds validam igual); decisões 126–129 duplicadas; gate admin sem validar e-mail; telemetria pré-requisito da V0 que é só texto. Cada uma tem responsável e pergunta objetiva no doc 10. A divergência sobre dono do cadastro foi resolvida pela **revogação da dec. 21** (01/08); os riscos de segurança da auditoria **permanecem válidos e pendentes**.
+**Leia o doc `10-divergencias-e-decisoes-pendentes.md` na íntegra antes de codificar qualquer coisa.** As dez mais impactantes, em resumo: economia ativa na V0 × "sem economia ativa" da rev. 2.3 (**as regras econômicas seguem indefinidas** — a Consolidação registrou, não resolveu); Diamante sem cobertura no documento-base; `var score` = moeda (armadilha de nomenclatura); mascote QUAD × resíduos "Danilo" (assets, ids e um texto no app, l.3637); tutorial 9×19×29 passos; dec. 105 × comportamento real do `vq_tut_skip`; README/docs/00/03 defasados (**resolvida em 01/08** — docs de entrada reescritos com a URL vigente; os dois builds validam igual); decisões 126–129 duplicadas; gate admin sem validar e-mail; telemetria pré-requisito da V0 que é só texto. Cada uma tem responsável e pergunta objetiva no doc 10. A divergência sobre dono do cadastro foi resolvida pela **revogação da dec. 21** (01/08); os riscos de segurança da auditoria **permanecem válidos e pendentes**.
 
 ## 11. O que pode ser aproveitado
 
@@ -223,7 +223,7 @@ Tudo o que é **estado e lógica de negócio no cliente**: autenticação/RBAC, 
 2. **Rode e navegue** (seção 3): as 3 personas, o tutorial completo, uma compra + estorno, um quiz ao vivo, criação de turma no admin.
 3. **Leia o resto na ordem da seção 1** (auditoria 00 → este guia → PDF → decisões → CHANGELOG → auditoria 01–12, fechando com o plano de transformação do doc 12, atualizado em 01/08).
 4. **Leve as perguntas da seção 14 ao Danilo** (produto) — várias travam arquitetura (economia — indefinida; Diamante; corte V0/V1; bug do reset).
-5. **Higiene do repositório** — o grosso foi feito em 01/08 (build portátil e validado, `.rar` e `quad-coin.png` removidos, código morto removido). Resta: README/docs 00/03 atualizados, botão `[DEMO PROVISÓRIO]`, textos residuais "Danilo", `v-pretaf` (religar ou remover) — cada um com ok do gestor.
+5. **Higiene do repositório** — o grosso foi feito em 01/08 (build portátil e validado, `.rar` e `quad-coin.png` removidos, código morto removido, README/docs 00/01/03 reescritos). Resta: botão `[DEMO PROVISÓRIO]`, textos residuais "Danilo", `v-pretaf` (religar ou remover) — cada um com ok do gestor.
 6. **Recrie a rede de testes**: o repositório não tem nenhum teste versionado — os hooks `window.__*` documentam onde as suítes Playwright se apoiavam (56 suítes rodaram fora do repo em 01/08); versione as novas junto do código.
 7. **Participe da ESPECIFICAÇÃO MÓDULO A MÓDULO** — a próxima fase oficial definida pela Consolidação, **antes de qualquer implementação**: cada um dos 11 Módulos Planejados precisa de especificação (fichas em `docs/arquitetura/01-modulos-planejados.md`). Os pontos `[INTEGRAÇÃO REAL]` do fonte agora se dividem entre módulos internos (a especificar) e integrações externas a definir (site/checkout, pagamentos, PDF, QR, storage).
 8. **Só então** desenhe back-end e migre telas — usando o protótipo como especificação visual e de regras (telemetria e autenticação seguem candidatas a primeiros alicerces, conforme o relatório e a auditoria).
@@ -261,7 +261,7 @@ Tudo o que é **estado e lógica de negócio no cliente**: autenticação/RBAC, 
 - [ ] Entrei nas 3 personas com as credenciais da seção 3 (aluno livre · `moura@quadconcursos.com.br`/`quad1234` · chave `NPP-2026`)
 - [ ] Fiz o tutorial completo, uma compra + estorno, um quiz ao vivo e criei uma turma no admin
 - [ ] Li docs/auditoria 00, 10 e 11 e o registro de decisões (ciente das duplicatas 126–129 e da **dec. 21 revogada em 01/08**)
-- [ ] Confirmei com o gestor a URL vigente do artefato e atualizei README/docs 00/03 (pendência que restou)
+- [x] ~~Atualizar README/docs 00/03~~ — **feito em 01/08** (reescritos contra a Consolidação, com docs/01; URL vigente registrada em README/docs 00/02/03 — resta só a confirmação formal da URL pelo gestor)
 - [x] ~~Corrigir caminho do `build.py` / validação do `build.ps1`~~ — **feito em 01/08** (build portátil, validações espelhadas)
 - [x] ~~Remover `Viver o Quad.rar` e `quad-coin.png`~~ — **feito em 01/08**
 - [x] ~~Remover código morto (`openQuiz`, `fmtSync`, `tutDadosOk`, chaves `vq_*` mortas, fluxo `CODE_OK`)~~ — **feito em 01/08** com regressão de 56 suítes; `LINKS_ONLINE` foi **preservado** (ponto de integração planejado). Restam: botão `[DEMO PROVISÓRIO]`, resíduos "Danilo" (dependem de ok do gestor)

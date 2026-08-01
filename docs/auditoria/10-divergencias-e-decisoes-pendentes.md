@@ -12,7 +12,7 @@
 Em 01/08/2026 o gestor Danilo Moura determinou a **Consolidação Arquitetural v1.0** (documento oficial: `docs/arquitetura/00-arquitetura-oficial.md` — referência arquitetural única do projeto). Ela **respondeu parte das perguntas** deste documento e **superou premissas** de algumas seções. Nenhuma pergunta foi apagada: cada uma está marcada como **[RESPONDIDA — Consolidação v1.0]** (com a resposta e a data) ou **[ABERTA]** — na tabela consolidada da seção 9 e, quando relevante, no corpo. Em resumo, a Consolidação:
 
 - **Respondeu:** a precedência documental (Q0 — `docs/arquitetura/` prevalece); os limites app × site × plataforma-base e a propriedade dos módulos (seção 7 — 11 capacidades viram **módulos internos** da plataforma); o destino da dec. 21 (Q9 — **revogada**: o cadastro passa a pertencer à arquitetura do app, como Módulo Planejado; o fluxo novo **não foi implementado** e o protótipo mantém o portão "Cadastro no site" como demonstração); a saída do `Viver o Quad.rar` (Q22 — removido em 01/08).
-- **NÃO respondeu** (seguem abertas): todas as perguntas da **economia** (Q5, Q7, Q8, Q18 — loja, Quad Coins, Diamantes e gift cards permanecem previstos, mas as **regras econômicas seguem indefinidas**, não estudadas); mascote/nomenclatura (Q1, Q2); tutorial 29 passos × dec. 105 (Q3, Q4); renomear `score` (Q6); nota de promoção (Q10); Pré-TAF (Q11); palavrões (Q12); higiene pré-piloto restante (Q13); telemetria/log de eventos (Q14); IDs estáveis (Q15); graduação (Q16); risco de abandono (Q17); catálogo de integrações (Q19); registro de decisões (Q20); reescrita de README/docs (Q21).
+- **NÃO respondeu** (seguem abertas): todas as perguntas da **economia** (Q5, Q7, Q8, Q18 — loja, Quad Coins, Diamantes e gift cards permanecem previstos, mas as **regras econômicas seguem indefinidas**, não estudadas); mascote/nomenclatura (Q1, Q2); tutorial 29 passos × dec. 105 (Q3, Q4); renomear `score` (Q6); nota de promoção (Q10); Pré-TAF (Q11); palavrões (Q12); higiene pré-piloto restante (Q13); telemetria/log de eventos (Q14); IDs estáveis (Q15); graduação (Q16); risco de abandono (Q17); catálogo de integrações (Q19); registro de decisões (Q20). A reescrita de README/docs (Q21) foi **executada em 01/08** (docs de entrada reescritos contra a Consolidação; resta só a validação da URL pelo gestor).
 - **Nota técnica:** o fonte agora vive em `src/` (20 partes; `src.html` não existe mais) — as referências "src.html l.N" abaixo valem para o monolito auditado em 30/07 (`src/README.md` explica a correspondência). Parte do código morto citado adiante foi removida em 01/08 com regressão verde (duplicata de `hojeISO`, fluxo de autorização de dispositivo, chaves mortas de localStorage, `openQuiz`/`fmtSync`/`tutDadosOk`); os riscos de segurança permanecem válidos e **registrados como pendências** — nenhuma solução foi implementada.
 
 ---
@@ -101,7 +101,7 @@ Rótulos usados (vocabulário obrigatório da auditoria): CONFIRMADO NO CÓDIGO 
 
 ### 1.7 Cadastro no aplicativo × cadastro no site — **[RESPONDIDA — Consolidação v1.0, 01/08/2026]**
 
-> **Atualização 01/08:** a **dec. 21 foi REVOGADA** pela Consolidação Arquitetural v1.0. O cadastro **passa a pertencer à arquitetura do app** (módulo interno de cadastro — "Módulo Planejado", ainda sem especificação). O fluxo novo **NÃO foi implementado**: o protótipo continua exibindo o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo. A divergência documental abaixo (README/docs/00/docs/01 descrevendo o modelo pré-dec. 21) permanece registrada como histórico — a reescrita dos docs (Q21) segue aberta e agora deve refletir a Consolidação, não a dec. 21.
+> **Atualização 01/08:** a **dec. 21 foi REVOGADA** pela Consolidação Arquitetural v1.0. O cadastro **passa a pertencer à arquitetura do app** (módulo interno de cadastro — "Módulo Planejado", ainda sem especificação). O fluxo novo **NÃO foi implementado**: o protótipo continua exibindo o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo. A divergência documental abaixo (README/docs/00/docs/01 descrevendo o modelo pré-dec. 21) permanece registrada como histórico — a reescrita dos docs (Q21) foi **executada em 01/08**, refletindo a Consolidação (docs/01 registra a revogação da dec. 21).
 
 | Campo | Conteúdo |
 |---|---|
@@ -110,7 +110,7 @@ Rótulos usados (vocabulário obrigatório da auditoria): CONFIRMADO NO CÓDIGO 
 | Impacto | O documento "comece aqui" (porta de entrada do gestor) e a visão-e-escopo ensinam um fluxo removido há 10 dias de trabalho. |
 | Rótulos | CONFIRMADO NO CÓDIGO · DIVERGÊNCIA DOCUMENTAL (README/00/01) · DEPENDE DE SISTEMA EXTERNO (checkout real). |
 
-- **Q9 [RESPONDIDA — Consolidação v1.0, 01/08/2026]:** **Não** — a dec. 21 foi **revogada**. A conta passa a nascer no próprio app (módulo interno de cadastro, Módulo Planejado); README/docs/00/docs/01 devem ser reescritos contra a Consolidação. O protótipo segue com o portão "Cadastro no site" apenas como demonstração até o módulo ser especificado.
+- **Q9 [RESPONDIDA — Consolidação v1.0, 01/08/2026]:** **Não** — a dec. 21 foi **revogada**. A conta passa a nascer no próprio app (módulo interno de cadastro, Módulo Planejado); README/docs/00/docs/01 **foram reescritos contra a Consolidação em 01/08** (Q21). O protótipo segue com o portão "Cadastro no site" apenas como demonstração até o módulo ser especificado.
 
 ---
 
@@ -121,7 +121,7 @@ Consolidação verificada no docs/02-registro-de-decisoes.md. **Ao citar decisõ
 | Decisão antiga | Substituída/alterada por | O que mudou |
 |---|---|---|
 | 3 (mascote Danilo) + 7 (tour de 9 passos) ✱ | **17** (19/07) | Mascote → QUAD; tutorial obrigatório substitui o tour (README/00/03 ainda citam as antigas) |
-| 5 (portão de entrada) + 6 (cadastro no app) ✱ | **21** (20/07) → **21 REVOGADA pela Consolidação v1.0 (01/08)** | Cadastro passou ao site em 20/07; em 01/08 a Consolidação devolveu o cadastro à arquitetura do app (Módulo Planejado — fluxo novo não implementado; README/00/01 seguem defasados) |
+| 5 (portão de entrada) + 6 (cadastro no app) ✱ | **21** (20/07) → **21 REVOGADA pela Consolidação v1.0 (01/08)** | Cadastro passou ao site em 20/07; em 01/08 a Consolidação devolveu o cadastro à arquitetura do app (Módulo Planejado — fluxo novo não implementado; README/00/01 foram reescritos em 01/08 refletindo a revogação) |
 | 9 (parte: avatar escolhido no Perfil) | **24** | Personagem definitivo escolhido no onboarding; entra a mochila de combate |
 | 32 (passo da boina aponta o card) | **41** | Tutorial aponta a boina diretamente |
 | 42/43/45 (simulados em fluxos separados) | **47** → **117b/122/123** → **165** (28/07) | Presencial nunca gratuito e nunca premia QdC; digital sem vagas, pode ser gratuito e premia por acerto; bloco de Simulados sai de Missões para o Calendário |
@@ -233,9 +233,11 @@ Estado na auditoria de 30/07 (rev. 2.3 §14 + dec. 21 + código):
 - **Ordem não cronológica no fim do arquivo** (após a 161 vêm 170–181, depois 162–169, depois as repetidas 126–129, depois um bloco decrescente 105→46), contrariando o cabeçalho "por ordem".
 - Rótulos: DIVERGÊNCIA DOCUMENTAL · DECISÃO TÉCNICA PENDENTE.
 
-### 8.2 README.md, docs/00 e docs/03 (defasados em ~18/07)
+### 8.2 README.md, docs/00 e docs/03 (defasados em ~18/07) — **[RESOLVIDA em 01/08/2026]**
 
-| Item defasado | Real verificado |
+> **Atualização 01/08:** os quatro docs de entrada (README, docs/00, docs/01 e docs/03) foram **reescritos em 01/08** contra a Consolidação v1.0 — com a URL vigente `945e81a8-…` (agora registrada em README, docs/00, docs/02 e docs/03), `build.py` documentado, tamanhos reais, árvore com `src/` e roteiro atual. A tabela abaixo permanece como **registro histórico** da defasagem encontrada em 30/07.
+
+| Item defasado | Real verificado (30/07) |
 |---|---|
 | URL do artefato `…/4d06ad26-…` nos 3 documentos | URL vigente informada: `945e81a8-9ca3-4d55-9169-c4fc9f6f3703` — **HIPÓTESE** (nenhum arquivo do repo registra a URL nova; validar com o gestor) |
 | Só `build.ps1` citado | Existe `build.py` (raiz, mesmos 10 tokens — build.py:6–27), não citado em nenhum doc |
@@ -249,8 +251,8 @@ Estado na auditoria de 30/07 (rev. 2.3 §14 + dec. 21 + código):
 
 Na auditoria: versionado no Git, **nenhum documento o referenciava** (grep = zero), conteúdo não inspecionado — HIPÓTESE: cópia antiga do projeto; dobrava o peso do clone. *Atualização 01/08:* o `.rar` (e também o `quad-coin.png` órfão) foi **removido do repositório** nos commits da Consolidação.
 
-- **Q20 (desenvolvedor — técnico):** Resolver as duplicatas 126–129 (ex.: renumerar as segundas ocorrências como 182/183) e restaurar a ordenação do registro — ou migrar para IDs imutáveis com data? Qual convenção?
-- **Q21 (desenvolvedor redige; Danilo valida a URL):** Reescrever README, docs/00 e docs/03 contra o estado de 28/07 (URL do artefato, build.py, árvore, tamanhos, roteiro de demonstração, nome do mascote) — aprovar?
+- **Q20 (desenvolvedor — técnico):** Resolver as duplicatas 126–129 (ex.: renumerar as segundas ocorrências como **189 em diante** — os números 182–188 já foram consumidos pelas decisões da Consolidação em 01/08 — ou migrar para IDs imutáveis com data) e restaurar a ordenação do registro? Qual convenção?
+- **Q21 [EXECUTADA em 01/08] (Danilo valida a URL):** ~~Reescrever README, docs/00 e docs/03~~ — **feito em 01/08**: os docs de entrada (com docs/01) foram reescritos contra a Consolidação (URL do artefato, build.py, árvore com `src/`, tamanhos, roteiro, mascote QUAD); resta a validação formal da URL pelo gestor.
 - **Q22 [RESPONDIDA — Consolidação v1.0, 01/08/2026]:** **Sim — executado.** O "Viver o Quad.rar" e o `quad-coin.png` órfão saíram do repositório nos commits de 01/08.
 
 ---
@@ -282,11 +284,11 @@ Na auditoria: versionado no Git, **nenhum documento o referenciava** (grep = zer
 | Q18 | Corte oficial do piloto: lista do que fica ligado/vitrine/desligado (V1/V2 demonstrados)? | Produto | Danilo Moura | **[ABERTA]** |
 | Q19 | Catálogo de contratos das 24 marcas `[INTEGRAÇÃO REAL]` como 1º artefato técnico? | Técnica | Desenvolvedor (Danilo prioriza) | **[ABERTA]** — reescopada: separar fronteiras de módulos internos × integrações externas (seção 7) |
 | Q20 | Registro de decisões: renumerar duplicatas 126–129 e reordenar, ou IDs imutáveis? | Técnica | Desenvolvedor | **[ABERTA]** |
-| Q21 | Reescrever README/docs/00/docs/03 contra o estado de 28/07 (inclui URL do artefato)? | Técnica | Desenvolvedor (Danilo valida URL) | **[ABERTA]** — agora contra o estado de 01/08 (fonte em `src/`, build portátil) e a Consolidação como referência |
+| Q21 | Reescrever README/docs/00/docs/03 (inclui URL do artefato)? | Técnica | Desenvolvedor (Danilo valida URL) | **[EXECUTADA em 01/08]** — README, docs/00, docs/01 e docs/03 reescritos contra a Consolidação (URL vigente registrada no repo, `src/`, builds, árvore, roteiro); resta só a validação da URL pelo gestor |
 | Q22 | "Viver o Quad.rar" sai do repositório? | Produto→Técnica | Danilo Moura autoriza; desenvolvedor executa | **[RESPONDIDA — Consolidação v1.0]** Sim — **executado em 01/08** (junto com o `quad-coin.png` órfão) |
 
 ---
 
 ## 10. Observação final
 
-Nenhuma das divergências acima é defeito do protótipo em si — a maioria nasceu da velocidade das rodadas de 19–28/07, que evoluíram o código (e o CHANGELOG e o registro de decisões) sem retropropagar para o relatório-base e para os documentos de entrada. A **Consolidação Arquitetural v1.0 (01/08/2026)** resolveu a governança documental (Q0), os limites de propriedade app × site × plataforma-base (seção 7), o destino da dec. 21 (Q9) e a higiene do repositório (Q22 e parte de Q13). Das que restam, as respostas a **Q5/Q7/Q8/Q18 (economia — regras seguem indefinidas por decisão explícita da Consolidação: registrar, não inventar)** e **Q21 (reescrita dos docs de entrada, agora contra a Consolidação)** resolvem a maior parte da lista.
+Nenhuma das divergências acima é defeito do protótipo em si — a maioria nasceu da velocidade das rodadas de 19–28/07, que evoluíram o código (e o CHANGELOG e o registro de decisões) sem retropropagar para o relatório-base e para os documentos de entrada. A **Consolidação Arquitetural v1.0 (01/08/2026)** resolveu a governança documental (Q0), os limites de propriedade app × site × plataforma-base (seção 7), o destino da dec. 21 (Q9) e a higiene do repositório (Q22 e parte de Q13). A reescrita dos docs de entrada (Q21) foi executada em 01/08. Das que restam, as respostas a **Q5/Q7/Q8/Q18 (economia — regras seguem indefinidas por decisão explícita da Consolidação: registrar, não inventar)** resolvem a maior parte da lista.

@@ -84,8 +84,9 @@ Tudo abaixo é **demonstração — simulação 100% local no navegador**, sem s
 - **3 perfis**: Aluno, Professor (quiz ao vivo com polling) e Administrador
   N.P.P. (Turma = Edital × Modalidade, árvore do edital, banco de questões)
 - **Aluno**: identidade de combate (nome de guerra + avatar da coleção PM, com o
-  nome estampado na farda), Quad Coins de participação, missões 10+10 com expiração,
-  quiz sem feedback imediato, garimpo de Coins em eventos
+  nome estampado na farda), Quad Coins de participação, missões/flashcards em
+  blocos por turno (com expiração em 7 dias), quiz sem feedback imediato,
+  garimpo de Coins em eventos
 - **Loja**: compras com Quad Coins e Diamantes, gift cards, mochila e skins —
   as **regras econômicas seguem indefinidas** (registradas, não estudadas)
 - **Botão "+"**: Quadrômetro (a jornada do aluno em números), Calendário e
@@ -97,8 +98,11 @@ Tudo abaixo é **demonstração — simulação 100% local no navegador**, sem s
 
 ## Padrão visual
 
-Tema azul e branco da marca: acento `#1B7FC4` sobre fundo `#EAF3FB`, cartões
-brancos, tipografia de aplicativo (Inter/Roboto/SF Pro, fallback Segoe UI).
+Tema azul e branco da marca — valores conferidos no CSS do fonte (`src/01-css-base.html`):
+acento `#1B7FC4` (variável `--gold`) sobre fundo claro `#F3F9FE` (`--bg`; tema
+escuro `#0B1E30`), cartões brancos, tipografia de aplicativo (Inter/Exo 2/SF Pro,
+fallback Segoe UI). Elementos do redesign gamificado (`src/02`) usam ainda azuis
+de destaque como `#0878F8` e `#062B64`.
 
 ## Governança
 

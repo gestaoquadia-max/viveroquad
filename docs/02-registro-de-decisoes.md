@@ -1,17 +1,14 @@
 # Registro de Decisões — Viver o Quad (protótipo)
 
-Decisões tomadas durante a construção do protótipo (jul/2026), por ordem.
-Complementa o "Registro de Decisões Travadas" da rev. 2.3.
+Decisões tomadas durante a construção do protótipo e a Consolidação
+Arquitetural (jul–ago/2026), por ordem. Complementa o "Registro de Decisões
+Travadas" da rev. 2.3. As decisões **182–188** (01/08/2026, Consolidação
+Arquitetural v1.0) estão no **fim da tabela**. (Defeito conhecido, apontado
+pela auditoria — doc 10, §8.1/Q20: a ordenação do trecho final 46–181 está
+quebrada e os números 126–129 aparecem duplicados; saneamento pendente.)
 
 | # | Data | Decisão | Observações |
 |---|---|---|---|
-| 182 | 01/08 | **Viver o Quad = plataforma principal do Quad Concursos**: 11 capacidades deixam de ser sistemas externos e viram módulos internos (cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios, cronogramas); site/checkout, pagamentos, plataforma de cursos e notificações seguem externos (integrações a definir) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 183 | 01/08 | **Dec. 21 REVOGADA**: o cadastro passa a pertencer à arquitetura do app; o fluxo novo NÃO foi implementado — o protótipo mantém a demonstração "cadastro no site" até a especificação do módulo | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 184 | 01/08 | **Módulo sem especificação suficiente = "Módulo Planejado"** (objetivo, responsabilidade, dependências, observações; sem implementação parcial) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 185 | 01/08 | **Regras econômicas permanecem INDEFINIDAS** (não estudadas); estrutura da loja preservada; nenhuma regra nova criada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 186 | 01/08 | **Riscos de segurança da auditoria (30/07) registrados como pendências** para a fase de desenvolvimento; nenhuma solução implementada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 187 | 01/08 | **Fonte dividido em `src/`** (20 partes contíguas; saída byte-idêntica verificada); `build.py`/`build.ps1` portáteis com validação de tokens (ausentes e sobras); regra de trabalho: editar as partes de `src/` | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
-| 188 | 01/08 | **Código morto removido com regressão completa verde (56 suítes)**: `hojeISO` duplicada, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`; `LINKS_ONLINE` preservado como ponto de integração planejado; bug do reset (`vq_intro_done`) segue aberto por exigir decisão | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
 | 1 | 13/07 | Protótipo como HTML único (Artefato claude.ai + arquivo local) | 3 perfis: aluno, professor, admin |
 | 2 | 14/07 | **Padrão visual**: azul e branco da marca em todos os projetos Quad | Correção após tentativa de tema escuro/dourado |
 | 3 | 14/07 | **Danilo** é o mascote-guia (robô azul, folha de personagem própria) | Nome homenageia o Fundador; vídeo 3D em loop |
@@ -201,6 +198,13 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | — | 24/07 | **Pacote do aluno · fases seguintes**: turmas completas (criação no Controle com professores por matéria/vagas QdC×Dmn/pop-up de moeda/bloqueio de horário/matrícula refletida no Início e Domínio), área do professor com quiz por PDF e relatório da sala, gift cards com QR + validação pela câmera no "+", estorno em 7 dias com aba "Estornos e desistências" | Faseamento do pacote 24/07 (aluno) |
 | — | 24/07 | **Fases seguintes acordadas**: 5 abas novas do admin (Painel de controle, Painel interno, Relatórios, Liberações, Loja) com crédito manual de moedas, bloqueio de conta, chat no "+", criação completa de turmas, produtos digitais pré-configurados, criador de skins, botão de Quests e Relatórios com gráficos; regra do "ver completo" para blocos grandes | Faseamento da entrega do pacote 24/07 |
 | 46 | 21/07 | **Estrutura (N.P.P.)**: concursos com árvore de edital própria + situação (aberto/proposta/reta-final); "Definir Domínio" troca a árvore do aluno em Domínio; modalidades RONDESP/PATAMO/BOPE com régua teoria×questões (70/30, 50/50, 20/80); turmas = concurso×modalidade×período (início/término) | Concursos: PM-BA CFO/Soldado, PM fronteiras Soldado, Polícia Penal/Civil BA, PRF. Árvores reais dos não-CFO entram por upload do edital `[INTEGRAÇÃO REAL]` (V0: exemplos compactos) |
+| 182 | 01/08 | **Viver o Quad = plataforma principal do Quad Concursos**: 11 capacidades deixam de ser sistemas externos e viram módulos internos (cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios, cronogramas); site/checkout, pagamentos, plataforma de cursos e notificações seguem externos (integrações a definir) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 183 | 01/08 | **Dec. 21 REVOGADA**: o cadastro passa a pertencer à arquitetura do app; o fluxo novo NÃO foi implementado — o protótipo mantém a demonstração "cadastro no site" até a especificação do módulo | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 184 | 01/08 | **Módulo sem especificação suficiente = "Módulo Planejado"** (objetivo, responsabilidade, dependências, observações; sem implementação parcial) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 185 | 01/08 | **Regras econômicas permanecem INDEFINIDAS** (não estudadas); estrutura da loja preservada; nenhuma regra nova criada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 186 | 01/08 | **Riscos de segurança da auditoria (30/07) registrados como pendências** para a fase de desenvolvimento; nenhuma solução implementada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 187 | 01/08 | **Fonte dividido em `src/`** (20 partes contíguas; saída byte-idêntica verificada); `build.py`/`build.ps1` portáteis com validação de tokens (ausentes e sobras); regra de trabalho: editar as partes de `src/` | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 188 | 01/08 | **Código morto removido com regressão completa verde (56 suítes)**: `hojeISO` duplicada, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`; `LINKS_ONLINE` preservado como ponto de integração planejado; bug do reset (`vq_intro_done`) segue aberto por exigir decisão | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
 
 ## Regras de trabalho vigentes
 

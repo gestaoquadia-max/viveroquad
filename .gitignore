@@ -1,4 +1,4 @@
-# Saídas de build — regeneradas por build.ps1 (edite sempre src.html)
+# Saídas de build — regeneradas por build.py ou build.ps1 (edite sempre as partes de src/)
 index.html
 artifact.html
 

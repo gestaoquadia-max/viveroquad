@@ -1,5 +1,42 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 01/08/2026 — Consolidação Arquitetural v1.0: fonte em `src/`, build portátil, limpeza de código morto e documentação alinhada
+
+Quatro commits no dia, todos decorrentes da Consolidação Arquitetural v1.0
+determinada pelo gestor Danilo Moura (documento oficial em
+`docs/arquitetura/00-arquitetura-oficial.md`). **Nenhuma mudança de
+comportamento funcional** — divisão do fonte com saída de build byte-idêntica
+e limpeza validada por regressão completa (56 suítes verdes).
+
+- **Fonte dividido em `src/` e build portátil** (commit "fonte dividido em
+  src/ (20 partes) e build portátil"): o `src.html` deixou de existir e virou
+  **20 partes contíguas** `src/NN-descricao.html` (a concatenação na ordem
+  reproduz o monolito; tabela e regras em `src/README.md`). O `build.py`
+  passou a usar caminho relativo ao próprio script (roda de qualquer
+  diretório), valida as 20 partes e valida tokens **ausentes e sobras**;
+  o `build.ps1` espelha as mesmas validações. Removidos do versionamento os
+  órfãos `Viver o Quad.rar` (9 MB) e `quad-coin.png` (904 KB).
+- **Código morto removido com regressão completa** (commit "remoção de
+  código morto verificado"): a duplicata sombreada de `hojeISO`; o fluxo
+  revogado de autorização de dispositivo (`currentEmail`, `scenario`,
+  `pendingRunTour`, `CODE_OK`, `deviceAuthorized`, `pendingAnswers`, o objeto
+  `LS` e as chaves `vq_device_authorized`/`vq_last_sync`/`vq_pending`); as
+  chaves de tutorial nunca lidas (`vq_tut_step`/`vq_tut_done`/`vq_tut_rew`);
+  as funções nunca chamadas `openQuiz`, `fmtSync` e `tutDadosOk`; 8
+  comentários enganosos atualizados. Chaves de `localStorage` vivas agora:
+  só `vq_tut_skip` e `vq_intro_done`. `LINKS_ONLINE` **preservado** como
+  ponto de integração planejado; o bug do reset (não limpa `vq_intro_done`)
+  **não** foi corrigido (mudaria comportamento) — segue documentado.
+- **Eventos-semente reancorados em +8 semanas** (manutenção da demonstração):
+  as datas fixas dos 7 eventos da semana tinham vencido no calendário real;
+  deslocamento de 56 dias preserva os dias da semana dos rótulos. Nenhuma
+  regra de negócio alterada.
+- **Documentação alinhada à Consolidação**: criados `docs/arquitetura/00` e
+  `01`; reescritos `README.md`, `docs/00`, `docs/01` e `docs/03` (URL vigente
+  do Artefato, build, árvore com `src/`, roteiro atual); decisões **182–188**
+  registradas em `docs/02`; docs da auditoria anotados (seções "Atualização
+  01/08").
+
 ## 30/07/2026 — Auditoria e especificação do protótipo (docs/auditoria/)
 
 - **14 documentos novos em `docs/auditoria/`** (00-resumo-executivo a

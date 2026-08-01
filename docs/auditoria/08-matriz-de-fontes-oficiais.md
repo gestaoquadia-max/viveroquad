@@ -11,7 +11,7 @@
 
 **Determinação do gestor Danilo Moura (documento oficial de 01/08/2026):** o Viver o Quad passa a ser **a plataforma principal do Quad Concursos**, e onze capacidades antes tratadas como sistemas externos tornam-se **módulos internos** da plataforma (cadastro; autenticação; matrículas; produção de materiais; banco de questões; simulados; inteligência pedagógica; loja; administração; relatórios; cronogramas). A mudança é **exclusivamente arquitetural** — nada foi implementado; módulo sem especificação suficiente é **"Módulo Planejado"** (podendo coexistir com **"Demonstrado no protótipo (simulação local)"**).
 
-**Efeito sobre esta matriz:** as siglas **CAD, AUTH, MAT, MTL, BQ, EVT, PED, ADM, GAM** e a parte de **relatórios** do BI passam a designar **módulos internos do Viver o Quad**; **SITE, FIN, GW, PLAT, NOT** (canal push/e-mail) e a **telemetria como serviço de dados** (parte de coleta do BI) permanecem **sistemas externos**, com integrações a definir. A tabela de siglas abaixo ganhou a coluna "Titularidade (v1.0)". As colunas **Fonte oficial proposta / Cria / Altera / Consultam** continuam válidas como arquitetura-alvo — o que muda é a titularidade (módulo interno × sistema externo), não a atribuição de fonte oficial. **Fontes oficiais que dependem de decisão pendente permanecem pendentes** (ex.: cronograma — planilha da coordenação × PED; cadastro de docentes — CAD × RH; catálogo de concursos — PED × BQ).
+**Efeito sobre esta matriz:** as siglas **CAD, AUTH, MAT, MTL, BQ, EVT, PED, ADM, GAM** e a parte de **relatórios** do BI passam a designar **módulos internos do Viver o Quad**. A capacidade **Loja** das 11 corresponde, nesta matriz, à sigla **GAM** ("economia da plataforma") junto ao "Back-end da Loja" da Matriz D — o mesmo par que o doc 07 designa por **S14 + S7**, agora **módulo interno Loja** (Módulo Planejado; regras econômicas indefinidas); **SITE, FIN, GW, PLAT, NOT** (canal push/e-mail) e a **telemetria como serviço de dados** (parte de coleta do BI) permanecem **sistemas externos**, com integrações a definir. A tabela de siglas abaixo ganhou a coluna "Titularidade (v1.0)". As colunas **Fonte oficial proposta / Cria / Altera / Consultam** continuam válidas como arquitetura-alvo — o que muda é a titularidade (módulo interno × sistema externo), não a atribuição de fonte oficial. **Fontes oficiais que dependem de decisão pendente permanecem pendentes** (ex.: cronograma — planilha da coordenação × PED; cadastro de docentes — CAD × RH; catálogo de concursos — PED × BQ).
 
 **Decisão revogada:** a dec. 21 (cadastro obrigatoriamente no site) foi **revogada** — a criação de conta passa ao módulo Cadastro (CAD) da plataforma. **O fluxo novo NÃO foi implementado:** o protótipo mantém o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo. As linhas afetadas das Matrizes A e B receberam nota.
 
@@ -47,7 +47,7 @@ Esta matriz responde, para cada dado ou processo do ecossistema Viver o Quad: **
 | MTL | Sistema de materiais (storage/CDN) | **Módulo interno — Produção de materiais** (Módulo Planejado); storage/CDN em si é serviço externo |
 | NOT | Notificações/mensageria | **Externo** — canal push/e-mail; integração a definir |
 | BI | Relatórios/inteligência de dados | **Dividido:** Relatórios = módulo interno (Módulo Planejado); telemetria como serviço de dados = externo, a decidir |
-| GAM | Back-end de gamificação (score, patentes, ledger de moedas) | **Módulo interno** — economia da plataforma (Módulo Planejado); **regras econômicas indefinidas** |
+| GAM | Back-end de gamificação (score, patentes, ledger de moedas) | **Módulo interno** — economia da plataforma, incluindo a capacidade **Loja** (o "Back-end da Loja" da Matriz D; no doc 07, S14 + S7) (Módulo Planejado); **regras econômicas indefinidas** |
 | ERP | Estoque/logística (sistema externo) | **Externo** |
 | GW | Gateway de pagamento (sistema externo) | **Externo** |
 
@@ -155,7 +155,7 @@ Todos CONFIRMADOS NO CÓDIGO; são os pontos em que o protótipo já demonstra o
 3. Ledger de moedas (V1) e renomeação da variável `score` (QdC).
 4. Onde vive o cadastro de salas/capacidades (hoje hard-coded, `SALA_CAP` l. 8920).
 5. Cronograma: planilha da coordenação como fonte oficial sincronizada ou migração para o sistema pedagógico.
-6. Fila offline de respostas com idempotência (e limpeza do legado `vq_pending`/`vq_last_sync`, código morto).
+6. Fila offline de respostas com idempotência. *(A limpeza do legado `vq_pending`/`vq_last_sync` e demais código morto, aqui recomendada, foi **executada em 01/08** com regressão verde de 56 suítes — as chaves foram removidas do fonte; a decisão de desenho da fila real permanece pendente.)*
 7. Build separado dev/prod: hooks `window.__*`, credenciais demo e botões `[DEMO PROVISÓRIO]` fora do build de produção.
 8. Nota mínima de prova por fase (`GAMI.fases[].notaMin` não aplicada; `PROVA_APROV` fixo em 0,80).
 9. Como computar comportamento sem gravar rótulo (diretriz LGPD dos docs, sem implementação).

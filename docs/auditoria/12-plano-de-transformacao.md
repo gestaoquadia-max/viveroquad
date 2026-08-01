@@ -605,7 +605,7 @@ Itens apontados pela auditoria que não dependem do plano e podem ser aprovados 
 
 | Ação | Evidência da auditoria | Aprovador |
 |---|---|---|
-| Atualizar README/docs 00/03 do protótipo (URL do artefato, build.py, tamanhos reais, árvore de arquivos, roteiro de demo que hoje aponta telas removidas) | DIVERGÊNCIA DOCUMENTAL em cadeia confirmada (documento 11 / relatório de estrutura) | Danilo |
+| ✅ **FEITO (01/08)** — README/docs 00/01/03 reescritos contra a Consolidação (URL vigente do artefato registrada no repo, build.py documentado, tamanhos reais, árvore com `src/`, roteiro de demo atual); resta só a validação formal da URL pelo gestor | Commit "documentação alinhada à nova arquitetura"; a DIVERGÊNCIA DOCUMENTAL em cadeia do documento 11 fica sanada | — (executado; Danilo valida a URL) |
 | ✅ **FEITO (01/08)** — build corrigido: `build.py` agora usa caminho relativo ao script (portátil), valida as 20 partes de `src/` e valida tokens ausentes **e** sobras; `build.ps1` espelha as mesmas validações | Commit "fonte dividido em src/ (20 partes) e build portátil" | — (executado) |
 | ✅ **FEITO (01/08)** — removidos do versionamento `Viver o Quad.rar` (9 MB, órfão) e `quad-coin.png` (904 KB, nenhum build usa) | Commit "fonte dividido em src/ (20 partes) e build portátil" | — (executado) |
 | ✅ **FEITO (01/08)** — código morto removido do fonte com regressão completa: `hojeISO` duplicada, fluxo revogado de autorização de dispositivo (`CODE_OK` etc.), chaves `vq_*` mortas, `openQuiz`/`fmtSync`/`tutDadosOk`; 8 comentários enganosos atualizados. `LINKS_ONLINE` preservado como ponto de integração planejado; o bug do reset (não limpa `vq_intro_done`) segue aberto por decisão | Commit "remoção de código morto verificado" | — (executado) |
