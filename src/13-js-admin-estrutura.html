@@ -798,12 +798,11 @@
   });
   $('btnNovaQuestao').addEventListener('click', function () { toast('Cadastro: enunciado, alternativas, tag e campo de uso'); });
 
-  /* ---------- reset da demonstração (limpa a autorização do dispositivo) ---------- */
+  /* ---------- reset da demonstração (limpa as flags vq_* do navegador; atenção: hoje NÃO limpa vq_intro_done) ---------- */
   var btnReset = $('btnResetDemo');
   if (btnReset) btnReset.addEventListener('click', function () {
-    lsDel(LS.auth); lsDel(LS.sync); lsDel(LS.pend);
-    lsDel(TUT_LS.step); lsDel(TUT_LS.done); lsDel(TUT_LS.rew); lsDel('vq_tut_skip');
-    deviceAuthorized = false; pendingAnswers = 0; online = true;
+    lsDel('vq_tut_skip');
+    online = true;
     updatePending();
     sairConta();
     toast('Demonstração reiniciada — dispositivo não autorizado');

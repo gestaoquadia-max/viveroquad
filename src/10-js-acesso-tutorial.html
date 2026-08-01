@@ -9,12 +9,6 @@
     return !$('gateLayer').classList.contains('on') &&
            $('loginLayer').classList.contains('off');
   }
-  function fmtSync(ts) {
-    if (!ts) return '—';
-    var d = new Date(parseInt(ts, 10));
-    var p = function (n) { return (n < 10 ? '0' : '') + n; };
-    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' às ' + p(d.getHours()) + 'h' + p(d.getMinutes());
-  }
   function updatePending() { var chip = $('syncChip'); if (chip) chip.style.display = 'none'; }
   function refreshSalaLock() {
     var btn = $('btnEntrarQuiz');
@@ -42,7 +36,6 @@
   }
   function setOnline(v) {
     online = v;
-    lsSet(LS.sync, String(Date.now()));
     applyConnUI();
   }
   var connToggleEl = $('connToggle');
@@ -71,14 +64,14 @@
     /* conta bloqueada pela administração: não entra e vê o aviso */
     var contaEu = (typeof contaDe === 'function') ? contaDe('eu') : null;
     if (contaEu && contaEu.bloqueada) { $('bloqLayer').classList.add('on'); return; }
-    currentEmail = em;
     $('contaEmail').textContent = em;
     $('telemetry').textContent = 'login: ' + em + ' · origem: OPEN_ORGANIC · linha de base: ativa';
     $('loginLayer').classList.add('off');
     /* a verificação acontece DENTRO da vinheta — uma tela de carregamento só
        (antes: gate "verificando" + vinheta = duas páginas em sequência) */
-    /* a instrução do QUAD abre em TODO acesso — quem já conhece usa o "Pular".
-       (a suíte automatizada usa a chave vq_tut_skip para entrar direto)        */
+    /* a instrução do QUAD abre enquanto vq_tut_skip não estiver gravada:
+       concluir OU pular grava a chave e os próximos acessos entram direto
+       (a suíte automatizada usa a mesma chave)                             */
     var primeiro = lsGet('vq_tut_skip') !== '1';
     entrarApp(primeiro);
     var sv = $('splashVerify');
@@ -106,8 +99,6 @@
   function entrarApp(runTour) {
     fecharGate();
     $('loginLayer').classList.add('off');
-    lsSet(LS.auth, '1'); lsSet(LS.sync, String(Date.now()));
-    deviceAuthorized = true;
     playSplash(function () {
       applyConnUI();
       checarMatricula();  // sem matrícula ativa → funções bloqueadas + aviso
@@ -126,7 +117,6 @@
      · balão claro aponta para o QUAD; avanço = toque na direita ou "Avançar"
      · tutorial roda sempre com score/Coins zerados (é o começo do jogo)
      ================================================================== */
-  var TUT_LS = { step: 'vq_tut_step', done: 'vq_tut_done', rew: 'vq_tut_rew' };
   var tutOn = false, tutIdx = 0, tutExpect = null, tutAvatarOk = false;
   var TUT_PALAVROES = ['merda', 'porra', 'bosta', 'caralho', 'puta', 'fdp', 'cacete'];
 
@@ -152,11 +142,6 @@
     boinaEquipada = false;
     aplicarAvatar();
     var ch = $('chipBoina'); if (ch) ch.classList.add('locked');
-  }
-  function tutDadosOk() {
-    var partes = $('nomeCompleto').value.trim().split(/\s+/).filter(Boolean);
-    return partes.length >= 2 && $('nomeCompleto').value.trim().length >= 5 &&
-      $('foneAluno').value.replace(/\D/g, '').length >= 8;
   }
   /* o nome de guerra tem que VIR do nome completo: um dos nomes ou uma
      combinação deles em ordem — nunca o nome inteiro, nunca apelido */
@@ -404,7 +389,6 @@
   function tutGo(i) {
     tutIdx = i;
     if (i >= TUT.length) { return tutFim(); }
-    lsSet(TUT_LS.step, String(i));
     var st = TUT[i];
     if (st.view) showView(st.view, 'navAluno');
     var skip = st.onEnter ? st.onEnter() : null;

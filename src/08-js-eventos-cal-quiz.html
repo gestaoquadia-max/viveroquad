@@ -423,13 +423,6 @@
   ];
   var quiz = { idx: 0, sel: null, answers: [], source: null };
 
-  function openQuiz(source, kicker) {
-    quiz = { idx: 0, sel: null, answers: [], source: source };
-    $('quizKicker').textContent = kicker;
-    $('quizLayer').classList.add('on');
-    renderQuestion();
-  }
-
   function renderQuestion() {
     var q = QUESTIONS[quiz.idx];
     $('quizProgress').textContent = 'Questão ' + (quiz.idx + 1) + ' de ' + QUESTIONS.length;

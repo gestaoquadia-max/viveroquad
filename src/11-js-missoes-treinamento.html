@@ -877,7 +877,7 @@
     var precoBoina = elBoina ? (parseInt(elBoina.dataset.preco, 10) || 20) : 20;
     var pctScore = TUT_REW.score;
     var pctCoins = Math.max(0, TUT_REW.coins - precoBoina);
-    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
+    lsSet('vq_tut_skip', '1');
     tutOn = false; tourOn = false; tutExpect = null;
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
@@ -898,7 +898,7 @@
   var btnTutSkip = $('tutSkip');
   if (btnTutSkip) btnTutSkip.addEventListener('click', function (e) { e.stopPropagation(); tutPular(); });
   function tutFim() {
-    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
+    lsSet('vq_tut_skip', '1');
     tutOn = false; tourOn = false; tutExpect = null;
     $('tutLayer').classList.remove('on');
     $('daniloFab').style.display = '';
@@ -1001,10 +1001,10 @@
   document.addEventListener('contextmenu', function (e) {
     if (HOLD_SELS.some(function (h) { return !!e.target.closest(h.sel); })) e.preventDefault();
   });
-  /* [FOTOS PDF] guarda-roupa do personagem: cada variante (boina, gandola,
-     colete, fuzil, cipe, patamo, bope) mapeia o índice do avatar → recorte.
-     Os PDFs do gestor (6 imagens + classificação cada) preenchem este mapa;
-     a troca da foto na compra/equipar JÁ está ligada — é só popular. */
+  /* guarda-roupa do personagem: cada variante (boina, gandola, colete,
+     fuzil, cipe, patamo, bope) mapeia o índice do avatar → recorte.
+     O mapa é preenchido no BUILD pelo token de fotos (pasta fotos/,
+     7 variantes × 12 avatares); a troca na compra/equipar está ATIVA. */
   var AVATAR_VARIANTES = __FOTOS_VARIANTES__;   /* fotos oficiais por variante → índice do avatar */
   window.AVATAR_VARIANTES = AVATAR_VARIANTES;   /* suíte de testes injeta variantes */
   function fotoPersonagem() {

@@ -5,7 +5,8 @@
 
   /* ==================================================================
      MÓDULO GAMIFICAÇÃO · configuração central (o admin ajustará no
-     sistema real — nada de valores fixos espalhados pelo código)
+     sistema real; pendência conhecida: PROVA_APROV segue fixa em 80% e
+     as notaMin das fases ainda não são lidas por ninguém)
      ================================================================== */
   var GAMI = {
     provaQuestoes: 20,
@@ -57,20 +58,13 @@
   }
 
   // ---- estado de acesso e conectividade (SIMULADO no front-end) ----
-  // [INTEGRAÇÃO REAL] trocar por: verificação no servidor, envio de e-mail,
-  // biometria nativa e fila de sincronização. Aqui tudo é mock no navegador.
+  // [MÓDULO PLANEJADO · Autenticação] o acesso real será do módulo de
+  // autenticação da plataforma (Consolidação Arquitetural v1.0); aqui é mock.
   var online = true;          // rede simulada (alternável pelo toggle da statusbar)
-  var currentEmail = '';      // e-mail do fluxo de acesso em andamento
-  var scenario = 'ativo';     // ativo | dificuldade | nao_ativado
-  var pendingRunTour = false; // se o próximo entrarApp deve rodar o tour
-  var CODE_OK = '123456';     // código de demonstração aceito
   // persistência simulada só no navegador
-  var LS = { auth: 'vq_device_authorized', sync: 'vq_last_sync', pend: 'vq_pending' };
   function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
   function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
-  var deviceAuthorized = lsGet(LS.auth) === '1';
-  var pendingAnswers = parseInt(lsGet(LS.pend) || '0', 10) || 0;
 
   function $(id) { return document.getElementById(id); }
   function fmt(n) { return n.toLocaleString('pt-BR'); }
@@ -143,7 +137,8 @@
      separadas (gerais − QdC = Dmn). Matrícula bloqueia o turno; sem
      matrícula ativa, o app trava até entrar numa nova turma.            */
   /* banco de professores (Painel de controle) — fonte de verdade do corpo
-     docente. Alimenta a criação de turmas e a área do professor.        */
+     docente. Alimenta a criação de turmas e a área do professor.
+     (pendência: a grade CRONO ainda cita nomes fora deste banco)        */
   var DOCENTES = [
     { nome: 'Danilo Moura',        materias: ['Direito Administrativo', 'Direito Constitucional'], turnos: ['manhã', 'noite'], grad: 'Especialista em Direito Público', fone: '(71) 9 8877-2301', desligado: false, bloqueado: false },
     { nome: 'Cap. Silva',          materias: ['Direito Penal', 'Direito Penal Militar'],           turnos: ['noite'],          grad: 'Bacharel em Direito',              fone: '(71) 9 8811-1020', desligado: false, bloqueado: false },
@@ -181,7 +176,6 @@
   /* o aluno da demo veio do site já matriculado na PATAMO Noite (CFO) */
   var MATRICULAS = [{ turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' }];
   function turmaDe(id) { return TURMAS_LOJA.filter(function (t) { return t.id === id; })[0]; }
-  function hojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
   function matriculasAtivas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return !m.fim || m.fim >= h; }); }
   /* ---------- turma ATIVA: por qual matrícula o app fala ----------
      O aluno pode ter mais de uma turma. Uma delas comanda a tela —
