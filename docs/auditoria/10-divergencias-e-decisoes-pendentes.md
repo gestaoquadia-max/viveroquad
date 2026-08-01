@@ -7,6 +7,16 @@
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+Em 01/08/2026 o gestor Danilo Moura determinou a **Consolidação Arquitetural v1.0** (documento oficial: `docs/arquitetura/00-arquitetura-oficial.md` — referência arquitetural única do projeto). Ela **respondeu parte das perguntas** deste documento e **superou premissas** de algumas seções. Nenhuma pergunta foi apagada: cada uma está marcada como **[RESPONDIDA — Consolidação v1.0]** (com a resposta e a data) ou **[ABERTA]** — na tabela consolidada da seção 9 e, quando relevante, no corpo. Em resumo, a Consolidação:
+
+- **Respondeu:** a precedência documental (Q0 — `docs/arquitetura/` prevalece); os limites app × site × plataforma-base e a propriedade dos módulos (seção 7 — 11 capacidades viram **módulos internos** da plataforma); o destino da dec. 21 (Q9 — **revogada**: o cadastro passa a pertencer à arquitetura do app, como Módulo Planejado; o fluxo novo **não foi implementado** e o protótipo mantém o portão "Cadastro no site" como demonstração); a saída do `Viver o Quad.rar` (Q22 — removido em 01/08).
+- **NÃO respondeu** (seguem abertas): todas as perguntas da **economia** (Q5, Q7, Q8, Q18 — loja, Quad Coins, Diamantes e gift cards permanecem previstos, mas as **regras econômicas seguem indefinidas**, não estudadas); mascote/nomenclatura (Q1, Q2); tutorial 29 passos × dec. 105 (Q3, Q4); renomear `score` (Q6); nota de promoção (Q10); Pré-TAF (Q11); palavrões (Q12); higiene pré-piloto restante (Q13); telemetria/log de eventos (Q14); IDs estáveis (Q15); graduação (Q16); risco de abandono (Q17); catálogo de integrações (Q19); registro de decisões (Q20); reescrita de README/docs (Q21).
+- **Nota técnica:** o fonte agora vive em `src/` (20 partes; `src.html` não existe mais) — as referências "src.html l.N" abaixo valem para o monolito auditado em 30/07 (`src/README.md` explica a correspondência). Parte do código morto citado adiante foi removida em 01/08 com regressão verde (duplicata de `hojeISO`, fluxo de autorização de dispositivo, chaves mortas de localStorage, `openQuiz`/`fmtSync`/`tutDadosOk`); os riscos de segurança permanecem válidos e **registrados como pendências** — nenhuma solução foi implementada.
+
+---
+
 ## Como ler este documento
 
 Este é o consolidado de **tudo o que está em conflito, defasado ou sem dono** entre as quatro fontes do projeto: o relatório-base (docs/Viver-o-Quad-Relatorio-rev2-3.pdf, "rev. 2.3"), o registro de decisões (docs/02-registro-de-decisoes.md, decisões 1–181), a documentação de apoio (README.md, docs/00, 01, 03) e o **código** (src.html, 11.920 linhas — a fonte mais atual, acompanhada pelo CHANGELOG até 28/07).
@@ -15,7 +25,7 @@ Cada divergência traz: **fontes conflitantes → data das decisões → comport
 
 Rótulos usados (vocabulário obrigatório da auditoria): CONFIRMADO NO CÓDIGO · APENAS VISUAL · SIMULADO LOCALMENTE · DEPENDE DO FRONT-END REAL · DEPENDE DO BACK-END · DEPENDE DE BANCO DE DADOS · DEPENDE DE SISTEMA EXTERNO · HIPÓTESE · DECISÃO DE PRODUTO PENDENTE · DECISÃO TÉCNICA PENDENTE · DIVERGÊNCIA DOCUMENTAL.
 
-**Regra de precedência observada na prática:** quando documento e código divergem, o código + CHANGELOG refletem a intenção mais recente do gestor (as rodadas de 19–28/07 não foram retropropagadas para README/00/01/03, e a rev. 2.3 nunca recebeu a revisão "2.4" prometida desde a decisão 11, de 14/07). Isso não foi formalizado em lugar nenhum — é a primeira decisão a tomar (Q0, seção 9).
+**Regra de precedência observada na prática:** quando documento e código divergem, o código + CHANGELOG refletem a intenção mais recente do gestor (as rodadas de 19–28/07 não foram retropropagadas para README/00/01/03, e a rev. 2.3 nunca recebeu a revisão "2.4" prometida desde a decisão 11, de 14/07). Isso não estava formalizado em lugar nenhum na data da auditoria. *Atualização 01/08:* **Q0 foi respondida pela Consolidação v1.0** — `docs/arquitetura/00-arquitetura-oficial.md` é o documento arquitetural oficial e único, e prevalece sobre qualquer documento anterior em caso de conflito.
 
 ---
 
@@ -89,7 +99,9 @@ Rótulos usados (vocabulário obrigatório da auditoria): CONFIRMADO NO CÓDIGO 
 
 - **Q8 (Danilo Moura — produto, com Gestor da Economia):** O Diamante entra na rev. 2.4 como camada oficial da economia? Quem é o dono do portão dele (mesma governança do Quadcoin — CEO Vitor França, conforme rev. 2.3 §17/A.8)?
 
-### 1.7 Cadastro no aplicativo × cadastro no site — resolvido no código, defasado nos documentos
+### 1.7 Cadastro no aplicativo × cadastro no site — **[RESPONDIDA — Consolidação v1.0, 01/08/2026]**
+
+> **Atualização 01/08:** a **dec. 21 foi REVOGADA** pela Consolidação Arquitetural v1.0. O cadastro **passa a pertencer à arquitetura do app** (módulo interno de cadastro — "Módulo Planejado", ainda sem especificação). O fluxo novo **NÃO foi implementado**: o protótipo continua exibindo o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo. A divergência documental abaixo (README/docs/00/docs/01 descrevendo o modelo pré-dec. 21) permanece registrada como histórico — a reescrita dos docs (Q21) segue aberta e agora deve refletir a Consolidação, não a dec. 21.
 
 | Campo | Conteúdo |
 |---|---|
@@ -98,7 +110,7 @@ Rótulos usados (vocabulário obrigatório da auditoria): CONFIRMADO NO CÓDIGO 
 | Impacto | O documento "comece aqui" (porta de entrada do gestor) e a visão-e-escopo ensinam um fluxo removido há 10 dias de trabalho. |
 | Rótulos | CONFIRMADO NO CÓDIGO · DIVERGÊNCIA DOCUMENTAL (README/00/01) · DEPENDE DE SISTEMA EXTERNO (checkout real). |
 
-- **Q9 (Danilo Moura confirma — produto; desenvolvedor executa — técnico):** Confirma a dec. 21 como definitiva (conta nasce no site/checkout; app só autentica) para que README, docs/00 e docs/01 sejam reescritos contra o estado de 28/07?
+- **Q9 [RESPONDIDA — Consolidação v1.0, 01/08/2026]:** **Não** — a dec. 21 foi **revogada**. A conta passa a nascer no próprio app (módulo interno de cadastro, Módulo Planejado); README/docs/00/docs/01 devem ser reescritos contra a Consolidação. O protótipo segue com o portão "Cadastro no site" apenas como demonstração até o módulo ser especificado.
 
 ---
 
@@ -109,7 +121,7 @@ Consolidação verificada no docs/02-registro-de-decisoes.md. **Ao citar decisõ
 | Decisão antiga | Substituída/alterada por | O que mudou |
 |---|---|---|
 | 3 (mascote Danilo) + 7 (tour de 9 passos) ✱ | **17** (19/07) | Mascote → QUAD; tutorial obrigatório substitui o tour (README/00/03 ainda citam as antigas) |
-| 5 (portão de entrada) + 6 (cadastro no app) ✱ | **21** (20/07) | Cadastro passa ao site; app só faz login (README/00/01 defasados) |
+| 5 (portão de entrada) + 6 (cadastro no app) ✱ | **21** (20/07) → **21 REVOGADA pela Consolidação v1.0 (01/08)** | Cadastro passou ao site em 20/07; em 01/08 a Consolidação devolveu o cadastro à arquitetura do app (Módulo Planejado — fluxo novo não implementado; README/00/01 seguem defasados) |
 | 9 (parte: avatar escolhido no Perfil) | **24** | Personagem definitivo escolhido no onboarding; entra a mochila de combate |
 | 32 (passo da boina aponta o card) | **41** | Tutorial aponta a boina diretamente |
 | 42/43/45 (simulados em fluxos separados) | **47** → **117b/122/123** → **165** (28/07) | Presencial nunca gratuito e nunca premia QdC; digital sem vagas, pode ser gratuito e premia por acerto; bloco de Simulados sai de Missões para o Calendário |
@@ -155,12 +167,12 @@ Consolidação verificada no docs/02-registro-de-decisoes.md. **Ao citar decisõ
 | 4.5 | **View `v-pretaf` órfã**: a tela existe (~2062) mas nenhum `showView`/`data-goto` chega nela — o "+" mostra "Pré-TAF (EM BREVE)" bloqueado (~3290–3327), enquanto o README a vende como ativa | ~2062 + grep sem chamadas | CONFIRMADO NO CÓDIGO · DIVERGÊNCIA DOCUMENTAL · DECISÃO DE PRODUTO PENDENTE |
 | 4.6 | **31 hooks de teste `window.__*`** (`__admTudo`, `__eventos`, `__turmaAtiva`, `__evLotar`, `__dominio`, `__introFeita`, `__mat.encerrar`…) expostos no build publicado | ex.: ~5761–5763, ~8576, ~7856, ~3905–3908 | CONFIRMADO NO CÓDIGO · DECISÃO TÉCNICA PENDENTE (política de hooks em produção) |
 | 4.7 | **Suítes Playwright citadas em todo o CHANGELOG não estão versionadas** (nenhum arquivo de teste no repo — `git ls-files`) | CHANGELOG (`vtut`, `vfasea`–`vfaseh`, `vdmn`…) | DECISÃO TÉCNICA PENDENTE (versionar) |
-| 4.8 | **Chaves localStorage reais**: `vq_device_authorized`, `vq_last_sync`, `vq_pending`, `vq_tut_step`, `vq_tut_done`, `vq_tut_rew`, `vq_tut_skip`, `vq_intro_done` — lista completa não documentada em lugar nenhum | ~3736–3741, ~5697, ~6882 | CONFIRMADO NO CÓDIGO |
+| 4.8 | **Chaves localStorage reais** (na auditoria): `vq_device_authorized`, `vq_last_sync`, `vq_pending`, `vq_tut_step`, `vq_tut_done`, `vq_tut_rew`, `vq_tut_skip`, `vq_intro_done`. *Atualização 01/08:* as 6 primeiras foram **removidas** com regressão verde (fluxo revogado de dispositivo + chaves de tutorial nunca lidas); vivas hoje: só `vq_tut_skip` e `vq_intro_done` | ~3736–3741, ~5697, ~6882 (monolito 30/07) | CONFIRMADO NO CÓDIGO · resolvido em 01/08 |
 | 4.9 | **Telemetria decorativa**: a métrica-mãe (retorno espontâneo/`OPEN_ORGANIC`) é linha de texto estática (~1813–1814, ~5644) — a rev. 2.3 §8 diz que taxonomia de origem + linha de base são **pré-requisitos da V0** ("a V0 não começa sem…") | ~1813–1814, ~4710, ~5644 | APENAS VISUAL · DEPENDE DO BACK-END · DEPENDE DE BANCO DE DADOS |
 
 - **Q11 (Danilo Moura — produto):** O Pré-TAF volta a ser acessível na V0 (a tela `v-pretaf` já existe pronta e órfã) ou fica para a V1 (e a tela morta é removida)?
 - **Q12 (Danilo Moura — produto):** Qual é a lista oficial de termos vetados e a regra de moderação do nome de guerra (hoje: 7 termos improvisados no código)?
-- **Q13 (desenvolvedor — técnico; Danilo ciente):** Antes de qualquer piloto: remover o botão [DEMO PROVISÓRIO], definir a política dos hooks `window.__*` (strip no build de produção?) e versionar as suítes Playwright — aprovar este pacote de higiene?
+- **Q13 [ABERTA — parcialmente executada em 01/08] (desenvolvedor — técnico; Danilo ciente):** Antes de qualquer piloto: remover o botão [DEMO PROVISÓRIO], definir a política dos hooks `window.__*` (strip no build de produção?) e versionar as suítes Playwright — aprovar este pacote de higiene? *(A limpeza de código morto sem efeito de comportamento — `openQuiz`, `fmtSync`, `tutDadosOk`, duplicata de `hojeISO`, fluxo de dispositivo, chaves mortas — já foi feita em 01/08 com regressão verde; os três itens acima continuam pendentes.)*
 - **Q14 (Danilo Moura + desenvolvedor):** Quem constrói o log real de eventos/origem de sessão (pré-requisito declarado da V0) e ele fica pronto **antes** do piloto de 30 dias?
 
 ## 5. Regras ambíguas e nomenclatura divergente
@@ -193,9 +205,11 @@ Contra rev. 2.3 §7/§9/§16. O protótipo é, hoje, uma demonstração de **V0 
 
 - **Q18 (Danilo Moura — produto):** Qual é o **corte oficial do piloto de 30 dias** — a lista explícita do que fica ligado, do que vira vitrine e do que é desligado dentre as funcionalidades V1/V2 já demonstradas (economia, Diamante, domínio completo, patente dinâmica, mensageria)? (Complementa Q7.)
 
-## 7. Limites entre aplicativo, site e plataforma-base
+## 7. Limites entre aplicativo, site e plataforma-base — **[RESPONDIDA — Consolidação v1.0, 01/08/2026]**
 
-Estado consolidado (rev. 2.3 §14 + dec. 21 + código):
+> **Atualização 01/08:** a Consolidação Arquitetural v1.0 **respondeu a pergunta de fundo desta seção** (quem é dono de quê). O Viver o Quad passa a ser **a plataforma principal do Quad Concursos**; deixam de ser sistemas externos e viram **módulos internos**: cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios e cronogramas (módulo sem especificação = "Módulo Planejado"). Permanecem **fora** (integrações a definir): site e checkout (vitrine/venda), pagamentos/financeiro, plataforma de cursos (legado em avaliação), notificações push/e-mail (canal) e telemetria como serviço de dados (a decidir). A mudança é exclusivamente arquitetural — nada foi implementado; a tabela abaixo permanece como retrato do protótipo e da premissa antiga (rev. 2.3 §14 + dec. 21, ambas superadas). Referência: `docs/arquitetura/`.
+
+Estado na auditoria de 30/07 (rev. 2.3 §14 + dec. 21 + código):
 
 | Responsabilidade | Onde está hoje (protótipo) | Sistema real previsto | Rótulos |
 |---|---|---|---|
@@ -206,9 +220,9 @@ Estado consolidado (rev. 2.3 §14 + dec. 21 + código):
 | Estorno financeiro real | Devolução imediata da moeda local (~11684–11695) | Gateway de pagamento + financeiro | DEPENDE DE SISTEMA EXTERNO |
 | Pontos `[INTEGRAÇÃO REAL]` no código | **24 ocorrências** (extração de PDF de edital/quiz, gift card real, presença por chamada, chave do admin por pessoa etc.) | Cada um exige contrato de integração | DEPENDE DO BACK-END / DE SISTEMA EXTERNO |
 
-**Nenhum contrato de integração (API, payloads, donos) existe** — a divisão exata app × site × plataforma para cada ponto é HIPÓTESE.
+**Nenhum contrato de integração (API, payloads, donos) existe** — e isso segue verdadeiro após a Consolidação: ela definiu a **propriedade** (módulo interno × sistema externo), mas não especificou módulos nem contratos.
 
-- **Q19 (desenvolvedor — técnico; Danilo prioriza):** Transformar as 24 marcas `[INTEGRAÇÃO REAL]` num catálogo de contratos de integração (endpoint, dono do dado, sistema responsável) como primeiro artefato técnico do app real — aprovar e priorizar?
+- **Q19 [ABERTA — reescopada em 01/08] (desenvolvedor — técnico; Danilo prioriza):** Transformar as 24 marcas `[INTEGRAÇÃO REAL]` num catálogo técnico — agora separando **fronteiras internas** (pontos que viram módulos da plataforma) de **contratos de integração externa** (site/checkout, pagamentos, plataforma de cursos legada, notificações, telemetria) — aprovar e priorizar?
 
 ## 8. Integridade do registro de decisões e da documentação de apoio
 
@@ -231,46 +245,48 @@ Estado consolidado (rev. 2.3 §14 + dec. 21 + código):
 | Roteiro de demonstração do docs/00 | Não funciona mais (seção 1.7) |
 | Paleta do README (`#1B7FC4`/`#EAF3FB`) | CHANGELOG 18/07 registra a paleta da spec (`#0878F8`, `#EAF5FF`, `#062B64`…) — HIPÓTESE quanto aos valores vigentes exatos; DIVERGÊNCIA DOCUMENTAL provável |
 
-### 8.3 "Viver o Quad.rar" (9,4 MB) na raiz
+### 8.3 "Viver o Quad.rar" (9,4 MB) na raiz — **[RESPONDIDA — Consolidação v1.0, 01/08/2026: REMOVIDO]**
 
-Versionado no Git, **nenhum documento o referencia** (grep = zero). Conteúdo não inspecionado — HIPÓTESE: cópia antiga do projeto. Dobra o peso do clone.
+Na auditoria: versionado no Git, **nenhum documento o referenciava** (grep = zero), conteúdo não inspecionado — HIPÓTESE: cópia antiga do projeto; dobrava o peso do clone. *Atualização 01/08:* o `.rar` (e também o `quad-coin.png` órfão) foi **removido do repositório** nos commits da Consolidação.
 
 - **Q20 (desenvolvedor — técnico):** Resolver as duplicatas 126–129 (ex.: renumerar as segundas ocorrências como 182/183) e restaurar a ordenação do registro — ou migrar para IDs imutáveis com data? Qual convenção?
 - **Q21 (desenvolvedor redige; Danilo valida a URL):** Reescrever README, docs/00 e docs/03 contra o estado de 28/07 (URL do artefato, build.py, árvore, tamanhos, roteiro de demonstração, nome do mascote) — aprovar?
-- **Q22 (Danilo Moura — produto; execução técnica):** O "Viver o Quad.rar" pode sair do repositório?
+- **Q22 [RESPONDIDA — Consolidação v1.0, 01/08/2026]:** **Sim — executado.** O "Viver o Quad.rar" e o `quad-coin.png` órfão saíram do repositório nos commits de 01/08.
 
 ---
 
 ## 9. Tabela consolidada de perguntas
 
-| Nº | Pergunta (resumo) | Tipo | Responsável sugerido |
-|---|---|---|---|
-| Q0 | Formalizar a regra de precedência: em conflito, vale código+CHANGELOG até a rev. 2.4 sair? | Governança | Danilo Moura |
-| Q1 | Mascote = QUAD em tudo; remover resíduo "Danilo, o guia" (~3637)? | Produto | Danilo Moura |
-| Q2 | Renomear assets/ids `danilo*` → `quad*` agora ou depois? | Técnica | Desenvolvedor |
-| Q3 | Os 29 beats atuais são o roteiro oficial do tutorial? | Produto | Danilo Moura |
-| Q4 | Tutorial reabre a cada login (dec. 105) ou só via central do QUAD (código atual)? | Produto | Danilo Moura |
-| Q5 | Rev. 2.4: absorve o modelo QdC do protótipo ou o Anexo A continua sendo o alvo? Quem redige, quando? | Produto | Danilo Moura + Vitor França |
-| Q6 | Renomear `var score` (moeda) → `qdc`? | Técnica | Desenvolvedor |
-| Q7 | Piloto de 30 dias: Quad Store ligada, vitrine ou desligada? Crivo Financeiro/Jurídico acionado? | Produto | Danilo Moura + Vitor França/N.G.E. |
-| Q8 | Diamante entra na rev. 2.4? Quem é o dono do portão? | Produto | Danilo Moura + Gestor da Economia |
-| Q9 | Confirmar dec. 21 (cadastro no site) como definitiva para reescrever README/00/01? | Produto→Técnica | Danilo Moura confirma; desenvolvedor executa |
-| Q10 | Prova de promoção: nota mínima por fase (70–85%) ou 80% fixo? | Produto→Técnica | Danilo Moura decide; desenvolvedor implementa |
-| Q11 | Pré-TAF: religa na V0 (tela pronta e órfã) ou fica V1? | Produto | Danilo Moura |
-| Q12 | Lista oficial de palavrões/moderação do nome de guerra? | Produto | Danilo Moura |
-| Q13 | Pacote de higiene pré-piloto: remover [DEMO PROVISÓRIO], política dos hooks `__*`, versionar Playwright? | Técnica | Desenvolvedor |
-| Q14 | Log real de eventos/origem de sessão (pré-requisito da V0) pronto antes do piloto — quem faz? | Produto+Técnica | Danilo Moura + desenvolvedor |
-| Q15 | ID estável como chave (professor etc.) e e-mail não derivado do sobrenome no sistema real? | Técnica | Desenvolvedor |
-| Q16 | Regras de alteração da graduação do aluno? | Produto | Danilo Moura |
-| Q17 | Risco de abandono: o que dispara intervenção e quem age? | Produto | Danilo Moura |
-| Q18 | Corte oficial do piloto: lista do que fica ligado/vitrine/desligado (V1/V2 demonstrados)? | Produto | Danilo Moura |
-| Q19 | Catálogo de contratos das 24 marcas `[INTEGRAÇÃO REAL]` como 1º artefato técnico? | Técnica | Desenvolvedor (Danilo prioriza) |
-| Q20 | Registro de decisões: renumerar duplicatas 126–129 e reordenar, ou IDs imutáveis? | Técnica | Desenvolvedor |
-| Q21 | Reescrever README/docs/00/docs/03 contra o estado de 28/07 (inclui URL do artefato)? | Técnica | Desenvolvedor (Danilo valida URL) |
-| Q22 | "Viver o Quad.rar" sai do repositório? | Produto→Técnica | Danilo Moura autoriza; desenvolvedor executa |
+**Status atualizado em 01/08/2026** após a Consolidação Arquitetural v1.0: **[RESPONDIDA — Consolidação v1.0]** = a Consolidação deu a resposta (registrada na coluna Status); **[ABERTA]** = segue pendente. Nenhuma pergunta foi apagada.
+
+| Nº | Pergunta (resumo) | Tipo | Responsável sugerido | Status (01/08/2026) |
+|---|---|---|---|---|
+| Q0 | Formalizar a regra de precedência: em conflito, vale código+CHANGELOG até a rev. 2.4 sair? | Governança | Danilo Moura | **[RESPONDIDA — Consolidação v1.0]** `docs/arquitetura/00-arquitetura-oficial.md` é o documento arquitetural oficial e único; em conflito com qualquer documento anterior (decisões, auditoria, rev. 2.3), a Consolidação prevalece |
+| Q1 | Mascote = QUAD em tudo; remover resíduo "Danilo, o guia" (~3637)? | Produto | Danilo Moura | **[ABERTA]** — a Consolidação não tratou de mascote/nomenclatura |
+| Q2 | Renomear assets/ids `danilo*` → `quad*` agora ou depois? | Técnica | Desenvolvedor | **[ABERTA]** |
+| Q3 | Os 29 beats atuais são o roteiro oficial do tutorial? | Produto | Danilo Moura | **[ABERTA]** |
+| Q4 | Tutorial reabre a cada login (dec. 105) ou só via central do QUAD (código atual)? | Produto | Danilo Moura | **[ABERTA]** |
+| Q5 | Rev. 2.4: absorve o modelo QdC do protótipo ou o Anexo A continua sendo o alvo? Quem redige, quando? | Produto | Danilo Moura + Vitor França | **[ABERTA]** — a Consolidação manteve loja/QdC/Diamantes/gift cards previstos, mas registrou que as **regras econômicas seguem indefinidas** (não estudadas) |
+| Q6 | Renomear `var score` (moeda) → `qdc`? | Técnica | Desenvolvedor | **[ABERTA]** — não incluído na limpeza de 01/08 |
+| Q7 | Piloto de 30 dias: Quad Store ligada, vitrine ou desligada? Crivo Financeiro/Jurídico acionado? | Produto | Danilo Moura + Vitor França/N.G.E. | **[ABERTA]** |
+| Q8 | Diamante entra na rev. 2.4? Quem é o dono do portão? | Produto | Danilo Moura + Gestor da Economia | **[ABERTA]** — economia indefinida |
+| Q9 | Confirmar dec. 21 (cadastro no site) como definitiva para reescrever README/00/01? | Produto→Técnica | Danilo Moura confirma; desenvolvedor executa | **[RESPONDIDA — Consolidação v1.0]** **Não: dec. 21 REVOGADA** — cadastro passa à arquitetura do app (Módulo Planejado); fluxo novo não implementado; protótipo mantém o portão do site como demonstração |
+| Q10 | Prova de promoção: nota mínima por fase (70–85%) ou 80% fixo? | Produto→Técnica | Danilo Moura decide; desenvolvedor implementa | **[ABERTA]** |
+| Q11 | Pré-TAF: religa na V0 (tela pronta e órfã) ou fica V1? | Produto | Danilo Moura | **[ABERTA]** — `v-pretaf` foi mantida na limpeza de 01/08 justamente por depender desta decisão |
+| Q12 | Lista oficial de palavrões/moderação do nome de guerra? | Produto | Danilo Moura | **[ABERTA]** |
+| Q13 | Pacote de higiene pré-piloto: remover [DEMO PROVISÓRIO], política dos hooks `__*`, versionar Playwright? | Técnica | Desenvolvedor | **[ABERTA]** — parcial: código morto sem efeito de comportamento removido em 01/08; os três itens citados seguem pendentes |
+| Q14 | Log real de eventos/origem de sessão (pré-requisito da V0) pronto antes do piloto — quem faz? | Produto+Técnica | Danilo Moura + desenvolvedor | **[ABERTA]** — a Consolidação deixou a telemetria como serviço de dados **a decidir** |
+| Q15 | ID estável como chave (professor etc.) e e-mail não derivado do sobrenome no sistema real? | Técnica | Desenvolvedor | **[ABERTA]** — a especificar nos módulos internos (autenticação/administração) |
+| Q16 | Regras de alteração da graduação do aluno? | Produto | Danilo Moura | **[ABERTA]** |
+| Q17 | Risco de abandono: o que dispara intervenção e quem age? | Produto | Danilo Moura | **[ABERTA]** — vira pauta do módulo de inteligência pedagógica (Módulo Planejado) |
+| Q18 | Corte oficial do piloto: lista do que fica ligado/vitrine/desligado (V1/V2 demonstrados)? | Produto | Danilo Moura | **[ABERTA]** |
+| Q19 | Catálogo de contratos das 24 marcas `[INTEGRAÇÃO REAL]` como 1º artefato técnico? | Técnica | Desenvolvedor (Danilo prioriza) | **[ABERTA]** — reescopada: separar fronteiras de módulos internos × integrações externas (seção 7) |
+| Q20 | Registro de decisões: renumerar duplicatas 126–129 e reordenar, ou IDs imutáveis? | Técnica | Desenvolvedor | **[ABERTA]** |
+| Q21 | Reescrever README/docs/00/docs/03 contra o estado de 28/07 (inclui URL do artefato)? | Técnica | Desenvolvedor (Danilo valida URL) | **[ABERTA]** — agora contra o estado de 01/08 (fonte em `src/`, build portátil) e a Consolidação como referência |
+| Q22 | "Viver o Quad.rar" sai do repositório? | Produto→Técnica | Danilo Moura autoriza; desenvolvedor executa | **[RESPONDIDA — Consolidação v1.0]** Sim — **executado em 01/08** (junto com o `quad-coin.png` órfão) |
 
 ---
 
 ## 10. Observação final
 
-Nenhuma das divergências acima é defeito do protótipo em si — a maioria nasceu da velocidade das rodadas de 19–28/07, que evoluíram o código (e o CHANGELOG e o registro de decisões) sem retropropagar para o relatório-base e para os documentos de entrada. As respostas a **Q5 (rev. 2.4)**, **Q7/Q18 (corte do piloto)** e **Q21 (reescrita dos docs de entrada)** resolvem, sozinhas, a maior parte da lista.
+Nenhuma das divergências acima é defeito do protótipo em si — a maioria nasceu da velocidade das rodadas de 19–28/07, que evoluíram o código (e o CHANGELOG e o registro de decisões) sem retropropagar para o relatório-base e para os documentos de entrada. A **Consolidação Arquitetural v1.0 (01/08/2026)** resolveu a governança documental (Q0), os limites de propriedade app × site × plataforma-base (seção 7), o destino da dec. 21 (Q9) e a higiene do repositório (Q22 e parte de Q13). Das que restam, as respostas a **Q5/Q7/Q8/Q18 (economia — regras seguem indefinidas por decisão explícita da Consolidação: registrar, não inventar)** e **Q21 (reescrita dos docs de entrada, agora contra a Consolidação)** resolvem a maior parte da lista.

@@ -1,7 +1,7 @@
 # 12 · Plano de transformação — do protótipo "Viver o Quad" ao produto real
 
-**Data:** 30/07/2026
-**Fonte:** auditoria do protótipo (src.html, build, docs/ e relatório rev. 2.3)
+**Data:** 30/07/2026 · **Atualizado em:** 01/08/2026 (seção "Atualização — Consolidação Arquitetural v1.0" e notas nas fases 4, 5, 6, 8, 9 e 15)
+**Fonte:** auditoria do protótipo (src.html, build, docs/ e relatório rev. 2.3); Consolidação Arquitetural v1.0 (`docs/arquitetura/`)
 
 > **Este documento descreve um PROTÓTIPO NAVEGÁVEL. Nada aqui é sistema de produção; comportamentos são simulados localmente no navegador, salvo indicação em contrário.**
 
@@ -10,9 +10,42 @@
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+Em 01/08/2026, o gestor Danilo Moura determinou, em documento oficial, a **Consolidação Arquitetural v1.0** (ver [`docs/arquitetura/00-arquitetura-oficial.md`](../arquitetura/00-arquitetura-oficial.md) e [`docs/arquitetura/01-modulos-planejados.md`](../arquitetura/01-modulos-planejados.md) — em caso de conflito com este plano, **a arquitetura oficial prevalece**). A mudança é **exclusivamente arquitetural**: nada foi implementado, nenhum módulo ganhou back-end ou autenticação real, e o comportamento funcional do protótipo não mudou (divisão do fonte com saída byte-idêntica; limpeza de código morto com regressão verde de 56 suítes).
+
+**O que a Consolidação decidiu:**
+
+- O Viver o Quad passa a ser **a plataforma principal do Quad Concursos**. Onze capacidades antes tratadas como sistemas externos viram **módulos internos**: cadastro; autenticação; matrículas; produção de materiais; banco de questões; simulados; inteligência pedagógica; loja; administração; relatórios; cronogramas.
+- Permanecem **fora da plataforma** (integrações a definir): site e checkout (vitrine/venda), pagamentos/financeiro, plataforma de cursos (legado em avaliação), notificações push/e-mail (canal) e telemetria como serviço de dados (a decidir).
+- A **decisão 21 foi revogada**: o cadastro deixa de nascer obrigatoriamente no site e passa a pertencer à arquitetura do app. O fluxo novo **não foi implementado** — o protótipo continua exibindo o portão "Cadastro no site do Quad" como demonstração, até especificação do módulo.
+- Vocabulário de status obrigatório para os módulos: **"Demonstrado no protótipo (simulação local)"** e/ou **"Módulo Planejado"** (os dois coexistem num mesmo módulo). Módulo sem especificação suficiente é Módulo Planejado — sem exceção.
+- As **regras econômicas seguem indefinidas** (loja, Quad Coins, Diamantes, gift cards permanecem previstos, mas nada foi estudado nem decidido). Os **riscos de segurança da auditoria permanecem válidos**, registrados como pendências; nenhuma solução foi implementada.
+
+### O que a Consolidação adiantou das Fases 1–4 (e o que resta de cada uma)
+
+| Fase | O que a Consolidação JÁ fez | O que RESTA |
+|---|---|---|
+| **1 — Regras de produto** | Uma decisão estrutural tomada e registrada por decisão explícita do gestor: **dec. 21 revogada** (cadastro pertence ao app). Hierarquia documental definida: `docs/arquitetura/` é o documento arquitetural oficial e único, prevalecendo sobre rev. 2.3 e auditoria em caso de conflito. | Rev. 2.4 do relatório-base; saneamento do registro de decisões (duplicatas 126–129); chancela vigente/revogada/pendente das RN-01–RN-61; toda a ata de decisões pendentes do doc 10 — **inclusive a economia, que segue indefinida**. |
+| **2 — Escopo real da V0** | Vocabulário de status fixado ("Demonstrado no protótipo (simulação local)" / "Módulo Planejado"), que substitui a ambiguidade "demonstrado = pronto" e prepara a matriz liga/vitrine/desliga. | Praticamente tudo: matriz de funcionalidades, definição do piloto, lista de cortes. Nenhuma funcionalidade ganhou estado na V0 pela Consolidação. |
+| **3 — Separação V0/V1/V2** | A entrega 3 (registro do que não entra sem nova decisão) foi parcialmente antecipada na prática: o **código morto vestigial foi removido do fonte** no commit de 01/08 (`openQuiz`, fluxo `CODE_OK`/autorização de dispositivo, chaves de tutorial nunca lidas, `fmtSync`, `tutDadosOk`) — com regressão completa. | Roadmap refaseado V0/V1/V2 e backlog rastreável completos. A remoção do código morto não decide fase de nada — só limpa o vestígio. |
+| **4 — Fontes oficiais** | A pergunta-mãe da fase — "qual sistema é dono de cada domínio?" — foi respondida **no nível arquitetural** para 11 domínios: a plataforma é a dona lógica dos seus módulos internos. A matriz de propriedade dos docs 07/08 fica superada onde atribuía essas capacidades a sistemas externos. Fronteira externa também definida (site/checkout, pagamentos, cursos-legado, push/e-mail, telemetria-a-decidir). | Dono **por papel/área** de cada domínio (a Consolidação define o sistema, não a pessoa); plano de transição das fontes atuais (planilha da coordenação, cadastro de salas); regras de ouro ratificadas; e toda a especificação de cada módulo. |
+
+Além disso, a Consolidação executou parte das **"Ações imediatas"** da seção 3 deste plano (fonte reorganizado e build corrigido) — ver as marcações naquela tabela.
+
+### Próxima fase oficial: ESPECIFICAÇÃO MÓDULO A MÓDULO
+
+A próxima fase determinada pela Consolidação é a **especificação módulo a módulo, antes de qualquer implementação**: cada um dos 11 módulos internos (fichas em `docs/arquitetura/01-modulos-planejados.md`) precisa de especificação suficiente para deixar de ser apenas "Módulo Planejado". Nenhuma fase de construção deste plano (10–16) começa antes disso. As fases 1–4 continuam valendo como estrutura de decisão — a Consolidação as adiantou em parte, não as substituiu.
+
+### Ajustes de leitura nas fases deste plano
+
+Onde este plano dizia "definir se X é sistema externo", **a definição já existe**: cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios e cronogramas são **módulos internos da plataforma**. As fases 5, 6, 8, 9 e 15 recebem notas pontuais abaixo; o restante do texto original é mantido como registro da fotografia de 30/07.
+
+---
+
 ## 1. Como ler este plano
 
-- O protótipo (`src.html`, 11.920 linhas — CONFIRMADO NO CÓDIGO) é um **artefato de especificação viva**: demonstra telas, fluxos e 61 regras de negócio (RN-01–RN-61, documento 05 desta auditoria), mas **não contém uma linha de código de produção**. Todo dado vive em memória JS; a única persistência são 8 chaves de `localStorage` com flags de tutorial/dispositivo (documento 06). O plano parte desse fato: **o protótipo é referência de produto e UX, não base de código a evoluir**.
+- O protótipo (`src.html`, 11.920 linhas — CONFIRMADO NO CÓDIGO) é um **artefato de especificação viva**: demonstra telas, fluxos e 61 regras de negócio (RN-01–RN-61, documento 05 desta auditoria), mas **não contém uma linha de código de produção**. Todo dado vive em memória JS; a única persistência eram 8 chaves de `localStorage` com flags de tutorial/dispositivo (documento 06) — desde a limpeza de 01/08, restam as 2 chaves vivas `vq_tut_skip` e `vq_intro_done` (as mortas foram removidas do fonte). O plano parte desse fato: **o protótipo é referência de produto e UX, não base de código a evoluir**.
 - As 20 fases abaixo são as mínimas para sair do protótipo e chegar a um produto publicável. Elas **não são estritamente sequenciais** — a seção 2 mostra as dependências —, mas as fases 1 a 4 (alinhamento de produto e fontes) são pré-requisito de praticamente todas as outras. Construir antes de decidir repetiria, em produção, as divergências que a auditoria encontrou no protótipo (documento 10).
 - Cada fase traz: **objetivo · entregas · pré-requisitos · responsáveis sugeridos · riscos · decisões necessárias · critérios de conclusão**. Responsáveis são **papéis**, não nomes — a única pessoa nomeada é Danilo Moura, como decisor de produto, e os papéis citados no relatório rev. 2.3 (ex.: Gestor da Economia) aparecem como papéis.
 - O vocabulário de classificação da auditoria é usado quando o plano cita o estado atual de algo: CONFIRMADO NO CÓDIGO · APENAS VISUAL · SIMULADO LOCALMENTE · DEPENDE DO FRONT-END REAL · DEPENDE DO BACK-END · DEPENDE DE BANCO DE DADOS · DEPENDE DE SISTEMA EXTERNO · HIPÓTESE · DECISÃO DE PRODUTO PENDENTE · DECISÃO TÉCNICA PENDENTE · DIVERGÊNCIA DOCUMENTAL.
@@ -171,6 +204,8 @@ flowchart LR
 
 ## Fase 4 — Fontes oficiais
 
+> **Atualização 01/08/2026 (Consolidação v1.0):** a fronteira interno×externo já está definida — os 11 módulos internos pertencem à plataforma; site/checkout, pagamentos/financeiro, plataforma de cursos (legado em avaliação), push/e-mail e telemetria (a decidir) ficam fora. Resta desta fase: dono por papel/área, plano de transição das fontes atuais e regras de ouro ratificadas. Ver a seção "Atualização" no topo.
+
 **Objetivo** — Declarar, para cada domínio de dado, **qual sistema é a fonte oficial** (dono) e quem responde por ela — encerrando o padrão do protótipo em que o mesmo dado nasce em dois lugares (ex.: aluno com dois nomes completos, `DB_ALUNO.nome` ≠ `carreira.nomeCompleto`; professores da grade `CRONO` que não existem no banco `DOCENTES` — ambos CONFIRMADO NO CÓDIGO).
 
 **Entregas**
@@ -191,6 +226,8 @@ flowchart LR
 ---
 
 ## Fase 5 — Arquitetura técnica
+
+> **Atualização 01/08/2026 (Consolidação v1.0):** a decisão "o app é cliente da plataforma-base ou nasce ao lado dela?" está **respondida**: o Viver o Quad **é** a plataforma principal do Quad Concursos. A premissa de "app cliente de vários sistemas" cai. Esta fase segue pendente no que é técnico (stack, topologia, tempo real, hospedagem) e agora é precedida pela **especificação módulo a módulo**.
 
 **Objetivo** — Desenhar a arquitetura-alvo do produto. O protótipo não impõe nenhuma (é um HTML único com IIFE de ~8.250 linhas de JS — CONFIRMADO NO CÓDIGO); o único contexto herdado é a plataforma-base citada na rev. 2.3 (Next.js + Spring Boot + Pagar.me) e o ecossistema previsto de sistemas.
 
@@ -213,6 +250,8 @@ flowchart LR
 ---
 
 ## Fase 6 — Aplicações e serviços externos
+
+> **Atualização 01/08/2026 (Consolidação v1.0):** o catálogo desta fase **encolhe**: banco de questões, cadastro, matrículas, cronogramas etc. deixam de ser integrações e viram módulos internos (a construir, após especificação). Permanecem como integrações a definir: site e checkout, pagamentos/financeiro, plataforma de cursos (legado em avaliação), push/e-mail, telemetria como serviço de dados (a decidir) — além de serviços técnicos (storage/CDN, QR, extração de PDF, links externos, transmissão online).
 
 **Objetivo** — Inventariar, negociar e formalizar a relação com todos os sistemas **fora do app** dos quais ele depende. O código do protótipo marca explicitamente 24 pontos `[INTEGRAÇÃO REAL]` (CONFIRMADO NO CÓDIGO, grep da auditoria) — cada um é uma integração a contratar ou construir.
 
@@ -257,6 +296,8 @@ flowchart LR
 
 ## Fase 8 — Autenticação
 
+> **Atualização 01/08/2026 (Consolidação v1.0):** autenticação é **módulo interno** da plataforma. A entrega 4 abaixo muda de natureza: com a **dec. 21 revogada**, a conta não nasce mais obrigatoriamente no checkout do site — o cadastro pertence ao app, e a relação com o site/checkout vira integração a definir na especificação dos módulos Cadastro e Autenticação. Os riscos de segurança da auditoria permanecem válidos e registrados como pendências; nada foi implementado.
+
 **Objetivo** — Substituir os três gates **APENAS VISUAIS** do protótipo por autenticação e autorização reais. Estado confirmado na auditoria: aluno entra com **qualquer e-mail + qualquer senha**; professor usa e-mail derivado do sobrenome + senha demo `quad1234` comparada em texto claro no cliente; admin aceita **qualquer e-mail com "@"** + chave literal `NPP-2026`; os três gates são overlays removíveis por DevTools; as credenciais demo estão impressas na própria tela e embarcadas no artefato público.
 
 **Entregas**
@@ -278,6 +319,8 @@ flowchart LR
 ---
 
 ## Fase 9 — Cadastro e matrículas
+
+> **Atualização 01/08/2026 (Consolidação v1.0):** a **dec. 21 foi revogada** — cadastro e matrículas são módulos internos da plataforma; a conta não nasce mais no checkout do site como premissa. O texto abaixo (escrito sob a dec. 21) fica como registro histórico: a integração site/checkout→plataforma continua existindo, mas invertida (o site vende; o cadastro vive no app) e **a definir**. O fluxo novo **não foi implementado**: o protótipo mantém o portão "Cadastro no site do Quad" como demonstração, até especificação dos módulos Cadastro e Matrículas.
 
 **Objetivo** — Implementar o ciclo real conta→matrícula→acesso que o protótipo apenas encena: a conta nasce no checkout do site junto com a matrícula (decisão 21; botão do protótipo dá toast "Redirecionando… (demo)" — APENAS VISUAL); a matrícula ativa libera o app; o vencimento trava tudo exceto a Loja (regra RN-03, SIMULADO LOCALMENTE).
 
@@ -416,6 +459,8 @@ flowchart LR
 ---
 
 ## Fase 15 — Pagamentos e loja
+
+> **Atualização 01/08/2026 (Consolidação v1.0):** a **loja é módulo interno** da plataforma; **pagamentos/financeiro permanecem fora** (integração a definir). Loja, Quad Coins, Diamantes e gift cards seguem previstos, mas as **regras econômicas seguem indefinidas** — não foram estudadas; nada aqui deve ser lido como decisão econômica tomada. Esta fase continua condicionada à rev. 2.4 e ao crivo Financeiro+Jurídico.
 
 **Objetivo** — Transformar a economia demonstrada (SIMULADO LOCALMENTE de ponta a ponta) em economia real com dinheiro real — o degrau mais sensível do plano, condicionado pelas decisões da fase 2 e pelo crivo previsto no próprio Anexo A da rev. 2.3 (Financeiro + Jurídico para ralos de valor real).
 
@@ -556,13 +601,14 @@ flowchart LR
 
 ## 3. Ações imediatas de baixo risco (fora das fases — cada uma ainda exige aprovação)
 
-Itens apontados pela auditoria que não dependem do plano e podem ser aprovados isoladamente. **Nenhum deve ser executado sem ok explícito**:
+Itens apontados pela auditoria que não dependem do plano e podem ser aprovados isoladamente. **Nenhum deve ser executado sem ok explícito**. *Atualização 01/08/2026: os itens marcados ✅ foram executados nos commits da Consolidação (divisão do fonte em `src/` e limpeza de código morto, ambos de 01/08, com saída byte-idêntica e regressão de 56 suítes).*
 
 | Ação | Evidência da auditoria | Aprovador |
 |---|---|---|
 | Atualizar README/docs 00/03 do protótipo (URL do artefato, build.py, tamanhos reais, árvore de arquivos, roteiro de demo que hoje aponta telas removidas) | DIVERGÊNCIA DOCUMENTAL em cadeia confirmada (documento 11 / relatório de estrutura) | Danilo |
-| Declarar UM script de build canônico e corrigir o caminho absoluto fixo do build.py (quebra fora de `/home/user/viveroquad`) e a substituição silenciosa de tokens do build.ps1 | CONFIRMADO NO CÓDIGO (build.py l.2; build.ps1 sem validação) | Desenvolvedor responsável pelo protótipo |
-| Remover do versionamento `Viver o Quad.rar` (9 MB, órfão) e `quad-coin.png` (904 KB, nenhum build usa) | CONFIRMADO (git ls-files; builds usam só o .webp) | Danilo |
+| ✅ **FEITO (01/08)** — build corrigido: `build.py` agora usa caminho relativo ao script (portátil), valida as 20 partes de `src/` e valida tokens ausentes **e** sobras; `build.ps1` espelha as mesmas validações | Commit "fonte dividido em src/ (20 partes) e build portátil" | — (executado) |
+| ✅ **FEITO (01/08)** — removidos do versionamento `Viver o Quad.rar` (9 MB, órfão) e `quad-coin.png` (904 KB, nenhum build usa) | Commit "fonte dividido em src/ (20 partes) e build portátil" | — (executado) |
+| ✅ **FEITO (01/08)** — código morto removido do fonte com regressão completa: `hojeISO` duplicada, fluxo revogado de autorização de dispositivo (`CODE_OK` etc.), chaves `vq_*` mortas, `openQuiz`/`fmtSync`/`tutDadosOk`; 8 comentários enganosos atualizados. `LINKS_ONLINE` preservado como ponto de integração planejado; o bug do reset (não limpa `vq_intro_done`) segue aberto por decisão | Commit "remoção de código morto verificado" | — (executado) |
 | Versionar as suítes Playwright do protótipo (hoje só os hooks `window.__*` provam que existiram) | CONFIRMADO (zero testes no repo) | Desenvolvedor |
 | Remover do protótipo o botão `[DEMO PROVISÓRIO]` de patente e corrigir textos residuais ("Danilo, o guia", "Missões 10+10") — se o protótipo seguir sendo mostrado | CONFIRMADO NO CÓDIGO (l.7740; l.3633/3637) | Danilo |
 | Sanear o registro de decisões (duplicatas 126–129, ordenação) — antecipa parte da fase 1 | CONFIRMADO (documento de divergências, seção 2) | Danilo + analista de produto |

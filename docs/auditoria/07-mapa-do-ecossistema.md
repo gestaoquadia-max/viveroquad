@@ -7,6 +7,34 @@
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+**Determinação do gestor Danilo Moura (documento oficial de 01/08/2026):** o Viver o Quad passa a ser **a plataforma principal do Quad Concursos**. Este mapa foi escrito em 30/07 sob a premissa "o app não será dono de tudo"; a Consolidação v1.0 **reinterpreta** essa premissa: onze capacidades que as fichas abaixo tratavam como **sistemas externos** ao app passam a ser **módulos internos da plataforma Viver o Quad**. A mudança é **exclusivamente arquitetural** — nada foi implementado, nenhum comportamento do protótipo mudou, e módulo sem especificação suficiente é **"Módulo Planejado"** (status que pode coexistir com **"Demonstrado no protótipo (simulação local)"** num mesmo módulo).
+
+**Correspondência capacidade (v1.0) × sistemas deste mapa:**
+
+| Capacidade da plataforma (v1.0) | Sistema(s) neste documento | Titularidade v1.0 |
+|---|---|---|
+| Cadastro | S3 | Módulo interno |
+| Autenticação | S4 | Módulo interno |
+| Matrículas | S5 | Módulo interno |
+| Produção de materiais | S12 | Módulo interno |
+| Banco de questões | S9 | Módulo interno |
+| Simulados (com eventos e portaria) | S13 | Módulo interno |
+| Inteligência pedagógica | S10 | Módulo interno |
+| Cronogramas | S10 | Módulo interno |
+| Loja (com a economia interna) | S14 + S7 | Módulo interno — **regras econômicas seguem indefinidas** |
+| Administração | S11 | Módulo interno |
+| Relatórios | S16 (parte de relatórios) | Módulo interno |
+
+**Permanecem FORA da plataforma (integrações a definir):** S2 Site + Checkout (vitrine/venda), S6 Pagamentos/Financeiro, S8 Plataforma de cursos (legado em avaliação), S15 Notificações push/e-mail (como canal de entrega) e a **telemetria como serviço de dados** (a parte de coleta do S16 — a decidir).
+
+**Decisão revogada:** a dec. 21 (cadastro obrigatoriamente no site) foi **revogada** — o cadastro passa a pertencer à arquitetura do app (módulo Cadastro). **O fluxo novo NÃO foi implementado:** o protótipo continua exibindo o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo.
+
+**O que NÃO muda:** os riscos apontados pela auditoria de 30/07 permanecem válidos e ficam registrados como pendências (nenhuma solução foi implementada); as regras econômicas (loja, Quad Coins, Diamantes, gift cards) permanecem previstas, porém indefinidas (não estudadas); o comportamento funcional e a experiência do usuário do protótipo são os mesmos. As seções e fichas abaixo foram **preservadas como registro da auditoria de 30/07**, com uma linha **"Titularidade (v1.0)"** acrescentada a cada ficha; onde o texto original tratar um item convertido como "sistema externo", leia-se "módulo do Viver o Quad". (Nota: as referências "src.html l.N" valem para o monolito da auditoria; o `src/README.md` explica a correspondência com a divisão em 20 partes de 01/08.)
+
+---
+
 ## 1. Como ler este mapa
 
 Este documento converte as **necessidades demonstradas pelo protótipo** em um mapa de **sistemas com responsabilidades LÓGICAS**. Ele **não** define microsserviços, tecnologias nem topologia de implantação — apenas responde: *que sistemas o ecossistema Quad precisa ter, quem é dono de qual dado, e o que cada um troca com o aplicativo*.
@@ -29,68 +57,62 @@ Vocabulário de classificação usado (obrigatório): CONFIRMADO NO CÓDIGO · A
 
 ## 2. Visão geral do ecossistema
 
-| # | Sistema (nome provisório) | Objetivo em uma linha | Existência atual | Situação no protótipo |
-|---|---|---|---|---|
-| S1 | **Aplicativo Viver o Quad** | Experiência diária do aluno (e painéis de professor/admin da demo) | Existe **como protótipo navegável** (arquivo único) | CONFIRMADO NO CÓDIGO |
-| S2 | **Site principal + Checkout Quad** | Venda, criação de conta, recarga de Diamantes | Em construção segundo docs/01 (HIPÓTESE) | Referenciado por toasts/`[INTEGRAÇÃO REAL]` |
-| S3 | **Plataforma-base de alunos** (cadastro geral) | Fonte da verdade de quem é o aluno | "Já em construção" (docs/01, l. 9) — HIPÓTESE | Simulada por `DB_ALUNO`/`CONTAS` |
-| S4 | **Autenticação e autorização** | Identidade, sessões, papéis, revogação | INEXISTENTE como serviço do app | Gates APENAS VISUAIS |
-| S5 | **Matrículas** | Vínculo aluno×turma, vigência, regras comerciais | Função presumida do site/plataforma-base (HIPÓTESE) | Simulada por `MATRICULAS` |
-| S6 | **Pagamentos / Financeiro** | Dinheiro real, estornos, gift cards, créditos | Gateway citado no rev. 2.3 (Pagar.me) — HIPÓTESE | Simulado (`COMPRAS`, `ESTORNOS`, `GIFT_LOTES`) |
-| S7 | **Gamificação e economia interna** (ledger) | Score, patentes, Quad Coins, Diamantes | INEXISTENTE (rev. 2.3 exige ledger na V1) | Simulado (`carreira`, `score`, `GAMI`) |
-| S8 | **Plataforma de cursos** | Conteúdo dos cursos/aulas gravadas | Não confirmada nos documentos auditados — HIPÓTESE | Não referenciada diretamente no código |
-| S9 | **Banco central de questões e editais** | Questões, gabaritos, árvores de edital | INEXISTENTE | Simulado (bancos hardcoded) |
-| S10 | **Sistema pedagógico** | Cronograma, missões, quizzes, Domínio | Hoje: **planilha da coordenação** (Google Sheets) + nada | Simulado (`CRONO`, `BLOCOS_TURMA`, `QUIZZES`) |
-| S11 | **Painel administrativo** | Parametrização e governança da operação | INEXISTENTE (a persona admin é a demo dele) | Simulado (persona N.P.P.) |
-| S12 | **Materiais** (publicação/storage) | Arquivos didáticos por turma | INEXISTENTE (exige storage/CDN) | Simulado (`MATERIAIS` + dataURL) |
-| S13 | **Eventos, simulados e portaria** | Agenda, inscrições, vagas, presença física | INEXISTENTE | Simulado (`EVENTOS`, `SIMULADOS`, `ACESSO_ST`) |
-| S14 | **Loja (Quad Store)** | Catálogo, estoque, posse, pedidos, skins | INEXISTENTE (economia ativa é V1 no rev. 2.3) | Simulado (vitrine completa) |
-| S15 | **Notificações e mensageria** | Avisos, recados, push | INEXISTENTE (push é V1) | Simulado (`RECADOS`, `AVISOS`) — chat de mão única |
-| S16 | **Telemetria e relatórios** (inteligência de dados) | Eventos de uso, métrica-mãe, IRA, relatórios | INEXISTENTE — **e é pré-requisito da V0 real** | APENAS VISUAL (linha de texto estática) |
+| # | Sistema (nome provisório) | Objetivo em uma linha | Existência atual | Situação no protótipo | Titularidade (Consolidação v1.0) |
+|---|---|---|---|---|---|
+| S1 | **Aplicativo Viver o Quad** | Experiência diária do aluno (e painéis de professor/admin da demo) | Existe **como protótipo navegável** (arquivo único) | CONFIRMADO NO CÓDIGO | **A própria plataforma principal** do Quad Concursos |
+| S2 | **Site principal + Checkout Quad** | Venda, recarga de Diamantes | Em construção segundo docs/01 (HIPÓTESE) | Referenciado por toasts/`[INTEGRAÇÃO REAL]` | **Externo** — integração a definir (dec. 21, sobre criação de conta, revogada) |
+| S3 | **Plataforma-base de alunos** (cadastro geral) | Fonte da verdade de quem é o aluno | "Já em construção" (docs/01, l. 9) — HIPÓTESE | Simulada por `DB_ALUNO`/`CONTAS` | **Módulo interno — Cadastro** (Módulo Planejado) |
+| S4 | **Autenticação e autorização** | Identidade, sessões, papéis, revogação | INEXISTENTE como serviço do app | Gates APENAS VISUAIS | **Módulo interno — Autenticação** (Módulo Planejado) |
+| S5 | **Matrículas** | Vínculo aluno×turma, vigência, regras comerciais | Função presumida do site/plataforma-base (HIPÓTESE) | Simulada por `MATRICULAS` | **Módulo interno — Matrículas** (Módulo Planejado) |
+| S6 | **Pagamentos / Financeiro** | Dinheiro real, estornos, gift cards, créditos | Gateway citado no rev. 2.3 (Pagar.me) — HIPÓTESE | Simulado (`COMPRAS`, `ESTORNOS`, `GIFT_LOTES`) | **Externo** — integração a definir |
+| S7 | **Gamificação e economia interna** (ledger) | Score, patentes, Quad Coins, Diamantes | INEXISTENTE (rev. 2.3 exige ledger na V1) | Simulado (`carreira`, `score`, `GAMI`) | **Módulo interno** (junto da Loja) — Módulo Planejado; **regras econômicas indefinidas** |
+| S8 | **Plataforma de cursos** | Conteúdo dos cursos/aulas gravadas | Não confirmada nos documentos auditados — HIPÓTESE | Não referenciada diretamente no código | **Externo** — legado em avaliação |
+| S9 | **Banco central de questões e editais** | Questões, gabaritos, árvores de edital | INEXISTENTE | Simulado (bancos hardcoded) | **Módulo interno — Banco de questões** (Módulo Planejado) |
+| S10 | **Sistema pedagógico** | Cronograma, missões, quizzes, Domínio | Hoje: **planilha da coordenação** (Google Sheets) + nada | Simulado (`CRONO`, `BLOCOS_TURMA`, `QUIZZES`) | **Módulo interno — Inteligência pedagógica + Cronogramas** (Módulo Planejado) |
+| S11 | **Painel administrativo** | Parametrização e governança da operação | INEXISTENTE (a persona admin é a demo dele) | Simulado (persona N.P.P.) | **Módulo interno — Administração** (Módulo Planejado) |
+| S12 | **Materiais** (publicação/storage) | Arquivos didáticos por turma | INEXISTENTE (exige storage/CDN) | Simulado (`MATERIAIS` + dataURL) | **Módulo interno — Produção de materiais** (Módulo Planejado) |
+| S13 | **Eventos, simulados e portaria** | Agenda, inscrições, vagas, presença física | INEXISTENTE | Simulado (`EVENTOS`, `SIMULADOS`, `ACESSO_ST`) | **Módulo interno — Simulados/Eventos** (Módulo Planejado) |
+| S14 | **Loja (Quad Store)** | Catálogo, estoque, posse, pedidos, skins | INEXISTENTE (economia ativa é V1 no rev. 2.3) | Simulado (vitrine completa) | **Módulo interno — Loja** (Módulo Planejado); **regras econômicas indefinidas** |
+| S15 | **Notificações e mensageria** | Avisos, recados, push | INEXISTENTE (push é V1) | Simulado (`RECADOS`, `AVISOS`) — chat de mão única | **Externo** — canal push/e-mail, integração a definir |
+| S16 | **Telemetria e relatórios** (inteligência de dados) | Eventos de uso, métrica-mãe, IRA, relatórios | INEXISTENTE — **e é pré-requisito da V0 real** | APENAS VISUAL (linha de texto estática) | **Dividido:** Relatórios = módulo interno (Módulo Planejado); telemetria como serviço de dados = externo, a decidir |
 
 ---
 
 ## 3. Diagrama de relações — **tudo PROPOSTO**
 
-O diagrama abaixo é uma **proposta de relações lógicas** derivada do que o protótipo simula e do que os documentos preveem. **Nenhuma dessas integrações existe hoje** — no protótipo, todas as setas são substituídas por variáveis locais no mesmo arquivo.
+O diagrama abaixo é uma **proposta de relações lógicas** derivada do que o protótipo simula e do que os documentos preveem, **atualizada para a Consolidação Arquitetural v1.0 (01/08/2026)**: os módulos convertidos aparecem DENTRO da plataforma Viver o Quad; os sistemas que permanecem externos aparecem fora, com integrações a definir. **Nenhuma dessas integrações existe hoje** — no protótipo, todas as setas são substituídas por variáveis locais no mesmo arquivo, e todos os módulos internos são Módulos Planejados (nada implementado).
 
 ```mermaid
 flowchart TB
-    APP["S1 · Aplicativo Viver o Quad<br/>(hoje: protótipo 100% local)"]
+    subgraph PLAT["PLATAFORMA VIVER O QUAD — Consolidação v1.0 (módulos internos; tudo PROPOSTO, nada implementado)"]
+        APP["S1 · Experiência do aluno<br/>(hoje: protótipo 100% local)"]
+        CADM["S3 · Módulo Cadastro"]
+        AUTH["S4 · Módulo Autenticação"]
+        MATR["S5 · Módulo Matrículas"]
+        GAMI["S7 · Economia interna<br/>(regras econômicas indefinidas)"]
+        BQ["S9 · Módulo Banco de questões"]
+        SP["S10 · Módulo Inteligência pedagógica<br/>+ Cronogramas"]
+        ADM["S11 · Módulo Administração"]
+        MTR["S12 · Módulo Produção de materiais"]
+        EV["S13 · Módulo Simulados/Eventos<br/>(com portaria)"]
+        LOJA["S14 · Módulo Loja (Quad Store)"]
+        REL["S16a · Módulo Relatórios"]
+    end
 
-    subgraph COM["Camada comercial — PROPOSTO"]
-        SITE["S2 · Site + Checkout"]
+    subgraph EXT["FORA DA PLATAFORMA — integrações a definir"]
+        SITE["S2 · Site + Checkout (vitrine/venda)"]
         PAG["S6 · Pagamentos / Financeiro"]
-        LOJA["S14 · Loja (Quad Store)"]
+        PC["S8 · Plataforma de cursos<br/>(legado em avaliação)"]
+        NOT["S15 · Notificações (canal push/e-mail)"]
+        TEL["S16b · Telemetria como serviço de dados<br/>(a decidir)"]
     end
 
-    subgraph BASE["Núcleo de dados do aluno — PROPOSTO"]
-        PB["S3 · Plataforma-base de alunos"]
-        AUTH["S4 · Autenticação / Autorização"]
-        MATR["S5 · Matrículas"]
-    end
-
-    subgraph PED["Camada pedagógica — PROPOSTO"]
-        BQ["S9 · Banco de questões e editais"]
-        SP["S10 · Sistema pedagógico"]
-        MTR["S12 · Materiais"]
-        PC["S8 · Plataforma de cursos"]
-        EV["S13 · Eventos, simulados e portaria"]
-    end
-
-    subgraph GOV["Gestão e inteligência — PROPOSTO"]
-        ADM["S11 · Painel administrativo"]
-        GAMI["S7 · Gamificação e economia"]
-        NOT["S15 · Notificações / Mensageria"]
-        TEL["S16 · Telemetria e relatórios"]
-    end
-
-    SITE -->|"conta + matrícula + recarga Dmn"| PB
+    SITE -->|"venda de matrícula + recarga Dmn"| MATR
     SITE -->|"cobrança em dinheiro"| PAG
-    PB -->|"identidade cadastral"| AUTH
+    CADM -->|"identidade cadastral<br/>(dec. 21 revogada: conta nasce aqui; fluxo a especificar)"| AUTH
     AUTH -->|"login, sessão, papéis"| APP
-    PB -->|"dados do aluno (hoje: DB_ALUNO)"| APP
-    PB --- MATR
+    CADM -->|"dados do aluno (hoje: DB_ALUNO)"| APP
+    CADM --- MATR
     MATR -->|"matrícula ativa libera o app"| APP
     PAG -->|"crédito de Diamantes / estorno"| GAMI
     GAMI -->|"saldos, score, patente validados"| APP
@@ -100,16 +122,17 @@ flowchart TB
     BQ -->|"provas, flashcards, quizzes"| APP
     SP -->|"cronograma, missões, Domínio"| APP
     MTR -->|"arquivos por turma"| APP
-    PC -.->|"papel a definir — HIPÓTESE"| MTR
+    PC -.->|"papel a definir — legado em avaliação"| MTR
     EV -->|"agenda, inscrições, presença"| APP
     EV -->|"itens com data na vitrine"| LOJA
     ADM -->|"parametrização (GAMI, salas, preços)"| SP
     ADM --> LOJA
     ADM --> EV
     ADM --> GAMI
-    NOT -->|"avisos, recados, push (V1)"| APP
+    NOT -->|"entrega de avisos, recados, push (V1)"| APP
     APP -->|"eventos de uso (OPEN_ORGANIC…)"| TEL
-    TEL -->|"relatórios / IRA"| ADM
+    TEL -.->|"dados agregados — a decidir"| REL
+    REL -->|"relatórios / IRA"| ADM
 ```
 
 ---
@@ -120,6 +143,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S1 · Aplicativo Viver o Quad
 
+- **Titularidade (Consolidação v1.0):** deixa de ser "um braço" do ecossistema — o Viver o Quad é **a plataforma principal do Quad Concursos**, e os sistemas convertidos (fichas S3–S5, S7, S9–S14 e a parte de relatórios do S16) tornam-se seus módulos internos. Status: Demonstrado no protótipo (simulação local).
 - **Objetivo:** ser a experiência diária do aluno (missões, aulas, Domínio, carreira, loja, eventos), com painéis acoplados de professor e de administração na demo.
 - **Dados sob sua responsabilidade (no alvo):** quase nenhum — apenas estado de interface e preferências locais (ex.: turma ativa exibida, avatar escolhido). Hoje o protótipo carrega **tudo** (ver demais fichas) e persiste só 8 flags `vq_*` no localStorage — 4 delas total ou parcialmente mortas (`vq_pending`, `vq_last_sync`, `vq_tut_step`, `vq_tut_rew`). CONFIRMADO NO CÓDIGO.
 - **Operações:** exibir, coletar interação, enviar respostas/compras/inscrições aos sistemas de trás, emitir eventos de telemetria.
@@ -134,12 +158,13 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S2 · Site principal + Checkout Quad
 
+- **Titularidade (Consolidação v1.0):** **permanece sistema externo** à plataforma (vitrine/venda); integração a definir. A criação de conta, porém, sai do seu escopo: a dec. 21 foi revogada e o cadastro passa ao módulo Cadastro da plataforma (ver S3).
 - **Objetivo:** vender (matrículas, recargas), criar a conta do aluno e ser a porta comercial do Quad.
 - **Dados sob sua responsabilidade:** funil de venda, pedidos de compra em dinheiro, criação de conta (que alimenta S3), recargas de Diamante.
 - **Operações:** checkout, criação de conta na compra, recarga de Dmn, correção cadastral ("Corrigir no site" — beat do tutorial, l. 5793–5801).
 - **Consumidores:** S3 (recebe contas/matrículas), S6 (cobrança), S7 (crédito de Dmn), S1 (redirecionamentos).
 - **Fornecedores:** — (ponta de entrada).
-- **Fonte oficial de quê:** ato da venda e criação da conta. A dec. 21 fixou: **a conta nasce no checkout do site, o app só autentica**.
+- **Fonte oficial de quê:** ato da venda. Quanto à criação da conta: a dec. 21 ("a conta nasce no checkout do site, o app só autentica") foi **revogada na Consolidação v1.0** — o cadastro passa ao módulo Cadastro da plataforma. **O fluxo novo não foi implementado:** o protótipo mantém o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo.
 - **Status:** no protótipo, é só encenação — `btnIrCheckout` (l. 5664–5667) dá toast "`[INTEGRAÇÃO REAL] abrir o checkout do site`"; "Diamantes insuficientes — recarregue no site do Quad ou resgate um gift card" (l. 8664). SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO.
 - **Existência atual:** site declarado existente/em construção pelos documentos (stack com Pagar.me segundo o rev. 2.3) — HIPÓTESE, não verificável neste repositório.
 - **Integração com o app:** deep link app→checkout; webhook/API checkout→app ("compra aprovada → matrícula ativa → Dmn creditado"). DEPENDE DE SISTEMA EXTERNO + DEPENDE DO BACK-END.
@@ -148,11 +173,12 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S3 · Plataforma-base de alunos (cadastro geral)
 
+- **Titularidade (Consolidação v1.0):** deixa de ser sistema externo — passa a ser o **módulo Cadastro do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local). Com a revogação da dec. 21, a criação de conta pertence a este módulo (fluxo a especificar; o portão do site segue no protótipo como demonstração).
 - **Objetivo:** ser a fonte única da identidade cadastral do aluno (e, possivelmente, de colaboradores/docentes).
 - **Dados sob sua responsabilidade:** nome completo, contatos, situação da conta (ativa/bloqueada), preferências de conta (avatar, nome de guerra, perfil privado do ranking), vínculo com matrículas.
 - **Operações:** CRUD de contas, bloqueio/desbloqueio (com derrubada de sessão — RN-05), fornecimento de dados ao app.
 - **Consumidores:** S1, S4, S5, S7, S11, S16.
-- **Fornecedores:** S2 (criação de conta na venda).
+- **Fornecedores:** S2 (criação de conta na venda — **registro de 30/07**; com a dec. 21 revogada na v1.0, a criação de conta passa a este módulo, fluxo a especificar).
 - **Fonte oficial de quê:** quem é o aluno. O código diz literalmente que `DB_ALUNO` traz "dados que chegam do banco de dados geral do site" (l. 3944–3946).
 - **Status:** SIMULADO LOCALMENTE — `DB_ALUNO` (l. 3946), `CONTAS` (l. 9803, 4 contas), `carreira.nomeCompleto` (l. 3709). DEPENDE DE BANCO DE DADOS + DEPENDE DO BACK-END.
 - **Existência atual:** "plataforma web já em construção (a grande base de dados)" — docs/01, l. 8–10; "todo aluno já existe na plataforma-base" — l. 56. HIPÓTESE quanto ao estágio real.
@@ -162,6 +188,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S4 · Autenticação e autorização
 
+- **Titularidade (Consolidação v1.0):** **módulo Autenticação do Viver o Quad** (deixa de ser serviço externo ao app). Status: Módulo Planejado + Demonstrado no protótipo (simulação local — gates apenas visuais).
 - **Objetivo:** identidade verificada, sessões, papéis (aluno/professor/admin) e revogação imediata.
 - **Dados sob sua responsabilidade:** credenciais, sessões/tokens, papéis e permissões, chaves administrativas, trilha de acesso.
 - **Operações:** login/logout, emissão e revogação de sessão (bloqueio de conta/professor derruba sessão — RN-05/RN-48), emissão de chave do admin "por pessoa, pela direção" (`[INTEGRAÇÃO REAL]`, l. 9790), RBAC.
@@ -176,6 +203,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S5 · Matrículas
 
+- **Titularidade (Consolidação v1.0):** **módulo Matrículas do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local). A venda continua no site/checkout (externo); a gestão do vínculo aluno×turma passa ao módulo.
 - **Objetivo:** manter o vínculo aluno×turma com vigência e as regras comerciais associadas.
 - **Dados sob sua responsabilidade:** matrículas (turma, turno, concurso, início/fim), vagas por moeda, regra de turno único, estado "matrícula ativa".
 - **Operações:** matricular (com débito via S6/S7), encerrar/estornar (devolvendo vaga — RN-10), verificar vigência (o app trava sem matrícula ativa — RN-03), bloquear turno ocupado (RN-07).
@@ -190,6 +218,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S6 · Pagamentos / Financeiro
 
+- **Titularidade (Consolidação v1.0):** **permanece sistema externo** à plataforma; integração a definir.
 - **Objetivo:** tudo que envolve dinheiro real: cobrança, estorno bancário, gift cards, créditos manuais auditáveis.
 - **Dados sob sua responsabilidade:** transações, janela de estorno (7 dias — RN-26) e consumo que a encerra (RN-27), lotes de gift card de liberação única (RN-20), log de créditos manuais com motivo (RN-21), faturamento.
 - **Operações:** cobrar (via gateway), estornar, emitir/queimar gift card (QR), creditar manualmente, alimentar relatórios de vendas/estornos.
@@ -204,6 +233,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S7 · Gamificação e economia interna (ledger)
 
+- **Titularidade (Consolidação v1.0):** **módulo interno do Viver o Quad** (economia da plataforma, junto da Loja). Status: Módulo Planejado + Demonstrado no protótipo (simulação local). **As regras econômicas (Quad Coins, Diamantes, gift cards) permanecem previstas, porém indefinidas — não estudadas.**
 - **Objetivo:** ser o dono validado de score de carreira, patentes, Quad Coins e Diamantes — com ledger auditável (exigência do Anexo A, rev. 2.3, para a V1).
 - **Dados sob sua responsabilidade:** `carreira` (scoreCarreira/scorePatente/scoreTemporada, patente, histórico), saldos QdC/Dmn, regras (`GAMI`: 14 patentes, 4 fases, prova de 20 questões), recompensas (missões, garimpo, simulado digital), unicidade de prêmios (tutorial, bônus da noite).
 - **Operações:** creditar/debitar com validação servidor; liberar e corrigir prova de promoção (RN-43); aplicar bloqueio de 24h; calcular rankings reais.
@@ -218,6 +248,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S8 · Plataforma de cursos
 
+- **Titularidade (Consolidação v1.0):** **permanece fora da plataforma** — legado em avaliação; integração a definir.
 - **Objetivo:** hospedar o conteúdo dos cursos (aulas gravadas/ao vivo, trilhas) que o app referencia mas não possui.
 - **Dados sob sua responsabilidade:** catálogo de cursos/aulas, progresso de consumo de vídeo (HIPÓTESE).
 - **Operações / consumidores / fornecedores:** HIPÓTESE — a investigação da auditoria a cita como co-responsável por materiais e cursos vendidos na loja, mas **nenhum ponto do código aponta diretamente para ela** (não há player, link de aula gravada ou SSO de curso no protótipo).
@@ -230,6 +261,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S9 · Banco central de questões e editais
 
+- **Titularidade (Consolidação v1.0):** **módulo Banco de questões do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local).
 - **Objetivo:** ser a fonte única de questões etiquetadas, gabaritos e árvores de edital (Concurso → Edital → Matéria → Assunto), previsto explicitamente no rev. 2.3 ("banco de questões geral etiquetado por tag; campo de uso aula/missão").
 - **Dados sob sua responsabilidade:** questões (múltipla escolha e certo/errado), gabaritos, árvores de edital por concurso, histórico de dificuldade por aluno×questão (insumo da prova de promoção — RN-43).
 - **Operações:** lançamento de edital ("a árvore real entra pelo lançamento do edital — `[INTEGRAÇÃO REAL]`", l. 4096–4097); extração de questões de PDF (quiz do professor e simulado digital — `[INTEGRAÇÃO REAL]`); servir questões **sem gabarito** ao cliente.
@@ -244,6 +276,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S10 · Sistema pedagógico
 
+- **Titularidade (Consolidação v1.0):** **módulo do Viver o Quad**, cobrindo duas capacidades da v1.0: **Inteligência pedagógica** e **Cronogramas**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local). A planilha da coordenação segue como origem atual da grade (a sincronização/migração continua DECISÃO TÉCNICA PENDENTE).
 - **Objetivo:** orquestrar a vida acadêmica: cronograma semanal por turma, missões diárias, quiz da aula, Domínio (leitura nº 1 do rev. 2.3), modalidades (70/30, 50/50, 20/80).
 - **Dados sob sua responsabilidade:** grade por turma (chave = id da turma, dec. 163), fila de missões por aluno×turma (marcos D0/D+1/D+7/D+30, expiração 7 dias), estado de quiz por turma, respostas e autoavaliações (Errei/Difícil/Bom/Fácil), percentuais de Domínio por sub-assunto, escalação docente por matéria.
 - **Operações:** montar/sincronizar cronograma; gerar missões por turno da turma; ativar quiz (professor) e agregar respostas em tempo real; calcular Domínio a partir de respostas reais; escalar docentes ativos da matéria (RN-50).
@@ -258,6 +291,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S11 · Painel administrativo
 
+- **Titularidade (Consolidação v1.0):** **módulo Administração do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local — persona N.P.P.).
 - **Objetivo:** governança e parametrização de toda a operação: turmas, preços, salas, eventos, simulados, gift cards, contas, mensagens, cronograma, relatórios.
 - **Dados sob sua responsabilidade:** parametrizações (`GAMI`, lotação de salas `SALA_CAP` — hoje hardcoded 155/85/125/185, RN-14), catálogos, logs administrativos (`CRONO_LOG`, `CREDITOS`, `ESTORNOS`).
 - **Operações:** CRUD de turmas/isoladas/eventos/simulados/produtos com validações (lotação da sala, conflito de agenda unificado — RN-16); crédito manual; bloqueio de contas; gift cards em lote; mensagens por público (RN-54); troca de aulas na grade.
@@ -266,12 +300,13 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 - **Fonte oficial de quê:** parâmetros e atos de governança (quem criou, alterou, creditou, bloqueou — trilha de auditoria).
 - **Status:** SIMULADO LOCALMENTE — a persona admin (N.P.P.) do protótipo é a demonstração navegável deste sistema inteiro. DEPENDE DO BACK-END + DEPENDE DE BANCO DE DADOS.
 - **Existência atual:** INEXISTENTE como sistema real.
-- **Integração com o app:** o painel pode ser um sistema separado (web) — o protótipo o embute no mesmo arquivo por conveniência de demo. DECISÃO TÉCNICA PENDENTE: painel dentro do app ou produto web próprio.
+- **Integração com o app:** o protótipo embute o painel no mesmo arquivo por conveniência de demo. **Atualização v1.0:** a administração é **módulo interno da plataforma** (titularidade resolvida); a topologia de implantação (mesma interface do app ou front separado) segue DECISÃO TÉCNICA PENDENTE.
 - **Riscos:** ações administrativas sem trilha auditável real; no protótipo o gate é um overlay CSS removível por DevTools.
 - **Decisões pendentes:** DECISÃO TÉCNICA PENDENTE — onde vive o cadastro de salas/espaço físico (RN-14 pede configurável); DECISÃO DE PRODUTO PENDENTE — matriz de permissões por núcleo (N.P.P. × direção × recepção).
 
 ### S12 · Materiais (publicação e storage)
 
+- **Titularidade (Consolidação v1.0):** **módulo Produção de materiais do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local). A fronteira com a plataforma de cursos (S8, externa — legado em avaliação) segue pendente.
 - **Objetivo:** publicar arquivos didáticos por turma → matéria (da árvore do edital) → assunto → tipo, com download real e retirada do ar.
 - **Dados sob sua responsabilidade:** arquivos (PDF, slides, vídeo-links), metadados (turma, matéria, assunto, tipo, data, "novo"), vínculo com matrícula (matrícula nova traz o material; estorno o leva — RN-56).
 - **Operações:** upload (admin), listagem filtrada por matrículas ativas do aluno, download, remoção com liberação de storage.
@@ -286,6 +321,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S13 · Eventos, simulados e portaria
 
+- **Titularidade (Consolidação v1.0):** **módulo Simulados/Eventos do Viver o Quad** (a capacidade "simulados" da v1.0, que aqui abrange também eventos e portaria). Status: Módulo Planejado + Demonstrado no protótipo (simulação local). O controle de acesso físico segue dependendo de sistema externo.
 - **Objetivo:** agenda de eventos do Quad (genéricos, sem segmentação por turma — dec. 161), simulados presenciais/digitais, vagas por moeda, reserva unificada de salas e presença física (portaria).
 - **Dados sob sua responsabilidade:** eventos (`EVENTOS`, l. 4226 — gratuitos/pagos, online com link, +BÔNUS), simulados (`SIMULADOS`, l. 6299 — presencial sempre vendido e sem prêmio QdC, RN-36; digital sem vagas e premiando por acerto, RN-38), inscrições (`SIM_INSC`, `evState`), listas de portaria (`ACESSO_ST`, l. 10820), ocupação de salas/Estúdio (RN-16/RN-17), histórico do aluno (`SIM_HIST`).
 - **Operações:** criar/editar/cancelar (admin), vender/inscrever, controlar vagas **por moeda** com reserva atômica, liberar entrada (que pontua score e **consome a compra**, matando o estorno — RN-27/RN-39), expirar o que venceu (RN-31).
@@ -300,6 +336,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S14 · Loja (Quad Store)
 
+- **Titularidade (Consolidação v1.0):** **módulo Loja do Viver o Quad**. Status: Módulo Planejado + Demonstrado no protótipo (simulação local). **As regras econômicas permanecem previstas, porém indefinidas (não estudadas)** — registrar, não inventar.
 - **Objetivo:** vitrine e back-office de tudo que se compra com moedas internas: turmas, isoladas, simulados, eventos, itens físicos com estoque, itens de combate (recompra livre), skins em cadeia, cursos, mentoria.
 - **Dados sob sua responsabilidade:** catálogo por categoria, preços/vagas por moeda, estoque físico (RN-23), posse (`lojaOwned`), mochila (`MOCHILA` — itens repetíveis, RN-24), cadeia de skins e farda de escolha única (RN-25), pedidos de retirada (`PEDIDOS`, RN-23).
 - **Operações:** vender com confirmação (RN-22), decrementar estoque, gerenciar pedidos na recepção (entrega consome a compra), aplicar regras de choque de agenda ("EM CHOQUE" avisa; matrícula barra — RN-30), estornar desfazendo a aquisição por tipo (RN-28).
@@ -314,6 +351,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S15 · Notificações e mensageria
 
+- **Titularidade (Consolidação v1.0):** **permanece fora da plataforma** como canal de entrega (push/e-mail); integração a definir. (A produção do conteúdo comunicado — avisos, recados — é feita pelos módulos internos, como a Administração.)
 - **Objetivo:** entregar comunicação oficial: avisos por turma, recados individuais e por público, recados a professores, e (futuro) push.
 - **Dados sob sua responsabilidade:** avisos com alvo por id de turma (RN-53), mensagens com estado de leitura dos dois lados, públicos e alcance (RN-54), histórico do admin.
 - **Operações:** enviar por público (turma/isolada/simulado/evento/todos, com prefixo "[Turma X]"), marcar leitura, exibir contadores; push real e chat de mão dupla são V1/V2 (EM BREVE no protótipo — APENAS VISUAL).
@@ -328,6 +366,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ### S16 · Telemetria e relatórios (inteligência de dados)
 
+- **Titularidade (Consolidação v1.0):** **dividida.** A parte de **relatórios** passa a ser **módulo Relatórios do Viver o Quad** (Módulo Planejado + Demonstrado no protótipo, simulação local — telas do admin). A **telemetria como serviço de dados** (coleta/ingestão) permanece **fora da plataforma — a decidir**. O restante da ficha vale para o conjunto, como registrado em 30/07.
 - **Objetivo:** coletar eventos de uso com taxonomia de origem (ORGANIC/CLASS/PUSH/MENTOR/NOTICE/CAMPAIGN), medir a **métrica-mãe** (retorno espontâneo, só `OPEN_ORGANIC`), construir a linha de base comportamental, alimentar relatórios e — como fast-follow — o IRA (Índice de Risco de Abandono).
 - **Dados sob sua responsabilidade:** eventos de uso, origem de sessão, agregados comportamentais (tempo por questão, constância, abandono), relatórios (individuais/turmas/gerais/loja), rankings consolidados.
 - **Operações:** ingestão de eventos, agregação, relatórios, alertas de risco.
@@ -344,7 +383,7 @@ Cada ficha segue o mesmo roteiro: objetivo · dados sob responsabilidade · oper
 
 ## 5. Matriz "quem é a fonte oficial de quê"
 
-Consolidação das fichas — em caso de conflito futuro entre sistemas, esta coluna decide. Derivada do mapa estrutura×ecossistema da auditoria de dados (tudo PROPOSTO).
+Consolidação das fichas — em caso de conflito futuro entre sistemas, esta coluna decide. Derivada do mapa estrutura×ecossistema da auditoria de dados (tudo PROPOSTO). **Leitura pós-Consolidação v1.0:** S3, S4, S5, S7, S9, S10, S11, S12, S13 e S14 são módulos internos do Viver o Quad; em S16, relatórios é módulo interno e a telemetria-como-serviço permanece externa (a decidir). A atribuição de fonte oficial por dado não muda — muda a titularidade (módulo interno × sistema externo).
 
 | Dado | Fonte oficial proposta | Estruturas do protótipo que hoje o simulam |
 |---|---|---|
@@ -388,7 +427,7 @@ Consolidação das fichas — em caso de conflito futuro entre sistemas, esta co
 | 6 | Build dev/prod (remover hooks `window.__*`, credenciais demo, botão de patente `[DEMO PROVISÓRIO]`) | DECISÃO TÉCNICA PENDENTE | S1 | Desenvolvedor |
 | 7 | Mecanismo de presença física (QR × chamada × geofencing) e seu enquadramento LGPD | DECISÃO DE PRODUTO PENDENTE | S13, S16 | Danilo Moura |
 | 8 | Fronteira Materiais × Plataforma de cursos | DECISÃO DE PRODUTO PENDENTE | S8, S12 | Danilo Moura |
-| 9 | Painel administrativo: dentro do app ou produto web separado | DECISÃO TÉCNICA PENDENTE | S11 | Desenvolvedor (validação Danilo) |
+| 9 | Administração: titularidade resolvida na Consolidação v1.0 (módulo interno da plataforma); segue pendente só a topologia de implantação (mesma interface ou front separado) | DECISÃO TÉCNICA PENDENTE | S11 | Desenvolvedor (validação Danilo) |
 | 10 | Cadastro de docentes: dono (S3/RH), ID estável no lugar de nome-chave | DECISÃO TÉCNICA PENDENTE | S3, S4, S10 | Desenvolvedor |
 | 11 | Sincronização planilha da coordenação → sistema pedagógico | DECISÃO TÉCNICA PENDENTE | S10 | Desenvolvedor + coordenação |
 | 12 | Política de retenção/eliminação de eventos e contas (direitos do titular) | DECISÃO DE PRODUTO PENDENTE | S3, S16 | Danilo Moura (com jurídico) |
@@ -397,4 +436,4 @@ Consolidação das fichas — em caso de conflito futuro entre sistemas, esta co
 
 ---
 
-*Documento produzido pela rodada de redação da auditoria (redator do mapa de ecossistema), a partir dos docs 06 (dados locais e persistência), 05 (regras de negócio) e 10 (divergências e decisões pendentes) desta série, com verificação pontual em `src.html` e `docs/`. Tudo que não pôde ser confirmado está marcado como HIPÓTESE; todas as relações entre sistemas são PROPOSTAS.*
+*Documento produzido pela rodada de redação da auditoria (redator do mapa de ecossistema), a partir dos docs 06 (dados locais e persistência), 05 (regras de negócio) e 10 (divergências e decisões pendentes) desta série, com verificação pontual em `src.html` e `docs/`. Tudo que não pôde ser confirmado está marcado como HIPÓTESE; todas as relações entre sistemas são PROPOSTAS. Atualizado em 01/08/2026 para refletir a Consolidação Arquitetural v1.0 (titularidade dos sistemas → módulos internos), sem alteração das evidências de 30/07.*

@@ -7,6 +7,18 @@
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+**Determinação do gestor Danilo Moura (documento oficial de 01/08/2026):** o Viver o Quad passa a ser **a plataforma principal do Quad Concursos**, e onze capacidades antes tratadas como sistemas externos tornam-se **módulos internos** da plataforma (cadastro; autenticação; matrículas; produção de materiais; banco de questões; simulados; inteligência pedagógica; loja; administração; relatórios; cronogramas). A mudança é **exclusivamente arquitetural** — nada foi implementado; módulo sem especificação suficiente é **"Módulo Planejado"** (podendo coexistir com **"Demonstrado no protótipo (simulação local)"**).
+
+**Efeito sobre esta matriz:** as siglas **CAD, AUTH, MAT, MTL, BQ, EVT, PED, ADM, GAM** e a parte de **relatórios** do BI passam a designar **módulos internos do Viver o Quad**; **SITE, FIN, GW, PLAT, NOT** (canal push/e-mail) e a **telemetria como serviço de dados** (parte de coleta do BI) permanecem **sistemas externos**, com integrações a definir. A tabela de siglas abaixo ganhou a coluna "Titularidade (v1.0)". As colunas **Fonte oficial proposta / Cria / Altera / Consultam** continuam válidas como arquitetura-alvo — o que muda é a titularidade (módulo interno × sistema externo), não a atribuição de fonte oficial. **Fontes oficiais que dependem de decisão pendente permanecem pendentes** (ex.: cronograma — planilha da coordenação × PED; cadastro de docentes — CAD × RH; catálogo de concursos — PED × BQ).
+
+**Decisão revogada:** a dec. 21 (cadastro obrigatoriamente no site) foi **revogada** — a criação de conta passa ao módulo Cadastro (CAD) da plataforma. **O fluxo novo NÃO foi implementado:** o protótipo mantém o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo. As linhas afetadas das Matrizes A e B receberam nota.
+
+**O que NÃO muda:** os riscos e evidências de 30/07 permanecem válidos e registrados como pendências (nenhuma solução implementada); as regras econômicas (loja, Quad Coins, Diamantes, gift cards) seguem previstas, porém **indefinidas (não estudadas)**; o comportamento do protótipo é o mesmo. (Nota: as referências "src.html l.N" valem para o monolito da auditoria; o `src/README.md` explica a correspondência com a divisão em 20 partes de 01/08.)
+
+---
+
 ## 1. Como ler esta matriz
 
 Esta matriz responde, para cada dado ou processo do ecossistema Viver o Quad: **quem é o dono oficial do dado, quem pode criá-lo e alterá-lo, quem apenas consulta, e o que o aplicativo do aluno pode guardar dele**.
@@ -17,27 +29,27 @@ Esta matriz responde, para cada dado ou processo do ecossistema Viver o Quad: **
 - As colunas **Risco de duplicidade** e **Status no protótipo** descrevem o que **existe hoje no `src.html`**, com evidência (função/variável/linha aproximada) e o vocabulário obrigatório de classificação.
 - A coluna **Decisão pendente** aponta o que ainda precisa ser decidido, com o rótulo DECISÃO DE PRODUTO PENDENTE ou DECISÃO TÉCNICA PENDENTE.
 
-**Siglas dos sistemas do ecossistema previsto** (o app NÃO será dono de tudo):
+**Siglas dos sistemas do ecossistema previsto** (registro de 30/07: "o app NÃO será dono de tudo"; na Consolidação v1.0, a experiência do aluno e os módulos internos abaixo compõem juntos a plataforma Viver o Quad):
 
-| Sigla | Sistema |
-|---|---|
-| APP | Aplicativo do aluno "Viver o Quad" (este protótipo) |
-| SITE | Site principal e checkout do Quad Concursos |
-| PLAT | Plataforma de cursos |
-| CAD | Cadastro geral de usuários/alunos |
-| MAT | Sistema de matrículas |
-| FIN | Financeiro/pagamentos |
-| BQ | Banco central de questões |
-| ADM | Painel administrativo |
-| PED | Sistema pedagógico |
-| AUTH | Autenticação/autorização |
-| EVT | Sistema de eventos |
-| MTL | Sistema de materiais (storage/CDN) |
-| NOT | Notificações/mensageria |
-| BI | Relatórios/inteligência de dados |
-| GAM | Back-end de gamificação (score, patentes, ledger de moedas) |
-| ERP | Estoque/logística (sistema externo) |
-| GW | Gateway de pagamento (sistema externo) |
+| Sigla | Sistema | Titularidade (Consolidação v1.0) |
+|---|---|---|
+| APP | Aplicativo do aluno "Viver o Quad" (este protótipo) | Experiência do aluno da **plataforma Viver o Quad** |
+| SITE | Site principal e checkout do Quad Concursos | **Externo** — vitrine/venda; integração a definir |
+| PLAT | Plataforma de cursos | **Externo** — legado em avaliação |
+| CAD | Cadastro geral de usuários/alunos | **Módulo interno — Cadastro** (Módulo Planejado) |
+| MAT | Sistema de matrículas | **Módulo interno — Matrículas** (Módulo Planejado) |
+| FIN | Financeiro/pagamentos | **Externo** — integração a definir |
+| BQ | Banco central de questões | **Módulo interno — Banco de questões** (Módulo Planejado) |
+| ADM | Painel administrativo | **Módulo interno — Administração** (Módulo Planejado) |
+| PED | Sistema pedagógico | **Módulo interno — Inteligência pedagógica + Cronogramas** (Módulo Planejado) |
+| AUTH | Autenticação/autorização | **Módulo interno — Autenticação** (Módulo Planejado) |
+| EVT | Sistema de eventos | **Módulo interno — Simulados/Eventos** (Módulo Planejado) |
+| MTL | Sistema de materiais (storage/CDN) | **Módulo interno — Produção de materiais** (Módulo Planejado); storage/CDN em si é serviço externo |
+| NOT | Notificações/mensageria | **Externo** — canal push/e-mail; integração a definir |
+| BI | Relatórios/inteligência de dados | **Dividido:** Relatórios = módulo interno (Módulo Planejado); telemetria como serviço de dados = externo, a decidir |
+| GAM | Back-end de gamificação (score, patentes, ledger de moedas) | **Módulo interno** — economia da plataforma (Módulo Planejado); **regras econômicas indefinidas** |
+| ERP | Estoque/logística (sistema externo) | **Externo** |
+| GW | Gateway de pagamento (sistema externo) | **Externo** |
 
 **Tipos de armazenamento permitidos no APP:**
 - **cache** — cópia de leitura descartável, com validade; o servidor manda.
@@ -52,15 +64,17 @@ Esta matriz responde, para cada dado ou processo do ecossistema Viver o Quad: **
 
 **Arquitetura-alvo proposta:** no ecossistema real, o APP **não é fonte oficial de nenhum dado de negócio**. Ele exibe caches e réplicas, coleta ações do aluno (respostas, pedidos de compra, inscrições) e as envia ao back-end, que é quem decide. O próprio código já declara isso: *"no sistema real vem validado do servidor — a interface nunca decide sozinha quantos pontos foram conquistados"* (comentário, l. 3706–3707). As únicas classes de dado "próprias" do APP seriam preferências de interface e filas temporárias de sincronização.
 
+**Nota pós-Consolidação v1.0:** este princípio permanece integralmente válido. "APP" nesta matriz designa a **interface/experiência do aluno**; com a v1.0, os donos oficiais dos dados (CAD, MAT, BQ, PED, GAM etc.) passam a ser **módulos internos da própria plataforma Viver o Quad** — mas continuam sendo o lado servidor que decide, nunca a interface. Todos são Módulos Planejados: nada disso existe implementado.
+
 ---
 
 ## 3. Matriz A — Identidade, acesso e permissões
 
 | Dado/processo | Fonte oficial proposta | Cria | Altera | Consultam | App armazena? | Tipo | Sincronização | Offline | Risco de duplicidade | Status no protótipo | Decisão pendente |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| **Usuário (conta)** | CAD | SITE (conta nasce no checkout, junto da matrícula — dec. 21) | CAD/ADM | APP, PLAT, MAT, FIN, AUTH, BI | Sim | cache de sessão | No login e a cada abertura de sessão | Exibe cache; sem edição | Alto — o protótipo já tem 2 nomes para o mesmo aluno (`DB_ALUNO.nome` l. 3946 ≠ `carreira.nomeCompleto` l. 3709) | SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO | Identificador único de pessoa (CPF/ID) — DECISÃO TÉCNICA PENDENTE |
+| **Usuário (conta)** | CAD (módulo Cadastro) | Módulo Cadastro (a dec. 21 — conta nasce no checkout do site — foi **revogada** na Consolidação v1.0; fluxo novo NÃO implementado: o protótipo mantém o portão "Cadastro no site" como demonstração) | CAD/ADM | APP, PLAT, MAT, FIN, AUTH, BI | Sim | cache de sessão | No login e a cada abertura de sessão | Exibe cache; sem edição | Alto — o protótipo já tem 2 nomes para o mesmo aluno (`DB_ALUNO.nome` l. 3946 ≠ `carreira.nomeCompleto` l. 3709) | SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO | Identificador único de pessoa (CPF/ID) — DECISÃO TÉCNICA PENDENTE |
 | **Perfil (papel aluno/professor/admin)** | AUTH | AUTH (na criação da conta/colaborador) | ADM (concede/revoga) | Todos os sistemas | Sim | cache (claims/token de sessão) | A cada login/refresh de token | Funções sensíveis negadas | Médio — no protótipo o papel é troca de botão `.persona-btn` (l. 3917), sem sessão | APENAS VISUAL + DEPENDE DO BACK-END | RBAC real por pessoa — DECISÃO TÉCNICA PENDENTE |
-| **Aluno (dados cadastrais)** | CAD | SITE (checkout) | CAD/ADM; o aluno edita só preferências (avatar, perfil privado) | APP, PED, FIN, BI | Sim | cache de sessão + **próprio** para preferências de interface | Login + ao alterar | Cache somente leitura | Alto (mesmo caso da conta: dois nomes) | SIMULADO LOCALMENTE (`DB_ALUNO` l. 3946) + DEPENDE DE SISTEMA EXTERNO | Regras de alteração da graduação do aluno ("gestor definirá", CHANGELOG 18/07) — DECISÃO DE PRODUTO PENDENTE |
+| **Aluno (dados cadastrais)** | CAD (módulo Cadastro) | Módulo Cadastro (dec. 21 revogada na v1.0; fluxo a especificar — antes: SITE/checkout) | CAD/ADM; o aluno edita só preferências (avatar, perfil privado) | APP, PED, FIN, BI | Sim | cache de sessão + **próprio** para preferências de interface | Login + ao alterar | Cache somente leitura | Alto (mesmo caso da conta: dois nomes) | SIMULADO LOCALMENTE (`DB_ALUNO` l. 3946) + DEPENDE DE SISTEMA EXTERNO | Regras de alteração da graduação do aluno ("gestor definirá", CHANGELOG 18/07) — DECISÃO DE PRODUTO PENDENTE |
 | **Professor (cadastro docente)** | CAD (RH/coordenação) | ADM ("Banco de professores") | ADM; o próprio professor (senha/foto, l. 4992–5010) | APP, PED, EVT, BI | Sim | cache/réplica de leitura | Diária + ao alterar | Leitura do cache | **Crítico** — a grade `CRONO` cita ~10 professores que NÃO existem em `DOCENTES` (l. 4753–4771 × l. 3815); o nome é a chave do cadastro (`renomearDocente` l. 8178) | SIMULADO LOCALMENTE + DEPENDE DE BANCO DE DADOS | ID estável (não o nome) e e-mail não derivado do sobrenome (colisão de sobrenomes iguais — l. 4917) — DECISÃO TÉCNICA PENDENTE |
 | **Permissão (chaves, bloqueios, revogações)** | AUTH | Direção via ADM ("a chave é emitida e revogada pela direção, por pessoa" — comentário l. 9790) | ADM/AUTH (bloqueio derruba sessão na hora — l. 9891, 4938–4941) | Todos os sistemas | Não (apenas token volátil de sessão) | cache volátil (token) | Tempo real (revogação imediata) | Sem validação offline de permissão sensível | Alto — os gates do protótipo são overlays CSS/JS removíveis por DevTools (l. 4934, 9786) | APENAS VISUAL + SIMULADO LOCALMENTE + DEPENDE DO BACK-END | Retirar hooks `window.__*` (31) e credenciais demo (`quad1234`, `NPP-2026`) do build de produção — DECISÃO TÉCNICA PENDENTE |
 
@@ -70,7 +84,7 @@ Esta matriz responde, para cada dado ou processo do ecossistema Viver o Quad: **
 
 | Dado/processo | Fonte oficial proposta | Cria | Altera | Consultam | App armazena? | Tipo | Sincronização | Offline | Risco de duplicidade | Status no protótipo | Decisão pendente |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| **Matrícula** | MAT | SITE (compra no checkout — dec. 21); ADM em casos manuais (HIPÓTESE) | MAT + FIN (estorno) | APP (gate de acesso — `checarMatricula` l. 3899), AUTH, PED, FIN, BI | Sim | cache com validade curta | No login + push em compra/estorno | Cache vale por prazo curto; vencido sem confirmação, app trava | Alto — `MATRICULAS` (l. 3850) é array local mutável; `window.__mat.encerrar()` (l. 3905) apaga tudo | SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO + DEPENDE DO BACK-END | Contrato app × site × matrículas para reconhecimento de matrícula (`[INTEGRAÇÃO REAL]`) — DECISÃO TÉCNICA PENDENTE |
+| **Matrícula** | MAT (módulo Matrículas) | SITE (compra no checkout — a venda permanece externa; a dec. 21, que tratava do **cadastro**, foi revogada na v1.0 e não altera a venda); ADM em casos manuais (HIPÓTESE) | MAT + FIN (estorno) | APP (gate de acesso — `checarMatricula` l. 3899), AUTH, PED, FIN, BI | Sim | cache com validade curta | No login + push em compra/estorno | Cache vale por prazo curto; vencido sem confirmação, app trava | Alto — `MATRICULAS` (l. 3850) é array local mutável; `window.__mat.encerrar()` (l. 3905) apaga tudo | SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO + DEPENDE DO BACK-END | Contrato app × site × matrículas para reconhecimento de matrícula (`[INTEGRAÇÃO REAL]`) — DECISÃO TÉCNICA PENDENTE |
 | **Turma** | ADM (cadastro) + MAT | ADM (só no Painel de controle, com validações — dec. 53/138/155) | ADM (edição preserva matrículas; remoção travada com matrícula ativa) | APP, SITE (venda), MAT, PED, EVT, BI | Sim | réplica de leitura (catálogo) | Diária + ao alterar | Catálogo em cache; comprar exige conexão | Médio — vagas por moeda decrementadas no cliente (`matricular` l. 8757) | SIMULADO LOCALMENTE (`TURMAS_LOJA` l. 3842) + DEPENDE DE BANCO DE DADOS | Onde vive o cadastro de salas/capacidades (`SALA_CAP` l. 8920 é hard-coded) — DECISÃO TÉCNICA PENDENTE |
 | **Concurso** | PED (Estrutura) + BQ | ADM (lançamento) | ADM (situação: edital publicado/reta final etc.) | APP (Domínio), BQ, PED, BI | Sim | réplica de leitura | Por publicação/retificação | Réplica local | Baixo | SIMULADO LOCALMENTE (`CONCURSOS` l. 4122) + DEPENDE DE BANCO DE DADOS | Dono do catálogo de concursos (PED × BQ) — DECISÃO TÉCNICA PENDENTE |
 | **Edital (árvore de conteúdo)** | BQ (lançamento de edital) | ADM/PED via upload; extração do PDF é sistema externo | ADM/PED (retificações versionadas) | APP (Domínio, materiais por árvore), BQ, PED, MTL, BI | Sim | réplica versionada | Por publicação | Réplica local | Médio — só a árvore CFO é real; as demais são exemplos compactos hard-coded (l. 4099–4121) | SIMULADO LOCALMENTE + DEPENDE DE SISTEMA EXTERNO (parser de PDF) | Pipeline de extração do edital ("a árvore real entra pelo lançamento do edital — [INTEGRAÇÃO REAL]", l. 4096) — DECISÃO TÉCNICA PENDENTE |
@@ -155,4 +169,4 @@ Todos CONFIRMADOS NO CÓDIGO; são os pontos em que o protótipo já demonstra o
 
 ---
 
-*Documento 08 da série de auditoria. Ver também: 05-regras-de-negocio.md (regras RN-01–RN-61 citadas), 06-dados-locais-e-persistencia.md (inventário completo das estruturas e chaves `vq_*`).*
+*Documento 08 da série de auditoria. Ver também: 05-regras-de-negocio.md (regras RN-01–RN-61 citadas), 06-dados-locais-e-persistencia.md (inventário completo das estruturas e chaves `vq_*`). Atualizado em 01/08/2026 para refletir a Consolidação Arquitetural v1.0 (titularidade das siglas → módulos internos; dec. 21 revogada), sem alteração das evidências de 30/07.*

@@ -9,6 +9,8 @@ Este documento responde a uma pergunta única: **do que existe hoje no repositó
 
 A resposta honesta, antecipada: **o maior valor do protótipo não é o código — é a especificação viva que ele carrega.** O `src.html` é um monólito de 11.920 linhas (um único IIFE de ~8.250 linhas de JS, ~207 variáveis globais internas, 235 listeners, tudo em memória) que NÃO é arquitetura recomendada para produção e não deve ser "aproveitado" tecnicamente para economizar trabalho. O que ele contém de valioso — e é muito — são: as 61 regras de negócio já decididas e demonstradas (RN-01–RN-61, doc 05), o roteiro completo de onboarding, a identidade visual pronta, as mídias produzidas, os textos de interface e um histórico de 181 decisões com CHANGELOG de 116 entradas. Isso encurta meses de descoberta de produto. O código em si, quase nada.
 
+> **Atualização — Consolidação Arquitetural v1.0 (01/08/2026):** o fonte foi **dividido em 20 partes contíguas em `src/`** (a concatenação na ordem reproduz o monolito; saída de build byte-idêntica), o build ganhou portabilidade e validações (§3.6), os órfãos `Viver o Quad.rar` e `quad-coin.png` foram removidos do repositório e boa parte do código morto da seção 4 foi removida do fonte com regressão completa (56 suítes). **Nada disso muda os vereditos deste documento**: o resultado concatenado continua um protótipo de documento único — mais manutenível, porém não é a arquitetura final, e a implementação real segue sendo RECONSTRUIR.
+
 ---
 
 ## 1. As cinco categorias usadas neste documento
@@ -36,15 +38,15 @@ Um mesmo ativo pode ter mais de uma categoria (ex.: a Loja é REFERÊNCIA VISUAL
 | Textos de interface (microcopy) | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | — | Perder a voz do produto na reescrita |
 | Lógica de regras de negócio (JS) | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | RECONSTRUIR (implementação) | Portar código cliente que decide valor (moeda, promoção, vaga) para produção |
 | Dados mock (seeds) | DESCARTAR APÓS VALIDAÇÃO | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO (exceções: árvore CFO, GAMI, roteiro TUT, bancos de questões demo) | Confundir seed com dado real; telefones/nomes plausíveis vazando |
-| Build (build.py / build.ps1) | REAPROVEITAR COM REFATORAÇÃO (só para o protótipo) | RECONSTRUIR (no produto real não existe equivalente) | Achar que o "build" do protótipo é um pipeline de produção |
+| Build (build.py / build.ps1) | REAPROVEITAR COM REFATORAÇÃO (só para o protótipo) — **refatoração aplicada em 01/08, ver §3.6** | RECONSTRUIR (no produto real não existe equivalente) | Achar que o "build" do protótipo é um pipeline de produção |
 | Hooks de teste `window.__*` | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO (inventário de casos de teste) | DESCARTAR APÓS VALIDAÇÃO (no build de produção) | Publicar hooks de manipulação de estado em app com dado real |
 | Documentação | dividida: CHANGELOG + docs/02 = REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO; README/00/03 = RECONSTRUIR; PDF rev. 2.3 = base a revisar | REAPROVEITAR COM REFATORAÇÃO (renumerar decisões) | Desenvolvedor novo seguir o README (defasado em ≥8 pontos) |
-| Mídias (fotos, sprites, vídeo, fontes, logos) | REAPROVEITAR COM REFATORAÇÃO | DESCARTAR APÓS VALIDAÇÃO (órfãos: quad-coin.png, .rar) | Renomear/perder o vínculo variante↔avatar das 84 fotos |
+| Mídias (fotos, sprites, vídeo, fontes, logos) | REAPROVEITAR COM REFATORAÇÃO | DESCARTAR APÓS VALIDAÇÃO (órfãos: quad-coin.png, .rar — **removidos em 01/08**) | Renomear/perder o vínculo variante↔avatar das 84 fotos |
 | Gamificação (patentes, score, prova, tutorial) | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | RECONSTRUIR (motor) | Reaproveitar correção/gabarito no cliente (fraude trivial) |
 | Economia (moedas, Loja, estornos, gift cards) | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | RECONSTRUIR (ledger); DECISÃO DE PRODUTO PENDENTE (rev. 2.4) | Tratar como decidido o que a rev. 2.3 ainda não absorveu (Diamante, economia na V0) |
 | Área do administrador (N.P.P.) | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | RECONSTRUIR | Herdar vícios do protótipo (nome como chave primária, preço raspado do DOM) |
 | Área do professor | REAPROVEITAR COMO REGRA OU ESPECIFICAÇÃO | RECONSTRUIR | Herdar e-mail derivado do sobrenome como regra de identidade |
-| Persistência local (localStorage `vq_*`) | RECONSTRUIR | DESCARTAR APÓS VALIDAÇÃO (4 chaves mortas) | Basear continuidade de conta em flag de dispositivo |
+| Persistência local (localStorage `vq_*`) | RECONSTRUIR | DESCARTAR APÓS VALIDAÇÃO (4 chaves mortas — **chaves mortas removidas em 01/08**; ver §3.14) | Basear continuidade de conta em flag de dispositivo |
 | Suítes Playwright (externas, não versionadas) | RECONSTRUIR (recuperar e versionar) | — | Perder a única rede de regressão que o protótipo já teve |
 
 ---
@@ -88,11 +90,11 @@ Um mesmo ativo pode ter mais de uma categoria (ex.: a Loja é REFERÊNCIA VISUAL
 2. Gabaritos embutidos no cliente (`QUESTIONS`, `QA_MULT`, `QA_CE`, prova de patente) tornam fraude trivial.
 3. O acoplamento é total por desenho (as 3 personas compartilham o mesmo estado no mesmo arquivo para realizar o "tudo conectado" da demo) — não há fronteira de módulo para extrair.
 4. Os 24 pontos `[INTEGRAÇÃO REAL]` marcados no fonte já dizem onde o autor sabia que o protótipo termina.
-5. Duplicatas e fragilidades internas (função `hojeISO` definida 2×, dependência de ordem de declaração comentada no bloco final l. 11884–11885, sem `use strict`) confirmam que o arquivo não foi escrito para viver além da demo.
+5. Duplicatas e fragilidades internas (função `hojeISO` definida 2× — a duplicata foi removida em 01/08 —, dependência de ordem de declaração comentada no bloco final l. 11884–11885, sem `use strict`) confirmam que o arquivo não foi escrito para viver além da demo.
 
 **Exceção parcial (algoritmos como pseudo-especificação):** meia dúzia de algoritmos merecem ser transcritos para a especificação porque codificam decisões finas de produto: `salaConflito()`/`salaOcupacoes()` (definição exata de "choque": mesma sala + mesmo dia da semana + horários cruzados + períodos cruzados, l. 8942–8980), `choqueDeAgenda()` (agenda do aluno), `tutGuerraOk()` (nome de guerra: só letras, sem palavrão, subsequência ordenada do nome completo, nunca o nome inteiro, l. 5731–5748), `estornoDias()`/`compraConsumida()` (janela de 7 dias × consumo), `rkNomeExibido()` (privacidade de mão dupla com top 10 sempre visível). Transcrever a LÓGICA, não portar o código.
 
-**Risco:** o pior cenário desta auditoria seria um desenvolvedor "aproveitar" o IIFE como base do app real. Registre-se com todas as letras: **o monólito não é arquitetura recomendada e não deve ser ponto de partida técnico.**
+**Risco:** o pior cenário desta auditoria seria um desenvolvedor "aproveitar" o IIFE como base do app real. Registre-se com todas as letras: **o monólito não é arquitetura recomendada e não deve ser ponto de partida técnico.** *(Atualização 01/08: o fonte foi dividido em 20 partes contíguas em `src/` — isso facilita a manutenção do protótipo, mas não muda este veredito: o concatenado continua o mesmo documento único de protótipo, não a arquitetura final, e a implementação real segue sendo RECONSTRUIR.)*
 
 ### 3.5 Dados mock (seeds) — DESCARTAR APÓS VALIDAÇÃO, com exceções nominais
 
@@ -117,6 +119,8 @@ Um mesmo ativo pode ter mais de uma categoria (ex.: a Loja é REFERÊNCIA VISUAL
 **O que existe (CONFIRMADO NO CÓDIGO):** dois scripts equivalentes que embutem 10 tokens de mídia em base64 e geram `index.html`/`artifact.html` (~9,4 MB). O rebuild reproduz o artefato byte a byte (verificado por `cmp` na auditoria) — o build está íntegro e sincronizado.
 
 **Justificativa:** enquanto o protótipo existir como ferramenta de demonstração, o build precisa continuar funcionando — e para isso vale refatorar: (1) trocar o caminho absoluto fixo `/home/user/viveroquad` do build.py (l. 2) por caminho relativo; (2) adicionar validação de token ausente ao build.ps1 (hoje passa em silêncio e pode publicar `__TOKEN__` cru); (3) validar contagem de fotos em `fotos/` (hoje pasta vazia passa em silêncio); (4) eleger UM script canônico e documentá-lo (hoje README/docs só citam build.ps1, mas o último build foi feito com build.py).
+
+**Atualização — recomendações JÁ aplicadas (01/08/2026, Consolidação v1.0):** as recomendações (1) e (2) foram executadas — build.py passou a usar caminho relativo ao script (portátil) e os dois scripts validam token ausente **e** sobra de token não substituído. Além disso, o fonte foi dividido em 20 partes contíguas em `src/` e o build valida a contagem de partes (aborta se não achar exatamente 20), com saída byte-idêntica verificada. As recomendações (3) (contagem de fotos) e (4) (script canônico único) seguem em aberto.
 
 **Para o produto real:** RECONSTRUIR — não existe equivalente. Um app de verdade tem pipeline de assets, CDN, cache e streaming de mídia; "9,4 MB de HTML com vídeo em base64" é uma técnica de protótipo autocontido, correta para o fim a que serve e inaplicável fora dele.
 
@@ -185,21 +189,25 @@ Um mesmo ativo pode ter mais de uma categoria (ex.: a Loja é REFERÊNCIA VISUAL
 
 O localStorage do protótipo guarda só 8 flags `vq_*`, das quais **4 são total ou parcialmente mortas** (`vq_pending` nunca escrita; `vq_last_sync` e `vq_tut_step`/`vq_tut_done` nunca lidas; `vq_tut_rew` jamais usada) e o reset da demo esquece `vq_intro_done` (inconsistência CONFIRMADA). O "modo offline" interno é um booleano sem alternador acessível na UI (`#connToggle` referenciado no JS não existe no HTML — o modo é inatingível). Nada disso é base para o offline real (fila de sincronização, autorização de dispositivo, cache) — que é projeto novo (DEPENDE DO FRONT-END REAL + DEPENDE DO BACK-END). As chaves mortas: DESCARTAR APÓS VALIDAÇÃO.
 
+**Atualização (01/08/2026):** o descarte foi executado na Consolidação v1.0 — as chaves `vq_device_authorized`, `vq_last_sync`, `vq_pending`, `vq_tut_step`, `vq_tut_done` e `vq_tut_rew` foram removidas do fonte junto com o fluxo revogado de autorização de dispositivo, com regressão completa (56 suítes). **Restam vivas apenas `vq_tut_skip` e `vq_intro_done`.** O bug do reset (não limpa `vq_intro_done`) não foi corrigido — mudaria comportamento — e segue documentado. O veredito RECONSTRUIR para o offline real permanece.
+
 ---
 
 ## 4. Lista consolidada — DESCARTAR APÓS VALIDAÇÃO
 
 Itens de peso morto identificados pelas seis frentes (remover do protótipo/repositório depois de confirmação humana, idealmente numa única rodada de higiene com rebuild e re-teste):
 
+*Atualização (01/08/2026): a rodada de higiene aconteceu na Consolidação v1.0, com regressão completa (56 suítes) — a coluna "Observação" registra, item a item, o que foi removido e o que permanece.*
+
 | Item | Evidência | Observação |
 |---|---|---|
-| `Viver o Quad.rar` (9 MB, versionado) | git ls-files; nenhum doc referencia | HIPÓTESE: cópia antiga. Confirmar com o gestor antes de apagar |
-| `quad-coin.png` (904 KB, versionado) | build.py l.14 / build.ps1 l.13 usam só o .webp | Órfão de build |
-| Botão `[DEMO PROVISÓRIO — REMOVER]` de subir patente + `#btnDiaEstudo` (+275 pts) | l. 7740–7758, 7510 | Remoção prometida no CHANGELOG 20/07 e ainda pendente |
-| Fluxo antigo de login por código (`CODE_OK='123456'`, `scenario`) e textos do aside que o descrevem | l. 3732–3734, 3645–3654 | Código morto + DIVERGÊNCIA DOCUMENTAL no próprio app |
-| `#daniloPop` com vídeo sem handler que o abra; funções nunca referenciadas `fmtSync`, `openQuiz`, `tutDadosOk` | l. 3273–3287; 5580, 4644, 5724 | Vestigiais confirmados por busca de palavra inteira |
-| `LINKS_ONLINE` (objeto vazio, autodeclarado obsoleto) | l. 11866 | Código morto |
-| Chaves localStorage mortas (`vq_pending`, `vq_last_sync`, `vq_tut_rew`; leitura de `vq_tut_step`/`vq_tut_done`) | doc 06 §2 | Junto com correção do reset (`vq_intro_done`) |
+| `Viver o Quad.rar` (9 MB, versionado) | git ls-files; nenhum doc referencia | HIPÓTESE: cópia antiga. Confirmar com o gestor antes de apagar. **REMOVIDO do repositório em 01/08** |
+| `quad-coin.png` (904 KB, versionado) | build.py l.14 / build.ps1 l.13 usam só o .webp | Órfão de build. **REMOVIDO do repositório em 01/08** |
+| Botão `[DEMO PROVISÓRIO — REMOVER]` de subir patente + `#btnDiaEstudo` (+275 pts) | l. 7740–7758, 7510 | Remoção prometida no CHANGELOG 20/07 e ainda pendente. **Permanece em 01/08** |
+| Fluxo antigo de login por código (`CODE_OK='123456'`, `scenario`) e textos do aside que o descrevem | l. 3732–3734, 3645–3654 | Código morto + DIVERGÊNCIA DOCUMENTAL no próprio app. **Código REMOVIDO em 01/08** (com `currentEmail`, `pendingRunTour`, `deviceAuthorized`, `pendingAnswers` e o objeto `LS`); o texto do aside permanece |
+| `#daniloPop` com vídeo sem handler que o abra; funções nunca referenciadas `fmtSync`, `openQuiz`, `tutDadosOk` | l. 3273–3287; 5580, 4644, 5724 | Vestigiais confirmados por busca de palavra inteira. **Funções REMOVIDAS em 01/08**; `#daniloPop` permanece |
+| `LINKS_ONLINE` (objeto vazio, autodeclarado obsoleto) | l. 11866 | Código morto. **PRESERVADO deliberadamente em 01/08** como ponto de integração planejado — deixa de ser candidato a descarte |
+| Chaves localStorage mortas (`vq_pending`, `vq_last_sync`, `vq_tut_rew`; leitura de `vq_tut_step`/`vq_tut_done`) | doc 06 §2 | Junto com correção do reset (`vq_intro_done`). **Chaves REMOVIDAS em 01/08** (também `vq_device_authorized`); a correção do reset segue pendente (mudaria comportamento) |
 | View órfã `v-pretaf` (inalcançável pela UI) | l. 2062; grep sem `showView('v-pretaf')` | **Não é descarte automático:** religar ou remover é DECISÃO DE PRODUTO PENDENTE (a tela está pronta) |
 | Texto interno "Danilo, o guia" e "Missões 10+10" em cards estáticos | l. 3637, 3633 | Corrigir, não descartar a tela |
 

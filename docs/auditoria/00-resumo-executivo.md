@@ -9,13 +9,29 @@ Este resumo condensa os achados de seis frentes de investigação (estrutura/bui
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+Em 01/08/2026, dois dias após esta auditoria, o gestor Danilo Moura determinou a **Consolidação Arquitetural v1.0**. Ela muda premissas e o estado do repositório; as seções abaixo foram anotadas onde ficaram desatualizadas. Resumo do que mudou:
+
+1. **Nova premissa arquitetural: o Viver o Quad é a plataforma principal do Quad Concursos.** Onze capacidades que esta auditoria tratava como sistemas externos passam a ser **módulos internos** da plataforma: cadastro; autenticação; matrículas; produção de materiais; banco de questões; simulados; inteligência pedagógica; loja; administração; relatórios; cronogramas. Permanecem **fora** (integrações a definir): site e checkout (vitrine/venda), pagamentos/financeiro, plataforma de cursos (legado em avaliação), notificações push/e-mail (canal) e telemetria como serviço de dados (a decidir). A mudança é **exclusivamente arquitetural** — nada foi implementado; módulo sem especificação suficiente é "Módulo Planejado".
+2. **Decisão 21 revogada.** O cadastro deixa de pertencer obrigatoriamente ao site e passa a pertencer à arquitetura do app (Módulo Planejado). O fluxo novo **não foi implementado**: o protótipo mantém o portão "Cadastro no site do Quad" como demonstração, até a especificação do módulo.
+3. **O fonte agora vive em `src/` — `src.html` não existe mais.** O monolito foi dividido em **20 partes contíguas** (`NN-descricao.html`); a concatenação na ordem reproduz o documento único com saída de build byte-idêntica. As referências "src.html l.N" desta auditoria valem para o monolito auditado em 30/07; `src/README.md` traz a tabela das partes e a correspondência.
+4. **Build portátil com validação.** `build.py` passou a usar caminho relativo ao próprio script, valida a presença das 20 partes e valida tokens **ausentes e sobras**; `build.ps1` espelha as mesmas validações.
+5. **Código morto removido, com regressão completa (56 suítes verdes):** a duplicata sombreada de `hojeISO`; o fluxo revogado de autorização de dispositivo (variáveis, objeto `LS` e chaves `vq_device_authorized`/`vq_last_sync`/`vq_pending`); as chaves de tutorial nunca lidas (`vq_tut_step`/`vq_tut_done`/`vq_tut_rew`); as funções nunca chamadas `openQuiz`, `fmtSync` e `tutDadosOk`; 8 comentários enganosos atualizados. As chaves de `localStorage` vivas agora são só **`vq_tut_skip` e `vq_intro_done`**. `LINKS_ONLINE` foi **preservado** como ponto de integração planejado. O bug do reset (não limpa `vq_intro_done`) **não** foi corrigido — mudaria comportamento — e segue documentado.
+6. **Peso morto fora do repositório:** `Viver o Quad.rar` (9,4 MB, órfão) e `quad-coin.png` (904 KB, órfão) foram removidos do versionamento.
+7. **`docs/arquitetura/` passa a ser a referência arquitetural única do projeto.** Em conflito entre esta auditoria e a Consolidação, prevalece `docs/arquitetura/00-arquitetura-oficial.md`.
+
+O comportamento funcional e a experiência do usuário do protótipo **não mudaram** (divisão com saída byte-idêntica; limpeza com regressão verde). As pendências de segurança do §5.3 permanecem válidas e registradas — nenhuma solução foi implementada. As perguntas que a Consolidação respondeu (e as que continuam abertas) estão marcadas no doc 10.
+
+---
+
 ## 1. O que o protótipo é hoje
 
 O "Viver o Quad" V0 é **um único arquivo HTML navegável** que demonstra, de ponta a ponta, a experiência prevista para o app do aluno do Quad Concursos — e também as áreas do professor e da administração (N.P.P.), todas no mesmo arquivo, alternadas por botões de persona.
 
-- **Fonte única editável:** `src.html` (11.920 linhas, 764 KB), com CSS (linhas ~3–1570), HTML (~1571–3668) e um único bloco JavaScript (IIFE, ~3670–11920).
+- **Fonte editável:** na auditoria, `src.html` (11.920 linhas, 764 KB), com CSS (linhas ~3–1570), HTML (~1571–3668) e um único bloco JavaScript (IIFE, ~3670–11920). *Atualização 01/08:* o fonte foi dividido nas **20 partes contíguas de `src/`** — `src.html` não existe mais; a concatenação reproduz o mesmo documento único (ver `src/README.md`).
 - **Saídas de build:** `index.html` e `artifact.html` (~9,4 MB cada), gerados por `build.py` ou `build.ps1`, que embutem todas as mídias (fontes, vídeo do mascote, sprites, logos, 84 fotos de variantes de avatar) como data-URIs base64. As saídas **não são versionadas** (.gitignore) e rodam 100% offline — não há nenhuma chamada de rede no arquivo gerado (zero `fetch`/`XMLHttpRequest`/`WebSocket`, zero scripts externos). CONFIRMADO NO CÓDIGO.
-- **Dados 100% locais:** todo o "banco de dados" são arrays e objetos JavaScript em memória (`TURMAS_LOJA`, `MATRICULAS`, `EVENTOS`, `SIMULADOS`, `DOCENTES`, `COMPRAS`, `CONCURSOS` com árvores de edital etc.). A única persistência é o `localStorage`, usado apenas para **8 flags** de tutorial/dispositivo (prefixo `vq_`). Recarregar a página (F5) zera moedas, compras, matrículas, mensagens e progresso — sobrevivem só as flags. CONFIRMADO NO CÓDIGO.
+- **Dados 100% locais:** todo o "banco de dados" são arrays e objetos JavaScript em memória (`TURMAS_LOJA`, `MATRICULAS`, `EVENTOS`, `SIMULADOS`, `DOCENTES`, `COMPRAS`, `CONCURSOS` com árvores de edital etc.). A única persistência é o `localStorage`: na auditoria eram **8 flags** de tutorial/dispositivo (prefixo `vq_`); *desde a limpeza de 01/08 restam só as 2 vivas* (`vq_tut_skip` e `vq_intro_done`). Recarregar a página (F5) zera moedas, compras, matrículas, mensagens e progresso — sobrevivem só as flags. CONFIRMADO NO CÓDIGO.
 - **Mecânicas que funcionam de verdade dentro da sessão** (SIMULADO LOCALMENTE): login e tutorial de 29 passos, economia com duas moedas (Quad Coins e Diamantes), Quad Store completa com estorno em 7 dias e "consumo mata estorno", turma ativa trocável, missões/flashcards por turma, quiz ao vivo professor↔aluno, prova de promoção de patente, gift cards com liberação única, portaria/recepção, criação de turmas/eventos/simulados pelo admin com validação de salas e choque de agenda, mensageria admin→aluno/professor, relatórios que misturam dados vivos da sessão com números sintéticos estáveis.
 - **Histórico rastreável:** 116 entradas de CHANGELOG (13→28/07) e 181 decisões numeradas em `docs/02-registro-de-decisoes.md`. É o registro mais fiel do comportamento vigente — mais atual que o README e que o relatório rev. 2.3.
 
@@ -30,10 +46,12 @@ O "Viver o Quad" V0 é **um único arquivo HTML navegável** que demonstra, de p
 
 ## 3. Grau de complexidade encontrado
 
-| Métrica | Valor verificado |
+Valores medidos no monolito auditado em 30/07. *Atualização 01/08:* o fonte agora são as 20 partes de `src/` (11.889 linhas somadas, após a remoção de código morto); as demais ordens de grandeza permanecem.
+
+| Métrica | Valor verificado (30/07) |
 |---|---|
-| Linhas do `src.html` | **11.920** (CSS ~1.568 · HTML ~2.098 · JS ~8.250) |
-| Declarações de função nomeada | **468** (466 nomes únicos; 2 duplicatas: `hojeISO`, `falta`) |
+| Linhas do `src.html` | **11.920** (CSS ~1.568 · HTML ~2.098 · JS ~8.250) — *01/08: 11.889 nas 20 partes de `src/`* |
+| Declarações de função nomeada | **468** (466 nomes únicos; 2 duplicatas: `hojeISO`, `falta`) — *01/08: a duplicata sombreada de `hojeISO` foi removida* |
 | Views (`id="v-*"`) | **22** (9 aluno · 5 professor · 8 admin) |
 | `addEventListener` | **235** |
 | Overlays/camadas | 21 (ids `*Layer`, incl. `#simDigLayer`) · Navbars: 3 · Blocos `data-bl` do admin: 21 |
@@ -41,7 +59,7 @@ O "Viver o Quad" V0 é **um único arquivo HTML navegável** que demonstra, de p
 | Temporizadores | 33 `setTimeout` · 5 `setInterval` |
 | Manipulação de DOM | 187 linhas com `innerHTML` × 17 `createElement` |
 | Hooks de teste `window.__*` | **31** |
-| Chaves de `localStorage` | **8** (todas `vq_*`; 4 total ou parcialmente mortas) |
+| Chaves de `localStorage` | **8** (todas `vq_*`; 4 total ou parcialmente mortas) — *01/08: mortas removidas; vivas hoje: **2** (`vq_tut_skip`, `vq_intro_done`)* |
 | Marcações `[INTEGRAÇÃO REAL]` no código | 24 |
 | Saída de build | ~9,4 MB por arquivo (mídias em base64) |
 | Documentação | 116 entradas de CHANGELOG · 181 decisões numeradas |
@@ -63,8 +81,8 @@ Tudo nas três áreas é, no mínimo, SIMULADO LOCALMENTE; os documentos detalha
 ### 5.1 Riscos técnicos
 1. **Monólito acoplado sem rede de proteção.** 8.250 linhas de JS num IIFE com dependência de ordem de declaração (admitida em comentário no próprio código), sem testes versionados. Qualquer manutenção fora do ambiente original opera às cegas.
 2. **Armadilhas de nomenclatura.** A variável `score` guarda **Quad Coins (moeda)**, não o score de carreira (`carreira.score*`) — legado documentado que confundirá qualquer desenvolvedor novo. Não existe `TURMAS`; o símbolo real é `TURMAS_LOJA`. DECISÃO TÉCNICA PENDENTE (renomear).
-3. **Padrões que não migram.** Preços da Loja raspados do DOM; nome do professor como chave primária; "PDF" de lista de presença via `window.print()`; código morto autodeclarado (botão `[DEMO PROVISÓRIO]` de subir patente, `openQuiz`, `#daniloPop`, `LINKS_ONLINE`, 4 chaves de localStorage mortas, view `v-pretaf` órfã/inalcançável, `#connToggle` referenciado no JS mas inexistente no HTML).
-4. **Build frágil fora do ambiente atual** (ver §8).
+3. **Padrões que não migram.** Preços da Loja raspados do DOM; nome do professor como chave primária; "PDF" de lista de presença via `window.print()`; código morto autodeclarado na auditoria (botão `[DEMO PROVISÓRIO]` de subir patente, `openQuiz`, `#daniloPop`, `LINKS_ONLINE`, 4 chaves de localStorage mortas, view `v-pretaf` órfã/inalcançável, `#connToggle` referenciado no JS mas inexistente no HTML). *Atualização 01/08:* `openQuiz` e as chaves mortas de localStorage foram **removidos** com regressão verde (junto com `fmtSync`, `tutDadosOk`, a duplicata de `hojeISO` e o fluxo revogado de autorização de dispositivo); `LINKS_ONLINE` foi **preservado deliberadamente** como ponto de integração planejado; botão `[DEMO PROVISÓRIO]`, `v-pretaf`, `#daniloPop` e `#connToggle` permanecem (decisões pendentes).
+4. **Build frágil fora do ambiente atual** — **corrigido em 01/08** (ver §8).
 
 ### 5.2 Riscos de expectativa
 1. **O protótipo parece pronto e não é.** Tudo o que "funciona" é mutação local; a distância até o produto real é a construção de todo o back-end e das integrações (§6).
@@ -92,40 +110,40 @@ A diferença não é de "polimento", é de natureza:
 | Cronograma | Snapshot fixo da "semana 30" | Sincronização com a planilha/sistema da coordenação |
 | Telemetria | Linha de texto estática | Log de eventos com taxonomia de origem, desde o dia 1 |
 
-O ecossistema previsto deixa claro que **o app não será dono de quase nada**: cadastro, matrícula, financeiro, questões, materiais, eventos e relatórios pertencem a sistemas próprios (existentes ou futuros) com os quais o app conversará. Os 24 pontos `[INTEGRAÇÃO REAL]` no código são o mapa dessas costuras — cada um é DEPENDE DO BACK-END, DEPENDE DE BANCO DE DADOS ou DEPENDE DE SISTEMA EXTERNO.
+Na premissa vigente à época da auditoria, o ecossistema previsto deixava claro que **o app não seria dono de quase nada**: cadastro, matrícula, financeiro, questões, materiais, eventos e relatórios pertenceriam a sistemas próprios com os quais o app conversaria. *Atualização 01/08 — essa premissa foi SUPERADA pela Consolidação v1.0:* o Viver o Quad passa a ser **a plataforma principal**, e cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios e cronogramas viram **módulos internos** (Módulos Planejados enquanto não especificados); seguem externos apenas site/checkout, pagamentos/financeiro, plataforma de cursos (legado em avaliação), notificações push/e-mail e telemetria como serviço de dados (a decidir) — ver `docs/arquitetura/`. Os 24 pontos `[INTEGRAÇÃO REAL]` no código continuam sendo o mapa das costuras, agora relidos como fronteiras módulo interno × integração externa.
 
 ## 7. O que um desenvolvedor precisa compreender antes de alterar o código
 
-1. **Edite somente o `src.html`.** `index.html` e `artifact.html` são saídas de build e serão sobrescritas. O fluxo é: editar → rodar build → publicar.
-2. **Os 10 tokens de build são sagrados.** `__FONTS__`, `__DANILO_VIDEO__`, `__DANILO_SPRITE__`, `__QUAD_LOGO__`, `__QUAD_SIMBOLO__`, `__AVATARS__`, `__INSIGNIAS__`, `__QUAD_COIN__`, `__DIAMANTE__`, `__FOTOS_VARIANTES__`. O `build.py` aborta se um token sumir; o `build.ps1` **publica silenciosamente o token cru** — cuidado redobrado no Windows.
-3. **Um IIFE só, com dependência de ordem.** Não há módulos; blocos no fim do arquivo dependem de declarações anteriores (comentado no próprio código, l.11884). `showView()` (l.4040) é o hub que dispara os re-renders de todas as personas — mudanças de tela quase sempre passam por ali.
+1. **Edite somente as partes de `src/`** (desde 01/08; `src.html` não existe mais — ver `src/README.md`). `index.html` e `artifact.html` são saídas de build e serão sobrescritas. O fluxo é: editar → rodar build → publicar.
+2. **Os 10 tokens de build são sagrados.** `__FONTS__`, `__DANILO_VIDEO__`, `__DANILO_SPRITE__`, `__QUAD_LOGO__`, `__QUAD_SIMBOLO__`, `__AVATARS__`, `__INSIGNIAS__`, `__QUAD_COIN__`, `__DIAMANTE__`, `__FOTOS_VARIANTES__`. *Desde 01/08*, **os dois scripts** abortam se um token sumir ou sobrar não substituído (na auditoria, o `build.ps1` publicava silenciosamente o token cru).
+3. **Um IIFE só, com dependência de ordem.** Não há módulos; blocos no fim do arquivo dependem de declarações anteriores. `showView()` é o hub que dispara os re-renders de todas as personas — mudanças de tela quase sempre passam por ali. (As referências de linha "l.N" desta auditoria valem para o monolito de 30/07; `src/README.md` explica a correspondência com as partes.)
 4. **As três personas compartilham estado.** Alterar uma estrutura do admin (ex.: `TURMAS_LOJA`, `QUIZZES`, `SALA_CAP`) reflete na hora no aluno e no professor. Não existe "área isolada".
 5. **Armadilhas de nome:** `score` = Quad Coins (moeda); o score de carreira mora em `carreira.*`. O catálogo de turmas é `TURMAS_LOJA`.
 6. **Comportamento é especificado pelo CHANGELOG e pelo registro de decisões**, não pelo README (defasado em ~10 dias e vários fluxos). Em conflito, vale o código; em dúvida de intenção, a decisão numerada mais recente.
 7. **Os hooks `window.__*` são contrato com as suítes Playwright externas** (não versionadas). Não remova nem renomeie sem decisão explícita.
-8. **localStorage:** 8 chaves `vq_*`; só `vq_tut_skip` e `vq_intro_done` têm efeito funcional real hoje; o botão "Reiniciar demonstração" esquece `vq_intro_done` (bug conhecido).
-9. **Duplicatas e código morto conhecidos** (ver §5.1.3) — não os tome como padrão a seguir.
+8. **localStorage:** desde 01/08, só existem **2 chaves** (`vq_tut_skip` e `vq_intro_done`) — as 6 mortas/revogadas da auditoria foram removidas com regressão; o botão "Reiniciar demonstração" continua esquecendo `vq_intro_done` (bug conhecido, mantido para não mudar comportamento).
+9. **Duplicatas e código morto conhecidos** (ver §5.1.3 — parte removida em 01/08) — não os tome como padrão a seguir.
 
 ## 8. Situação do build e portabilidade do protótipo
 
-**Veredito: o build está íntegro e sincronizado, mas é frágil fora do ambiente atual.**
+**Veredito da auditoria (30/07): o build está íntegro e sincronizado, mas é frágil fora do ambiente atual.** *Atualização 01/08: a fragilidade de portabilidade foi corrigida — ver marcações abaixo.*
 
-- **Íntegro:** o rebuild com `build.py` reproduz o `artifact.html` em disco **byte a byte** (verificado por `cmp` nesta auditoria). Todas as 9 mídias + 84 fotos existem; os 10 tokens estão no `src.html`.
+- **Íntegro:** o rebuild com `build.py` reproduz o `artifact.html` em disco **byte a byte** (verificado por `cmp` nesta auditoria; a divisão do fonte em `src/`, em 01/08, também foi verificada com saída byte-idêntica). Todas as 9 mídias + 84 fotos existem; os 10 tokens estão no fonte.
 - **Autoria do último build:** `build.py` (as aspas simples no objeto `__FOTOS_VARIANTES__` do artefato o denunciam) — **em contradição com README/docs, que só ensinam `build.ps1`** e nem citam a existência do `build.py`. DIVERGÊNCIA DOCUMENTAL.
-- **Portabilidade quebrada por desenho:** o `build.py` tem **caminho absoluto fixo `/home/user/viveroquad` na linha 2** — em qualquer outra máquina/pasta ele morre de imediato (correção trivial: caminho relativo ao próprio arquivo). O `build.ps1` é portátil de pasta (`$PSScriptRoot`), mas só roda em Windows/PowerShell **e não valida token ausente** (risco de publicar HTML com `__TOKEN__` exposto). Nenhum dos dois cobre "qualquer máquina" sem ajuste; nenhum valida a pasta `fotos/` vazia (build passa em silêncio com objeto vazio).
-- **Mídias:** 9 arquivos + `fotos/` (7 variantes × 12 fotos .webp) viram data-URIs; o base64 infla ~33% e resulta nos ~9,4 MB por saída. Dois arquivos versionados são **peso morto**: `Viver o Quad.rar` (9 MB, órfão, nenhum documento o cita — HIPÓTESE: cópia antiga) e `quad-coin.png` (904 KB; os builds usam o .webp).
+- **Portabilidade — CORRIGIDA em 01/08:** na auditoria, o `build.py` tinha **caminho absoluto fixo `/home/user/viveroquad`** (morria em qualquer outra máquina/pasta) e o `build.ps1` **não validava token ausente** (risco de publicar HTML com `__TOKEN__` exposto). Desde a Consolidação, o `build.py` usa caminho **relativo ao próprio script**, valida a presença das **20 partes** de `src/` e valida tokens **ausentes e sobras**; o `build.ps1` espelha as mesmas validações.
+- **Mídias:** 9 arquivos + `fotos/` (7 variantes × 12 fotos .webp) viram data-URIs; o base64 infla ~33% e resulta nos ~9,4 MB por saída. Os dois arquivos de **peso morto** apontados pela auditoria — `Viver o Quad.rar` (9 MB, órfão) e `quad-coin.png` (904 KB; os builds usam o .webp) — foram **removidos do repositório em 01/08**.
 - **README/docs de build desatualizados em cadeia:** URL antiga do artefato (`4d06ad26-…`) em README, docs/00 e docs/03 (a vigente, `945e81a8-…`, não está registrada em nenhum arquivo do repo — HIPÓTESE quanto ao valor, confirmada apenas pelo contexto da auditoria); tamanhos irreais ("src ~70 KB" vs 764 KB; "index ~4 MB" vs 9,4 MB); "três mídias" vs 10 tokens; árvore de arquivos do README omitindo 10+ itens (build.py, fonts.css, insignias.jpg, diamante.webp, quad-coin.*, fotos/, o .rar, entre outros).
 
-**Correções mínimas recomendadas:** caminho relativo no `build.py`; validação de tokens e de contagem de fotos nos dois scripts (ou eleger um script canônico); reescrever README/docs/03 contra o estado de 28/07; remover `.rar` e `quad-coin.png` do versionamento; versionar as suítes Playwright.
+**Correções mínimas recomendadas — situação em 01/08:** caminho relativo no `build.py` — **feito**; validação de tokens nos dois scripts — **feito** (contagem de fotos segue sem validação); remover `.rar` e `quad-coin.png` — **feito**; reescrever README/docs/03 — **pendente**; versionar as suítes Playwright — **pendente**.
 
 ## 9. Ordem recomendada para as próximas etapas
 
-1. **Higiene imediata do repositório e do build** (baixo risco, alto retorno): corrigir o caminho do `build.py`, declarar o script canônico, remover órfãos (`.rar`, `quad-coin.png`), atualizar README/docs/00/03 (URL, build, tamanhos, árvore, roteiro de demo, nome do mascote QUAD).
+1. **Higiene imediata do repositório e do build** — *em grande parte executada em 01/08*: caminho do `build.py` corrigido, validações nos dois scripts, órfãos (`.rar`, `quad-coin.png`) removidos; **pendente**: atualizar README/docs/00/03 (URL, build, tamanhos, árvore, roteiro de demo, nome do mascote QUAD).
 2. **Recuperar a rede de proteção:** versionar as suítes Playwright junto do protótipo e documentar a política dos hooks `window.__*` (mantê-los fora de qualquer build "de produção").
-3. **Limpezas cirúrgicas no código** (sem mudar comportamento): remover o botão `[DEMO PROVISÓRIO]` e o código morto conhecido; renomear `score`→`qdc`; decidir o destino da view órfã `v-pretaf`; consertar o reset da demo (`vq_intro_done`).
+3. **Limpezas cirúrgicas no código** (sem mudar comportamento) — *parcialmente executada em 01/08* (código morto removido com regressão verde: `hojeISO` duplicada, fluxo de autorização de dispositivo, chaves mortas de localStorage, `openQuiz`/`fmtSync`/`tutDadosOk`); **pendente**: remover o botão `[DEMO PROVISÓRIO]`; renomear `score`→`qdc`; decidir o destino da view órfã `v-pretaf`; consertar o reset da demo (`vq_intro_done`).
 4. **Rodada de decisões de produto com Danilo** (perguntas consolidadas no documento de pendências): corte do piloto de 30 dias (economia ligada/vitrine/desligada), entrada do Diamante na rev. 2.4, tutorial reabrindo ou não a cada acesso, Pré-TAF, saneamento do registro de decisões (duplicatas 126–129 e ordenação).
 5. **Rev. 2.4 do documento-base:** absorver (ou rejeitar formalmente) o que o protótipo demonstrou além da rev. 2.3 — pendência formal desde a decisão 11.
-6. **Só então, arquitetura da aplicação real:** contratos com o ecossistema (cadastro, matrículas, financeiro, questões, eventos, materiais, notificações, relatórios), autenticação de verdade, ledger da economia, telemetria com taxonomia de origem — e o desenho LGPD (base legal, minimização, retenção, direitos do titular) **antes** de qualquer dado real entrar.
+6. **Só então, arquitetura da aplicação real** — *reenquadrada em 01/08 pela Consolidação v1.0 (ver `docs/arquitetura/`)*: especificação dos módulos internos da plataforma (cadastro, autenticação, matrículas, materiais, questões, simulados, inteligência pedagógica, loja, administração, relatórios, cronogramas) e contratos com o que permanece externo (site/checkout, pagamentos/financeiro, plataforma de cursos legada, notificações, telemetria), ledger da economia, telemetria com taxonomia de origem — e o desenho LGPD (base legal, minimização, retenção, direitos do titular) **antes** de qualquer dado real entrar.
 
 ## 10. Mapa dos documentos da auditoria
 

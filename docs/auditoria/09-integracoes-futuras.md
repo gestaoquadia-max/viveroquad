@@ -7,6 +7,19 @@
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+A Consolidação Arquitetural v1.0, determinada pelo gestor Danilo Moura em 01/08/2026, torna o Viver o Quad a **plataforma principal** do Quad Concursos: onze capacidades que este documento tratava como sistemas do ecossistema deixam de ser sistemas externos e passam a ser **módulos internos da própria plataforma** — cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios e cronogramas. Consequências para este documento:
+
+1. **A maioria dos 22 contratos deixa de ser integração com SISTEMA EXTERNO** e passa a ser **CONTRATO INTERNO** entre o front do app e módulos da própria plataforma. A **forma** de cada contrato interno — API interna, serviço, biblioteca — **fica para a fase de especificação**; as fichas continuam registrando apenas o contrato lógico, e as **entradas/saídas lógicas não mudaram**.
+2. O campo **"Sistema fornecedor"** de cada ficha (e a coluna correspondente da tabela-resumo) foi atualizado para o módulo interno correspondente, sempre marcado **[PLANEJADO]**. A mudança é **exclusivamente arquitetural**: nada foi implementado, e todo módulo interno citado é "Módulo Planejado".
+3. Permanecem **fornecedores EXTERNOS** apenas: **pagamentos/checkout do site** (dinheiro real), a **plataforma de cursos** (legado em avaliação) e o **canal de notificações push/e-mail**.
+4. A **dec. 21 foi revogada**: o cadastro passa a pertencer à arquitetura do app (Módulo de Cadastro). O fluxo novo **não foi implementado** — o protótipo mantém o portão "Cadastro no site do Quad" como demonstração até a especificação do módulo (afeta principalmente as Fichas 1, 2 e 3).
+5. As **regras econômicas** (loja, Quad Coins, Diamantes, gift cards) **seguem indefinidas** — as Fichas 14–17 registram a indefinição; nenhuma regra nova foi criada.
+6. Os campos **"Estado atual"**, os rótulos (inclusive "DEPENDE DE SISTEMA EXTERNO"), as evidências de código e o texto da seção "Como ler" foram **mantidos como registro da auditoria de 30/07/2026** sobre o monolito `src.html`. As referências "src.html l.N" valem para o monolito auditado; a correspondência com a divisão do fonte em 20 partes (commits de 01/08/2026) está em `src/README.md`.
+
+---
+
 ## Como ler este documento
 
 O app "Viver o Quad" **não será dono de tudo**: no ecossistema previsto ele conversa com o site principal e checkout do Quad, plataforma de cursos, cadastro geral de usuários/alunos, matrículas, financeiro/pagamentos, banco central de questões, painel administrativo, sistema pedagógico, autenticação/autorização, eventos, materiais, notificações e relatórios/inteligência de dados.
@@ -32,37 +45,37 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 
 ### Tabela-resumo
 
-| # | Necessidade | Sistema fornecedor principal | Estado atual |
+| # | Necessidade | Sistema fornecedor principal (Consolidação v1.0) | Estado atual |
 |---|---|---|---|
-| 1 | Autenticar aluno | Autenticação/autorização + cadastro geral | Simulação local (login aceita tudo) |
-| 2 | Validar matrícula | Matrículas + site/checkout | Simulação local (encenação na vinheta) |
-| 3 | Obter dados do aluno | Cadastro geral de usuários/alunos | Mock (`DB_ALUNO`) |
-| 4 | Obter turmas | Matrículas + painel administrativo | Simulação local (`TURMAS_LOJA`/`MATRICULAS`) |
-| 5 | Trocar contexto de turma | App real (front-end) + banco de preferências | Simulação local (não persiste) |
-| 6 | Consultar cronograma | Sistema pedagógico (hoje: planilha da coordenação) | Simulação local (snapshot `CRONO`) |
-| 7 | Obter questões | Banco central de questões | Simulação local (bancos demo com gabarito no cliente) |
-| 8 | Enviar respostas | Sistema pedagógico + banco de questões | Simulação local (correção no cliente) |
-| 9 | Calcular desempenho (Domínio/score) | Sistema pedagógico + gamificação (back-end) | Mock (percentuais por hash) + simulação local (score) |
-| 10 | Registrar eventos comportamentais | Relatórios/inteligência de dados | Mock (linha de telemetria decorativa) |
-| 11 | Operar quiz ao vivo | Back-end tempo real + banco de questões | Simulação local (polling randômico no mesmo navegador) |
-| 12 | Consultar ranking | Back-end de gamificação + relatórios | Mock (posições por fórmula/hash) |
-| 13 | Listar materiais | Sistema de materiais (storage/CDN) | Simulação local (dataURL em memória) |
-| 14 | Realizar compras | Site/checkout + financeiro | Simulação local (duas moedas em memória) |
-| 15 | Consultar pagamento (saldo/recarga) | Financeiro/pagamentos + checkout | Simulação local (`diamantes`, gift cards) |
-| 16 | Controlar estoque | Estoque/logística + painel administrativo | Simulação local (decremento em memória) |
-| 17 | Solicitar estorno | Financeiro/pagamentos (gateway) | Simulação local (janela de 7 dias em memória) |
-| 18 | Registrar presença | Portaria/recepção + eventos | Simulação local (booleano em `ACESSO_ST`/`SIM_INSC`) |
-| 19 | Liberar entrada | Portaria/recepção + financeiro (consumo) | Simulação local |
-| 20 | Enviar avisos | Notificações/mensageria | Simulação local (sem push; badge no "+") |
-| 21 | Administrar professores | Cadastro de colaboradores + autenticação | Simulação local (nome como chave; senha em texto claro) |
-| 22 | Administrar editais e questões | Banco central de questões + painel administrativo | Integração parcial na demo (árvores vivas) + telas apenas visuais |
+| 1 | Autenticar aluno | Módulos de Autenticação e Cadastro [PLANEJADOS] | Simulação local (login aceita tudo) |
+| 2 | Validar matrícula | Módulo de Matrículas [PLANEJADO] (+ pagamentos/checkout, externos) | Simulação local (encenação na vinheta) |
+| 3 | Obter dados do aluno | Módulo de Cadastro [PLANEJADO] | Mock (`DB_ALUNO`) |
+| 4 | Obter turmas | Módulos de Matrículas e Administração [PLANEJADOS] | Simulação local (`TURMAS_LOJA`/`MATRICULAS`) |
+| 5 | Trocar contexto de turma | App real (front-end) + Módulo de Cadastro [PLANEJADO] (preferência) | Simulação local (não persiste) |
+| 6 | Consultar cronograma | Módulo de Cronogramas [PLANEJADO] (hoje: planilha da coordenação) | Simulação local (snapshot `CRONO`) |
+| 7 | Obter questões | Módulo de Banco de Questões [PLANEJADO] | Simulação local (bancos demo com gabarito no cliente) |
+| 8 | Enviar respostas | Módulos de Inteligência Pedagógica e Banco de Questões [PLANEJADOS] | Simulação local (correção no cliente) |
+| 9 | Calcular desempenho (Domínio/score) | Módulo de Inteligência Pedagógica [PLANEJADO] + gamificação interna (módulo a definir) | Mock (percentuais por hash) + simulação local (score) |
+| 10 | Registrar eventos comportamentais | Módulo de Relatórios [PLANEJADO] (telemetria como serviço de dados: a decidir) | Mock (linha de telemetria decorativa) |
+| 11 | Operar quiz ao vivo | Módulos de Simulados e Banco de Questões [PLANEJADOS] | Simulação local (polling randômico no mesmo navegador) |
+| 12 | Consultar ranking | Módulo de Relatórios [PLANEJADO] + gamificação interna (módulo a definir) | Mock (posições por fórmula/hash) |
+| 13 | Listar materiais | Módulo de Produção de Materiais [PLANEJADO] (+ plataforma de cursos, externa) | Simulação local (dataURL em memória) |
+| 14 | Realizar compras | Módulo da Loja [PLANEJADO] (+ pagamentos/checkout, externos) | Simulação local (duas moedas em memória) |
+| 15 | Consultar pagamento (saldo/recarga) | Módulos da Loja e Administração [PLANEJADOS] (+ pagamentos/checkout, externos) | Simulação local (`diamantes`, gift cards) |
+| 16 | Controlar estoque | Módulos da Loja, Matrículas e Administração [PLANEJADOS] | Simulação local (decremento em memória) |
+| 17 | Solicitar estorno | Módulos da Loja e Administração [PLANEJADOS] (+ gateway de pagamento, externo) | Simulação local (janela de 7 dias em memória) |
+| 18 | Registrar presença | Módulos de Administração e Simulados [PLANEJADOS] | Simulação local (booleano em `ACESSO_ST`/`SIM_INSC`) |
+| 19 | Liberar entrada | Módulos de Administração e Loja [PLANEJADOS] | Simulação local |
+| 20 | Enviar avisos | Módulos de Administração e Matrículas [PLANEJADOS] (+ canal de notificações, externo) | Simulação local (sem push; badge no "+") |
+| 21 | Administrar professores | Módulos de Cadastro, Autenticação e Administração [PLANEJADOS] | Simulação local (nome como chave; senha em texto claro) |
+| 22 | Administrar editais e questões | Módulos de Banco de Questões e Administração [PLANEJADOS] | Integração parcial na demo (árvores vivas) + telas apenas visuais |
 
 ---
 
 ## Ficha 1 — Autenticar aluno
 
 - **Necessidade**: validar e-mail+senha do aluno, abrir sessão e recusar conta bloqueada; "Criar conta" redireciona ao site (a conta nasce no checkout, junto da matrícula — dec. 21).
-- **Sistema fornecedor**: autenticação/autorização + cadastro geral de usuários/alunos; criação de conta é do site/checkout.
+- **Sistema fornecedor**: Módulo de Autenticação do Viver o Quad [PLANEJADO] + Módulo de Cadastro do Viver o Quad [PLANEJADO]. A criação de conta passa a pertencer ao Módulo de Cadastro (dec. 21 revogada na Consolidação v1.0); o protótipo, porém, mantém o portão "Cadastro no site do Quad" como demonstração até a especificação do módulo.
 - **Entrada lógica**: e-mail, senha, identificação do dispositivo/app; no redirecionamento de cadastro, retorno ao app após concluir no site.
 - **Saída lógica**: sessão válida (com identidade do aluno e perfis/permissões) ou recusa tipada: credencial inválida, **conta bloqueada** ("procure a administração"), conta inexistente (encaminhar ao site).
 - **Frequência e momento**: a cada login; renovação silenciosa de sessão durante o uso; revogação empurrada quando o painel administrativo bloquear a conta (hoje o bloqueio derruba a sessão na hora — comportamento que o produto quer manter no real).
@@ -74,7 +87,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 2 — Validar matrícula
 
 - **Necessidade**: confirmar, no momento do acesso, que o aluno tem matrícula ativa; sem matrícula ativa o app trava (resta a Quad Store — dec. 62).
-- **Sistema fornecedor**: sistema de matrículas (alimentado pelo site/checkout) + financeiro (status de pagamento).
+- **Sistema fornecedor**: Módulo de Matrículas do Viver o Quad [PLANEJADO]; pagamentos/financeiro e o checkout do site permanecem fornecedores EXTERNOS (venda em dinheiro e status de pagamento).
 - **Entrada lógica**: identidade do aluno autenticado.
 - **Saída lógica**: lista de matrículas com situação (ativa/encerrada), turma, turno, concurso e data de término; vazio = app bloqueado.
 - **Frequência e momento**: no login (hoje encenado na vinheta "Verificando a matrícula de…"); reconferência ao retomar o app e quando um estorno/encerramento chegar do financeiro.
@@ -86,7 +99,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 3 — Obter dados do aluno
 
 - **Necessidade**: exibir e manter nome completo, telefone, nome de guerra, avatar escolhido e estado de carreira (patente, scores) — dados que o código diz virem "do banco de dados geral do site".
-- **Sistema fornecedor**: cadastro geral de usuários/alunos (identidade e contato) + back-end de gamificação (carreira — ver Ficha 9); correção de dados cadastrais é feita **no site**, não no app (texto do tutorial: "Corrigir no site").
+- **Sistema fornecedor**: Módulo de Cadastro do Viver o Quad [PLANEJADO] (identidade e contato) + gamificação interna da plataforma (carreira — ver Ficha 9; módulo responsável a definir na especificação). O texto do tutorial ("Corrigir no site") reflete o protótipo anterior à revogação da dec. 21 — o fluxo real de correção cadastral fica para a especificação do Módulo de Cadastro.
 - **Entrada lógica**: identidade do aluno; para escrita: nome de guerra validado (regras locais de subsequência do nome e filtro de palavrões podem continuar no front) e escolha de avatar.
 - **Saída lógica**: ficha do aluno (nome, telefone, nome de guerra, avatar, patente, scores, histórico de promoções).
 - **Frequência e momento**: leitura no login e ao abrir o perfil; escrita ao salvar o perfil (nome de guerra/avatar — escolha do avatar é única, no tutorial).
@@ -98,7 +111,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 4 — Obter turmas
 
 - **Necessidade**: listar o catálogo de turmas à venda (preços e vagas POR MOEDA, sala, turno, horário, concurso, período) e as turmas do aluno; aplicar a regra "uma turma por turno até o término".
-- **Sistema fornecedor**: matrículas + painel administrativo (criação/edição de turma) + site/checkout (venda).
+- **Sistema fornecedor**: Módulo de Matrículas do Viver o Quad [PLANEJADO] + Módulo de Administração do Viver o Quad [PLANEJADO] (criação/edição de turma); o site/checkout permanece fornecedor EXTERNO quando a venda for em dinheiro.
 - **Entrada lógica**: identidade do aluno (para marcar INDISPONÍVEL por turno ocupado e ESGOTADA por vaga zerada).
 - **Saída lógica**: catálogo com `precoDmn/precoQdc/vagasDmn/vagasQdc`, sala, turno, concurso, início/fim; matrículas do aluno com situação.
 - **Frequência e momento**: ao abrir a Quad Store e "Minhas turmas"; atualização quando o admin cria/edita/remove turma ou altera preços/vagas (hoje reflete na hora porque tudo é o mesmo arquivo).
@@ -110,7 +123,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 5 — Trocar contexto de turma (turma ativa)
 
 - **Necessidade**: com 2+ matrículas, eleger a "turma ativa" que comanda Início, Aula de hoje, avisos, ranking da sala, Domínio, quiz, Missões, calendário e materiais — trocável sem deslogar, com a escolha lembrada entre sessões.
-- **Sistema fornecedor**: majoritariamente o **próprio front-end real** (recomposição das telas); a **preferência** de turma ativa é estado do usuário e pertence ao banco de perfil/preferências.
+- **Sistema fornecedor**: majoritariamente o **próprio front-end real** (recomposição das telas); a **preferência** de turma ativa é estado do usuário e pertence ao perfil/preferências do Módulo de Cadastro do Viver o Quad [PLANEJADO].
 - **Entrada lógica**: id da turma escolhida.
 - **Saída lógica**: confirmação de gravação da preferência; o restante é recomposição local com dados das Fichas 4, 6, 7, 13 filtrados pela turma.
 - **Frequência e momento**: a cada troca manual (topo, Minhas turmas, faixa do Domínio, pop-up pós-matrícula); leitura da preferência no login.
@@ -122,7 +135,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 6 — Consultar cronograma
 
 - **Necessidade**: exibir a grade semanal da turma (dia × tempo × matéria × professor × sala), a "Aula de hoje" com estados AGORA/ENCERRADO e o calendário do professor — grade chaveada pelo **id da turma** (dec. 163).
-- **Sistema fornecedor**: sistema pedagógico/coordenação. O código declara a origem real de hoje: **planilha Google Sheets da coordenação** (comentário l. ~4740–4744, sincronização prevista para a V1) — portanto, enquanto a planilha for a fonte, é integração com sistema externo.
+- **Sistema fornecedor**: Módulo de Cronogramas do Viver o Quad [PLANEJADO]. O código declara a origem real de hoje: **planilha Google Sheets da coordenação** (comentário l. ~4740–4744, sincronização prevista para a V1) — enquanto a planilha for a fonte, ela permanece uma origem de dados externa transitória (tratamento a definir na especificação do módulo).
 - **Entrada lógica**: id da turma + semana de referência.
 - **Saída lógica**: grade da semana (slots, dias, datas, aulas com matéria/professor), sala; alterações pontuais (troca de aula) com histórico.
 - **Frequência e momento**: ao abrir Início/calendários; atualização quando a coordenação troca uma aula (hoje o admin edita e reflete na hora; no real, sincronização periódica ou push da fonte).
@@ -134,7 +147,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 7 — Obter questões
 
 - **Necessidade**: alimentar os motores de questões do app — flashcards do Treinamento Rápido, blocos de missões da noite, quiz da aula, simulado digital, prova de promoção e a missão de introdução — com questões classificadas por concurso/matéria/assunto do edital; inclui a extração de questões a partir de PDF enviado por professor/admin.
-- **Sistema fornecedor**: **banco central de questões** (+ serviço de extração de PDF, marcado `[INTEGRAÇÃO REAL]` em vários pontos).
+- **Sistema fornecedor**: Módulo de Banco de Questões do Viver o Quad [PLANEJADO] (+ extração de PDF, marcada `[INTEGRAÇÃO REAL]` em vários pontos — forma de implementação a definir na especificação).
 - **Entrada lógica**: contexto pedido (concurso/turma, matéria/assunto, tipo — múltipla escolha ou certo/errado —, quantidade, finalidade: flashcard/quiz/simulado/prova); para extração: o arquivo PDF.
 - **Saída lógica**: lote de questões com enunciado, alternativas e metadados; **o gabarito NÃO deve viajar com a questão** para nenhuma avaliação que valha pontos — hoje o gabarito está no objeto no cliente (`QUESTIONS[].right`, `QA_MULT`, `QA_CE`, `TR_BANK`, `AULA_DEMO`, `TQ`), o que permitiria fraude trivial (risco já registrado na auditoria de dados).
 - **Frequência e momento**: ao montar cada bloco/quiz/simulado/prova; a fila de missões nasce por turma no horário dela (hoje 22h15, `novosBlocosDia`).
@@ -146,7 +159,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 8 — Enviar respostas
 
 - **Necessidade**: registrar cada resposta do aluno (flashcards com autoavaliação Errei/Difícil/Bom/Fácil, blocos da noite, quiz da aula, simulado digital, prova de promoção) para corrigir, premiar, alimentar o Domínio, o relatório ao vivo do professor e o histórico.
-- **Sistema fornecedor**: sistema pedagógico + banco central de questões (histórico por aluno×questão) + back-end de gamificação (recompensas — Ficha 9).
+- **Sistema fornecedor**: Módulo de Inteligência Pedagógica do Viver o Quad [PLANEJADO] + Módulo de Banco de Questões do Viver o Quad [PLANEJADO] (histórico por aluno×questão) + gamificação interna da plataforma (recompensas — Ficha 9; módulo responsável a definir na especificação).
 - **Entrada lógica**: identidade do aluno, contexto (turma, bloco/quiz/simulado/prova), questão, resposta, autoavaliação quando houver, tempo de resposta.
 - **Saída lógica**: confirmação de registro; quando a correção é do servidor: resultado (acertos, aprovação da prova, recompensas creditadas); estado do bloco (feito/expirado — expiração em 7 dias vira "Atrasadas").
 - **Frequência e momento**: a cada resposta ou ao fechar o bloco (lote); prova de promoção ao concluir; simulado digital ao concluir ou zerar o cronômetro.
@@ -158,7 +171,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 9 — Calcular desempenho (Domínio, score, patente, recompensas)
 
 - **Necessidade**: manter os três scores (carreira/patente/temporada), o Domínio por sub-assunto do edital, a liberação e correção da prova de promoção (80% promove; reprovação bloqueia 24h) e o crédito de recompensas (score, Quad Coins) — com a regra de ouro do próprio código: *"a interface nunca decide sozinha quantos pontos foram conquistados"* (comentário l. ~3706).
-- **Sistema fornecedor**: back-end de gamificação + sistema pedagógico + relatórios/inteligência de dados; parametrização (14 patentes, 4 fases, metas) vem do painel administrativo.
+- **Sistema fornecedor**: gamificação interna da plataforma (módulo responsável a definir na especificação) + Módulo de Inteligência Pedagógica do Viver o Quad [PLANEJADO] + Módulo de Relatórios do Viver o Quad [PLANEJADO]; parametrização (14 patentes, 4 fases, metas) vem do Módulo de Administração do Viver o Quad [PLANEJADO].
 - **Entrada lógica**: eventos confirmados de atividade (Ficha 8: respostas, blocos completos, presenças da Ficha 19, participação em eventos).
 - **Saída lógica**: saldos e scores atualizados, percentuais de Domínio, estado da prova (disponível/bloqueada até data-hora), resultado de promoção com transferência de excedente, histórico de patentes.
 - **Frequência e momento**: recalculo a cada evento confirmado; leitura ao abrir Quadrômetro/Domínio; prova sob demanda.
@@ -170,7 +183,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 10 — Registrar eventos comportamentais (telemetria)
 
 - **Necessidade**: registrar origem da sessão (taxonomia ORGANIC/CLASS/PUSH/MENTOR/NOTICE/CAMPAIGN), tempo por questão, padrões de resposta, abandono e constância — a "linha de base comportamental" que o docs/01 define como pré-requisito da V0 e insumo do futuro IRA (Índice de Risco de Abandono); métrica-mãe do produto é o retorno espontâneo `OPEN_ORGANIC`.
-- **Sistema fornecedor**: relatórios/inteligência de dados (coletor de eventos/analytics).
+- **Sistema fornecedor**: Módulo de Relatórios do Viver o Quad [PLANEJADO] (coletor de eventos/analytics); a hipótese de telemetria como serviço de dados apartado segue em avaliação na Consolidação v1.0 (a decidir).
 - **Entrada lógica**: eventos com carimbo de tempo, tipo, contexto (tela, turma, atividade) e **identificador pseudonimizado** do aluno.
 - **Saída lógica**: em princípio nenhuma para o app (fire-and-forget); leituras agregadas voltam pelos relatórios (Ficha do ecossistema de BI, fora deste app).
 - **Frequência e momento**: contínua, desde o dia 1 ("eventos logados desde o dia 1" — docs/01).
@@ -182,7 +195,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 11 — Operar quiz ao vivo
 
 - **Necessidade**: o professor cria o quiz da turma a partir de um PDF (1–30 questões, 1–180 min, múltipla escolha ou certo/errado), ativa (trava), acompanha o placar e o relatório por questão em tempo real e encerra; o aluno responde com cronômetro, sem gabarito e sem premiação; um quiz por turma.
-- **Sistema fornecedor**: back-end de tempo real (sala ao vivo) + banco central de questões/extração de PDF (Ficha 7).
+- **Sistema fornecedor**: Módulo de Simulados do Viver o Quad [PLANEJADO] (operação ao vivo — a infraestrutura de tempo real fica para a fase de especificação) + Módulo de Banco de Questões do Viver o Quad [PLANEJADO]/extração de PDF (Ficha 7).
 - **Entrada lógica**: do professor: turma, tipo, nº de questões, duração, PDF, comandos criar/refazer/descartar/ativar/encerrar; do aluno: respostas com tempo (Ficha 8).
 - **Saída lógica**: para o aluno: estado do quiz da sua turma (criado/ativo/encerrado) e as questões; para o professor: contagem de respondentes sobre a lotação real da turma e distribuição por alternativa por questão, **começando em branco** ("nada de % inventado na aula").
 - **Frequência e momento**: durante a aula; estado do quiz precisa chegar ao aluno em segundos (hoje é instantâneo porque tudo é o mesmo navegador).
@@ -194,7 +207,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 12 — Consultar ranking
 
 - **Necessidade**: exibir ranking da sala (turma ativa) e geral, com privacidade de mão dupla (perfil privado mascara o nome e deixa de ver os demais; top 10 sempre visível) e pontos sempre à vista.
-- **Sistema fornecedor**: back-end de gamificação + relatórios; a preferência público/privado pertence ao banco de preferências do usuário.
+- **Sistema fornecedor**: gamificação interna da plataforma (módulo responsável a definir na especificação) + Módulo de Relatórios do Viver o Quad [PLANEJADO]; a preferência público/privado pertence ao perfil/preferências do Módulo de Cadastro do Viver o Quad [PLANEJADO].
 - **Entrada lógica**: identidade do aluno, escopo (sala/geral), preferência de privacidade (escrita quando o aluno alterna o interruptor).
 - **Saída lógica**: lista posicionada (nome de guerra ou máscara conforme regra), posição e total; confirmação da gravação da preferência.
 - **Frequência e momento**: ao abrir o ranking; recomputo periódico no servidor (não a cada clique).
@@ -206,7 +219,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 13 — Listar materiais
 
 - **Necessidade**: entregar ao aluno os materiais publicados por turma → matéria (da árvore do edital) → assunto → tipo (slides/resumo/lista/mapa/vídeo), com download real e etiqueta de turma; matrícula nova traz o material, estorno o leva; o admin publica, edita e tira do ar.
-- **Sistema fornecedor**: sistema de materiais (armazenamento/CDN de arquivos) + plataforma de cursos; publicação via painel administrativo.
+- **Sistema fornecedor**: Módulo de Produção de Materiais do Viver o Quad [PLANEJADO] (armazenamento/entrega de arquivos — forma a definir na especificação); a plataforma de cursos permanece fornecedora EXTERNA (legado em avaliação); publicação via Módulo de Administração do Viver o Quad [PLANEJADO].
 - **Entrada lógica**: leitura: identidade do aluno (matrículas ativas filtram); publicação: turma, matéria, assunto, tipo, título, arquivo ou link de vídeo.
 - **Saída lógica**: lista de materiais com metadados e URL segura de download/streaming; confirmações de publicação/remoção.
 - **Frequência e momento**: ao abrir a área de materiais; notificação de material novo é desejável (Ficha 20).
@@ -218,7 +231,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 14 — Realizar compras
 
 - **Necessidade**: vender no app com as duas moedas (Quad Coin conquistada; Diamante comprada em dinheiro) — turmas (com vagas por moeda), isoladas, eventos pagos, simulados, produtos físicos com estoque, cursos/mentorias, skins (cadeia + farda de escolha única) e itens de combate (recompra livre) — sempre com confirmação, registrando a compra para relatório e estorno.
-- **Sistema fornecedor**: back-end da loja/inventário + financeiro (ledger das moedas) + site/checkout (quando a venda é em dinheiro real — hoje só a recarga de Diamantes); catálogo governado pelo painel administrativo.
+- **Sistema fornecedor**: Módulo da Loja do Viver o Quad [PLANEJADO] (loja/inventário e saldos das moedas internas — as regras econômicas seguem indefinidas); pagamentos/financeiro e o site/checkout permanecem fornecedores EXTERNOS quando a venda é em dinheiro real (hoje só a recarga de Diamantes); catálogo governado pelo Módulo de Administração do Viver o Quad [PLANEJADO].
 - **Entrada lógica**: identidade do aluno, item, quantidade, **moeda escolhida** (pop-up "Creditar em" quando há duas), confirmação.
 - **Saída lógica**: resultado atômico: débito do saldo, baixa de vaga/estoque **na moeda usada**, posse/matrícula/inscrição criada, registro de compra (com carimbo para a janela de estorno); recusas tipadas: saldo insuficiente ("recarregue no site ou resgate um gift card"), ESGOTADA/LOTADO, turno ocupado, choque de agenda (aviso sem impedir, exceto matrícula, que é barrada).
 - **Frequência e momento**: sob demanda; vagas por moeda e estoque exigem **reserva atômica no servidor** (concorrência real não pode viver no cliente).
@@ -230,7 +243,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 15 — Consultar pagamento (saldos, recarga e gift card)
 
 - **Necessidade**: exibir os saldos de Quad Coins e Diamantes; receber crédito de Diamantes vindo de **recarga no checkout do site** ou de **gift card de liberação única** (lotes com QR criados no painel); receber créditos manuais da administração (com motivo e trilha).
-- **Sistema fornecedor**: financeiro/pagamentos (ledger central das duas moedas) + site/checkout (recarga em dinheiro) + painel administrativo (lotes de gift card e créditos manuais) + sistema externo de geração/leitura de QR.
+- **Sistema fornecedor**: Módulo da Loja do Viver o Quad [PLANEJADO] (saldos das duas moedas — as regras econômicas seguem indefinidas) + Módulo de Administração do Viver o Quad [PLANEJADO] (lotes de gift card e créditos manuais); pagamentos/financeiro e o checkout do site permanecem fornecedores EXTERNOS (recarga em dinheiro real); geração/leitura de QR: forma a definir na especificação.
 - **Entrada lógica**: consulta de saldo (identidade do aluno); resgate de gift card (código digitado ou lido por câmera); confirmação de recarga vinda do checkout (fluxo site → financeiro → app).
 - **Saída lógica**: saldos atualizados; resultado do resgate (creditado na moeda do lote / recusado por já usado — liberação única validada centralmente); extrato de créditos com motivo.
 - **Frequência e momento**: saldo ao abrir o app e após cada transação; resgate sob demanda; recarga chega por confirmação assíncrona do checkout.
@@ -242,7 +255,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 16 — Controlar estoque
 
 - **Necessidade**: produtos físicos com estoque decrescente (compra de N unidades baixa N; item sai da vitrine ao zerar; estorno devolve), vagas por moeda em turmas e simulados presenciais limitadas pela lotação física das salas (155/85/125/185), e pedidos de retirada na recepção.
-- **Sistema fornecedor**: estoque/logística (produtos físicos) + matrículas/eventos (vagas) + painel administrativo (cadastro de salas e ajuste de vagas — "a sala cresce se a administração abrir mais vagas").
+- **Sistema fornecedor**: Módulo da Loja do Viver o Quad [PLANEJADO] (estoque de produtos físicos) + Módulo de Matrículas do Viver o Quad [PLANEJADO] e Módulo de Simulados do Viver o Quad [PLANEJADO] (vagas de turmas, eventos e simulados presenciais — alocação fina por módulo a definir na especificação) + Módulo de Administração do Viver o Quad [PLANEJADO] (cadastro de salas e ajuste de vagas — "a sala cresce se a administração abrir mais vagas").
 - **Entrada lógica**: reserva/baixa vinda da compra (Ficha 14), devolução vinda do estorno (Ficha 17), ajustes administrativos de estoque/vagas/preços.
 - **Saída lógica**: disponibilidade atual por item e por moeda; recusa quando zerado; confirmação de ajuste.
 - **Frequência e momento**: leitura ao renderizar vitrines; baixa/devolução transacional junto da compra/estorno.
@@ -254,7 +267,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 17 — Solicitar estorno
 
 - **Necessidade**: permitir estorno de qualquer compra em até 7 dias corridos (contagem regressiva visível, confirmação em dois toques), devolvendo a moeda e **desfazendo a posse por tipo** (matrícula devolve vaga e turno; produto volta ao estoque; evento sai do calendário; item de combate sai da mochila; skin regride a cadeia; simulado sai da recepção); compra **consumida** (entrada liberada/entrega confirmada) sai da janela; o admin acompanha estornos e ranking de itens estornados.
-- **Sistema fornecedor**: financeiro/pagamentos (quando envolver dinheiro real: gateway externo) + back-end da loja/inventário + painel administrativo.
+- **Sistema fornecedor**: Módulo da Loja do Viver o Quad [PLANEJADO] (loja/inventário) + Módulo de Administração do Viver o Quad [PLANEJADO]; pagamentos/financeiro permanece fornecedor EXTERNO quando envolver dinheiro real (gateway).
 - **Entrada lógica**: identidade do aluno, compra referenciada, confirmação dupla.
 - **Saída lógica**: resultado transacional (moeda devolvida + posse desfeita + registro em estornos) ou recusa tipada (prazo encerrado, compra consumida).
 - **Frequência e momento**: sob demanda dentro da janela; o carimbo de consumo (Ficha 19) precisa chegar ao financeiro em tempo real para fechar a janela ("participar do aulão e estornar depois lesaria a empresa" — dec. 178).
@@ -266,7 +279,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 18 — Registrar presença
 
 - **Necessidade**: registrar que o aluno compareceu — inscrição em evento presencial o coloca na lista da portaria; presença em simulado presencial pontua score; presença em aula (chamada do professor) é insumo dos relatórios; listas de conferência impressas para atividades.
-- **Sistema fornecedor**: portaria/recepção (controle de acesso físico) + eventos/simulados + sistema pedagógico (chamada); no faseamento do relatório rev. 2.3, geofencing aparece como recurso de V1 (HIPÓTESE de escopo — nada no código).
+- **Sistema fornecedor**: Módulo de Administração do Viver o Quad [PLANEJADO] (operação de portaria/recepção — o controle de acesso físico em si segue operação presencial) + Módulo de Simulados do Viver o Quad [PLANEJADO] (eventos/simulados) + Módulo de Inteligência Pedagógica do Viver o Quad [PLANEJADO] (chamada); no faseamento do relatório rev. 2.3, geofencing aparece como recurso de V1 (HIPÓTESE de escopo — nada no código).
 - **Entrada lógica**: identidade do aluno + atividade (evento/simulado/aula) + meio de verificação (hoje: clique do atendente; no real: QR/credencial/chamada).
 - **Saída lógica**: presença registrada com carimbo; efeitos: score creditado (Ficha 9), compra consumida (Ficha 17), histórico do aluno atualizado.
 - **Frequência e momento**: na chegada do aluno à atividade; chamada durante a aula ("[INTEGRAÇÃO REAL] presença confirmada por chamada" — texto da própria UI do professor).
@@ -278,7 +291,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 19 — Liberar entrada
 
 - **Necessidade**: na portaria, o atendente vê os grupos por evento presencial vigente e por simulado, localiza o inscrito e "Libera entrada" — o ato confirma presença, pontua score (e QdC quando a atividade premia), move o simulado ao histórico do aluno e **consome a compra** (fecha a janela de estorno na hora); a entrega de produto físico na recepção segue o mesmo padrão de consumo.
-- **Sistema fornecedor**: portaria/recepção (operação) sobre eventos/simulados + financeiro (consumo) + gamificação (pontuação).
+- **Sistema fornecedor**: Módulo de Administração do Viver o Quad [PLANEJADO] (operação de portaria/recepção) sobre eventos/simulados (Módulo de Simulados [PLANEJADO]) + Módulo da Loja do Viver o Quad [PLANEJADO] (consumo da compra) + gamificação interna da plataforma (pontuação — módulo responsável a definir na especificação); quando a compra envolver dinheiro real, o carimbo de consumo interessa também ao financeiro EXTERNO (janela de estorno).
 - **Entrada lógica**: operador autenticado + inscrito/pedido referenciado + ação (liberar entrada / confirmar entrega).
 - **Saída lógica**: transação única: liberado/entregue + presença + pontuação + consumo; recusa se já liberado.
 - **Frequência e momento**: em tempo real na chegada do aluno; a lista da portaria precisa refletir compras e cancelamentos imediatamente (hoje reflete porque é o mesmo arquivo).
@@ -290,7 +303,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 20 — Enviar avisos
 
 - **Necessidade**: (a) avisos de mural com turma-alvo por id ("todas" ou uma turma — o aluno vê os da turma ativa + gerais); (b) mensagens da administração por público (aluno individual, professor, inscritos de turma/isolada/simulado/evento, todos) com cálculo de alcance, entrega no chat "+" do aluno com prefixo `[Público]`, recados ao professor na área dele, e status ENVIADA→LIDA sincronizado; (c) push real de notificação — hoje inexistente ("o app nunca empurra na V0").
-- **Sistema fornecedor**: notificações/mensageria + banco de inscrições (para resolver públicos e alcance); emissão pelo painel administrativo.
+- **Sistema fornecedor**: mensageria interna do app (mural e mensagens no chat — contrato interno; módulo responsável a definir na especificação) + Módulo de Matrículas do Viver o Quad [PLANEJADO] (inscrições, para resolver públicos e alcance); emissão pelo Módulo de Administração do Viver o Quad [PLANEJADO]; o canal de notificações push/e-mail permanece fornecedor EXTERNO.
 - **Entrada lógica**: emissor autorizado, tipo de alvo, alvo (id), texto; edição/remoção de aviso.
 - **Saída lógica**: publicação confirmada com alcance real ("alcança N alunos"); para o destinatário: aviso/mensagem com carimbo; recibo de leitura de volta ao emissor.
 - **Frequência e momento**: sob demanda do emissor; leitura marcada quando o destinatário abre o chat; push (quando existir, V1) na hora do envio.
@@ -302,7 +315,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 21 — Administrar professores
 
 - **Necessidade**: manter o banco do corpo docente (nome, até 3 matérias, turnos, graduação, telefone, foto, senha), com login do professor (hoje e-mail derivado do sobrenome + senha), escalação por matéria nas turmas ("só quem ministra a matéria; vaga sem candidato fica aberta"), rename propagado, desligar/bloquear/apagar **derrubando a sessão na hora**, e relatório de horas derivado da grade.
-- **Sistema fornecedor**: cadastro geral de colaboradores (RH/coordenação) + autenticação/autorização corporativa + painel administrativo; relatórios/BI para as horas.
+- **Sistema fornecedor**: Módulo de Cadastro do Viver o Quad [PLANEJADO] (colaboradores/corpo docente) + Módulo de Autenticação do Viver o Quad [PLANEJADO] + Módulo de Administração do Viver o Quad [PLANEJADO]; Módulo de Relatórios do Viver o Quad [PLANEJADO] para as horas.
 - **Entrada lógica**: operações CRUD do painel (com validações: homônimo, ≥1 matéria, ≥1 turno); credenciais do professor no login; troca de senha e foto pelo próprio professor.
 - **Saída lógica**: cadastro consistente propagado a turmas, isoladas, eventos, cronograma e recados; sessões revogadas quando bloqueado/desligado/apagado; recusas de login tipadas (desligado, bloqueado, senha errada).
 - **Frequência e momento**: CRUD sob demanda; revogação de sessão em tempo real; relatório de horas por período (mês/tri/semestre/ano).
@@ -314,7 +327,7 @@ Fatos que valem para TODAS as fichas (CONFIRMADO NO CÓDIGO):
 ## Ficha 22 — Administrar editais e questões
 
 - **Necessidade**: lançar concurso/edital com sua árvore (matéria → assunto → sub-assunto) a partir do documento oficial (upload/leitura de PDF), editar situação (aberto/proposta/reta-final), reconciliar edital novo com antigo (o que SAIU/ENTROU, recálculo de percentuais), definir qual árvore comanda o Domínio, e manter o banco central de questões (cadastro, tags, uso) que alimenta todas as Fichas 7/8/11.
-- **Sistema fornecedor**: banco central de questões + serviço de leitura/parse de edital (PDF) + painel administrativo; a árvore alimenta o sistema pedagógico (Domínio, materiais, cronograma, criação de turmas).
+- **Sistema fornecedor**: Módulo de Banco de Questões do Viver o Quad [PLANEJADO] + leitura/parse de edital em PDF (forma a definir na especificação) + Módulo de Administração do Viver o Quad [PLANEJADO]; a árvore alimenta o Módulo de Inteligência Pedagógica do Viver o Quad [PLANEJADO] (Domínio, materiais, cronograma, criação de turmas).
 - **Entrada lógica**: PDF do edital ou edição manual da árvore; metadados do concurso; operações de questão (enunciado, alternativas, gabarito, tags, vínculo com a árvore).
 - **Saída lógica**: árvore versionada publicada para o app (Domínio, seletor de matérias das turmas e materiais); relatório de reconciliação; questões disponíveis por contexto.
 - **Frequência e momento**: no lançamento/retificação de edital (evento raro e crítico); curadoria de questões contínua.

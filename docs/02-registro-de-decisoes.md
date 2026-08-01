@@ -5,12 +5,19 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 
 | # | Data | Decisão | Observações |
 |---|---|---|---|
+| 182 | 01/08 | **Viver o Quad = plataforma principal do Quad Concursos**: 11 capacidades deixam de ser sistemas externos e viram módulos internos (cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios, cronogramas); site/checkout, pagamentos, plataforma de cursos e notificações seguem externos (integrações a definir) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 183 | 01/08 | **Dec. 21 REVOGADA**: o cadastro passa a pertencer à arquitetura do app; o fluxo novo NÃO foi implementado — o protótipo mantém a demonstração "cadastro no site" até a especificação do módulo | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 184 | 01/08 | **Módulo sem especificação suficiente = "Módulo Planejado"** (objetivo, responsabilidade, dependências, observações; sem implementação parcial) | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 185 | 01/08 | **Regras econômicas permanecem INDEFINIDAS** (não estudadas); estrutura da loja preservada; nenhuma regra nova criada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 186 | 01/08 | **Riscos de segurança da auditoria (30/07) registrados como pendências** para a fase de desenvolvimento; nenhuma solução implementada | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 187 | 01/08 | **Fonte dividido em `src/`** (20 partes contíguas; saída byte-idêntica verificada); `build.py`/`build.ps1` portáteis com validação de tokens (ausentes e sobras); regra de trabalho: editar as partes de `src/` | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
+| 188 | 01/08 | **Código morto removido com regressão completa verde (56 suítes)**: `hojeISO` duplicada, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`; `LINKS_ONLINE` preservado como ponto de integração planejado; bug do reset (`vq_intro_done`) segue aberto por exigir decisão | Consolidação Arquitetural v1.0 (documento oficial do gestor) |
 | 1 | 13/07 | Protótipo como HTML único (Artefato claude.ai + arquivo local) | 3 perfis: aluno, professor, admin |
 | 2 | 14/07 | **Padrão visual**: azul e branco da marca em todos os projetos Quad | Correção após tentativa de tema escuro/dourado |
 | 3 | 14/07 | **Danilo** é o mascote-guia (robô azul, folha de personagem própria) | Nome homenageia o Fundador; vídeo 3D em loop |
 | 4 | 14/07 | Logo oficial (Q em três azuis) em login, vinheta e cabeçalho | Arquivo da marca, sem redesenho |
 | 5 | 14/07 | Fluxo de entrada: login → vinheta → portão (Já sou aluno / Primeira vez) | Vinheta: "Comece seu sonho por aqui..." + barra de carregamento |
-| 6 | 14/07 | Cadastro do 1º acesso com **preenchimento automático** da plataforma-base | Tela seguinte abre carregando; dados chegam campo a campo |
+| 6 | 14/07 | Cadastro do 1º acesso com **preenchimento automático** da plataforma-base | Tela seguinte abre carregando; dados chegam campo a campo · **REVOGADA/SUPERADA pela Consolidação v1.0 (dec. 182)** |
 | 7 | 14/07 | **Tour obrigatório do Danilo** no 1º acesso (9 passos, Anterior/Próximo) | Plataforma só libera após concluir |
 | 8 | 14/07 | Aba de métricas = **Quadrômetro** (nunca "Perfil") | "Perfil do aluno" é a tela de conta (nome de guerra, avatar, senha) |
 | 9 | 14/07 | Avatares = coleção oficial da PM (12 opções); nome de guerra estampado na farda | Sprite recortado do arquivo do gestor |
@@ -25,8 +32,8 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 18 | 19/07 | Na identificação militar, a partícula fixa segue **"QUAD"** (o roteiro citava "QD" como alternativa a padronizar) | Mantida a decisão anterior do nome de guerra composto; mudar para "QD" exige só ajustar `GAMI`/`nomeCurto` |
 | 19 | 20/07 | **Cadeia de skins**: Gandola → Capa de colete → Fuzil → fardas finais (CIPE 500 · PATAMO 750 · BOPE 1300); **farda é escolha única** — comprou uma, as demais ficam indisponíveis; cada compra troca a foto do personagem | Artes chegarão em PDF do gestor; até lá, placeholder visual (anel da foto + chip). Elos: 60/120/200 |
 | 20 | 20/07 | **Área do administrador (N.P.P.)** com acesso por chave da direção; módulos: Avisos gerais (card do aluno renomeado), cronograma por turma, eventos/regras, liberações (retirada de produtos, simulados presenciais via QdC com liberação de entrada, simulados digitais), visão de alunos/dificuldades e governança da Loja | Tudo conectado ao app do aluno em tempo real; chave demo NPP-2026 · `[INTEGRAÇÃO REAL]` marcado nos pontos de sistema |
-| 21 | 20/07 | **Cadastro no site (checkout), não no app**: o app só faz login (e-mail+senha) + "Criar conta" → site; a matrícula ativa libera o acesso | Removidos código por e-mail, ativação, cadastro interno e autorização de dispositivo |
-| 22 | 20/07 | **Dados do aluno vêm do banco geral**: o tutorial confirma nome/turma ("Vi que você é…") em vez de pedir; só o nome de guerra é digitado; foto mostra "AL SD QUAD ______" até a escolha | Nome+telefone pré-preenchidos |
+| 21 | 20/07 | **Cadastro no site (checkout), não no app**: o app só faz login (e-mail+senha) + "Criar conta" → site; a matrícula ativa libera o acesso | Removidos código por e-mail, ativação, cadastro interno e autorização de dispositivo · **REVOGADA/SUPERADA pela Consolidação v1.0 (dec. 183)** |
+| 22 | 20/07 | **Dados do aluno vêm do banco geral**: o tutorial confirma nome/turma ("Vi que você é…") em vez de pedir; só o nome de guerra é digitado; foto mostra "AL SD QUAD ______" até a escolha | Nome+telefone pré-preenchidos · **REVOGADA/SUPERADA pela Consolidação v1.0 (dec. 182)** |
 | 23 | 20/07 | **Prova de promoção automática (sem fiscal)**: 20 questões que o aluno já classificou como difíceis (Errei/Difícil), sem revelar; 80% promove, senão nova tentativa em 24h | Substitui a prova supervisionada por humano |
 | 24 | 20/07 | **Escolha de personagem sai do Perfil** (o personagem é definitivo, escolhido no onboard) e entra a **mochila de combate**: ícone abre uma Storage de itens comprados na Loja que não são skin/farda (armas, broches etc.) | Base para os futuros eventos de quest (reunir itens → item novo); itens iniciais: faca 40, lanterna 35, bússola 30, broche 25, cantil 20, corda 45 |
 | 25 | 20/07 | **Chips "Itens do personagem" removidos** (redundantes com a foto + mochila): boina e skins **quem possui, veste** — sem equipar/desequipar manual | A foto já mostra o que está vestido; o resto vai para a mochila |
@@ -85,7 +92,7 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 | 80 | 25/07 | **Relatórios e Liberações lendo dados vivos**: seletor de turmas e banco de inscritos por atividade incluem turmas/eventos criados; sem inscritos mostra "sem inscritos" | Fecha a mesma causa raiz da decisão 78 |
 | 81 | 25/07 | **Editor de preços e vagas das turmas** (Dmn, QdC e vagas por moeda) na aba Loja — corrige valor sem apagar/recriar a turma | Antes só dava para mudar preço recriando a turma, derrubando matrículas |
 | 82 | 25/07 | **"Minhas turmas · matrículas ativas"** no Perfil do aluno, com selo PRINCIPAL/ATIVA; ranking da sala com total real da turma | A 2ª matrícula debitava e não aparecia em lugar nenhum |
-| 83 | 25/07 | **Relatório do professor começa em branco** até a primeira resposta; **e-mail institucional por docente** validado no login; **sem escalação de professor em matéria que ele não ministra** | Evita leitura errada em aula e vínculo pessoa×acesso frouxo |
+| 83 | 25/07 | **Relatório do professor começa em branco** até a primeira resposta; **e-mail institucional por docente** validado no login; **sem escalação de professor em matéria que ele não ministra** | Evita leitura errada em aula e vínculo pessoa×acesso frouxo · **SUPERADA pela dec. 85** |
 | 87 | 25/07 | **Professores no evento**: chips múltiplos vindos do Banco de professores no cadastro de evento; o nome aparece para o aluno (carrossel, página do evento, Loja) e no painel da coordenação | Base para a agenda e o calendário do professor |
 | 88 | 25/07 | **Menu do professor com 5 áreas**: Painel de controle (foto, cadastro, turmas, troca de senha individual), Eventos (aula de hoje por turno + eventos com o nome dele), Quiz ao vivo, Calendário e Recepção (chat montado, EM BREVE na V1) | Substitui a aba única "Sala ao vivo" |
 | 90 | 25/07 | **Apagar professor** do banco (✕ com confirmação em dois toques): remove do banco, das turmas, dos eventos e derruba a sessão dele | Desligar/bloquear preservam o cadastro; apagar é definitivo |
@@ -197,8 +204,15 @@ Complementa o "Registro de Decisões Travadas" da rev. 2.3.
 
 ## Regras de trabalho vigentes
 
-- Editar sempre `src.html`; `index.html` é saída de build
-- **Republicar o Artefato a cada alteração** — regra inegociável
+- Editar sempre as partes em `/home/user/viveroquad/src/` (não existe mais
+  `src.html`; ver `src/README.md` para a tabela das 20 partes); `index.html`
+  é saída de build
+- Build via `python3 build.py` (ou `build.ps1` no Windows) — valida as 20
+  partes e os tokens (ausentes e sobras)
+- **Republicar o Artefato a cada alteração** — regra inegociável; URL vigente:
+  <https://claude.ai/code/artifact/945e81a8-9ca3-4d55-9169-c4fc9f6f3703>
+- `docs/arquitetura/00-arquitetura-oficial.md` é a referência arquitetural
+  única
 - Padrão visual azul/branco da marca; nunca criar temas próprios
 - Textos inseridos pelo gestor geram perguntas de esclarecimento; toda entrega
   abre com resumo do entendimento

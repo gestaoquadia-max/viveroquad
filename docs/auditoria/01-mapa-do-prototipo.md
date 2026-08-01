@@ -9,6 +9,47 @@ Este é o mapa de orientação do repositório `/home/user/viveroquad` para quem
 
 ---
 
+## Atualização — Consolidação Arquitetural v1.0 (01/08/2026)
+
+*Seção acrescentada em 01/08/2026. O restante deste documento é o retrato verificado de 30/07/2026; o §2 (fluxo de build) foi corrigido para o estado vigente.*
+
+A Consolidação Arquitetural v1.0 (`docs/arquitetura/00-arquitetura-oficial.md`) reorganizou o fonte **sem alterar o comportamento funcional nem a experiência do usuário** do protótipo: a divisão do arquivo tem saída de build byte-idêntica, e a limpeza de código morto passou com regressão completa (56 suítes).
+
+**1. `src.html` foi dividido em 20 partes contíguas em `src/`** (`NN-descricao.html`): a concatenação na ordem do prefixo numérico reproduz o monolito. Nenhuma parte é HTML/CSS/JS válido sozinha; a ordem é imutável; as regras de ouro e a tabela completa estão em `src/README.md`. Resumo das partes:
+
+| Parte | Conteúdo |
+|---|---|
+| 01-css-base | Título, `__FONTS__`, temas claro/escuro, moldura `.phone`, login, portões, tutorial |
+| 02-css-gamificado | CSS do redesign gamificado: herói, admin, Loja, insígnias, rankings, media queries |
+| 03-html-aluno | Masthead, barra de personas e as 9 views do aluno |
+| 04-html-professor | As 5 views do professor |
+| 05-html-admin | As 8 views do administrador N.P.P. |
+| 06-html-overlays | Overlays (prova, quizzes, compra, chat, portões, tutorial), artes vetoriais, 3 navbars |
+| 07-js-estado-dados | Abertura do `<script>`/IIFE, estado global, moedas, docentes, turmas, matrículas, concursos |
+| 08-js-eventos-cal-quiz | Eventos + página do evento, calendário do aluno, motor de quiz, aula de hoje |
+| 09-js-professor | Gate/login do professor, painel, relatórios, quiz ao vivo com polling |
+| 10-js-acesso-tutorial | Conectividade, acesso ao portal, tutorial do QUAD |
+| 11-js-missoes-treinamento | Treinamento rápido, blocos do dia por turma, simulados do aluno, avatares |
+| 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais |
+| 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo |
+| 14-js-loja-economia | Loja: moedas, compras, catálogos, salas/lotações, overlay de compra, skins |
+| 15-js-mochila-skins | Mochila de combate e cadeia de skins do personagem |
+| 16-js-admin-controle | Gate N.P.P., contas/créditos, mensagens por público, gift cards, cronograma, materiais |
+| 17-js-admin-liberacoes | Eventos do admin, pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
+| 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |
+| 19-js-compras-estornos | Relatório de compras e estornos de 7 dias (lado do aluno) |
+| 20-js-relatorios-boot | Relatórios com gráficos, cascata de inicialização, fechamento do IIFE |
+
+**2. `build.py` agora é portátil e validado**: caminho relativo ao script (o caminho absoluto fixo foi eliminado), concatenação das 20 partes de `src/` com validação da contagem (aborta se não achar exatamente 20), validação de **token ausente** e de **sobra de token não substituído**. `build.ps1` espelha as mesmas validações. Isso resolve o ponto crítico nº 1 do §8 e a DECISÃO TÉCNICA PENDENTE do §2.3.
+
+**3. Arquivos removidos do repositório**: `Viver o Quad.rar` (9 MB) e `quad-coin.png` (904 KB, órfão de build) — resolve o ponto crítico nº 3 do §8.
+
+**4. Código morto removido do fonte** (~40 linhas; regressão completa com 56 suítes — atende parcialmente o ponto crítico nº 10 do §8): a `hojeISO` duplicada/sombreada; o fluxo revogado de autorização de dispositivo (vars `currentEmail`, `scenario`, `pendingRunTour`, `CODE_OK`, `deviceAuthorized`, `pendingAnswers`, o objeto `LS {auth,sync,pend}` e as chaves `vq_device_authorized`/`vq_last_sync`/`vq_pending`); as chaves de tutorial nunca lidas (`vq_tut_step`/`vq_tut_done`/`vq_tut_rew`); as funções nunca chamadas (`openQuiz`, `fmtSync`, `tutDadosOk`); e 8 comentários enganosos atualizados. **As chaves de localStorage vivas agora são só `vq_tut_skip` e `vq_intro_done`** — a tabela do §6.3 abaixo retrata as 8 chaves de 30/07. `LINKS_ONLINE` foi **preservado** como ponto de integração planejado. O bug do reset (não limpa `vq_intro_done`) **não** foi corrigido — corrigi-lo mudaria comportamento — e segue documentado.
+
+> **Nota global:** as referências "src.html l.N" deste e dos demais docs da auditoria valem para o monolito de 30/07; a concatenação das partes na ordem o reproduz (menos ~40 linhas de código morto removidas em 01/08).
+
+---
+
 ## 1. Estrutura de arquivos do repositório
 
 O repositório é um protótipo de **arquivo único**: um `src.html` editável + mídias soltas + dois scripts de build que embutem as mídias como data-URIs base64 e geram os arquivos finais (`artifact.html` e `index.html`, não versionados). Inventário verificado por `ls`, `git ls-files` (106 arquivos rastreados) e `.gitignore` (CONFIRMADO NO CÓDIGO).
@@ -59,15 +100,18 @@ O repositório é um protótipo de **arquivo único**: um `src.html` editável +
 
 ## 2. Fluxo de build
 
+*(Corrigido em 01/08/2026 — Consolidação v1.0. Até 30/07 o fonte era o monolito `src.html` e o build.py tinha caminho absoluto fixo; ver a Atualização no topo.)*
+
 ```
-src.html  (fonte com 10 tokens __*__)
-   +
+src/01-*.html … src/20-*.html  (20 partes contíguas; concatenadas na ordem
+   +                            do prefixo = fonte com 10 tokens __*__)
 9 mídias + fonts.css + fotos/ (84 webp)
    │
-   ├── build.py   (Python 3 — Linux/qualquer SO, MAS caminho absoluto fixo)
-   └── build.ps1  (PowerShell — Windows, caminho relativo ao script)
+   ├── build.py   (Python 3 — portátil: caminho relativo ao script;
+   │               valida 20 partes, token ausente E sobra de token)
+   └── build.ps1  (PowerShell — Windows; espelha as mesmas validações)
    │
-   ▼  substituição de token → data-URI base64
+   ▼  concatenação → substituição de token → data-URI base64
 artifact.html  (~9,4 MB, sem esqueleto <html> — o Artifact embrulha ao publicar)
 index.html     (~9,4 MB, com esqueleto parcial — abre com clique duplo, offline)
 ```
@@ -89,6 +133,8 @@ index.html     (~9,4 MB, com esqueleto parcial — abre com clique duplo, offlin
 
 ### 2.2 Diferenças entre os dois scripts (CONFIRMADO NO CÓDIGO)
 
+**Tabela histórica (30/07).** Em 01/08 as diferenças críticas foram eliminadas: build.py passou a usar caminho relativo ao script e os dois scripts validam contagem de partes, token ausente e sobra de token não substituído.
+
 | Aspecto | build.py | build.ps1 |
 |---|---|---|
 | Caminho-base | **Absoluto fixo** `/home/user/viveroquad` (l. 2) — **quebra em qualquer outra máquina/pasta** | `$PSScriptRoot` (l. 5) — portátil entre pastas, mas exige Windows/PowerShell |
@@ -102,7 +148,7 @@ index.html     (~9,4 MB, com esqueleto parcial — abre com clique duplo, offlin
 
 - **Íntegro e sincronizado**: o rebuild via build.py reproduz o `artifact.html` em disco **byte a byte** (verificado por `cmp`). Todas as mídias esperadas existem; os 10 tokens existem no src.html.
 - **O último build (28/07) foi feito com build.py** — o `artifact.html` usa aspas simples em `__FOTOS_VARIANTES__`, assinatura do script Python. Isso contradiz o README e docs/03, que só ensinam `build.ps1` (DIVERGÊNCIA DOCUMENTAL — ver §7).
-- **Nenhum dos dois scripts é universal**: build.py morre fora de `/home/user/viveroquad`; build.ps1 só roda em Windows/PowerShell. Cada um cobre um ambiente (DECISÃO TÉCNICA PENDENTE: unificar ou corrigir o caminho do build.py).
+- **Nenhum dos dois scripts é universal**: build.py morre fora de `/home/user/viveroquad`; build.ps1 só roda em Windows/PowerShell. Cada um cobre um ambiente (DECISÃO TÉCNICA PENDENTE: unificar ou corrigir o caminho do build.py). **Resolvido em 01/08**: build.py agora usa caminho relativo ao script e roda em qualquer pasta/SO com Python 3.
 
 ---
 

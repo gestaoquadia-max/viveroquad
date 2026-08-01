@@ -1,5 +1,7 @@
 # Auditoria do protótipo "Viver o Quad" (V0 "Prova de Vida") — índice
 
+> **Leia antes:** esta auditoria retrata o repositório em **30/07/2026**. A **Consolidação Arquitetural v1.0 (01/08/2026)** reorganizou o fonte (o `src.html` foi dividido em 20 partes contíguas em `src/`, o build ganhou portabilidade e validações, e código morto e arquivos órfãos foram removidos — sem mudar o comportamento do protótipo) e **revogou parte do mapa de sistemas** descrito aqui (onze capacidades antes previstas como sistemas externos passaram a módulos internos da plataforma; a decisão 21, do cadastro no site, foi revogada). As referências "src.html l.N" destes documentos valem para o monolito de 30/07 (a concatenação das partes o reproduz — ver `src/README.md` e a Atualização no doc 01). **A leitura do projeto começa por `docs/arquitetura/00-arquitetura-oficial.md`**; esta auditoria segue válida como retrato verificado do protótipo e registro das pendências.
+
 14 documentos, numerados 00→13, produzidos pela auditoria de 30/07/2026. Todos descrevem um **protótipo navegável** — nada aqui é sistema de produção.
 
 ## Os 14 documentos

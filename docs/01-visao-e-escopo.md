@@ -1,13 +1,17 @@
 # Visão e Escopo — Viver o Quad
 
 > Síntese do documento-base *Relatório de Projeto rev. 2.3* (Danilo Moura,
-> jul/2026). O PDF completo está nesta pasta e é a referência canônica.
+> jul/2026). O PDF completo está nesta pasta e é a referência canônica —
+> **exceto onde a Consolidação Arquitetural v1.0 (01/08/2026) dispõe em
+> contrário**; ver a seção final e
+> [`docs/arquitetura/00-arquitetura-oficial.md`](arquitetura/00-arquitetura-oficial.md).
 
 ## O que é
 
 O Viver o Quad é um aplicativo (iOS e Android) que acompanha a jornada do aluno
-— da compra do curso até o curso de formação. É um braço da plataforma web já em
-construção (a grande base de dados) e conversa diretamente com ela. Transforma o
+— da compra do curso até o curso de formação. Na rev. 2.3 ele era descrito como
+um braço de uma plataforma web externa; desde a Consolidação v1.0 ele é **a
+plataforma principal do Quad Concursos** (ver seção final). Transforma o
 dia a dia do aluno em dado, e o dado em cuidado e direcionamento.
 
 **Em uma frase:** engajar, reter e fazer o aluno evoluir — medindo participação,
@@ -41,6 +45,9 @@ questão, padrões de resposta, abandono, constância).
 4. **Ciclo de Conquista** — a progressão econômica (V1)
 5. **Quadcoin** — o poder de utilização interna (V1)
 
+As regras econômicas (loja, Quad Coins, Diamantes, gift cards) permanecem
+previstas, mas **indefinidas** — registradas, não estudadas.
+
 ## Regras estruturais
 
 - **Árvore de conteúdo** (Concurso → Edital → Matéria → Assunto) é separada de
@@ -51,7 +58,49 @@ questão, padrões de resposta, abandono, constância).
 - Comportamento é computado, nunca gravado como rótulo (LGPD)
 - IRA (Índice de Risco de Abandono): fast-follow; eventos logados desde o dia 1
 
-## Público da V0
+## Público da V0 e cadastro
 
-Público interno: todo aluno já existe na plataforma-base — por isso o cadastro
-do app usa preenchimento automático a partir do banco.
+Público interno: todo aluno da V0 já é aluno Quad. Sobre onde nasce o cadastro,
+o estado real é:
+
+- A decisão 21 (cadastro obrigatoriamente no site) foi **revogada** em
+  01/08/2026 — o cadastro passou a pertencer à **arquitetura do app** (módulo
+  Cadastro, planejado).
+- O fluxo novo **não foi implementado**: o protótipo mantém o portão
+  **"Cadastro no site do Quad"** como demonstração, até a especificação do
+  módulo. (O preenchimento automático a partir de uma plataforma-base, citado
+  em versões antigas deste documento, não existe no protótipo atual.)
+
+## Consolidação Arquitetural v1.0 (01/08/2026)
+
+Determinada pelo gestor Danilo Moura em documento oficial
+([`docs/arquitetura/00-arquitetura-oficial.md`](arquitetura/00-arquitetura-oficial.md)).
+
+**Nova premissa:** o Viver o Quad deixa de ser um app satélite de uma
+plataforma-base externa e passa a ser **a plataforma principal do Quad
+Concursos**. Onze capacidades antes tratadas como sistemas externos passam a
+ser **módulos internos** da plataforma:
+
+1. Cadastro
+2. Autenticação
+3. Matrículas
+4. Produção de materiais
+5. Banco de questões
+6. Simulados
+7. Inteligência pedagógica
+8. Loja
+9. Administração
+10. Relatórios
+11. Cronogramas
+
+Permanecem **fora** da plataforma (integrações a definir): site e checkout
+(vitrine/venda), pagamentos/financeiro, plataforma de cursos (legado em
+avaliação), notificações push/e-mail (canal) e telemetria como serviço de
+dados (a decidir).
+
+**Limites da mudança:** ela é exclusivamente arquitetural — **nada foi
+implementado**, e módulo sem especificação suficiente é **"Módulo Planejado"**.
+O que o protótipo mostra segue sendo **"Demonstrado no protótipo (simulação
+local)"** — os dois status podem coexistir num mesmo módulo. Os riscos da
+auditoria de segurança de 30/07/2026 permanecem válidos, registrados como
+pendências, sem solução implementada.
