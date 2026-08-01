@@ -1,0 +1,691 @@
+  /* ==================================================================
+     ÁREA DO PROFESSOR + QUIZ DA AULA
+     · cadastro individual (chave da coordenação) e escolha do professor
+     · turmas em que o professor está inserido aparecem sozinhas
+     · quiz por PDF (múltipla escolha ou certo/errado) com tempo
+     · criado → "Aula com Quiz" · ativado → botão Quiz para a sala
+     · sem premiação: as respostas alimentam o relatório ao vivo
+     ================================================================== */
+  var profLiberado = false, PROF_ATUAL = null, SALA_ATUAL = null;
+  var pollTimer = null, pollN = 0;
+  /* turmas sem corpo docente definido ganham distribuição automática */
+  function ensureProfs(t) {
+    if (t.professores) return t.professores;
+    var c = (typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
+    var mats = (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : ['Língua Portuguesa', 'Matemática', 'Direito Constitucional', 'Direito Penal', 'Legislação específica'];
+    var off = edHash(t.id) % (PROFESSORES.length || 1);
+    t.professores = {};
+    mats.forEach(function (m, i) {
+      var candidatos = docentesDaMateria(m);
+      /* sem professor DAQUELA matéria a vaga fica em aberto — nada de escalar
+         quem não dá a matéria só para preencher a grade */
+      if (candidatos.length) { t.professores[m] = candidatos[(off + i) % candidatos.length].nome; }
+    });
+    return t.professores;
+  }
+  function materiasDoProf(t, nome) {
+    var ps = ensureProfs(t), out = [];
+    Object.keys(ps).forEach(function (m) { if (ps[m] === nome) out.push(m); });
+    return out;
+  }
+  function turmasDoProf(nome) {
+    return TURMAS_LOJA.filter(function (t) { return materiasDoProf(t, nome).length > 0; });
+  }
+  /* Cada professor tem a SUA conta: o e-mail funcional já diz quem entrou.
+     Nada de escolher o nome numa lista — o perfil vem do cadastro.
+     [INTEGRAÇÃO REAL] senha individual do professor, definida no cadastro. */
+  var PROF_SENHA_DEMO = 'quad1234';   /* senha inicial de todo cadastro novo */
+  function senhaDoProf(d) { return (d && d.senha) ? d.senha : PROF_SENHA_DEMO; }
+  function semAcento(x) { return (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x; }
+  function emailDoProf(nome) {
+    var limpo = semAcento(nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim();
+    var partes = limpo.split(/\s+/);
+    var chave = (partes[partes.length - 1] || 'professor').toLowerCase().replace(/[^a-z]/g, '');
+    return chave + '@quadconcursos.com.br';
+  }
+  function docentePorEmail(em) {
+    var alvo = (em || '').trim().toLowerCase();
+    return DOCENTES.filter(function (d) { return emailDoProf(d.nome) === alvo; })[0] || null;
+  }
+  function profGateNota() {
+    var el = $('profGateNota'); if (!el) return;
+    var d = docentesAtivos()[0];
+    el.innerHTML = 'demo: ' + (d ? emailDoProf(d.nome) : 'nome@quadconcursos.com.br') +
+      ' · senha ' + PROF_SENHA_DEMO + ' — no sistema real cada professor tem a própria senha, definida no cadastro da coordenação';
+  }
+  profGateNota();
+  $('btnProfEntrar').addEventListener('click', function () {
+    var em = $('profEmail').value.trim(), sn = $('profSenha').value;
+    if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
+    var doc = docentePorEmail(em);
+    if (!doc) { toast('E-mail não encontrado no corpo docente — procure a coordenação.'); return; }
+    if (doc.desligado) { toast('Este cadastro está desligado — procure a coordenação.'); return; }
+    if (sn !== senhaDoProf(doc)) { toast('Senha incorreta.'); return; }
+    if (doc.bloqueado) { toast('Acesso bloqueado pela coordenação — procure a administração.'); return; }
+    profLiberado = true;
+    PROF_ATUAL = doc.nome;
+    if ($('profSaidaMsg')) $('profSaidaMsg').style.display = 'none';
+    $('profSenha').value = '';
+    $('profGate').classList.remove('on');
+    $('profNome').textContent = PROF_ATUAL;
+    $('profTopNome').textContent = PROF_ATUAL;
+    renderProfTurmas();
+    renderProfRecados();
+    renderProfTudo();
+    toast('Bem-vindo, ' + PROF_ATUAL + ' — boa aula!');
+  });
+  /* ---------- Painel de controle do professor ---------- */
+  function profIniciais(nome) {
+    var ps = (nome || '').replace(/^(Prof\.ª|Prof\.|Cap\.|Ten\.|Sgt\.|Maj\.|Cel\.)\s*/i, '').trim().split(/\s+/);
+    return ((ps[0] || '?')[0] + (ps.length > 1 ? ps[ps.length - 1][0] : '')).toUpperCase();
+  }
+  function renderProfPainel() {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var foto = $('profFoto');
+    if (foto) {
+      foto.innerHTML = d.foto ? '<img src="' + d.foto + '" alt="Foto de ' + d.nome + '">' : profIniciais(d.nome);
+      if ($('btnProfFotoTirar')) $('btnProfFotoTirar').style.display = d.foto ? 'inline-flex' : 'none';
+    }
+    if ($('profPnNome')) $('profPnNome').textContent = d.nome;
+    if ($('profPnGrad')) $('profPnGrad').textContent = (d.grad || 'sem graduação informada') + ' · ' + (d.fone || 'telefone não informado');
+    if ($('profPnTurnos')) {
+      $('profPnTurnos').innerHTML = (d.turnos || []).map(function (t) {
+        return '<span class="tag">' + t.toUpperCase() + '</span>';
+      }).join('') || '<span class="tag warn">SEM TURNO DEFINIDO</span>';
+    }
+    if ($('profPnMaterias')) {
+      $('profPnMaterias').innerHTML = (d.materias || []).map(function (m) {
+        return '<div class="adm-bar"><span class="nm">' + m + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matéria cadastrada — fale com a coordenação.</p>';
+    }
+    if ($('profPnTurmas')) {
+      var ts = turmasDoProf(PROF_ATUAL);
+      $('profPnTurmas').innerHTML = ts.map(function (t) {
+        return '<div class="adm-bar"><span class="nm">' + t.nome +
+          '<small>' + (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor +
+          ' · você: ' + materiasDoProf(t, PROF_ATUAL).join(', ') + '</small></span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não foi inserido em nenhuma turma.</p>';
+    }
+  }
+  if ($('btnProfFoto')) $('btnProfFoto').addEventListener('click', function () { $('profFotoFile').click(); });
+  if ($('profFotoFile')) $('profFotoFile').addEventListener('change', function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var r = new FileReader();
+    r.onload = function () { d.foto = r.result; renderProfPainel(); toast('Foto atualizada.'); };
+    r.readAsDataURL(f);
+    this.value = '';
+  });
+  if ($('btnProfFotoTirar')) $('btnProfFotoTirar').addEventListener('click', function () {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    d.foto = null; renderProfPainel(); toast('Foto removida — voltaram as iniciais.');
+  });
+  if ($('btnProfSenha')) $('btnProfSenha').addEventListener('click', function () {
+    var d = docenteDe(PROF_ATUAL); if (!d) return;
+    var at = $('profSenhaAtual').value, nv = $('profSenhaNova').value, cf = $('profSenhaConf').value;
+    if (at !== senhaDoProf(d)) { toast('A senha atual não confere.'); return; }
+    if (!nv || nv.length < 6) { toast('A nova senha precisa de pelo menos 6 caracteres.'); return; }
+    if (nv !== cf) { toast('As duas novas senhas não são iguais.'); return; }
+    if (nv === at) { toast('A nova senha precisa ser diferente da atual.'); return; }
+    d.senha = nv;
+    $('profSenhaAtual').value = ''; $('profSenhaNova').value = ''; $('profSenhaConf').value = '';
+    toast('Senha alterada — use a nova no próximo acesso.');
+  });
+
+  /* ---------- Eventos do professor: aula de hoje + eventos com o nome dele ---------- */
+  function profAulasDeHoje(nome, diaIdx) {
+    var idx = (diaIdx == null) ? new Date().getDay() - 1 : diaIdx;   /* seg=0 … sex=4 */
+    if (idx < 0 || idx > 4) return [];
+    var out = [];
+    turmasDoProf(nome).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)];
+      if (!grade) return;
+      var minhas = materiasDoProf(t, nome);
+      var slots = horSlots(t.hor) || CRONO.slots;
+      var tempos = (grade.aulas[idx] || []).map(function (a, i) {
+        var meu = (a.p === nome) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+        return { hr: slots[i] || CRONO.slots[i], mat: a.m, prof: a.p, enc: a.e, meu: meu };
+      });
+      if (tempos.some(function (x) { return x.meu; })) {
+        out.push({ turma: t, sala: grade.sala, tempos: tempos });
+      }
+    });
+    return out;
+  }
+  function renderProfEventos() {
+    if (!PROF_ATUAL) return;
+    var el = $('profAulasHoje');
+    if (el) {
+      var aulas = profAulasDeHoje(PROF_ATUAL);
+      var agora = new Date(), mins = agora.getHours() * 60 + agora.getMinutes();
+      el.innerHTML = aulas.map(function (a) {
+        var faixas = slotsFaixas(a.tempos.map(function (x) { return x.hr; }));
+        var linhas = a.tempos.map(function (x, i) {
+          var cls = '', st = '';
+          var fx = faixas[i];
+          if (fx) {
+            if (mins >= fx[1]) { cls = ' done'; st = 'ENCERRADO'; }
+            else if (mins >= fx[0]) { cls = ' now'; st = 'AGORA'; }
+          }
+          if (!x.meu) { cls += ' done'; }
+          return '<div class="aula-slot' + cls + '"><span class="a-hr">' + x.hr + '</span>' +
+            '<div class="a-info"><b>' + (x.mat || 'a definir') + '</b><span>' +
+            (x.enc ? 'Encontro ' + String(x.enc).padStart(2, '0') + ' · ' : '') +
+            (x.meu ? 'sua aula' : 'Prof. ' + (x.prof || 'a definir')) + '</span></div>' +
+            (st ? '<span class="a-st">' + st + '</span>' : (x.meu ? '<span class="a-st">SUA AULA</span>' : '')) + '</div>';
+        }).join('');
+        return '<div class="p-card" style="margin-bottom:12px">' +
+          '<div class="aula-turno">' + a.turma.turno + '</div>' +
+          '<h3 class="aula-title" style="margin:2px 0 0">' + a.turma.nome + ' · ' + a.sala + '</h3>' +
+          '<p class="sub">' + (a.turma.focoNome || a.turma.concurso) + ' · ' + a.turma.hor + '</p>' +
+          linhas +
+          '<div style="margin-top:10px"><button class="btn ghost small" data-ir-sala="' + a.turma.id + '">Abrir o quiz desta sala</button></div>' +
+          '</div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você não tem aula hoje. Quando tiver, aparece um bloco por turno — manhã, tarde e noite.</p>';
+      el.querySelectorAll('[data-ir-sala]').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          showView('v-sala', 'navProfessor');
+          abrirSala(bt.dataset.irSala);
+        });
+      });
+    }
+    var ev = $('profEvList');
+    if (ev) {
+      var meus = eventosDoProf(PROF_ATUAL).filter(function (x) { return !evAcabou(x); });
+      ev.innerHTML = meus.map(function (x) {
+        var quem = evProfs(x).filter(function (n) { return n !== PROF_ATUAL; });
+        return '<div class="mission-row"><div class="m-dot">◈</div>' +
+          '<div class="grow"><div class="t">' + x.nome + '</div>' +
+          '<div class="d">' + x.quando + ' · ' + (x.modalidade || '') +
+          (quem.length ? ' · com ' + quem.join(', ') : '') + '</div></div>' +
+          '<span class="tag ok">VOCÊ</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento com o seu nome nesta semana.</p>';
+    }
+  }
+
+  /* ---------- Calendário do professor ---------- */
+  function renderProfCal() {
+    var el = $('profCalList'); if (!el || !PROF_ATUAL) return;
+    var rows = [];
+    var hojeIdx = new Date().getDay() - 1;
+    turmasDoProf(PROF_ATUAL).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)]; if (!grade) return;
+      var minhas = materiasDoProf(t, PROF_ATUAL);
+      var slots = horSlots(t.hor) || CRONO.slots;
+      CRONO.dias.forEach(function (dia, di) {
+        (grade.aulas[di] || []).forEach(function (a, i) {
+          var meu = (a.p === PROF_ATUAL) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+          if (!meu) return;
+          rows.push({
+            ord: di * 10 + i,
+            html: calRow(di === hojeIdx ? 'HOJE' : CRONO.datas[di].split('/')[0],
+              dia.slice(0, 3).toUpperCase(),
+              (a.m || 'Aula') + ' · ' + t.nome,
+              (slots[i] || CRONO.slots[i]) + ' · ' + grade.sala + ' · ' + t.turno,
+              'AULA', di === hojeIdx ? 'live' : '')
+          });
+        });
+      });
+    });
+    rows.sort(function (a, b) { return a.ord - b.ord; });
+    var html = rows.map(function (r) { return r.html; }).join('');
+    eventosDoProf(PROF_ATUAL).filter(function (x) { return !evAcabou(x); }).forEach(function (x) {
+      var partes = x.quando.split(' · ');
+      var dm = partes[1] || '';
+      html += calRow((dm.split('/')[0]) || '·', partes[0] || '', x.nome,
+        (partes[2] ? partes[2] + ' · ' : '') + (x.online ? 'evento online' : 'evento presencial'), 'EVENTO', 'gold');
+    });
+    el.innerHTML = html || '<p class="sub" style="padding:8px 0">Nada agendado para você nesta semana.</p>';
+  }
+
+  /* ---------- Informações: relatório de aulas e eventos por período ---------- */
+  var PROF_PER = 'mes';
+  var PROF_PERIODOS = { mes: { rot: 'no mês', semanas: 4 }, tri: { rot: 'no trimestre', semanas: 13 },
+    sem: { rot: 'no semestre', semanas: 26 }, ano: { rot: 'no ano', semanas: 52 } };
+  /* quantas aulas ele tem por SEMANA em cada turma (grade fixa da coordenação) */
+  function profAulasSemana(nome) {
+    var out = [];
+    turmasDoProf(nome).forEach(function (t) {
+      var grade = CRONO.turmas[cronoKey(t)]; if (!grade) return;
+      var minhas = materiasDoProf(t, nome), n = 0, mats = {};
+      CRONO.dias.forEach(function (dia, di) {
+        (grade.aulas[di] || []).forEach(function (a) {
+          var meu = (a.p === nome) || minhas.some(function (m) { return a.m && materiaBate(m, a.m); });
+          if (meu) { n++; if (a.m) mats[a.m] = 1; }
+        });
+      });
+      if (n) out.push({ turma: t, porSemana: n, materias: Object.keys(mats) });
+    });
+    return out;
+  }
+  function renderProfRel() {
+    if (!PROF_ATUAL) return;
+    var per = PROF_PERIODOS[PROF_PER] || PROF_PERIODOS.mes;
+    var porTurma = profAulasSemana(PROF_ATUAL);
+    var totalAulas = porTurma.reduce(function (a, x) { return a + x.porSemana * per.semanas; }, 0);
+    var evs = eventosDoProf(PROF_ATUAL);
+    /* eventos são pontuais: no mês conta o que está na agenda; nos períodos
+       maiores, a recorrência mensal da grade de eventos do Quad             */
+    var totalEv = Math.round(evs.length * (per.semanas / 4));
+    var horas = porTurma.reduce(function (a, x) {
+      var sl = horSlots(x.turma.hor) || CRONO.slots;
+      var fx = slotsFaixas(sl);
+      var minutos = fx.reduce(function (m, f) { return m + (f ? (f[1] - f[0]) : 0); }, 0) / (sl.length || 1);
+      return a + (x.porSemana * per.semanas * (minutos || 90)) / 60;
+    }, 0);
+    if ($('profRelResumo')) {
+      $('profRelResumo').innerHTML =
+        '<div class="adm-bar"><span class="nm">Aulas ministradas<small>' + per.rot + ' · ' + porTurma.length + (porTurma.length === 1 ? ' turma' : ' turmas') + '</small></span><span class="pct">' + totalAulas + '</span></div>' +
+        '<div class="adm-bar"><span class="nm">Horas em sala<small>estimativa pela grade</small></span><span class="pct">' + Math.round(horas) + 'h</span></div>' +
+        '<div class="adm-bar"><span class="nm">Eventos com você<small>' + per.rot + '</small></span><span class="pct">' + totalEv + '</span></div>';
+    }
+    if ($('profRelTurmas')) {
+      var maxT = porTurma.reduce(function (m, x) { return Math.max(m, x.porSemana); }, 1);
+      $('profRelTurmas').innerHTML = porTurma.map(function (x) {
+        var tot = x.porSemana * per.semanas;
+        return '<div class="adm-bar"><span class="nm">' + x.turma.nome +
+          '<small>' + (x.materias.join(', ') || 'sua matéria') + ' · ' + x.porSemana + '×/semana</small></span>' +
+          '<span class="mini-track"><i style="width:' + Math.round(x.porSemana / maxT * 100) + '%;background:var(--p-blue)"></i></span>' +
+          '<span class="pct">' + tot + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não tem aulas lançadas na grade.</p>';
+    }
+    if ($('profRelEventos')) {
+      $('profRelEventos').innerHTML = evs.map(function (e) {
+        var quem = evProfs(e).filter(function (n) { return n !== PROF_ATUAL; });
+        return '<div class="adm-bar"><span class="nm">' + e.nome +
+          '<small>' + e.quando + (quem.length ? ' · com ' + quem.join(', ') : '') + '</small></span>' +
+          '<span class="tag' + (evAcabou(e) ? '' : ' ok') + '">' + (evAcabou(e) ? 'REALIZADO' : 'AGENDADO') + '</span></div>';
+      }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento com o seu nome no período.</p>';
+    }
+  }
+  (function () {
+    var tabs = $('profRelTabs'); if (!tabs) return;
+    tabs.querySelectorAll('.rel-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        tabs.querySelectorAll('.rel-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        PROF_PER = bt.dataset.per;
+        renderProfRel();
+      });
+    });
+  })();
+  function renderProfTudo() {
+    if (!PROF_ATUAL) return;
+    renderProfPainel(); renderProfEventos(); renderProfCal(); renderProfRel();
+  }
+  window.__prof = function (dia) {
+    return { atual: PROF_ATUAL, aulas: profAulasDeHoje(PROF_ATUAL, dia), eventos: eventosDoProf(PROF_ATUAL).map(function (e) { return e.nome; }) };
+  };
+
+  function renderProfRecados() {
+    var card = $('profRecadosCard'), el = $('profRecadosList'); if (!card || !el) return;
+    var lista = (typeof RECADOS_PROF !== 'undefined' && PROF_ATUAL) ? (RECADOS_PROF[PROF_ATUAL] || []) : [];
+    var naoLidas = lista.filter(function (r) { return !r.lida; }).length;
+    [$('profRecBadge'), $('profRecBadgeNav')].forEach(function (badge) {
+      if (badge) { badge.style.display = naoLidas ? 'inline-flex' : 'none'; badge.textContent = naoLidas; }
+    });
+    el.innerHTML = lista.map(function (r) {
+      return '<div class="chat-msg' + (r.lida ? '' : ' nova') + '"><div class="cm-de">Administração Quad</div>' +
+        '<div class="cm-tx">' + r.texto + '</div><div class="cm-qd">' + r.quando + '</div></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum recado da administração por enquanto.</p>';
+    /* leu de fato quando ABRIU a tela da recepção */
+    if (currentView !== 'v-prof-chat') { return; }
+    setTimeout(function () {
+      lista.forEach(function (r) { r.lida = true; if (r.admRef) r.admRef.lida = true; });
+      [$('profRecBadge'), $('profRecBadgeNav')].forEach(function (bd) { if (bd) bd.style.display = 'none'; });
+      if (typeof renderAdmMsgs === 'function') renderAdmMsgs();
+    }, 800);
+  }
+  function renderProfTurmas() {
+    var el = $('profTurmasList'); if (!el || !PROF_ATUAL) return;
+    var ts = turmasDoProf(PROF_ATUAL);
+    $('profTopSub').textContent = ts.length + (ts.length === 1 ? ' turma' : ' turmas') + ' · corpo docente';
+    el.innerHTML = ts.map(function (t) {
+      var mats = materiasDoProf(t, PROF_ATUAL);
+      return '<div class="mission-row"><div class="m-dot">◉</div>' +
+        '<div class="grow"><div class="t">' + t.nome + '</div>' +
+        '<div class="d">' + (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor + ' · você: ' + mats.join(', ') + '</div></div>' +
+        '<button class="btn ghost small" data-sala="' + t.id + '">Abrir sala</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Você ainda não foi inserido em nenhuma turma.</p>';
+    el.querySelectorAll('[data-sala]').forEach(function (bt) {
+      bt.addEventListener('click', function () { abrirSala(bt.dataset.sala); });
+    });
+  }
+  function abrirSala(id) {
+    var t = turmaDe(id); if (!t) return;
+    SALA_ATUAL = id;
+    $('salaHead').textContent = t.nome;
+    $('salaInfo').textContent = (t.focoNome || t.concurso) + ' · ' + t.turno + ' · ' + t.hor + ' · suas matérias: ' + materiasDoProf(t, PROF_ATUAL).join(', ');
+    $('profTurmasCard').style.display = 'none';
+    $('salaDetail').style.display = 'block';
+    qzSyncBotoes();
+  }
+  $('btnSalaVoltar').addEventListener('click', function () {
+    pollParar();
+    SALA_ATUAL = null;
+    $('salaDetail').style.display = 'none';
+    $('profTurmasCard').style.display = 'block';
+  });
+
+  /* ---------- quiz da aula: bancos (na demo; o PDF real é extraído) ---------- */
+  var QA_MULT = [
+    { txt: 'Sobre o poder de polícia, é correto afirmar que:', alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.', 'Decorre da supremacia do interesse público e condiciona direitos individuais.', 'Confunde-se com o poder disciplinar aplicado a servidores.', 'Só pode ser exercido pelo Poder Judiciário.'], right: 1 },
+    { txt: 'O ato administrativo discricionário caracteriza-se por:', alts: ['Ausência total de limites legais.', 'Margem de escolha em conveniência e oportunidade, dentro da lei.', 'Dispensa de motivação em qualquer caso.', 'Ser sempre revogável pelo Judiciário.'], right: 1 },
+    { txt: 'A hierarquia na Administração Pública autoriza:', alts: ['Delegação de atos políticos.', 'Avocação e revisão de atos dos subordinados.', 'Suprimir a competência legal de outro órgão.', 'Aplicar pena privativa de liberdade.'], right: 1 },
+    { txt: 'São atributos do ato administrativo:', alts: ['Presunção de legitimidade, imperatividade e autoexecutoriedade.', 'Coisa julgada, imperatividade e anterioridade.', 'Legalidade, moralidade e publicidade.', 'Tipicidade penal e culpabilidade.'], right: 0 },
+    { txt: 'O abuso de poder ocorre quando o agente:', alts: ['Atua dentro da competência com finalidade pública.', 'Excede a competência ou desvia a finalidade do ato.', 'Motiva o ato conforme a lei.', 'Delega atribuições com previsão legal.'], right: 1 },
+    { txt: 'A revogação do ato administrativo:', alts: ['Atinge ato ilegal, com efeitos retroativos.', 'Atinge ato válido e inconveniente, com efeitos para frente.', 'Só pode ser feita pelo Judiciário.', 'Independe de competência do agente.'], right: 1 },
+    { txt: 'São requisitos do ato administrativo:', alts: ['Competência, finalidade, forma, motivo e objeto.', 'Competência, culpa, dolo e resultado.', 'Publicidade, oralidade e celeridade.', 'Ampla defesa, contraditório e duplo grau.'], right: 0 },
+    { txt: 'A anulação do ato administrativo ilegal:', alts: ['Depende sempre de ação judicial.', 'Pode ser feita pela própria Administração, de ofício.', 'Gera direito adquirido ao beneficiado.', 'Só cabe se houver prejuízo ao erário.'], right: 1 },
+    { txt: 'Sobre a improbidade administrativa, é correto afirmar:', alts: ['Alcança apenas agentes públicos efetivos.', 'Exige dolo nas condutas, salvo exceções legais.', 'É modalidade de crime militar.', 'Dispensa a demonstração de conduta.'], right: 1 },
+    { txt: 'O princípio da eficiência na Administração Pública:', alts: ['Autoriza descumprir a legalidade em nome do resultado.', 'Exige boa gestão de meios e resultados, dentro da lei.', 'Aplica-se apenas à esfera federal.', 'Foi revogado pela Constituição de 1988.'], right: 1 }
+  ];
+  var QA_CE = [
+    { txt: 'O poder de polícia condiciona o exercício de direitos individuais em favor do interesse público.', right: 0 },
+    { txt: 'O poder disciplinar aplica-se a qualquer particular, mesmo sem vínculo com a Administração.', right: 1 },
+    { txt: 'A autoexecutoriedade permite executar o ato sem prévia autorização judicial, nos casos previstos.', right: 0 },
+    { txt: 'Ato vinculado admite juízo de conveniência e oportunidade do administrador.', right: 1 },
+    { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 },
+    { txt: 'A revogação atinge ato válido e produz efeitos apenas para o futuro.', right: 0 },
+    { txt: 'A anulação de ato ilegal depende sempre de decisão judicial.', right: 1 },
+    { txt: 'A publicidade é requisito de eficácia dos atos administrativos em regra.', right: 0 },
+    { txt: 'O agente público responde por improbidade independentemente de dolo em qualquer hipótese.', right: 1 },
+    { txt: 'A competência é elemento vinculado do ato administrativo.', right: 0 },
+    { txt: 'A Administração pode rever os próprios atos, de ofício, quando eivados de ilegalidade.', right: 0 }
+  ];
+  /* CADA TURMA tem o SEU quiz: turmaId -> quiz. Dois professores (ou o mesmo
+     professor em salas seguidas) trabalham ao mesmo tempo sem se atropelar.  */
+  var QUIZZES = {};   /* { turmaId, tipo, minutos, pdf, qs, status, alunoFez, respostasAluno, pollN } */
+  var QZ_MAX_Q = 30;  /* teto por quiz — o PDF real manda o número de questões */
+  /* [INTEGRAÇÃO REAL] as questões saem da extração do PDF anexado. Na demo o
+     banco cobre as primeiras e, se o professor pedir mais do que o banco tem,
+     as seguintes seguem numeradas para o quiz não ficar curto do que ele pediu. */
+  function qzMontarQuestoes(tipo, nq) {
+    var banco = tipo === 'ce' ? QA_CE : QA_MULT;
+    var out = [];
+    for (var i = 0; i < nq; i++) {
+      var base = banco[i % banco.length];
+      var volta = Math.floor(i / banco.length);
+      out.push({
+        txt: (volta ? 'Q' + (i + 1) + ' · ' : '') + base.txt,
+        alts: base.alts || ['Certo', 'Errado'],
+        right: base.right
+      });
+    }
+    return out;
+  }
+  function quizDaSala(id) { return QUIZZES[id || SALA_ATUAL] || null; }
+  window.__quizAula = function (id) { return quizDaSala(id); };
+  window.__quizzes = function () { return QUIZZES; };
+  var QZ_VAZIO = 'Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. De <strong>1 a 30 questões</strong> e <strong>1 a 180 minutos</strong>. Criado, o aluno vê "Aula com Quiz" e você ainda pode <strong>refazer ou descartar</strong>; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo e o quiz trava. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.';
+  function qzStatusTxt(q) {
+    if (!q) { return QZ_VAZIO; }
+    var tp = q.tipo === 'ce' ? 'certo/errado' : 'múltipla escolha';
+    if (q.status === 'criado') {
+      return '<strong>Quiz criado</strong> — ' + q.qs.length + ' questões (' + tp + ') · ' + q.minutos + ' min · PDF “' + q.pdf + '”. A sala já vê <strong>“Aula com Quiz”</strong>. Ainda dá para <strong>refazer</strong> ou <strong>descartar</strong>; ative quando a aula começar.';
+    }
+    if (q.status === 'ativo') {
+      return '<strong>Quiz ATIVO</strong> — o botão “Quiz” apareceu para a sala com ' + q.minutos + ' min no relógio. Encerre para consolidar o relatório.';
+    }
+    return '<strong>Quiz encerrado</strong> — relatório consolidado abaixo. O aluno não pontua: o quiz é leitura pedagógica da sala.';
+  }
+  /* o "respondendo agora" pertence ao quiz da sala aberta — nunca vaza de uma turma para outra */
+  /* o placar da sala usa a LOTAÇÃO REAL da turma do quiz — e a última
+     vaga só é reservada ao aluno da demo se ele estiver matriculado nela */
+  function pollTotal(q) {
+    var t = (q && typeof turmaDe === 'function') ? turmaDe(q.turmaId) : null;
+    return Math.max(12, (t && typeof turmaInscritos === 'function') ? turmaInscritos(t) : 42);
+  }
+  function pollDoAluno(q) {
+    return !!(q && typeof matriculasAtivas === 'function' &&
+      matriculasAtivas().some(function (m) { return m.turmaId === q.turmaId; }));
+  }
+  function pollPinta(q) {
+    var tot = pollTotal(q);
+    var n = q ? q.pollN : 0, extra = (q && q.alunoFez) ? 1 : 0;
+    if ($('pollCount')) $('pollCount').textContent = Math.min(tot, n + extra) + '/' + tot;
+    if ($('pollBar')) $('pollBar').style.width = Math.min(100, n / tot * 100) + '%';
+  }
+  function pollParar() { clearInterval(pollTimer); pollTimer = null; }
+  function pollRodar(q) {
+    pollParar();
+    if (!q || q.status !== 'ativo') { return; }
+    pollPinta(q);
+    pollTimer = setInterval(function () {
+      var tot = pollTotal(q);
+      var alvo = (q.alunoFez || !pollDoAluno(q)) ? tot : tot - 1;   /* vaga do aluno só na turma dele */
+      q.pollN = Math.min(alvo, q.pollN + Math.ceil(Math.random() * 5));
+      pollPinta(q);
+      if (q.pollN >= alvo) { pollParar(); }
+    }, 700);
+  }
+  function qzSyncBotoes() {
+    var q = quizDaSala();
+    /* enquanto NÃO estiver ativo, o professor pode refazer o quiz quantas vezes quiser */
+    $('btnQuizCriar').disabled = !!(q && q.status === 'ativo');
+    $('btnQuizCriar').textContent = (q && q.status === 'criado') ? 'Refazer quiz' : 'Criar quiz';
+    $('btnQuizAtivar').disabled = !(q && q.status === 'criado');
+    $('btnQuizEncerrar').disabled = !(q && (q.status === 'criado' || q.status === 'ativo'));
+    $('btnQuizEncerrar').textContent = (q && q.status === 'criado') ? 'Descartar' : 'Encerrar';
+    $('qzRelCard').style.display = (q && (q.status === 'ativo' || q.status === 'encerrado')) ? 'block' : 'none';
+    $('qzStatus').innerHTML = qzStatusTxt(q);
+    $('liveTag').style.display = (q && q.status === 'ativo') ? 'inline-block' : 'none';
+    if ($('pollSub')) {
+      $('pollSub').textContent = (q && q.status === 'encerrado')
+        ? 'Quiz encerrado — respostas consolidadas.'
+        : 'Acompanhe quantos alunos já enviaram as respostas.';
+    }
+    pollPinta(q);
+    if (q && (q.status === 'ativo' || q.status === 'encerrado')) { qzRelatorio(q); }
+    pollRodar(q);
+  }
+  $('btnQuizCriar').addEventListener('click', function () {
+    if (!SALA_ATUAL) { toast('Abra uma sala primeiro.'); return; }
+    var tipo = $('qzTipo').value;
+    var nq = parseInt($('qzNq').value, 10), min = parseInt($('qzMin').value, 10);
+    var arq = ($('qzPdf').files && $('qzPdf').files[0]) ? $('qzPdf').files[0].name : '';
+    if (!arq) { toast('Anexe o PDF com as questões do quiz.'); return; }
+    if (!nq || nq < 1 || nq > QZ_MAX_Q) { toast('Número de questões: de 1 a ' + QZ_MAX_Q + ' por quiz.'); return; }
+    if (!min || min < 1 || min > 180) { toast('Tempo do quiz: de 1 a 180 minutos.'); return; }
+    QUIZZES[SALA_ATUAL] = { turmaId: SALA_ATUAL, tipo: tipo, minutos: min, pdf: arq, status: 'criado', alunoFez: false, respostasAluno: [], pollN: 0,
+      qs: qzMontarQuestoes(tipo, nq) };
+    qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz criado — a sala “' + (turmaDe(SALA_ATUAL) || {}).nome + '” já sabe que hoje tem quiz.');
+  });
+  $('btnQuizAtivar').addEventListener('click', function () {
+    var q = quizDaSala();
+    if (!q || q.status !== 'criado') return;
+    q.status = 'ativo'; q.pollN = 0;
+    qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz ativado — a sala está respondendo.');
+  });
+  $('btnQuizEncerrar').addEventListener('click', function () {
+    var q = quizDaSala();
+    if (!q) return;
+    if (q.status === 'criado') {   /* nem chegou a valer: some sem deixar rastro para a sala */
+      delete QUIZZES[SALA_ATUAL];
+      pollParar();
+      qzSyncBotoes(); refreshQuizAula();
+      toast('Quiz descartado — a sala voltou a ficar sem quiz.');
+      return;
+    }
+    if (q.status !== 'ativo') return;
+    q.status = 'encerrado';
+    qzSyncBotoes(); refreshQuizAula();
+    toast('Quiz encerrado — relatório da sala consolidado.');
+  });
+  /* distribuição de alternativas por questão (determinística na demo) */
+  function qzDist(quiz, q, qi) {
+    var n = q.alts.length, pesos = [], soma = 0;
+    for (var i = 0; i < n; i++) { var w = 8 + (edHash(q.txt + ':' + i) % 25) + (i === q.right ? 42 : 0); pesos.push(w); soma += w; }
+    var pct = pesos.map(function (w) { return Math.round(w / soma * 100); });
+    var dif = 100 - pct.reduce(function (a, b) { return a + b; }, 0);
+    pct[q.right] += dif;
+    /* a resposta real do aluno desta demo entra no bolo */
+    if (quiz.alunoFez && quiz.respostasAluno[qi] != null) {
+      var esc = quiz.respostasAluno[qi];
+      pct[esc] = Math.min(100, pct[esc] + 2);
+      var doador = -1, maior = -1;
+      for (var d = 0; d < pct.length; d++) { if (d !== esc && pct[d] > maior) { maior = pct[d]; doador = d; } }
+      if (doador >= 0) pct[doador] = Math.max(0, pct[doador] - 2);
+    }
+    return pct;
+  }
+  function qzRelatorio(quiz) {
+    var el = $('qzRelList');
+    quiz = quiz || quizDaSala();
+    if (!el || !quiz) return;
+    /* ANTES de alguém responder o relatório fica em branco — nada de % inventado na aula */
+    if (!quiz.pollN && !quiz.alunoFez) {
+      el.innerHTML = '<p class="sub" style="padding:8px 0">Aguardando as respostas da sala — o gráfico por questão aparece assim que os alunos começarem a enviar.</p>';
+      return;
+    }
+    var LETRAS = ['A', 'B', 'C', 'D', 'E'];
+    el.innerHTML = quiz.qs.map(function (q, i) {
+      var pct = qzDist(quiz, q, i), ac = pct[q.right];
+      return '<div class="result-bar"><span class="q">Q' + (i + 1) + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + ac + '%"></div></div>' +
+        '<span class="n">' + ac + '%</span>' +
+        '<button class="btn ghost small" data-qrel="' + i + '">Relatório</button></div>' +
+        '<div class="qrel-det" data-qrel-det="' + i + '" style="display:none">' +
+        q.alts.map(function (alt, ai) {
+          var rot = q.alts.length === 2 ? alt : ('Letra ' + LETRAS[ai]);
+          return '<div class="adm-bar"><span class="nm">' + rot + (ai === q.right ? ' <span class="tag ok">CORRETA</span>' : '') + '</span>' +
+            '<span class="mini-track"><i style="width:' + pct[ai] + '%;background:var(--p-blue)"></i></span>' +
+            '<span class="pct">' + pct[ai] + '%</span></div>';
+        }).join('') + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-qrel]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var det = el.querySelector('[data-qrel-det="' + bt.dataset.qrel + '"]');
+        det.style.display = det.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+  }
+
+  /* ---------- lado do aluno: selo na Aula de hoje + botão Quiz ---------- */
+  function quizDaMinhaTurma() {
+    var ativas = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    var cands = [];
+    ativas.forEach(function (m) { if (QUIZZES[m.turmaId]) cands.push(QUIZZES[m.turmaId]); });
+    if (!cands.length) return null;
+    var ordem = { ativo: 0, criado: 1, encerrado: 2 };
+    cands.sort(function (a, b) {
+      var d = (ordem[a.status] || 9) - (ordem[b.status] || 9);
+      if (d) return d;
+      /* empate de status: vence o quiz da TURMA ATIVA */
+      return (b.turmaId === turmaAtivaId ? 1 : 0) - (a.turmaId === turmaAtivaId ? 1 : 0);
+    });
+    return cands[0];
+  }
+  function refreshQuizAula() {
+    var q = quizDaMinhaTurma();
+    var tag = $('salaTag'), sub = $('salaSub'), btn = $('btnEntrarQuiz');
+    if (!tag) return;
+    if (!q || q.status === 'encerrado') {
+      tag.textContent = 'SEM QUIZ ABERTO'; tag.classList.remove('live');
+      sub.textContent = q && q.status === 'encerrado' ? 'Quiz encerrado — o resultado sai com o professor.' : 'Quando o professor criar o quiz da aula, ele aparece aqui.';
+      btn.style.display = 'none';
+      return;
+    }
+    if (q.alunoFez) {
+      tag.textContent = 'QUIZ RESPONDIDO'; tag.classList.add('live');
+      sub.textContent = 'Respostas enviadas ao professor — sem gabarito agora, o resultado sai com ele.';
+      btn.style.display = 'none';
+      return;
+    }
+    var daTurma = (typeof turmaDe === 'function' && turmaDe(q.turmaId)) ? ' — ' + turmaDe(q.turmaId).nome : '';
+    if (q.status === 'criado') {
+      tag.textContent = 'AULA COM QUIZ'; tag.classList.remove('live');
+      sub.textContent = 'O professor preparou um quiz de ' + q.qs.length + ' questões para a aula de hoje' + daTurma + ' — ele ativa quando a aula começar.';
+      btn.style.display = 'none';
+      return;
+    }
+    /* ativo */
+    tag.textContent = 'AULA COM QUIZ ATIVO'; tag.classList.add('live');
+    sub.textContent = 'Quiz valendo' + daTurma + ': ' + q.qs.length + ' questões e ' + q.minutos + ' min no relógio — toque e responda.';
+    btn.textContent = 'Quiz';
+    btn.style.display = 'inline-block';
+    refreshSalaLock();
+  }
+  $('btnEntrarQuiz').addEventListener('click', function () {
+    if (!online) { toast('O quiz da aula precisa de conexão com a internet.'); return; }
+    var q = quizDaMinhaTurma();
+    if (!q || q.status !== 'ativo') { toast('O quiz ainda não está ativo.'); return; }
+    abrirQuizAula(q);
+  });
+
+  /* ---------- runtime do quiz da aula (cronômetro · sem premiação) ---------- */
+  var qaIdx = 0, qaSel = null, qaTimerT = null, qaFim = 0, QA_ATUAL = null;
+  function qaTick() {
+    var resta = Math.max(0, Math.round((qaFim - Date.now()) / 1000));
+    var m = Math.floor(resta / 60), sg = resta % 60;
+    $('qaTimer').textContent = (m < 10 ? '0' : '') + m + ':' + (sg < 10 ? '0' : '') + sg;
+    if (resta <= 0) { clearInterval(qaTimerT); qaFinaliza(true); }
+  }
+  function abrirQuizAula(q) {
+    qaIdx = 0; qaSel = null; QA_ATUAL = q;
+    q.respostasAluno = [];
+    $('qaKicker').textContent = 'Quiz da aula · ' + (turmaDe(q.turmaId) || {}).nome;
+    qaFim = Date.now() + q.minutos * 60000;
+    clearInterval(qaTimerT); qaTimerT = setInterval(qaTick, 250); qaTick();
+    qaRender();
+    $('qaLayer').classList.add('on');
+  }
+  function qaRender() {
+    var q = QA_ATUAL, item = q.qs[qaIdx];
+    $('qaProgress').textContent = 'Questão ' + (qaIdx + 1) + ' de ' + q.qs.length;
+    $('qaBody').innerHTML = '<p class="q-txt">' + item.txt + '</p>' +
+      item.alts.map(function (alt, i) {
+        return '<button class="q-alt" data-qa="' + i + '">' + alt + '</button>';
+      }).join('');
+    qaSel = null; $('btnQaNext').disabled = true;
+    $('btnQaNext').textContent = qaIdx === q.qs.length - 1 ? 'Enviar ao professor' : 'Responder';
+    $('qaBody').querySelectorAll('[data-qa]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        qaSel = parseInt(bt.dataset.qa, 10);
+        $('qaBody').querySelectorAll('[data-qa]').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+        $('btnQaNext').disabled = false;
+      });
+    });
+  }
+  $('btnQaNext').addEventListener('click', function () {
+    if (qaSel == null) return;
+    QA_ATUAL.respostasAluno[qaIdx] = qaSel;
+    if (qaIdx < QA_ATUAL.qs.length - 1) { qaIdx++; qaRender(); return; }
+    qaFinaliza(false);
+  });
+  $('btnSairQa').addEventListener('click', function () {
+    clearInterval(qaTimerT);
+    $('qaLayer').classList.remove('on');
+    toast('Você saiu do quiz — dá para voltar enquanto ele estiver ativo.');
+  });
+  function qaFinaliza(tempoEsgotado) {
+    clearInterval(qaTimerT);
+    QA_ATUAL.alunoFez = true;
+    $('qaLayer').classList.remove('on');
+    if (SALA_ATUAL === QA_ATUAL.turmaId) { qzRelatorio(QA_ATUAL); }   /* a resposta real entra no relatório do professor */
+    refreshQuizAula();
+    toast(tempoEsgotado ? 'Tempo esgotado — o que você respondeu foi enviado ao professor.' : 'Respostas enviadas ao professor — sem gabarito agora, o resultado sai com ele.');
+  }
+
+  /* ---------- vinheta (após conceder o acesso, antes de abrir o app) ---------- */
+  var splashTimer = null, splashDone = null;
+  function playSplash(done) {
+    splashDone = done || null;
+    var s = $('splashLayer');
+    s.innerHTML = s.innerHTML; // recria os nós para reiniciar as animações
+    s.classList.remove('done');
+    clearTimeout(splashTimer);
+    splashTimer = setTimeout(function () {
+      s.classList.add('done');
+      var d = splashDone; splashDone = null; if (d) d();
+    }, 3400);
+  }
+  $('splashLayer').addEventListener('click', function () {
+    clearTimeout(splashTimer);
+    $('splashLayer').classList.add('done');
+    var d = splashDone; splashDone = null; if (d) d();
+  });
+

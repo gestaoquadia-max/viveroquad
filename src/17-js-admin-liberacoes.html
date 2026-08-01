@@ -1,0 +1,550 @@
+  /* ---------- eventos da semana: regras e novos eventos ---------- */
+  function renderAdmEventos() {
+    $('admEvList').innerHTML = EVENTOS.map(function (ev) {
+      var tags = (ev.modalidade ? ev.modalidade.toUpperCase() : '') + (ev.pago ? ' · ' + fmt(ev.preco) + ' ' + moedaTxt(ev.moeda) : ' · GRÁTIS');
+      var insc = evInscritosCount(ev.id);
+      var quem = evProfsTxt(ev);
+      return '<div class="adm-bar"><span class="nm">' + ev.nome + '<small>' + ev.quando + ' · ' + tags + (quem ? ' · ' + quem : '') + (insc ? ' · ' + insc + ' inscrito' + (insc > 1 ? 's' : '') : '') + '</small></span>' +
+        '<button class="btn ghost small" data-ed-ev="' + ev.id + '">Editar</button>' +
+        '<button class="adm-x" data-cancel-ev="' + ev.id + '" aria-label="Cancelar evento">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum evento criado.</p>';
+    $('admEvSel').innerHTML = EVENTOS.map(function (ev) {
+      return '<option value="' + ev.id + '">' + ev.nome + '</option>';
+    }).join('');
+    if (typeof ativInit === 'function') { ativInit(); }   /* evento novo já pode ter os inscritos consultados nas Liberações */
+    $('admEvList').querySelectorAll('[data-cancel-ev]').forEach(function (bt) {
+      bt.addEventListener('click', function () { cancelarEvento(bt.dataset.cancelEv); });
+    });
+    $('admEvList').querySelectorAll('[data-ed-ev]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarEvento(bt.dataset.edEv); });
+    });
+  }
+  function evInscritosCount(id) {
+    var st = evState[id];
+    return (st && (st.comprado || st.inscrito)) ? 1 : 0;   /* demo: só o aluno desta sessão */
+  }
+  var evEdit = null;
+  function editarEvento(id) {
+    var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    evEdit = id;
+    $('admEvNovoNome').value = ev.nome;
+    $('admEvNovoResumo').value = ev.desc || '';
+    $('admEvNovoModal').value = ev.modalidade || 'presencial';
+    $('admEvNovoTipo').value = ev.pago ? 'pago' : 'gratuito';
+    $('admEvNovoLink').value = ev.link || '';
+    if ($('admEvNovoMoeda')) $('admEvNovoMoeda').value = ev.moeda || 'qdc';
+    $('admEvNovoPreco').value = ev.pago ? ev.preco : '';
+    if (ev.dataISO) $('admEvNovoData').value = ev.dataISO;
+    if (ev.hi) $('admEvNovoInicio').value = ev.hi;
+    if (ev.hf) $('admEvNovoFim').value = ev.hf;
+    renderEvProfChips(evProfs(ev));
+    admEvCamposToggle();
+    /* online já ficou com o Estúdio reservado: o seletor volta marcado */
+    $('admEvSala').value = ev.online ? ESTUDIO : (ev.sala || '');
+    admEvSalaEcoRender();
+    var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Salvar alterações';
+    admEvPreview();
+    $('admEvNovoNome').scrollIntoView({ block: 'center' });
+    toast('Editando “' + ev.nome + '” — as mudanças valem para quem já está inscrito ao salvar.');
+  }
+  function evEditReset() { evEdit = null; var btn = $('btnAdmEvNovo'); if (btn) btn.textContent = 'Criar evento'; }
+  function cancelarEvento(id) {
+    var ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    EVENTOS = EVENTOS.filter(function (x) { return x.id !== id; });
+    delete evState[id];
+    renderAdmEventos();
+    renderEvStrip();                                   /* sai do carrossel da semana */
+    if (typeof renderEventosLoja === 'function') renderEventosLoja();  /* e da vitrine da Loja */
+    if (typeof renderCalendario === 'function') renderCalendario();   /* e do calendário do aluno */
+    if (typeof renderSalas === 'function') renderSalas();             /* a sala/Estúdio volta a ficar livre */
+    if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+    delete ACESSO_ST[id];                                              /* o grupo sai da portaria */
+    if (typeof renderAcessos === 'function') renderAcessos();
+    toast('Evento “' + ev.nome + '” cancelado — saiu do carrossel, da Loja e dos calendários.');
+  }
+  $('btnAdmEvRegra').addEventListener('click', function () {
+    var id = $('admEvSel').value, regra = $('admEvRegra').value.trim(), val = $('admEvValor').value.trim();
+    if (!regra || !val) { toast('Preencha a regra e o valor.'); return; }
+    EVENTOS.forEach(function (ev) {
+      if (ev.id !== id) return;
+      ev[$('admEvTipo').value].push([regra, val]);
+      toast('Regra publicada na página do evento "' + ev.nome + '".');
+    });
+    $('admEvRegra').value = ''; $('admEvValor').value = '';
+    renderAdmEventos();
+  });
+  /* monta "QUA · 29/07 · 19H–21H" a partir da data, início e término */
+  var DIA_SEM = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  function fmtHora(h) { if (!h) return ''; var p = h.split(':'); return (+p[0]) + 'H' + (p[1] !== '00' ? p[1] : ''); }
+  function admEvQuando() {
+    var d = $('admEvNovoData').value;
+    if (!d) return '';
+    var p = d.split('-');
+    var dt = new Date(+p[0], +p[1] - 1, +p[2]);   /* local, sem escorregar de fuso */
+    var quando = DIA_SEM[dt.getDay()] + ' · ' + p[2] + '/' + p[1];
+    var ini = fmtHora($('admEvNovoInicio').value), fim = fmtHora($('admEvNovoFim').value);
+    if (ini) quando += ' · ' + ini + (fim ? '–' + fim : '');
+    return quando;
+  }
+  function admEvPreview() {
+    var q = admEvQuando();
+    $('admEvNovoPrev').textContent = q ? 'Agendado para: ' + q : 'Escolha a data, o início e o término na agenda.';
+  }
+  /* liga/desliga os campos de link (online) e preço (pago) */
+  /* os chips saem do Banco de professores — cadastrou lá, aparece aqui */
+  function renderEvProfChips(marcados) {
+    var host = $('admEvProfs'); if (!host) return;
+    var sel = marcados || evProfChipsSel();
+    host.innerHTML = (typeof docentesAtivos === 'function' ? docentesAtivos() : []).map(function (d) {
+      return '<button type="button" class="turno-chip' + (sel.indexOf(d.nome) >= 0 ? ' on' : '') + '" data-ev-prof="' + d.nome + '">' + d.nome + '</button>';
+    }).join('') || '<p class="sub" style="padding:4px 0">Nenhum professor ativo no banco de professores.</p>';
+    host.querySelectorAll('[data-ev-prof]').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+  }
+  function evProfChipsSel() {
+    var host = $('admEvProfs'); if (!host) return [];
+    return [].slice.call(host.querySelectorAll('.turno-chip.on')).map(function (b) { return b.dataset.evProf; });
+  }
+  renderEvProfChips([]);
+  function admEvCamposToggle() {
+    var online = $('admEvNovoModal').value === 'online';
+    var pago = $('admEvNovoTipo').value === 'pago';
+    $('admEvNovoLink').disabled = !online;
+    if (!online) $('admEvNovoLink').value = '';
+    $('admEvNovoPreco').disabled = !pago;
+    var mo = $('admEvNovoMoeda'); if (mo) mo.disabled = !pago;
+    if (!pago) $('admEvNovoPreco').value = '';
+    admEvSalaOpcoes();
+  }
+  /* reserva do espaço: presencial escolhe uma das 4 salas; online escolhe
+     o Estúdio — escolhe mesmo, o seletor fica ativo e vazio até que o
+     administrador o selecione, como em qualquer outra reserva          */
+  function admEvSalaOpcoes() {
+    var sel = $('admEvSala'); if (!sel) return;
+    var online = $('admEvNovoModal').value === 'online';
+    var lb = $('admEvReservaLb');
+    if (lb) lb.textContent = online ? 'Reserva do Estúdio · dia e horário' : 'Reserva de sala · dia e horário';
+    sel.disabled = false;
+    if (online) {
+      if (sel.value && sel.value !== ESTUDIO) sel.value = '';
+      sel.innerHTML = salaOpcoesHTML(sel, 'Reserve o espaço da transmissão', [ESTUDIO]);
+    } else {
+      if (sel.value === ESTUDIO) sel.value = '';
+      sel.innerHTML = salaOpcoesHTML(sel, 'Em qual sala o evento acontece?');
+    }
+    admEvSalaEcoRender();
+  }
+  function admEvOcupacao(sala) {
+    var d = $('admEvNovoData').value, hi = $('admEvNovoInicio').value, hf = $('admEvNovoFim').value;
+    if (!d || !hi || !hf || !(hi < hf)) return null;
+    return ocPontual(sala, 'novo evento', 'evento', d, hi, hf, evEdit || null);
+  }
+  function admEvSalaEcoRender() {
+    var eco = $('admEvSalaEco'); if (!eco) return;
+    var sl = $('admEvSala').value;
+    if (!sl) { eco.style.display = 'none'; return; }
+    eco.style.display = '';
+    eco.innerHTML = salaEcoHTML(sl, admEvOcupacao(sl));
+  }
+  (function () {
+    var el = $('admEvSala');
+    if (el) el.addEventListener('change', function () { admEvSalaEcoRender(); admLimpaErro(['admEvSala']); });
+    ['admEvNovoData', 'admEvNovoInicio', 'admEvNovoFim'].forEach(function (id) {
+      var c = $(id); if (c) c.addEventListener('change', admEvSalaEcoRender);
+    });
+  })();
+  window.__evSalaRefresh = admEvSalaOpcoes;
+  ['admEvNovoData', 'admEvNovoInicio', 'admEvNovoFim'].forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('change', admEvPreview);
+  });
+  ['admEvNovoModal', 'admEvNovoTipo'].forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('change', admEvCamposToggle);
+  });
+  admEvCamposToggle();
+  /* aviso fixo do evento: fica na tela dizendo o que falta */
+  var EV_CAMPOS = ['admEvNovoNome', 'admEvNovoData', 'admEvNovoInicio', 'admEvNovoLink', 'admEvNovoPreco', 'admEvSala'];
+  function evFalta(cond, campo, msg) {
+    if (!cond) return false;
+    admAlerta('admEvErro', msg);
+    if (campo) admMarcaErro(campo);
+    return true;
+  }
+  EV_CAMPOS.forEach(function (id) {
+    var el = $(id); if (!el) return;
+    ['input', 'change'].forEach(function (ev) { el.addEventListener(ev, function () { el.classList.remove('err'); }); });
+  });
+  $('btnAdmEvNovo').addEventListener('click', function () {
+    var nome = $('admEvNovoNome').value.trim(), quando = admEvQuando();
+    var resumo = $('admEvNovoResumo').value.trim();
+    var modalidade = $('admEvNovoModal').value;            /* online | presencial (tópico) */
+    var pago = $('admEvNovoTipo').value === 'pago';
+    var profs = evProfChipsSel();
+    var link = modalidade === 'online' ? $('admEvNovoLink').value.trim() : '';
+    var preco = parseInt($('admEvNovoPreco').value, 10);
+    admAlerta('admEvErro', ''); admLimpaErro(EV_CAMPOS);
+    if (evFalta(!nome, 'admEvNovoNome', 'Para cadastrar o evento falta o <b>nome</b>.')) return;
+    if (evFalta(!$('admEvNovoData').value, 'admEvNovoData', 'Para cadastrar o evento falta a <b>data</b> — escolha o dia na agenda.')) return;
+    if (evFalta(!quando, 'admEvNovoInicio', 'Para cadastrar o evento falta a <b>hora de início</b>.')) return;
+    if (evFalta(!!link && link.indexOf('http') !== 0, 'admEvNovoLink', 'O <b>link</b> do evento online precisa começar com http.')) return;
+    if (evFalta(pago && (!preco || preco < 1), 'admEvNovoPreco', 'O evento é <b>pago</b> — informe o <b>preço</b> de venda na Loja.')) return;
+    /* reserva do espaço: presencial numa das 4 salas, online no Estúdio.
+       (usa a modalidade e a data lidas AQUI — as variáveis online/dataISO
+       do restante do handler só são declaradas mais abaixo)             */
+    var evOnline = modalidade === 'online';
+    var evData = $('admEvNovoData').value || '';
+    var evHi = $('admEvNovoInicio').value, evHf = $('admEvNovoFim').value;
+    var evSala = $('admEvSala').value;
+    if (evFalta(!evSala, 'admEvSala', evOnline
+      ? 'Evento online ocupa o <b>Estúdio</b> de gravações: selecione-o para reservar o espaço.'
+      : 'Evento presencial ocupa sala: diga <b>em qual sala da sede</b> ele acontece.')) return;
+    if (evFalta(!evHi || !evHf || !(evHi < evHf), 'admEvNovoInicio', 'Informe o <b>horário</b> do evento — o término precisa ser depois do início.')) return;
+    var evOc = ocPontual(evSala, nome, 'evento', evData, evHi, evHf, evEdit || null);
+    var evChoque = evOc ? salaConflito(evOc) : null;
+    if (evChoque && evFalta(true, evOnline ? 'admEvNovoInicio' : 'admEvSala',
+      (evOnline ? 'O <b>Estúdio</b> já tem <b>' : 'A <b>' + evSala + '</b> já tem <b>') + evChoque.rot + '</b> nesse dia e horário (' + evChoque.hor +
+      ') — escolha outro horário' + (evOnline ? '.' : ' ou outra sala.'))) return;
+    var online = modalidade === 'online';
+    var moedaEv = pago ? ($('admEvNovoMoeda') ? $('admEvNovoMoeda').value : 'qdc') : 'qdc';
+    var dataISO = $('admEvNovoData').value || '';
+    /* SALVAR EDIÇÃO: atualiza no lugar, preservando inscritos (evState) */
+    if (evEdit) {
+      var ev = null; EVENTOS.forEach(function (x) { if (x.id === evEdit) ev = x; });
+      if (ev) {
+        ev.nome = nome; ev.desc = resumo || ev.desc; ev.modalidade = modalidade; ev.online = online; ev.link = link; ev.profs = profs;
+        ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
+        ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf;
+        ev.lot = online ? 0 : salaCap(evSala);   /* trocou de sala? a lotação acompanha */
+        ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
+        ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
+      }
+      evEditReset();
+      $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
+      $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
+      renderEvProfChips([]);
+      admEvPreview(); renderAdmEventos(); renderEventosLoja(); renderEvStrip();
+      if (typeof renderAcessos === 'function') renderAcessos();
+      if (typeof renderCalendario === 'function') renderCalendario();
+      toast('Evento “' + nome + '” atualizado — vale para todos, inclusive quem já está inscrito.');
+      return;
+    }
+    EVENTOS.push({ id: 'adm' + Date.now(), nome: nome,
+      tipo: (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL'),
+      quando: quando, dataISO: dataISO, sala: online ? '' : evSala, hi: evHi, hf: evHf,
+      lot: online ? 0 : salaCap(evSala), ocup: 0,   /* lotação = cadeiras da sala */
+      modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
+      cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
+      meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
+      desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
+    $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
+    $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
+    $('admEvSala').value = '';
+    admEvSalaOpcoes();
+    renderEvProfChips([]);
+    admEvPreview();
+    renderAdmEventos();
+    renderEventosLoja();   /* pago → vitrine da Loja */
+    renderEvStrip();       /* aparece no carrossel: pago = "Na Loja", grátis = direto */
+    if (typeof renderSalas === 'function') renderSalas();   /* a reserva entra no mapa (sala ou Estúdio) */
+    if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+    if (typeof window.__simSalaRefresh === 'function') window.__simSalaRefresh();
+    admAlerta('admEvErro', 'Evento <b>' + nome + '</b> criado para ' + quando + ' — ' +
+      (online ? '<b>Estúdio reservado</b>' : '<b>' + evSala + ' reservada</b> (' + salaCap(evSala) + ' lugares)') + ' · ' +
+      (pago ? 'à venda na Loja (' + (modalidade === 'online' ? 'Eventos online' : 'Eventos e aulões') + ') e no carrossel do Início com a tag “NA LOJA”.'
+            : 'já gira no carrossel do Início do aluno.'), true);
+    toast(pago
+      ? 'Evento pago criado — na Loja e no carrossel do Início com a tag “Na Loja”.'
+      : 'Evento gratuito criado — já gira no carrossel do Início.');
+  });
+
+  /* ---------- liberações: produtos presenciais (dar baixa) ---------- */
+  var PRESENCIAIS = ['Turma presencial', 'Aula isolada', 'Aulão especial', 'Evento presencial'];
+  var PEDIDOS = [
+    { aluno: nomeCurto(), item: 'Módulo impresso', presId: 'modulo', quando: 'há 2 dias', status: 'aguardando' },
+    { aluno: nomeCurto(), item: 'Garrafinha Quad', presId: 'garrafinha', quando: 'há 8 dias', status: 'entregue' },
+    { aluno: 'AL SGT QUAD SANTIAGO', item: 'Garrafinha Quad', quando: 'ontem · 19h40', status: 'aguardando' },
+    { aluno: 'SD QUAD BRANDÃO', item: 'Camiseta Quad', quando: 'hoje · 9h12', status: 'aguardando' },
+    { aluno: 'AL CB QUAD NASCIMENTO', item: 'Vade Mecum', quando: 'sexta · 20h05', status: 'entregue' }
+  ];
+  function pedidoNovo(item) {
+    PEDIDOS.unshift({ aluno: nomeCurto(), item: item, quando: 'agora', status: 'aguardando' });
+    renderPedidos();
+  }
+  /* pedido de item presencial: guarda o id e a quantidade para dar baixa e
+     devolver o item à Loja quando a entrega for confirmada */
+  function pedidoPresencial(p, qtd) {
+    PEDIDOS.unshift({ aluno: nomeCurto(), item: p.nome, presId: p.id, qtd: qtd, quando: 'agora', status: 'aguardando' });
+    renderPedidos();
+  }
+  function renderPedidos() {
+    var el = $('admPedidosList'); if (!el) return;
+    el.innerHTML = PEDIDOS.map(function (pd, i) {
+      var qt = pd.qtd && pd.qtd > 1 ? ' <span class="tag">×' + pd.qtd + '</span>' : '';
+      return '<div class="mission-row"><div class="grow"><div class="t">' + pd.item + qt + '</div>' +
+        '<div class="d">' + pd.aluno + ' · ' + pd.quando + '</div></div>' +
+        (pd.status === 'entregue'
+          ? '<span class="tag ok">ENTREGUE</span>'
+          : '<button class="btn small" data-ped="' + i + '">Confirmar entrega</button>') + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma retirada pendente.</p>';
+    el.querySelectorAll('[data-ped]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var pd = PEDIDOS[parseInt(bt.dataset.ped, 10)];
+        pd.status = 'entregue';
+        /* entregue = consumido: sai da janela de estorno do aluno */
+        if (pd.aluno === nomeCurto() && typeof compraConsumida === 'function') compraConsumida('pres', pd.presId);
+        /* o item presencial volta a ficar disponível na Loja do aluno, marcado como ENTREGUE */
+        if (pd.presId && typeof presDe === 'function') {
+          var p = presDe(pd.presId);
+          if (p && typeof renderPresenciais === 'function') renderPresenciais();
+        }
+        renderPedidos();
+        if (typeof renderRelCompras === 'function') renderRelCompras();   /* cai no relatório de compras do aluno */
+        toast('Entrega confirmada — baixa registrada e item liberado na Loja.');
+      });
+    });
+  }
+
+  /* ---------- Autorizações de acesso: portaria por tipo de atividade ----------
+     Simulados vêm de SIM_INSC (bloco próprio). Os demais tipos ficam aqui,
+     com liberação de entrada por pessoa.                                    */
+  function inscNome(seed, i) {
+    var pref = (i % 5 === 0) ? 'AL SGT QUAD ' : (i % 3 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+    return pref + RK_NOMES[(seed + i * 7) % RK_NOMES.length].toUpperCase();
+  }
+  function inscritosSeed(seed, n, euNoPrimeiro) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push({ nome: (euNoPrimeiro && i === 0) ? nomeCurto() : inscNome(seed, i), liberado: false, euSou: euNoPrimeiro && i === 0 });
+    return out;
+  }
+  /* ---------- Autorizações de acesso SINCRONIZADAS ----------
+     Os grupos saem das ATIVIDADES REAIS: todo evento presencial vigente
+     (aulão, minicurso, isolada em andamento…) vira um grupo de portaria,
+     com os inscritos da demo e — quando o aluno desta sessão comprou ou
+     se inscreveu — ele junto. Nada de atividade fictícia. Simulados
+     presenciais têm a própria recepção, no bloco ao lado.              */
+  var ACESSO_ST = {};   /* ev.id → lista de inscritos da portaria */
+  function acessoListaDe(ev) {
+    var st = ACESSO_ST[ev.id];
+    if (!st) {
+      var n = 2 + (edHash(ev.id) % 4);   /* inscritos-semente da demo */
+      st = ACESSO_ST[ev.id] = inscritosSeed(3 + (edHash(ev.id) % 90), n, false);
+    }
+    /* o aluno desta sessão entra e sai conforme a compra/inscrição dele */
+    var eu = evState[ev.id] && (evState[ev.id].comprado || evState[ev.id].inscrito);
+    var tem = st.some(function (p) { return p.euSou; });
+    if (eu && !tem) st.unshift({ nome: nomeCurto(), liberado: false, euSou: true });
+    if (!eu && tem) for (var i = st.length - 1; i >= 0; i--) { if (st[i].euSou) st.splice(i, 1); }
+    return st;
+  }
+  function acessosGrupos() {
+    return (typeof EVENTOS !== 'undefined' ? EVENTOS : []).filter(function (ev) {
+      if (ev.online || ev.modalidade === 'online') return false;   /* online não passa na portaria */
+      if (typeof evAcabou === 'function' && evAcabou(ev)) return false;
+      return true;
+    });
+  }
+  function renderAcessos() {
+    var el = $('admAcessos'); if (!el) return;
+    var grupos = acessosGrupos();
+    el.innerHTML = grupos.map(function (ev) {
+      var lista = acessoListaDe(ev);
+      var faltam = lista.filter(function (p) { return !p.liberado; }).length;
+      var lot = (typeof evLot === 'function') ? evLot(ev) : 0;
+      var linhas = lista.map(function (p, i) {
+        var right = p.liberado
+          ? '<span class="tag ok">ENTRADA LIBERADA</span>'
+          : '<button class="btn small" data-ac="' + ev.id + ':' + i + '">Liberar entrada</button>';
+        return '<div class="mission-row"><div class="grow"><div class="t">' + p.nome + (p.euSou ? ' · você' : '') + '</div></div>' + right + '</div>';
+      }).join('');
+      return '<div class="ac-cat">' + ev.nome +
+        '<span class="tag' + (faltam ? '' : ' ok') + '">' + (faltam ? faltam + ' a liberar' : 'tudo liberado') + '</span></div>' +
+        '<p class="sub" style="margin:0 0 4px">' + ev.quando + (ev.sala ? ' · ' + ev.sala : '') + (lot ? ' · ' + lot + ' lugares' : '') + '</p>' +
+        '<div class="ac-grupo">' + linhas + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma atividade presencial vigente — os grupos aparecem aqui quando um evento, aulão ou isolada estiver de pé.</p>';
+    el.querySelectorAll('[data-ac]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var pr = bt.dataset.ac.split(':');
+        var ev = null; EVENTOS.forEach(function (x) { if (x.id === pr[0]) ev = x; });
+        if (!ev) return;
+        var p = acessoListaDe(ev)[+pr[1]];
+        if (!p || p.liberado) return;
+        p.liberado = true;
+        /* liberou a entrada = consumiu: a compra sai da janela de estorno */
+        if (p.euSou) {
+          compraConsumida('evento', ev.id);
+          compraConsumida('item', ev.nome);   /* isolada comprada é logada pelo nome */
+        }
+        renderAcessos();
+        toast('Entrada liberada — ' + p.nome + ' · ' + ev.nome + (p.euSou ? '. A compra saiu da janela de estorno.' : '.'));
+      });
+    });
+  }
+
+  /* ---------- Inscritos por atividade: banco + lista colapsável (estilo ranking) ---------- */
+  var ATIVIDADES = [
+    { id: 'a-aulao', nome: 'Aulão de véspera RONDESP', tipo: 'Aulão', n: 73, seed: 13 },
+    { id: 'a-isolada', nome: 'Isolada Dir. Administrativo', tipo: 'Isolada', n: 21, seed: 17 },
+    { id: 'a-simulado', nome: 'Simuladão Quad', tipo: 'Simulado', n: 54, seed: 29 },
+    { id: 'a-excursao', nome: 'Excursão concurso PM-BA', tipo: 'Excursão', n: 40, seed: 31 },
+    { id: 'a-taf', nome: 'Treinamento TAF', tipo: 'TAF', n: 30, seed: 37 }
+  ];
+  var ativOpen = false;
+  /* turmas e eventos entram AUTOMATICAMENTE: o que a coordenação abre hoje
+     já pode ter a lista de inscritos consultada aqui, sem cadastro duplo.  */
+  function turmaInscritos(t) {
+    var base = t.criada ? 0 : (20 + (edHash(t.id) % 25));
+    var meus = (typeof matriculasAtivas === 'function')
+      ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
+    return base + meus;
+  }
+  function turmaRotulo(t) {
+    var tn = (t.turno || '');
+    return t.nome + (t.nome.toLowerCase().indexOf(tn.toLowerCase()) >= 0 ? '' : ' (' + tn + ')');
+  }
+  function ativBank() {
+    var lista = ATIVIDADES.slice();
+    (typeof TURMAS_LOJA !== 'undefined' ? TURMAS_LOJA : []).forEach(function (t) {
+      lista.push({ id: 'at-' + t.id, nome: turmaRotulo(t), tipo: 'Turma',
+        n: turmaInscritos(t), seed: 3 + (edHash(t.id) % 90) });
+    });
+    (typeof EVENTOS !== 'undefined' ? EVENTOS : []).forEach(function (ev) {
+      lista.push({ id: 'at-' + ev.id, nome: ev.nome, tipo: 'Evento',
+        n: (typeof evInscritosCount === 'function' ? evInscritosCount(ev.id) : 0), seed: 3 + (edHash(ev.id) % 90) });
+    });
+    return lista;
+  }
+  function ativDe(id) { return ativBank().filter(function (a) { return a.id === id; })[0]; }
+  function ativInit() {
+    var sel = $('admAtivSel'); if (!sel) return;
+    var atual = sel.value;
+    sel.innerHTML = ativBank().map(function (a) {
+      return '<option value="' + a.id + '"' + (a.id === atual ? ' selected' : '') + '>' + a.tipo + ' · ' + a.nome + '</option>';
+    }).join('');
+    renderAtivInscritos();
+  }
+  function renderAtivInscritos() {
+    var sel = $('admAtivSel'), el = $('admAtivInscritos'); if (!sel || !el) return;
+    var a = ativDe(sel.value); if (!a) { el.innerHTML = ''; return; }
+    var CAP = 5;
+    var total = a.n, mostra = ativOpen ? total : Math.min(CAP, total);
+    if (!total) {
+      el.innerHTML = '<div class="k-label sub-k" style="margin-top:2px">' + a.tipo + ' · ' + a.nome + ' <span class="tag">sem inscritos</span></div>' +
+        '<p class="sub" style="padding:8px 0">Ninguém inscrito ainda — assim que a primeira matrícula/compra entrar, o nome aparece aqui.</p>';
+      return;
+    }
+    var linhas = '';
+    for (var i = 1; i <= mostra; i++) linhas += '<div class="mission-row"><div class="cal-date">' + i + 'º</div>' +
+      '<div class="grow"><div class="t">' + inscNome(a.seed, i) + '</div>' +
+      '<div class="d">' + a.tipo + ' · ' + a.nome + '</div></div><span class="tag ok">INSCRITO</span></div>';
+    var html = '<div class="k-label sub-k" style="margin-top:2px">' + a.tipo + ' · ' + a.nome + ' <span class="tag">' + total + ' inscritos</span></div>' + linhas;
+    if (total > CAP) html += '<button class="btn ghost small rk-toggle" id="ativBtn">' + (ativOpen ? 'Mostrar menos' : 'Ver todos os ' + total + ' inscritos') + '</button>';
+    el.innerHTML = html;
+    if ($('ativBtn')) $('ativBtn').onclick = function () { ativOpen = !ativOpen; renderAtivInscritos(); };
+  }
+  /* ---------- lista de conferência em PDF ----------
+     Abre uma folha limpa numa janela nova e chama a impressão do próprio
+     navegador — no diálogo dá para "Salvar como PDF" ou imprimir para
+     conferir na portaria, no papel, com a coluna de presença em branco. */
+  function ativListaPdf() {
+    var sel = $('admAtivSel'); if (!sel) return;
+    var a = ativDe(sel.value); if (!a) return;
+    if (!a.n) { toast('“' + a.nome + '” ainda não tem inscritos para listar.'); return; }
+    var esc = function (x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+    var linhas = '';
+    for (var i = 1; i <= a.n; i++) {
+      linhas += '<tr><td class="n">' + i + '</td><td>' + esc(inscNome(a.seed, i)) + '</td><td class="ck"></td></tr>';
+    }
+    var doc = '<!doctype html><meta charset="utf-8"><title>Inscritos · ' + esc(a.nome) + '</title>' +
+      '<style>body{font:12px/1.45 Arial,Helvetica,sans-serif;color:#111;margin:24px}' +
+      'h1{font-size:16px;margin:0 0 2px}.meta{font-size:11px;color:#555;margin-bottom:14px}' +
+      'table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ccc;padding:6px 4px;text-align:left}' +
+      'th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#555}' +
+      'td.n{width:34px;color:#666}td.ck{width:90px}thead{display:table-header-group}tr{break-inside:avoid}' +
+      '@media print{body{margin:0}}</style>' +
+      '<h1>' + esc(a.tipo) + ' · ' + esc(a.nome) + '</h1>' +
+      '<div class="meta">' + a.n + ' inscritos · lista de conferência · Quad Concursos</div>' +
+      '<table><thead><tr><th>#</th><th>Nome de guerra</th><th>Presença</th></tr></thead><tbody>' +
+      linhas + '</tbody></table>';
+    var w = window.open('', '_blank');
+    if (!w) { toast('Libere os pop-ups para gerar a lista de conferência.'); return; }
+    w.document.write(doc); w.document.close(); w.focus();
+    setTimeout(function () { try { w.print(); } catch (e) {} }, 300);
+    toast('Lista de ' + a.n + ' inscritos aberta para impressão ou PDF.');
+  }
+  (function () {
+    var bp = $('btnAtivPdf');
+    if (bp) bp.addEventListener('click', ativListaPdf);
+  })();
+  (function () {
+    var sel = $('admAtivSel'); if (!sel) return;
+    sel.addEventListener('change', function () { ativOpen = false; renderAtivInscritos(); });
+    ativInit();
+  })();
+
+  /* ---------- Liberações: inscritos presenciais (liberar entrada e pontuar) ----------
+     Todos os inscritos (pagos OU grátis) aparecem agrupados por simulado. A
+     liberação marca a entrada; quando o simulado gera QdC (grátis), a
+     liberação também PONTUA quem compareceu.                                */
+  var DIA_SEM_SIM = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  function simQuando(d, ini, fim) {
+    if (!d) return '';
+    var p = d.split('-');
+    var dt = new Date(+p[0], +p[1] - 1, +p[2]);
+    var q = DIA_SEM_SIM[dt.getDay()] + ' · ' + p[2] + '/' + p[1];
+    var hi = fmtHora(ini), hf = fmtHora(fim);   /* fmtHora vem do bloco de eventos */
+    if (hi) q += ' · ' + hi + (hf ? '–' + hf : '');
+    return q;
+  }
+  function renderSimPres() {
+    var el = $('admSpLista'); if (!el) return;
+    var rots = [];
+    SIM_INSC.forEach(function (x) { if (rots.indexOf(x.simRot) < 0) rots.push(x.simRot); });
+    el.innerHTML = rots.map(function (rot) {
+      var linhas = SIM_INSC.map(function (x, i) { return { x: x, i: i }; })
+        .filter(function (o) { return o.x.simRot === rot; })
+        .map(function (o) {
+          var x = o.x;
+          var badge = x.geraQdC ? 'grátis · gera +' + x.valor + ' QdC na presença' : 'pago via Quad Coins';
+          var right = x.liberado
+            ? '<span class="tag ok">' + (x.pontuado ? 'LIBERADO · PONTUADO' : 'ENTRADA LIBERADA') + '</span>'
+            : '<button class="btn small" data-cp="' + o.i + '">Liberar entrada</button>';
+          return '<div class="mission-row"><div class="grow"><div class="t">' + x.nome + '</div>' +
+            '<div class="d">' + badge + '</div></div>' + right + '</div>';
+        }).join('');
+      return '<div class="k-label sub-k" style="margin-top:10px">' + rot + '</div>' + linhas;
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum inscrito ainda.</p>';
+    el.querySelectorAll('[data-cp]').forEach(function (bt) {
+      bt.addEventListener('click', function () { liberarInscrito(parseInt(bt.dataset.cp, 10)); });
+    });
+  }
+  function liberarInscrito(idx) {
+    var x = SIM_INSC[idx]; if (!x || x.liberado) return;
+    x.liberado = true;
+    /* a presença no simulado gera SCORE, como a maior parte das
+       interações do app; Quad Coins, só onde a atividade premia      */
+    x.pontuado = true;
+    if (x.euSou) {
+      carreira.scorePatente += x.score; carreira.scoreCarreira += x.score; carreira.scoreTemporada += x.score;
+      if (typeof renderCarreira === 'function') renderCarreira();
+      if (x.geraQdC) addScore(x.valor, 'Presença no simulado · +' + x.valor + ' QdC · +' + x.score + ' score');
+    }
+    toast(x.geraQdC
+      ? 'Entrada liberada — participante pontuado (+' + x.valor + ' QdC · +' + x.score + ' score).'
+      : 'Entrada liberada — presença confirmada (+' + x.score + ' score).');
+    /* liberado, o simulado do aluno sai da lista e vai ao histórico */
+    if (x.euSou) {
+      var sm = null; SIMULADOS.forEach(function (s) { if (s.rot === x.simRot && s.tag === 'PRESENCIAL') sm = s; });
+      if (sm && !sm.realizado) {
+        sm.realizado = true;
+        if (typeof compraConsumida === 'function') compraConsumida('simulado', sm.id);   /* entrou na sala: sem estorno */
+        SIM_HIST.unshift({ rot: sm.rot, tipo: 'Presencial', resultado: 'presença confirmada · +' + x.score + ' score' + (x.geraQdC ? ' · +' + x.valor + ' QdC' : '') });
+        if (typeof renderSimulados === 'function') renderSimulados();
+        if (typeof renderSimHist === 'function') renderSimHist();
+      }
+    }
+    renderSimPres();
+    if (typeof renderRelCompras === 'function') renderRelCompras();
+  }

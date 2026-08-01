@@ -1,0 +1,659 @@
+  /* ---------- eventos da semana ----------
+     Cada evento é produzido pela administração do Quad, que define as regras
+     de ganho de score e de Quad Coins. O que o admin publica aparece como
+     atalho na esteira (rolagem horizontal infinita) e abre a página própria. */
+  /* Cada evento tem: modalidade (online|presencial, um TÓPICO — não o nome),
+     pago (true → vendido na Loja; false → gratuito, dá recompensa ao participar),
+     preco, e regras de score/coins.                                          */
+  var EVENTOS = [
+    { id: 'nac', nome: 'NAC · Atualidades', tipo: 'ENCONTRO · AO VIVO', modalidade: 'online', pago: false, preco: 0, quando: 'QUA · 22/07 · 19H–21H', profs: ['Danilo Moura'],
+      cor: 'teal', meta: 'Atualidades da semana com Danilo Moura',
+      desc: 'Encontro semanal do Núcleo de Atualidades e Conhecimentos: os fatos da semana que podem cair na sua prova, analisados ao vivo.',
+      score: [['Presença no encontro', '+30 score'], ['Acerto no quiz de atualidades', '+2 score por questão']],
+      coins: [['Check-in ao vivo', '+10']] },
+    { id: 'aulao-rondesp', nome: 'Aulão de véspera RONDESP', tipo: 'AULÃO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'QUI · 23/07 · 19H–22H', profs: ['Cap. Silva', 'Prof.ª Ritha Galvão'],
+      cor: '', meta: 'Revisão final antes da prova', tag: 'COINS', garimpo: true,
+      desc: 'Aulão de véspera com os professores do Quad: pontos quentes do edital RONDESP, macetes de prova e rodada de questões comentadas.',
+      score: [['Presença confirmada', '+40 score'], ['Acerto na rodada de questões', '+1 score por questão']],
+      coins: [['Check-in no evento', '+10'], ['Garimpo escondido no aulão', '+15']] },
+    { id: 'gincana', nome: 'Gincana Quad Coins', tipo: 'EVENTO · ONLINE', modalidade: 'online', pago: false, preco: 0, quando: 'SEX · 24/07 · 20H–21H',
+      cor: 'gold', meta: 'Caça aos Coins escondidos', tag: 'COINS', garimpo: true,
+      desc: 'Uma hora de desafios-relâmpago no app: quem explora e resolve primeiro, garimpa mais. Os Coins da gincana expiram com ela.',
+      score: [['Desafio concluído', '+5 score por desafio']],
+      coins: [['Desafio vencido', '+5 por desafio'], ['Garimpo escondido na gincana', '+15'], ['Top 3 da noite', '+30']] },
+    { id: 'aulao-especial', nome: 'Aulão especial', tipo: 'EVENTO PAGO · PRESENCIAL', modalidade: 'presencial', online: false,
+      pago: true, preco: 80, moeda: 'qdc', quando: 'SÁB · 01/08 · 9H–12H', dataISO: '2026-08-01', sala: 'Sala 2', hi: '09:00', hf: '12:00', profs: ['Prof.ª Ritha Galvão'],
+      cor: 'navy2', meta: '80 QdC · evento presencial',
+      desc: 'Aulão de véspera de prova: revisão dirigida dos pontos mais cobrados, com rodada de questões comentadas ao vivo.',
+      score: [['Presença confirmada', '+40 score']], coins: [['Check-in no evento', '+10']] },
+    { id: 'simuladao', nome: 'Simuladão Quad', tipo: 'SIMULADO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'SÁB · 25/07 · 8H–13H', profs: ['Prof. Nascimento'],
+      cor: 'purple', meta: '140 questões · formato da banca',
+      desc: 'Simulado completo no formato e no tempo da banca, com ranking geral e correção comentada no fim do dia.',
+      score: [['Simulado concluído', '+120 score'], ['Aproveitamento acima de 70%', '+80 score bônus']],
+      coins: [['Participação', '+25'], ['Top 10 do ranking', '+50']] },
+    { id: 'semana-insana', nome: 'Semana Insana', tipo: 'MARATONA · PRESENCIAL', modalidade: 'presencial', pago: true, preco: 400, moeda: 'dmn', quando: 'SEG · 27/07 · 18H', ate: '2026-07-31',
+      cor: 'gold', meta: 'SEG a SEX · 400 Dmn',
+      desc: 'Cinco noites seguidas de revisão intensiva na sede — a maratona mais dura do Quad. O ingresso vale a semana inteira; o item segue na Quad Store até o último dia.',
+      score: [['Presença em cada noite', '+30 score'], ['Semana completa', '+100 score bônus']],
+      coins: [['Semana completa', '+40']] },
+    { id: 'mentoria-cfo', nome: 'Mentoria CFO · redação', tipo: 'MENTORIA · ONLINE', modalidade: 'online', pago: true, preco: 120, quando: 'DOM · 26/07 · 9H–11H', link: 'https://meet.quadconcursos.com.br/cfo-redacao',
+      cor: 'navy2', meta: 'Acesso pago · 120 QdC',
+      desc: 'Mentoria online de redação para o CFO: correção ao vivo, banca comentada e plano de treino individual. Acesso liberado pela Loja.',
+      score: [['Participação na mentoria', '+40 score']],
+      coins: [['Entrega da redação treino', '+15']] }
+  ];
+  var evState = {};   /* por evento: { garimpado, inscrito } */
+  /* professores do evento: alimentam o card do aluno, o painel do admin e,
+     mais adiante, a agenda do próprio professor. */
+  function evProfs(ev) { return (ev && ev.profs) ? ev.profs.slice() : []; }
+  /* evento gratuito que premia (score e/ou Quad Coins) ganha o selo +BÔNUS */
+  function evTemBonus(ev) {
+    if (!ev || ev.pago) return false;
+    return (ev.score && ev.score.length > 0) || (ev.coins && ev.coins.length > 0);
+  }
+  function evProfsTxt(ev) {
+    var ps = evProfs(ev);
+    if (!ps.length) return '';
+    if (ps.length === 1) return 'com ' + ps[0];
+    return 'com ' + ps.slice(0, -1).join(', ') + ' e ' + ps[ps.length - 1];
+  }
+  /* a grade do cronograma usa abreviações ("DIR. ADMIN."); o banco de
+     professores usa o nome cheio ("Direito Administrativo"). Casa as duas. */
+  function matPalavras(x) {
+    var t = (x || '').normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : (x || '');
+    return t.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
+      .filter(function (w) { return w.length > 2 && ['de', 'da', 'do', 'dos', 'das', 'com'].indexOf(w) < 0; });
+  }
+  function materiaBate(docMat, gradeMat) {
+    var A = matPalavras(docMat), B = matPalavras(gradeMat);
+    if (!A.length || !B.length) return false;
+    var hits = 0;
+    A.forEach(function (x) {
+      if (B.some(function (y) { var n = Math.min(3, x.length, y.length); return x.slice(0, n) === y.slice(0, n); })) hits++;
+    });
+    return hits >= Math.min(A.length, B.length);
+  }
+  function eventosDoProf(nome) {
+    return EVENTOS.filter(function (ev) { return evProfs(ev).indexOf(nome) >= 0; });
+  }
+  window.__evProf = eventosDoProf;   /* exposto para a suíte de testes */
+  window.__eventos = function () { return EVENTOS; };
+  window.__evEstado = function () { return evState; };
+  function evTileHTML(ev) {
+    var st = evState[ev.id] || {};
+    var insc = st.comprado || st.inscrito;   /* já garantiu a vaga */
+    var choque = insc ? null : choqueDeAgenda(agendaDoEvento(ev));
+    var etiqueta = insc ? '<span class="tag gold">INSCRITO</span>'
+      : (typeof evLotado === 'function' && evLotado(ev)) ? '<span class="tag warn">LOTADO</span>'
+      : choque ? '<span class="tag warn em-choque">EM CHOQUE</span>'
+      : ev.pago ? '<span class="tag gold">NA LOJA</span>'
+      : ev.tag ? '<span class="tag gold">' + ev.tag + '</span>'
+      : evTemBonus(ev) ? '<span class="tag gold">+BÔNUS</span>' : '';
+    return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
+      '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
+      '<span class="ev-name">' + ev.nome + '</span>' +
+      '<span class="ev-meta">' + (evProfsTxt(ev) || ev.meta) + '</span>' + etiqueta + '</button>';
+  }
+  /* eventos no Início: gratuitos + pagos ainda não vencidos.
+     Pago não comprado aparece com "Na Loja" (clique leva à Loja);
+     comprado vira "Inscrito"; vencido some do carrossel e da Loja. */
+  /* eventos são do QUAD, não de uma turma (dec. do gestor, 28/07):
+     todo evento vigente aparece para qualquer aluno                   */
+  function eventosInicio() {
+    return EVENTOS.filter(function (ev) { return !evAcabou(ev); });
+  }
+  var evNoInicioLen = 0;
+  function evPeriod(st) {
+    var tiles = st.querySelectorAll('.ev-tile');
+    if (!evNoInicioLen || tiles.length < evNoInicioLen * 2) return 0;
+    return tiles[evNoInicioLen].offsetLeft - tiles[0].offsetLeft;
+  }
+  function renderEvStrip() {
+    var lista = eventosInicio();
+    evNoInicioLen = lista.length;
+    var um = lista.map(evTileHTML).join('');
+    $('evStrip').innerHTML = um + um + um;   /* 3 cópias → fim liga com início */
+    $('evStrip').scrollLeft = evPeriod($('evStrip'));
+  }
+  /* eventos pagos ainda não comprados: vitrine da Loja
+     (presenciais no bloco de Itens presenciais; online nos Itens digitais) */
+  function renderEventosLoja() {
+    var alvos = { presencial: $('lojaEventos-pres'), online: $('lojaEventos-dig') };
+    if (!alvos.presencial && !alvos.online) return;
+    var ico = (typeof ICON_CAT !== 'undefined') ? ICON_CAT : {};
+    ['presencial', 'online'].forEach(function (modal) {
+      var g = alvos[modal]; if (!g) return;
+      var pagos = EVENTOS.filter(function (ev) {
+        if (!ev.pago || (ev.modalidade === 'online') !== (modal === 'online')) return false;
+        var comprado = evState[ev.id] && evState[ev.id].comprado;
+        /* pontual comprado sai da vitrine; evento de VÁRIOS DIAS permanece
+           (marcado INSCRITO) até o último dia — depois some sozinho */
+        if (evAcabou(ev)) return false;
+        return !comprado || !!ev.ate;
+      });
+      g.innerHTML = pagos.map(function (ev) {
+        var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
+        var comprado = evState[ev.id] && evState[ev.id].comprado;
+        var chq = comprado ? null : choqueDeAgenda(agendaDoEvento(ev));
+        var lot = evLot(ev), rest = lot ? Math.max(0, lot - evOcupados(ev)) : 0;
+        var lotado = !comprado && evLotado(ev);
+        var estq = comprado ? 'INSCRITO' : lotado ? 'LOTADO' : chq ? 'EM CHOQUE' : (lot ? rest + ' lugares' : '');
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + (lotado ? ' indisponivel' : '') + '" data-ev-buy="' + ev.id + '" data-moeda="' + mo + '">' +
+          (estq ? '<span class="li-estoque">' + estq + '</span>' : '') +
+          '<span class="li-ico">' + (modal === 'online' ? (ico.evento || '') : (ico.presencial || '')) + '</span>' +
+          '<span class="li-nome">' + ev.nome + '</span>' +
+          '<span class="li-desc">' + (evProfsTxt(ev) || (ev.ate ? 'até ' + dataBRcompleta(ev.ate) : 'evento ' + modal)) + '</span>' +
+          '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'INSCRITO' : lotado ? 'LOTADO' : fmt(ev.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+      }).join('') || (modal === 'online' ? '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum evento online à venda agora.</p>' : '');
+      g.querySelectorAll('[data-ev-buy]').forEach(function (bt) {
+        bt.addEventListener('click', function () { comprarEvento(bt.dataset.evBuy); });
+      });
+    });
+  }
+  function evHojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  /* lotação do evento presencial = as cadeiras da sala escolhida.
+     ocup = inscritos simulados da demo; o aluno desta sessão entra pela
+     evState. Online (Estúdio) não tem limite físico.                  */
+  function evLot(ev) {
+    if (!ev || ev.online || ev.modalidade === 'online') return 0;
+    return ev.lot || (typeof salaCap === 'function' ? salaCap(ev.sala) : 0) || 0;
+  }
+  function evOcupados(ev) {
+    return (ev.ocup || 0) + (typeof evInscritosCount === 'function' ? evInscritosCount(ev.id) : 0);
+  }
+  function evLotado(ev) {
+    var l = evLot(ev);
+    return l > 0 && evOcupados(ev) >= l;
+  }
+  window.__evLotar = function (id, n) {   /* para a suíte de testes */
+    var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    ev.ocup = n;
+    renderEventosLoja(); renderEvStrip();
+    if (typeof renderAcessos === 'function') renderAcessos();
+  };
+  function evAcabou(ev) {
+    var lim = ev.ate || ev.dataISO;   /* multi-dia usa 'ate'; pontual usa a própria data */
+    if (!lim) return false;
+    return evHojeISO() > lim;
+  }
+  function comprarEvento(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var ev = null; EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    if (evState[id] && evState[id].comprado) { toast('Você já está inscrito — o evento segue aqui até o último dia.'); return; }
+    if (evLotado(ev)) { toast('Lotado — a ' + (ev.sala || 'sala') + ' comporta ' + evLot(ev) + ' pessoas e as vagas acabaram.'); return; }
+    var choque = choqueDeAgenda(agendaDoEvento(ev));
+    var mo = ev.moeda === 'dmn' ? 'dmn' : 'qdc';
+    confirmarCompra({ nome: ev.nome, desc: 'evento ' + (ev.modalidade === 'online' ? 'online' : 'presencial'), preco: ev.preco, moeda: mo,
+      aviso: choque ? avisoChoque(choque) : '',
+      ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.evento : '' }, function () {
+      if (saldoDe(mo) < ev.preco) { toast(semSaldoMsg(mo)); return; }
+      debitar(mo, ev.preco, ev.nome + ' · −' + fmt(ev.preco) + ' ' + moedaTxt(mo));
+      var st = evState[id] || (evState[id] = { garimpado: false, inscrito: false });
+      st.comprado = true; st.inscrito = true;   /* comprou o acesso = já está dentro */
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();
+      if (typeof lojaCompraLog === 'function') lojaCompraLog(ev.nome, ev.preco, mo, 'evento', id);
+      if (typeof renderAcessos === 'function') renderAcessos();   /* entra na portaria na hora */
+      renderEventosLoja();
+      renderEvStrip();                                  /* entra no carrossel do Início */
+      if (typeof renderCalendario === 'function') renderCalendario();
+      toast(ev.nome + ' comprado — está nos seus Eventos, no Início' + (ev.modalidade === 'online' ? ' (link na página do evento)' : '') + '.');
+    });
+  }
+  /* rolagem infinita horizontal — captura pega também as cópias da rolagem vertical */
+  document.addEventListener('scroll', function (e) {
+    var st = e.target;
+    if (!st || !st.classList || !st.classList.contains('ev-strip')) return;
+    var W = evPeriod(st);
+    if (!W) return;
+    if (st.scrollLeft < W * 0.5) st.scrollLeft += W;
+    else if (st.scrollLeft > W * 1.5) st.scrollLeft -= W;
+  }, true);
+  /* desktop: arrastar com o mouse rola a esteira (no toque a rolagem é nativa) */
+  var evDrag = { on: false, strip: null, x: 0, left: 0, moved: false };
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var st = e.target.closest('.ev-strip');
+    if (!st) return;
+    evDrag.on = true; evDrag.strip = st; evDrag.x = e.clientX;
+    evDrag.left = st.scrollLeft; evDrag.moved = false;
+    st.classList.add('dragging');
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!evDrag.on || !evDrag.strip) return;
+    var dx = e.clientX - evDrag.x;
+    if (Math.abs(dx) > 5) evDrag.moved = true;
+    if (evDrag.moved) { evDrag.strip.scrollLeft = evDrag.left - dx; e.preventDefault(); }
+  });
+  document.addEventListener('pointerup', function () {
+    if (evDrag.strip) evDrag.strip.classList.remove('dragging');
+    evDrag.on = false; evDrag.strip = null;
+  });
+  /* desktop: roda do mouse sobre a esteira rola para o lado */
+  document.addEventListener('wheel', function (e) {
+    var st = e.target.closest('.ev-strip');
+    if (!st) return;
+    if (Math.abs(e.deltaY) >= Math.abs(e.deltaX)) { st.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, { passive: false });
+  document.addEventListener('click', function (e) {
+    var tile = e.target.closest('.ev-tile[data-ev]');
+    if (!tile) return;
+    if (evDrag.moved) { evDrag.moved = false; return; }   /* arrasto não é clique */
+    var id = tile.dataset.ev, ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    var st = evState[id] || {};
+    /* pago ainda não comprado: a inscrição é na Loja → leva o aluno
+       DIRETO ao item, não só à aba (dec. 173)                         */
+    if (ev && ev.pago && !(st.comprado || st.inscrito)) {
+      showView('v-loja', 'navAluno');
+      if (typeof renderEventosLoja === 'function') renderEventosLoja();
+      lojaLevarAte('[data-ev-buy="' + id + '"]');
+      toast('Este evento é pago — a inscrição é aqui na Loja.');
+      return;
+    }
+    openEvento(id);
+  });
+  /* leva o aluno até o item exato dentro da Loja e o faz piscar — vale
+     para eventos pagos, simulados e o que mais mandar alguém "à Loja"  */
+  function lojaLevarAte(seletor) {
+    setTimeout(function () {
+      var alvo = document.querySelector('#v-loja ' + seletor);
+      if (!alvo) return;
+      var card = alvo.closest('.p-card') || alvo;
+      card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      alvo.classList.remove('achei');
+      void alvo.offsetWidth;          /* reinicia a animação se repetirem o clique */
+      alvo.classList.add('achei');
+      setTimeout(function () { alvo.classList.remove('achei'); }, 2400);
+    }, 80);
+  }
+  function coinSvg() { return '<img class="coin-img" src="' + QUAD_COIN_SRC + '" alt="" aria-hidden="true">'; }
+  var QUAD_COIN_SRC = '__QUAD_COIN__';
+  function openEvento(id) {
+    var ev = null;
+    EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
+    if (!ev) return;
+    var st = evState[id] || (evState[id] = { garimpado: false, inscrito: false });
+    $('evHero').className = 'ev-hero ' + (ev.cor || '');
+    $('evTipo').textContent = ev.tipo;
+    $('evQuando').textContent = ev.quando;
+    $('evNome').textContent = ev.nome;
+    $('evMetaP').textContent = ev.meta + (evProfsTxt(ev) ? ' · ' + evProfsTxt(ev) : '');
+    var h = '<div class="p-card"><p class="sub" style="font-size:12.5px">' + ev.desc + '</p></div>';
+    h += '<div class="p-card"><div class="k-label">Regras de score</div>' +
+      ev.score.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts">' + r[1] + '</span></div>'; }).join('') + '</div>';
+    h += '<div class="p-card"><div class="k-label">Regras de Quad Coins</div>' +
+      ev.coins.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts coin">' + coinSvg() + r[1] + '</span></div>'; }).join('') + '</div>';
+    h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
+    var jaTem = st.inscrito || st.comprado;
+    var lotadoEv = !jaTem && (typeof evLotado === 'function') && evLotado(ev);
+    var rotInsc = lotadoEv ? ('Lotado — ' + (ev.sala || 'sala') + ' com ' + evLot(ev) + ' lugares')
+                : ev.pago ? (jaTem ? 'Comprado ✓ · no seu calendário' : 'Comprado — acesso liberado')
+                          : (jaTem ? 'Inscrito ✓ · no seu calendário' : 'Confirmar inscrição');
+    h += '<button class="btn" id="btnEvInscrever"' + (jaTem || lotadoEv ? ' disabled' : '') + '>' + rotInsc + '</button>';
+    /* evento online: o link de acesso aparece para quem está inscrito */
+    if (ev.online && ev.link) {
+      h += '<button class="btn ghost" id="btnEvLink"' + (st.inscrito ? '' : ' disabled') + '>' +
+        (st.inscrito ? 'Entrar no evento online ↗' : 'Inscreva-se para receber o link') + '</button>';
+    }
+    if (ev.garimpo) {
+      h += '<button class="btn ghost" id="btnEvGarimpo"' + (st.garimpado ? ' disabled' : '') + '>' +
+        (st.garimpado ? 'Garimpado ✓ · +15 Quad Coins' : 'Garimpar Quad Coins escondidos') + '</button>';
+    }
+    h += '</div>';
+    h += '<p class="sub" style="margin-top:12px; font-size:11px">Evento criado pela administração do Quad — regras de score e de Quad Coins são definidas por evento e podem mudar a cada edição.' +
+      (ev.online ? ' <strong>Evento online</strong>: o link de acesso fica liberado aqui após a inscrição.' : '') + '</p>';
+    $('evBody').innerHTML = h;
+    function evAplicaLink() {
+      var lb = $('btnEvLink'); if (!lb) return;
+      lb.disabled = false; lb.textContent = 'Entrar no evento online ↗';
+      lb.onclick = function () { toast('Abrindo o evento online — ' + ev.link); };
+    }
+    if (st.inscrito) evAplicaLink();
+    $('btnEvInscrever').onclick = function () {
+      if (!(st.inscrito || st.comprado) && typeof evLotado === 'function' && evLotado(ev)) {
+        toast('Lotado — a ' + (ev.sala || 'sala') + ' comporta ' + evLot(ev) + ' pessoas.'); return;
+      }
+      if (ev.pago) { comprarEvento(ev.id); return; }   /* pago passa pela compra (e pela agenda) */
+      var chq = choqueDeAgenda(agendaDoEvento(ev));
+      if (chq && this.dataset.okChoque !== '1') {
+        this.dataset.okChoque = '1';
+        this.textContent = 'Inscrever mesmo assim';
+        this.classList.add('ghost');
+        toast('Você já tem “' + chq + '” nesse horário. Se seguir, a escolha de qual atividade frequentar é sua — sem reposição de aula. Toque de novo para confirmar.');
+        return;
+      }
+      st.inscrito = true;
+      if (typeof renderAcessos === 'function') renderAcessos();   /* entra na portaria na hora */
+      if (typeof renderEvStrip === 'function') renderEvStrip();   /* tag INSCRITO no carrossel */
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();   /* contador de inscritos no admin */
+      this.disabled = true; this.textContent = 'Inscrito ✓ · no seu calendário';
+      evAplicaLink();
+      if (typeof renderCalendario === 'function') renderCalendario();   /* entra no calendário do aluno */
+      toast(ev.online ? 'Inscrição confirmada — link do evento liberado abaixo.' : 'Inscrição confirmada — o evento entrou no seu calendário.');
+    };
+    var g = $('btnEvGarimpo');
+    if (g) g.onclick = function () {
+      if (st.garimpado) return;
+      st.garimpado = true;
+      this.disabled = true; this.textContent = 'Garimpado ✓ · +15 Quad Coins';
+      addScore(15, '+15 Quad Coins garimpados no evento');
+    };
+    $('evLayer').style.display = 'flex';
+  }
+  $('btnEvVoltar').addEventListener('click', function () { $('evLayer').style.display = 'none'; });
+  /* ---------- calendário do aluno ----------
+     Três camadas: as AULAS da semana vêm da grade da TURMA ATIVA (trocar
+     de turma troca o calendário); os marcos do Quad (prazo de missões,
+     TAF) são de todos; e o que a CONTA comprou/inscreveu (eventos,
+     isoladas, mentoria) aparece com qualquer turma ativa.             */
+  var CAL_BASE = [
+    { dia: '18', dsem: 'SÁB', t: 'Corte das missões da semana', d: '23h59 · recupere as atrasadas antes', tag: 'PRAZO', cls: 'warn' },
+    { dia: '28', dsem: 'TER', t: 'Pré-TAF · teste de corrida 12 min', d: '6h30 · pista do quartel · atualiza suas marcas', tag: 'TAF', cls: '' }
+  ];
+  function calRow(dia, dsem, t, d, tag, cls) {
+    return '<div class="mission-row"><div class="cal-date">' + dia + '<small>' + dsem + '</small></div>' +
+      '<div class="grow"><div class="t">' + t + '</div><div class="d">' + d + '</div></div>' +
+      '<span class="tag ' + (cls || '') + '">' + tag + '</span></div>';
+  }
+  function calAulasDaTurma() {
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    if (!ta || typeof CRONO === 'undefined') return [];
+    var g = CRONO.turmas[cronoKey(ta)];
+    if (!g) return [];
+    var slots = (typeof horSlots === 'function' && ta.hor ? horSlots(ta.hor) : null) || CRONO.slots;
+    var hoje = new Date().getDay() - 1;   /* seg=0 … sex=4 */
+    return CRONO.dias.map(function (dnome, di) {
+      var partes = g.aulas[di].map(function (a, i) {
+        return a.m ? ((slots[i] || '').split('–')[0].trim() + ' ' + a.m) : null;
+      }).filter(Boolean);
+      var det = partes.length ? partes.join(' · ') + ' · ' + (ta.sala || g.sala)
+                              : 'grade a definir pela coordenação · ' + (ta.sala || g.sala);
+      return calRow(CRONO.datas[di].split('/')[0], dnome.slice(0, 3).toUpperCase(),
+        'Aula · ' + ta.nome, det, di === hoje ? 'HOJE' : 'AULA', di === hoje ? 'live' : '');
+    });
+  }
+  function renderCalendario() {
+    var el = $('calList'); if (!el) return;
+    var rows = calAulasDaTurma()
+      .concat(CAL_BASE.map(function (c) { return calRow(c.dia, c.dsem, c.t, c.d, c.tag, c.cls); }));
+    EVENTOS.forEach(function (ev) {
+      var st = evState[ev.id];
+      if (!st || !st.inscrito) return;
+      if (typeof evAcabou === 'function' && evAcabou(ev)) return;   /* passou a data: sai do calendário, fica no histórico */
+      var partes = ev.quando.split(' · ');   /* ['QUA','22/07','19H'] */
+      var dsem = partes[0] || '', dm = partes[1] || '', hora = partes[2] || '';
+      var dia = (dm.split('/')[0]) || dm || '·';
+      var det = (hora ? hora + ' · ' : '') + (ev.online ? 'evento online · link na página do evento' : 'inscrição confirmada');
+      rows.push(calRow(dia, dsem, ev.nome, det, 'INSCRITO', 'live'));
+    });
+    el.innerHTML = rows.join('') || '<p class="sub" style="padding:8px 0">Nada agendado ainda.</p>';
+  }
+  renderCalendario();
+  renderEvStrip();
+  queueSync();   /* leva a esteira para as cópias da rolagem infinita vertical */
+
+  /* ---------- quiz engine ---------- */
+  var QUESTIONS = [
+    {
+      txt: 'Sobre o poder de polícia, é correto afirmar que:',
+      alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.',
+             'Decorre da supremacia do interesse público e condiciona direitos individuais.',
+             'Confunde-se com o poder disciplinar aplicado a servidores.',
+             'Só pode ser exercido pelo Poder Judiciário.'],
+      right: 1
+    },
+    {
+      txt: 'O ato administrativo discricionário se caracteriza por:',
+      alts: ['Ausência total de limites legais.',
+             'Vinculação integral de todos os seus elementos.',
+             'Margem de escolha em motivo e objeto, dentro da lei.',
+             'Impossibilidade de controle judicial.'],
+      right: 2
+    },
+    {
+      txt: 'O poder hierárquico permite à Administração:',
+      alts: ['Aplicar sanções a particulares sem vínculo.',
+             'Escalonar funções, dar ordens e rever atos de subordinados.',
+             'Editar normas com força de lei.',
+             'Delegar competência exclusiva livremente.'],
+      right: 1
+    }
+  ];
+  var quiz = { idx: 0, sel: null, answers: [], source: null };
+
+  function openQuiz(source, kicker) {
+    quiz = { idx: 0, sel: null, answers: [], source: source };
+    $('quizKicker').textContent = kicker;
+    $('quizLayer').classList.add('on');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = QUESTIONS[quiz.idx];
+    $('quizProgress').textContent = 'Questão ' + (quiz.idx + 1) + ' de ' + QUESTIONS.length;
+    $('btnProxima').textContent = quiz.idx === QUESTIONS.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnProxima').disabled = true;
+    var body = $('quizBody');
+    body.innerHTML = '';
+    var p = document.createElement('p');
+    p.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 14px;font-weight:600';
+    p.textContent = q.txt;
+    body.appendChild(p);
+    q.alts.forEach(function (alt, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + 'ABCD'[i] + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = alt;
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel');
+        quiz.sel = i;
+        $('btnProxima').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+
+  function renderResult() {
+    var hits = 0;
+    quiz.answers.forEach(function (a, i) { if (a === QUESTIONS[i].right) hits++; });
+    var body = $('quizBody');
+    body.innerHTML = '';
+    $('quizProgress').textContent = 'Resultado';
+    var head = document.createElement('div');
+    head.className = 'p-card';
+    head.innerHTML = '<h3>' + hits + ' de ' + QUESTIONS.length + ' acertos</h3>' +
+      '<p class="sub">Acertos alimentam o Domínio (V1). Os Quad Coins vieram da participação: você fez, então pontuou.</p>';
+    body.appendChild(head);
+    QUESTIONS.forEach(function (q, i) {
+      var card = document.createElement('div');
+      card.className = 'p-card';
+      var ok = quiz.answers[i] === q.right;
+      card.innerHTML = '<div class="k-label">Questão ' + (i + 1) + ' · ' + (ok ? 'acertou' : 'errou') + '</div>' +
+        '<p class="sub" style="margin-bottom:8px"></p>' +
+        '<div class="q-alt ' + (ok ? 'hit' : 'miss') + '" style="cursor:default;margin-bottom:6px"><span class="letter">' + 'ABCD'[q.right] + '</span><span></span></div>' +
+        '<button class="btn ghost small">▶ Vídeo de resolução</button>';
+      card.querySelector('p').textContent = q.txt;
+      card.querySelector('.q-alt span:last-child').textContent = q.alts[q.right];
+      card.querySelector('button').addEventListener('click', function () { toast('Vídeo de resolução — placeholder do protótipo'); });
+      body.appendChild(card);
+    });
+    $('btnProxima').textContent = 'Concluir';
+    $('btnProxima').disabled = false;
+    quiz.idx = 'done';
+  }
+
+  $('btnProxima').addEventListener('click', function () {
+    if (quiz.idx === 'done') {
+      $('quizLayer').classList.remove('on');
+      addScore(20, '+20 Quad Coins · quiz da aula');
+      $('telemetry').textContent = 'origem: OPEN_ORGANIC · eventos: ' + (14 + QUESTIONS.length * 2) + ' · linha de base: ativa';
+      return;
+    }
+    quiz.answers.push(quiz.sel);
+    addPontos(1); // questão efetivamente respondida = 1 ponto de score
+    quiz.sel = null;
+    if (quiz.idx < QUESTIONS.length - 1) {
+      quiz.idx++;
+      renderQuestion();
+    } else {
+      renderResult();
+    }
+  });
+  $('btnSairQuiz').addEventListener('click', function () {
+    $('quizLayer').classList.remove('on');
+    toast('Missão pausada — expira 23h59.');
+  });
+
+  $('btnTreinoRapido').addEventListener('click', function () { trAbrir(); });
+  /* "Continuar missão" leva só às missões DAQUELA NOITE (nunca atrasadas/simulados):
+     abre direto a próxima missão da noite ainda pendente */
+  $('btnMissaoHome').addEventListener('click', function (ev) {
+    /* noite concluída: o botão vira "Retire aqui seus benefícios" */
+    if ($('btnMissaoHome').dataset.reward === '1') { resgatarBeneficios(ev); return; }
+    showView('v-missoes', 'navAluno');
+    if (typeof tutOn !== 'undefined' && tutOn) { return; }  /* no tutorial, o QUAD guia a Introdução */
+    var pend = missoesDaNoite().filter(function (x) { return !x.b.feito; });
+    if (pend.length) { trAbrirBloco(pend[0].i); }
+  });
+
+  /* ---------- aula de hoje · cronograma presencial ----------
+     Espelho da planilha "Cronograma semanal" da coordenação (Google Sheets).
+     Na V0 a semana vigente vem embutida (snapshot da semana 30); na V1 o app
+     sincroniza direto da planilha — o que for atualizado lá aparece aqui.
+     Estrutura avalia: dia da semana → turno → turma do aluno → 2 tempos.   */
+  var CRONO = {
+    semana: 30,
+    turno: 'NOITE',
+    slots: ['19h – 20h30', '20h30 – 22h'],
+    dias: ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'],
+    datas: ['20/07', '21/07', '22/07', '23/07', '24/07'],
+    turmas: {
+      'rondesp-n': { sala: 'SALA 1', tipo: 'teoria', aulas: [
+        [{ e: 10, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 9, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 10, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 11, m: 'DIR. PENAL', p: 'Marcello Esquivel' }],
+        [{ e: 2, m: 'NAC', p: 'Danilo Moura' }, { e: 2, m: 'ATUALIDADES', p: 'Moab Kigran' }],
+        [{ e: 10, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 8, m: 'IGUALDADE', p: 'Bruno Araújo' }],
+        [{ e: 13, m: 'PORTUGUÊS', p: 'Alisson Lopes' }, { e: 4, m: 'PENAL MILITAR', p: 'Minho' }]
+      ] },
+      'patamo-n': { sala: 'SALA 4', tipo: 'teoria + questões', aulas: [
+        [{ e: 7, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 4, m: 'MATEMÁTICA', p: 'Dan Reis' }],
+        [{ e: 3, m: 'DIR. PENAL', p: 'Marcello Esquivel' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 3, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }],
+        [{ e: 7, m: 'GEOGRAFIA', p: 'Noelice' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
+        [{ e: 5, m: 'PENAL MILITAR', p: 'Minho' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }]
+      ] },
+      'bope-n': { sala: 'SALA 3', tipo: 'questões', aulas: [
+        [{ e: 2, m: 'MATEMÁTICA', p: 'Dan Reis' }, { e: 1, m: 'HISTÓRIA', p: 'Moab Kigran' }],
+        [{ e: 1, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 2, m: 'IGUALDADE', p: 'Bruno Araújo' }],
+        [{ e: 2, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 2, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }],
+        [{ e: 3, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 2, m: 'GEOGRAFIA', p: 'Noelice' }],
+        [{ e: 2, m: 'DIR. ADMIN.', p: 'Danilo Moura' }, { e: 2, m: 'REDAÇÃO', p: 'Rodrigo' }]
+      ] }
+    }
+  };
+  /* A grade do cronograma segue as TURMAS REAIS (as mesmas da Quad Store):
+     turma nova nasce com a grade em branco para a coordenação preencher, e
+     turma que não existe mais some daqui — nada de turma-fantasma.        */
+  /* a grade é da TURMA, pelo id. Enquanto a chave era tipo+turno, duas
+     turmas do mesmo tipo no mesmo turno dividiam a mesma grade — a turma
+     nova nascia muda e podia exibir a aula da outra.                   */
+  function cronoKey(t) { return (t && t.id) ? t.id : ''; }
+  function sincronizarCronoTurmas() {
+    if (typeof TURMAS_LOJA === 'undefined') return;
+    var vivas = {};
+    TURMAS_LOJA.forEach(function (t) {
+      var k = cronoKey(t);
+      vivas[k] = 1;
+      if (!CRONO.turmas[k]) {
+        CRONO.turmas[k] = { sala: 'a definir', tipo: (t.tipoDesc || '').split('·').pop().trim() || 'aulas',
+          aulas: [0, 1, 2, 3, 4].map(function () { return [{ e: 0, m: '', p: '' }, { e: 0, m: '', p: '' }]; }) };
+      }
+    });
+    Object.keys(CRONO.turmas).forEach(function (k) { if (!vivas[k]) { delete CRONO.turmas[k]; } });
+  }
+  sincronizarCronoTurmas();
+  var ALUNO_TURMA = 'patamo-n';   /* chave do cronograma = id da turma ativa */
+  // [INTEGRAÇÃO REAL] a turma vem do cadastro geral do site; aqui, o valor
+  // confirmado no cadastro ("TURMA PATAMO (N)") vira a turma do app inteiro
+  function turmaLabel() {
+    /* o rótulo é o nome da turma ATIVA, com a letra do turno; só cai no
+       formato antigo (tipo + turno) se não houver matrícula ativa      */
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    if (ta) {
+      var l = { 'noite': 'N', 'manhã': 'M', 'tarde': 'T' }[ta.turno];
+      return ta.nome + (l ? ' (' + l + ')' : '');
+    }
+    if (typeof ALUNO_TURMA === 'undefined' || !ALUNO_TURMA) { return ''; }
+    var partes = ALUNO_TURMA.split(' ');
+    var turno = partes[partes.length - 1];
+    var letra = { 'NOITE': 'N', 'MANHÃ': 'M', 'TARDE': 'T' }[turno];
+    var nome = letra ? partes.slice(0, -1).join(' ') : ALUNO_TURMA;
+    return 'Turma ' + nome + (letra ? ' (' + letra + ')' : '');
+  }
+  /* horários vêm da turma criada no Painel de controle (fica sincronizado
+     em todo lugar que usa o dado: Aula de hoje, editor de cronograma…) */
+  function horSlots(hor) {
+    if (!hor) return null;
+    var ps = hor.split(' e ').map(function (x) { return x.trim().replace('–', ' – '); });
+    return ps.length === 2 ? ps : null;
+  }
+  /* o horário sai da própria turma dona da grade — antes vinha do par
+     tipo+turno e a turma criada por último sequestrava o horário alheio */
+  function turmaCronoSlots(chave) {
+    if (!chave || typeof TURMAS_LOJA === 'undefined') return null;
+    var t = TURMAS_LOJA.filter(function (x) { return x.id === chave; })[0];
+    return (t && t.hor) ? horSlots(t.hor) : null;
+  }
+  function slotMinutos(slot) {
+    var m = /(\d{1,2})h(?:\s*(\d{2}))?/.exec(slot || '');
+    return m ? (+m[1]) * 60 + (m[2] ? +m[2] : 0) : null;
+  }
+  function slotsFaixas(slots) {
+    return slots.map(function (s) {
+      var lados = s.split('–');
+      var ini = slotMinutos(lados[0]), fim = slotMinutos(lados[1]);
+      return (ini != null && fim != null) ? [ini, fim] : null;
+    });
+  }
+  function renderAulaHoje() {
+    var t = CRONO.turmas[ALUNO_TURMA];
+    if (!t) { return; }
+    var slots = turmaCronoSlots(ALUNO_TURMA) || CRONO.slots;
+    var agora = new Date();
+    var idx = agora.getDay() - 1;              /* seg=0 … sex=4 */
+    var temHoje = idx >= 0 && idx <= 4;
+    var showIdx = temHoje ? idx : 0;           /* sáb/dom → mostra segunda */
+    /* o título traz a turma DE VERDADE (nome e sala da matrícula ativa);
+       a grade continua vindo do cronograma por tipo + turno            */
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    $('aulaTurma').textContent = ta ? (ta.nome + ' · ' + (ta.sala || t.sala)) : (ALUNO_TURMA + ' · ' + t.sala);
+    $('aulaDia').textContent =
+      (temHoje ? 'Hoje · ' : 'Sem aula da sua turma hoje · próxima: ') +
+      CRONO.dias[showIdx] + ' · ' + CRONO.datas[showIdx] +
+      ' · ' + (ta ? ta.turno.toUpperCase() : CRONO.turno) + ' · ' + (ta ? ta.tipoDesc : t.tipo);
+    var mins = agora.getHours() * 60 + agora.getMinutes();
+    var faixasDin = slotsFaixas(slots);
+    var faixas = [faixasDin[0] || [19 * 60, 20 * 60 + 30], faixasDin[1] || [20 * 60 + 30, 22 * 60]];
+    $('aulaSlots').innerHTML = t.aulas[showIdx].map(function (a, i) {
+      var cls = '', st = '';
+      if (temHoje) {
+        if (mins >= faixas[i][1]) { cls = ' done'; st = 'ENCERRADO'; }
+        else if (mins >= faixas[i][0]) { cls = ' now'; st = 'AGORA'; }
+      }
+      /* turma recém-aberta ainda não tem grade lançada — dizer isso é
+         melhor do que mostrar "Encontro 00 · Prof." em branco        */
+      var vazio = !a.m;
+      return '<div class="aula-slot' + cls + '"><span class="a-hr">' + (slots[i] || CRONO.slots[i]) + '</span>' +
+        '<div class="a-info"><b>' + (vazio ? 'A definir' : a.m) + '</b><span>' +
+        (vazio ? 'A coordenação ainda não lançou a grade desta turma'
+               : 'Encontro ' + String(a.e).padStart(2, '0') + ' · Prof. ' + a.p) + '</span></div>' +
+        (st && !vazio ? '<span class="a-st">' + st + '</span>' : '') + '</div>';
+    }).join('');
+    $('aulaFonte').textContent = 'Aula presencial · Cronograma semanal · Semana ' + CRONO.semana +
+      ' — atualizado pela planilha da coordenação.';
+  }
+  renderAulaHoje();
+

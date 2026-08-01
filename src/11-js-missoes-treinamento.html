@@ -1,0 +1,1080 @@
+  /* ==================================================================
+     TREINAMENTO RÁPIDO · flashcards estilo Anki
+     · Aula presencial → operador extrai 2 PDFs → PDF 01: 40 certo/errado
+       em 4 ondas (D0 22h15 · D+1 22h15 · D+7 · D+30); PDF 02: banco geral
+     · Rodízio de 10 por assunto, alternando as matérias da aba
+     · Feedback imediato + autoavaliação (Errei/Difícil/Bom/Fácil)
+     · Acerto: +1 score · bloco de 10: +5 Quad Coins · atualiza o Domínio
+     · Zerou a aba: baralho é redistribuído pela dificuldade informada
+     ================================================================== */
+  var TR_GERAIS = ['Língua Portuguesa', 'Língua Inglesa', 'Informática', 'Matemática', 'História', 'Geografia'];
+  var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
+  function fc(m, a, c, t, o) { return { m: m, a: a, c: c, t: t, o: o, nota: -1, resp: null }; }
+  var TR_BANK = [
+    fc('Língua Portuguesa','Interpretação de textos',true,'A ideia central de um texto pode aparecer de forma implícita.','Nem sempre a tese está escrita com todas as letras.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Inferir é copiar uma informação explícita do texto.','Inferir é concluir a partir de pistas — o explícito se localiza.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'O título costuma antecipar o tema e orientar a leitura.','Use o título como bússola antes de ler.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Textos não verbais não transmitem informação.','Imagens, gráficos e símbolos também comunicam.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'Charges combinam linguagem verbal e não verbal.','Humor gráfico é texto misto por natureza.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Em textos mistos, a imagem nunca altera o sentido do escrito.','A imagem pode reforçar, ironizar ou contradizer o texto.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'A ironia pode inverter o sentido literal de uma frase.','O contexto denuncia a inversão.'),
+    fc('Língua Portuguesa','Interpretação de textos',true,'O contexto ajuda a definir o sentido de palavras ambíguas.','“Manga”, “banco”, “vela”: o entorno decide.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'O texto publicitário é neutro, sem intenção de convencer.','Publicidade existe para persuadir.'),
+    fc('Língua Portuguesa','Interpretação de textos',false,'Compreender um texto dispensa identificar o público-alvo.','Saber para quem se fala muda a leitura.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Cognatos são palavras parecidas com o português e ajudam na leitura.','“Important”, “diferent”… aliados do leitor.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Push” significa puxar.','Falso cognato: push = empurrar; pull = puxar.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Skimming é a leitura rápida para captar a ideia geral.','Passar o olho com propósito.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Scanning busca uma informação específica no texto.','Caçar um dado: nome, número, data.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Actually” significa atualmente.','Falso cognato: actually = na verdade.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Palavras repetidas ao longo do texto costumam indicar o tema.','Repetição é pista de assunto.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'“Parents” significa parentes.','Falso cognato: parents = pais.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'Títulos e imagens ajudam a prever o conteúdo em inglês.','Predição é estratégia de leitura.'),
+    fc('Língua Inglesa','Interpretação de textos',false,'Interpretar exige traduzir palavra por palavra.','O sentido global vale mais que a tradução literal.'),
+    fc('Língua Inglesa','Interpretação de textos',true,'O sufixo “-ly” costuma indicar advérbio.','Quickly, carefully, really…'),
+    fc('Informática','Editores de texto',true,'Ctrl+C copia e Ctrl+V cola, no Word e no Writer.','Atalhos universais de edição.'),
+    fc('Informática','Editores de texto',false,'Ctrl+Z refaz a última ação.','Ctrl+Z desfaz; refazer é Ctrl+Y (ou Ctrl+R no Writer).'),
+    fc('Informática','Editores de texto',true,'O corretor ortográfico sublinha palavras não reconhecidas.','O sublinhado é alerta, não sentença.'),
+    fc('Informática','Editores de texto',false,'Salvar em PDF impede qualquer pessoa de ler o arquivo.','PDF é formato de leitura, não de sigilo.'),
+    fc('Informática','Editores de texto',true,'Cabeçalho e rodapé se repetem nas páginas do documento.','Por isso carregam título e numeração.'),
+    fc('Informática','Editores de texto',true,'No Word em português, Ctrl+B salva o documento.','Pegadinha clássica: negrito é Ctrl+N.'),
+    fc('Informática','Editores de texto',false,'A extensão .docx é típica de planilhas.','.docx é texto; planilha é .xlsx.'),
+    fc('Informática','Editores de texto',true,'Localizar e substituir troca uma palavra em todo o texto de uma vez.','Ctrl+U no Word pt-BR.'),
+    fc('Informática','Editores de texto',false,'Quebra de página e quebra de linha são o mesmo recurso.','Uma muda de página; a outra, de linha.'),
+    fc('Informática','Editores de texto',true,'O Writer, do LibreOffice, é um editor de textos gratuito.','Software livre, muito cobrado em prova.'),
+    fc('Matemática','Conjuntos numéricos',true,'Todo número natural é também inteiro.','ℕ está contido em ℤ.'),
+    fc('Matemática','Conjuntos numéricos',false,'Todo número inteiro é natural.','−3 é inteiro e não é natural.'),
+    fc('Matemática','Conjuntos numéricos',true,'−3 é um número inteiro.','ℤ inclui os negativos.'),
+    fc('Matemática','Conjuntos numéricos',false,'1/2 é um número irracional.','Fração de inteiros é racional.'),
+    fc('Matemática','Conjuntos numéricos',true,'√2 é um número irracional.','Não há fração exata para √2.'),
+    fc('Matemática','Conjuntos numéricos',true,'Todo racional pode ser escrito como fração de inteiros, com denominador não nulo.','Definição de ℚ.'),
+    fc('Matemática','Conjuntos numéricos',false,'O zero não pertence ao conjunto dos racionais.','0 = 0/1 — racional.'),
+    fc('Matemática','Conjuntos numéricos',true,'Dízimas periódicas são números racionais.','Toda dízima periódica vira fração.'),
+    fc('Matemática','Conjuntos numéricos',false,'π é um número racional.','π é o irracional mais famoso.'),
+    fc('Matemática','Conjuntos numéricos',true,'O conjunto dos reais reúne racionais e irracionais.','ℝ = ℚ ∪ irracionais.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A dignidade da pessoa humana é fundamento da República.','Art. 1º, III, da CF.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'A soberania é objetivo fundamental da República.','Soberania é fundamento (art. 1º); objetivos estão no art. 3º.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'Construir uma sociedade livre, justa e solidária é objetivo fundamental.','Art. 3º, I.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'Todo o poder emana do povo, que o exerce por representantes eleitos ou diretamente.','Parágrafo único do art. 1º.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'Os Poderes da União são dependentes e hierarquizados entre si.','São independentes e harmônicos (art. 2º).'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'O pluralismo político é fundamento da República.','Art. 1º, V.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'O presidencialismo está listado no art. 1º como fundamento.','Forma de governo não integra a lista de fundamentos.'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A cidadania é fundamento da República.','Art. 1º, II.'),
+    fc('Direito Constitucional','Princípios fundamentais',false,'Promover o bem de todos, sem preconceitos, é fundamento da República.','É objetivo fundamental (art. 3º, IV).'),
+    fc('Direito Constitucional','Princípios fundamentais',true,'A independência nacional rege as relações internacionais do Brasil.','Art. 4º, I.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'A lei penal não retroage, salvo para beneficiar o réu.','Irretroatividade in pejus, retroatividade in bonam partem.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'A lei mais grave retroage para alcançar fatos antigos.','Nunca — só a mais benéfica retroage.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Considera-se praticado o crime no momento da ação ou omissão.','Teoria da atividade (art. 4º do CP).'),
+    fc('Direito Penal','Aplicação da lei penal',false,'O Brasil adota a teoria do resultado para o tempo do crime.','Adota a teoria da atividade.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Para o lugar do crime valem a conduta e o resultado.','Teoria da ubiquidade (art. 6º).'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Aplica-se a lei brasileira ao crime cometido no território nacional.','Princípio da territorialidade.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'Navio de guerra estrangeiro em águas brasileiras segue a lei brasileira.','É extensão do território de origem.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'A abolitio criminis extingue a punibilidade de fatos anteriores.','Lei que descriminaliza retroage sempre.'),
+    fc('Direito Penal','Aplicação da lei penal',false,'A lei temporária perde força sobre os fatos da sua vigência após o prazo.','Ultratividade: continua alcançando aqueles fatos.'),
+    fc('Direito Penal','Aplicação da lei penal',true,'Não há crime sem lei anterior que o defina.','Legalidade estrita (art. 1º do CP).')
+  ];
+
+  /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
+  var AULA_DEMO = {
+    m: 'Direito Administrativo', a: 'Poderes administrativos',
+    titulo: 'Poderes administrativos', prof: 'Danilo Moura',
+    cards: [
+      ['C','O poder de polícia condiciona direitos individuais em favor do interesse público.','Essência do conceito.'],
+      ['E','O poder de polícia é exercido exclusivamente pelo Poder Judiciário.','É típico da Administração Pública.'],
+      ['C','O poder hierárquico autoriza dar ordens, fiscalizar e rever atos de subordinados.','Tríade clássica da hierarquia.'],
+      ['E','O poder disciplinar alcança qualquer cidadão, mesmo sem vínculo com a Administração.','Só quem tem vínculo funcional ou contratual.'],
+      ['C','O poder regulamentar permite editar decretos para a fiel execução das leis.','Art. 84, IV, da CF.'],
+      ['E','O decreto regulamentar pode criar obrigações novas sem base legal.','Regulamento não inova a ordem jurídica.'],
+      ['C','A discricionariedade envolve conveniência e oportunidade dentro dos limites da lei.','Mérito administrativo com moldura legal.'],
+      ['E','O ato discricionário dispensa qualquer limite legal.','Discricionário ≠ arbitrário.'],
+      ['C','O excesso de poder é uma espécie de abuso de poder.','Abuso = excesso de poder + desvio de finalidade.'],
+      ['E','Excesso de poder e desvio de finalidade são a mesma coisa.','Um extrapola a competência; o outro trai o fim.'],
+      ['C','Licenças e alvarás são manifestações preventivas do poder de polícia.','Polícia administrativa preventiva.'],
+      ['E','A multa de trânsito não é manifestação do poder de polícia.','É o exemplo clássico da face repressiva.'],
+      ['C','A autoexecutoriedade permite executar certas medidas sem ordem judicial.','Atributo do poder de polícia.'],
+      ['E','Toda medida de polícia exige autorização judicial prévia.','A autoexecutoriedade dispensa, em regra.'],
+      ['C','A coercibilidade torna a medida de polícia obrigatória para o particular.','Imposição independe de concordância.'],
+      ['E','O particular pode recusar a fiscalização sem qualquer consequência.','A recusa pode gerar sanção.'],
+      ['C','O poder disciplinar exige processo com ampla defesa para punir.','Contraditório e ampla defesa sempre.'],
+      ['E','A punição disciplinar dispensa motivação.','Ato punitivo sem motivação é nulo.'],
+      ['C','A hierarquia permite avocar e delegar competências nos termos da lei.','Instrumentos do poder hierárquico.'],
+      ['E','Competências exclusivas podem ser livremente delegadas.','Exclusiva não se delega.'],
+      ['C','O Judiciário pode anular ato praticado com abuso de poder.','Controle de legalidade.'],
+      ['E','O ato com desvio de finalidade é válido se der bom resultado.','Fim ilegítimo contamina o ato.'],
+      ['C','Interditar estabelecimento irregular é exemplo de polícia repressiva.','Atuação após a infração.'],
+      ['E','A licença é ato discricionário.','Licença é vinculada; autorização é discricionária.'],
+      ['C','A autorização é, em regra, discricionária e precária.','Pode ser revogada.'],
+      ['E','A autorização gera direito adquirido definitivo ao particular.','Precariedade afasta o direito adquirido.'],
+      ['C','O poder regulamentar do chefe do Executivo se expressa tipicamente por decretos.','Decreto é o veículo típico.'],
+      ['E','Portaria de ministro tem força superior à lei.','Ato infralegal não supera a lei.'],
+      ['C','Parte do poder de polícia pode ser delegada a entidades de direito público.','Consenso na jurisprudência.'],
+      ['E','Empresas privadas podem aplicar sanções de polícia livremente.','Sanção exige regime de direito público.'],
+      ['C','A proporcionalidade limita a intensidade das medidas de polícia.','Meio adequado, necessário e proporcional.'],
+      ['E','A interdição de atividade dispensa juízo de proporcionalidade.','Medida drástica exige proporcionalidade reforçada.'],
+      ['C','A omissão do dever de agir também pode configurar abuso de poder.','Abuso por omissão existe.'],
+      ['E','Abuso de poder só ocorre por ação, nunca por omissão.','Omissão indevida também é abuso.'],
+      ['C','A revisão hierárquica permite anular atos ilegais de subordinados.','Autotutela + hierarquia.'],
+      ['E','O superior só pode rever ato de subordinado se for provocado.','Pode rever de ofício.'],
+      ['C','As sanções disciplinares devem respeitar o contraditório.','Devido processo também na via administrativa.'],
+      ['E','A “verdade sabida” autoriza punir sem defesa nos dias de hoje.','Superada pela CF/88.'],
+      ['C','O poder de polícia alcança atividades, bens e direitos dos particulares.','Campo amplo de incidência.'],
+      ['E','O poder de polícia não alcança bens, somente pessoas.','Bens também se sujeitam (ex.: interdição).']
+    ]
+  };
+  /* PDF 01 → bloco Hoje: 2 aulas por dia × marcos D0 · D+1 · D+7 · D+30.
+     Tudo libera às 22h15 do dia — o aluno só vê "as rápidas de hoje". */
+  var DIA_BLOCOS = [
+    { rot: 'Bloco 1 · Dir. Constitucional', det: 'aula de hoje · 19h', m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+    { rot: 'Bloco 2 · Matemática', det: 'aula de hoje · 20h30', m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem', fonte: 'aula', ini: 0 },
+    { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'semana passada', fonte: 'aula', ini: 10 },
+    { rot: 'Revisão · Língua Inglesa', det: 'semana passada', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
+    { rot: 'Revisão · Dir. Administrativo', det: 'mês passado', fonte: 'aula', ini: 20 },
+    { rot: 'Revisão · Informática', det: 'mês passado', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
+  ];
+  /* regras internas (não aparecem para o aluno):
+     · cada bloco nasce quando o sistema libera (22h15 do seu dia)
+     · concluído, desaparece da lista
+     · sem resposta, expira 7 dias após ser criado */
+  var DIA_EXPIRA_DIAS = 7;
+  /* blocos que estouraram os 7 dias caem em "Atrasadas" (seeds da demo) */
+  DIA_BLOCOS.push(
+    { rot: 'Bloco · Dir. Penal', det: 'aula de 8 dias atrás', m: 'Direito Penal', a: 'Aplicação da lei penal', fonte: 'deck', idadeDias: 8 },
+    { rot: 'Revisão · Dir. Administrativo', det: 'aula de 9 dias atrás', fonte: 'aula', ini: 30, idadeDias: 9 },
+    { rot: 'Revisão · Língua Portuguesa', det: 'aula de 10 dias atrás', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck', idadeDias: 10 }
+  );
+  DIA_BLOCOS.forEach(function (b) {
+    b.criadoEm = Date.now() - (b.idadeDias ? b.idadeDias * 864e5 : 0);
+    b.feito = false;
+  });
+  /* ---------- os blocos do dia são POR TURMA ----------
+     Cada matrícula tem a sua fila de missões: o progresso numa turma não
+     conta na outra. A demo nasce com a agenda cheia da PATAMO; turma nova
+     começa do dia zero (sem atrasadas), com as rápidas da aula no horário
+     DELA. As questões em si são o banco único da demo.                  */
+  var BLOCOS_TURMA = { 'patamo-n': DIA_BLOCOS };
+  function novosBlocosDia(t) {
+    var slots = (t && t.hor && typeof horSlots === 'function') ? horSlots(t.hor) : null;
+    var h1 = slots && slots[0] ? slots[0].split('–')[0].trim() : '19h';
+    var h2 = slots && slots[1] ? slots[1].split('–')[0].trim() : '20h30';
+    var bl = [
+      { rot: 'Bloco 1 · Dir. Constitucional', det: 'aula de hoje · ' + h1, m: 'Direito Constitucional', a: 'Princípios fundamentais', fonte: 'deck' },
+      { rot: 'Bloco 2 · Matemática', det: 'aula de hoje · ' + h2, m: 'Matemática', a: 'Conjuntos numéricos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'aula de ontem', fonte: 'aula', ini: 0 },
+      { rot: 'Revisão · Língua Portuguesa', det: 'aula de ontem', m: 'Língua Portuguesa', a: 'Interpretação de textos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'semana passada', fonte: 'aula', ini: 10 },
+      { rot: 'Revisão · Língua Inglesa', det: 'semana passada', m: 'Língua Inglesa', a: 'Interpretação de textos', fonte: 'deck' },
+      { rot: 'Revisão · Dir. Administrativo', det: 'mês passado', fonte: 'aula', ini: 20 },
+      { rot: 'Revisão · Informática', det: 'mês passado', m: 'Informática', a: 'Editores de texto', fonte: 'deck' }
+    ];
+    bl.forEach(function (b) { b.criadoEm = Date.now(); b.feito = false; });
+    return bl;
+  }
+  function diaBlocos() {
+    var id = (typeof turmaAtivaId !== 'undefined' && turmaAtivaId) ? turmaAtivaId : 'patamo-n';
+    if (!BLOCOS_TURMA[id]) BLOCOS_TURMA[id] = novosBlocosDia(typeof turmaDe === 'function' ? turmaDe(id) : null);
+    return BLOCOS_TURMA[id];
+  }
+  /* simulados chegam do admin e aparecem aqui */
+  /* Simulados — presencial (grátis gera QdC · pago custa QdC) ou digital.
+     Presencial: o aluno se inscreve aqui e a administração libera a entrada
+     (e pontua quem gera QdC) na área de Liberações. Digital: motor do quiz
+     cronometrado chega na próxima etapa. */
+  /* Simulados unificados — modalidade PRESENCIAL/DIGITAL × gratuito/pago.
+     · pago → vai para a Loja; comprar libera a inscrição (presencial) ou a
+       execução (digital)
+     · presencial → liberação na sede pela aba Liberar; liberado, vai ao
+       histórico
+     · digital → quiz cronometrado; realizado, vai ao histórico
+     Tudo é computado no histórico para fins pedagógicos.                    */
+  var SIMULADOS = [
+    { id: 's63', rot: 'Simulado 63 · SD PMBA', det: 'domingo · 8h', tag: 'PRESENCIAL', pago: true,  valor: 120, precoDmn: 120, precoQdc: 150, rec: 0, score: 120, vagas: 60, vagasDmn: 50, vagasQdc: 10, vagasGratis: 0,  insc: false, comprado: false, realizado: false },
+    { id: 'sq',  rot: 'Simuladão Quad',        det: 'sábado · 8h',  tag: 'PRESENCIAL', pago: true,  valor: 20,  precoDmn: 15, precoQdc: 20, rec: 0, score: 100, vagas: 80, vagasDmn: 20, vagasQdc: 60, vagasGratis: 0, insc: false, comprado: false, realizado: false },
+    { id: 'sd1', rot: 'Simulado digital · CFO 1ª fase', tag: 'DIGITAL', pago: false, valor: 0, pdf: 'cfo-1fase.pdf', minutos: 30, nq: 10, dia: '', feito: false, comprado: false }
+  ];
+  /* inscritos presenciais que aguardam liberação (feed da recepção) */
+  var SIM_INSC = [
+    { simRot: 'Simulado 63 · SD PMBA', nome: 'AL SGT QUAD SANTIAGO', pago: true,  valor: 120, score: 120, geraQdC: false, liberado: true,  pontuado: true,  euSou: false },
+    { simRot: 'Simulado 63 · SD PMBA', nome: 'SD QUAD BRANDÃO',       pago: true,  valor: 120, score: 120, geraQdC: false, liberado: false, pontuado: false, euSou: false },
+    { simRot: 'Simuladão Quad',        nome: 'AL CB QUAD NASCIMENTO',  pago: true,  valor: 20,  score: 100, geraQdC: false, liberado: false, pontuado: false, euSou: false }
+  ];
+  var SIM_HIST = [];   /* histórico de simulados realizados do aluno */
+  window.__blocos = function () { return { blocos: diaBlocos(), expira: DIA_EXPIRA_DIAS }; };
+  function renderAtrasadas() {
+    var agora = Date.now();
+    var tarde = diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return !x.b.feito && (agora - x.b.criadoEm) >= DIA_EXPIRA_DIAS * 864e5;
+    });
+    $('atrasadasList').innerHTML = tarde.map(function (x) {
+      return '<div class="mission-row"><div class="m-dot">↺</div>' +
+        '<div class="grow"><div class="t">' + x.b.rot + '</div><div class="d">' + x.b.det + ' · 10 rápidas</div></div>' +
+        '<button class="btn ghost small" data-dia="' + x.i + '">Recuperar</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma missão atrasada — disciplina em dia!</p>';
+    $('atrasadasList').querySelectorAll('[data-dia]').forEach(function (bt) {
+      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
+    });
+  }
+  function hojeISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function diaBR(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1]; }
+  function simDigDisponivel(sm) { return !sm.dia || sm.dia <= hojeISO(); }
+  /* está ativo na lista de simulados do aluno? (realizados vão ao histórico;
+     digital pago só entra depois de comprado na Loja) */
+  function simAtivo(sm) {
+    if (sm.realizado || sm.feito) return false;
+    if (sm.tag === 'DIGITAL' && sm.pago && !sm.comprado) return false;
+    return true;
+  }
+  /* cadeiras do simulado presencial: pagas e gratuitas, com o que resta */
+  function simVagas(sm) {
+    var dmn = sm.vagasDmn || 0, qdc = sm.vagasQdc || 0, gratis = sm.vagasGratis || 0;
+    return { dmn: dmn, qdc: qdc, gratis: gratis,
+             dmnRest: Math.max(0, sm.vagasDmnRest == null ? dmn : sm.vagasDmnRest),
+             qdcRest: Math.max(0, sm.vagasQdcRest == null ? qdc : sm.vagasQdcRest),
+             gratisRest: Math.max(0, sm.vagasGratisRest == null ? gratis : sm.vagasGratisRest),
+             total: dmn + qdc + gratis, temSala: dmn + qdc + gratis > 0 };
+  }
+  function simVagasRest(sm) { var v = simVagas(sm); return v.dmnRest + v.qdcRest + v.gratisRest; }
+  function simPreco(sm, moeda) {
+    if (moeda === 'dmn') return sm.precoDmn != null ? sm.precoDmn : sm.valor;
+    return sm.precoQdc != null ? sm.precoQdc : sm.valor;
+  }
+  /* prêmio em Quad Coins é do digital (por acerto); presencial não premia */
+  function simRec(sm) { return sm.tag === 'PRESENCIAL' ? 0 : (sm.rec > 0 ? sm.rec : 2); }
+  /* baixa no estoque da sala: 'dmn' | 'qdc' | 'gratis' */
+  function simTomaVaga(sm, tipo) {
+    var vg = simVagas(sm);
+    if (!vg.temSala) return true;   /* simulado antigo, sem controle de sala */
+    if (tipo === 'dmn') { if (vg.dmnRest <= 0) return false; sm.vagasDmnRest = vg.dmnRest - 1; return true; }
+    if (tipo === 'qdc') { if (vg.qdcRest <= 0) return false; sm.vagasQdcRest = vg.qdcRest - 1; return true; }
+    if (vg.gratisRest <= 0) return false;
+    sm.vagasGratisRest = vg.gratisRest - 1;
+    return true;
+  }
+  function simHint(sm) {
+    if (sm.tag === 'DIGITAL') {
+      if (!simDigDisponivel(sm)) return 'disponível em ' + diaBR(sm.dia);
+      if (sm.pago && !sm.comprado) {
+        var pv = [sm.precoDmn ? fmt(sm.precoDmn) + ' Dmn' : '', sm.precoQdc ? fmt(sm.precoQdc) + ' QdC' : ''].filter(Boolean).join(' ou ');
+        return sm.minutos + ' min · ' + sm.nq + ' questões · ' + (pv || fmt(sm.valor) + ' ' + moedaTxt(sm.moeda)) + ' na Loja';
+      }
+      return sm.minutos + ' min · ' + sm.nq + ' questões · +10 score e +' + (sm.rec > 0 ? sm.rec : 2) + ' QdC por acerto';
+    }
+    /* presencial ocupa lugar na sala: o aluno vê o que sobra por moeda */
+    var vg = simVagas(sm), partes = [];
+    if (vg.dmn > 0) partes.push(vg.dmnRest + ' de ' + vg.dmn + ' vagas em Dmn · ' + fmt(simPreco(sm, 'dmn')) + ' Dmn');
+    if (vg.qdc > 0) partes.push(vg.qdcRest + ' de ' + vg.qdc + ' vagas em QdC · ' + fmt(simPreco(sm, 'qdc')) + ' QdC');
+
+    if (!partes.length) return 'presencial · ' + fmt(sm.valor) + ' ' + moedaTxt(sm.moeda === 'dmn' ? 'dmn' : 'qdc') + ' na Loja';
+    return 'presencial · ' + partes.join(' · ');
+  }
+  function renderSimulados() {
+    var el = $('simuladosList'); if (!el) return;
+    var ativos = SIMULADOS.map(function (sm, i) { return { sm: sm, i: i }; }).filter(function (x) { return simAtivo(x.sm); });
+    el.innerHTML = ativos.map(function (x) {
+      var sm = x.sm, acao, tagTxt, dis = '', ok = false;
+      if (sm.tag === 'DIGITAL') {
+        tagTxt = 'DIGITAL';
+        if (simDigDisponivel(sm)) { acao = 'Responder o simulado'; }
+        else { acao = 'Em breve'; dis = ' disabled'; }
+      } else if (sm.insc || sm.comprado) { acao = 'Inscrito'; tagTxt = 'INSCRITO'; dis = ' disabled'; ok = true; }
+      else {
+        /* presencial é sempre vendido: a inscrição é a compra na Loja */
+        var vgs = simVagas(sm);
+        tagTxt = 'PRESENCIAL';
+        if (vgs.temSala && simVagasRest(sm) <= 0) { acao = 'Sala lotada'; dis = ' disabled'; }
+        else { acao = 'Comprar vaga na Loja'; }
+      }
+      /* leiaute em camadas: título+tag / detalhe em linha inteira / ação à direita */
+      return '<div class="sim-row"><div class="sim-top"><div class="m-dot">◈</div>' +
+        '<div class="t">' + sm.rot + '</div>' +
+        '<span class="tag' + (ok ? ' ok' : '') + '">' + tagTxt + '</span></div>' +
+        '<div class="d">' + (sm.det ? sm.det + ' · ' : '') + simHint(sm) + '</div>' +
+        '<div class="sim-act"><button class="btn ghost small" data-sim="' + x.i + '"' + dis + '>' + acao + '</button></div></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum simulado disponível agora.</p>';
+    el.querySelectorAll('[data-sim]').forEach(function (bt) {
+      bt.addEventListener('click', function () { simClick(parseInt(bt.dataset.sim, 10)); });
+    });
+  }
+  function simClick(i) {
+    var sm = SIMULADOS[i]; if (!sm) return;
+    if (sm.tag === 'DIGITAL') {
+      if (!simDigDisponivel(sm)) { toast('Este simulado abre em ' + diaBR(sm.dia) + '.'); return; }
+      abrirSimDig(sm);
+      return;
+    }
+    /* presencial */
+    if (sm.insc || sm.comprado) { toast('Inscrição já confirmada — apareça na sede para liberarem sua entrada.'); return; }
+    var vg = simVagas(sm);
+    if (vg.temSala && simVagasRest(sm) <= 0) { toast('Sala lotada — as ' + vg.total + ' vagas deste simulado já foram tomadas.'); return; }
+    /* presencial ocupa lugar na sala e é sempre vendido: a inscrição é a
+       compra na Loja, em Quad Coins ou Diamantes                        */
+    showView('v-loja', 'navAluno');
+    renderLojaSimulados();
+    lojaLevarAte('[data-sim-buy="' + sm.id + '"]');   /* direto no item, não só na aba */
+    toast('Simulado presencial — a inscrição é a compra da vaga na Loja, em Quad Coins ou Diamantes.');
+  }
+  /* choque de agenda do simulado presencial (mesma régua das compras) */
+  var simChoqueArmado = null;
+  function simChoque(sm) {
+    if (sm.tag !== 'PRESENCIAL' || !sm.dataISO) return null;
+    var fs = (sm.hi && sm.hf) ? faixaDe(sm.hi + '–' + sm.hf) : faixaDe(sm.det || '');
+    var ds = diaDaData(sm.dataISO);
+    if (!fs || ds == null) return null;
+    return choqueDeAgenda({ dias: [ds], ini: fs[0], fim: fs[1], rot: sm.rot, de: sm.dataISO, ate: sm.dataISO });
+  }
+  function simInscrever(sm) {
+    /* presencial é sempre vendido: a liberação na sede confirma a entrada
+       e pontua o score — prêmio em Quad Coins é do digital gratuito     */
+    SIM_INSC.unshift({ simRot: sm.rot, nome: nomeCurto(), pago: sm.pago, valor: sm.valor, score: sm.score,
+      geraQdC: false, liberado: false, pontuado: false, euSou: true });
+    if (typeof renderSimPres === 'function') renderSimPres();   /* aparece na recepção para liberar */
+  }
+  /* ---------- Loja: simulados pagos ---------- */
+  var SIM_ICO = '<svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg>';
+  function lojaSimVenda() {
+    return SIMULADOS.filter(function (sm) {
+      if (!sm.pago || sm.comprado || sm.realizado || sm.feito) return false;
+      var vg = simVagas(sm);
+      return !(sm.tag === 'PRESENCIAL' && vg.temSala && (vg.dmnRest + vg.qdcRest) <= 0);   /* vagas à venda esgotadas saem da vitrine */
+    });
+  }
+  function renderLojaSimulados() {
+    var alvos = { PRESENCIAL: $('lojaSim-pres'), DIGITAL: $('lojaSim-dig') };
+    if (!alvos.PRESENCIAL && !alvos.DIGITAL) return;
+    var vend = lojaSimVenda();
+    ['PRESENCIAL', 'DIGITAL'].forEach(function (tag) {
+      var g = alvos[tag]; if (!g) return;
+      var lista = vend.filter(function (sm) { return sm.tag === tag; });
+      g.innerHTML = lista.map(function (sm) {
+        var mo = sm.moeda === 'dmn' ? 'dmn' : 'qdc';
+        var desc = sm.tag === 'DIGITAL' ? 'digital · ' + sm.minutos + ' min' : 'presencial · ' + (sm.det || 'na sede');
+        var vgl = simVagas(sm);
+        var restL = simVagasRest(sm);
+        var chqL = sm.tag === 'PRESENCIAL' ? simChoque(sm) : null;
+        var precoL;
+        if (sm.tag === 'PRESENCIAL') {
+          precoL = vgl.dmn > 0 && vgl.qdc > 0
+            ? fmt(simPreco(sm, 'dmn')) + ' Dmn ou ' + fmt(simPreco(sm, 'qdc')) + ' QdC'
+            : vgl.qdc > 0 ? fmt(simPreco(sm, 'qdc')) + ' QdC' : fmt(simPreco(sm, 'dmn')) + ' Dmn';
+        } else {
+          precoL = [sm.precoDmn ? fmt(sm.precoDmn) + ' Dmn' : '', sm.precoQdc ? fmt(sm.precoQdc) + ' QdC' : ''].filter(Boolean).join(' ou ')
+            || fmt(sm.valor) + ' ' + moedaTxt(mo);
+        }
+        return '<button class="loja-item" data-sim-buy="' + sm.id + '" data-moeda="' + mo + '">' +
+          (chqL ? '<span class="li-estoque">EM CHOQUE</span>'
+                : (sm.tag === 'PRESENCIAL' && vgl.temSala ? '<span class="li-estoque">' + vgl.dmnRest + ' Dmn · ' + vgl.qdcRest + ' QdC</span>'
+                : sm.tag === 'DIGITAL' ? '<span class="li-estoque">sem limite</span>' : '')) +
+          '<span class="li-ico">' + SIM_ICO + '</span>' +
+          '<span class="li-nome">' + sm.rot + '</span>' +
+          '<span class="li-desc">' + desc + '</span>' +
+          '<span class="li-preco' + (chqL ? ' em-choque' : '') + '">' + precoL + '</span></button>';
+      }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum simulado à venda agora.</p>';
+      g.querySelectorAll('[data-sim-buy]').forEach(function (bt) {
+        bt.addEventListener('click', function () { comprarSimulado(bt.dataset.simBuy); });
+      });
+    });
+  }
+  function comprarSimulado(id) {
+    var sm = null; SIMULADOS.forEach(function (s) { if (s.id === id) sm = s; });
+    if (!sm || sm.comprado) return;
+    var avisoSim = '';
+    if (sm.tag === 'PRESENCIAL' && sm.dataISO) {
+      var fs = faixaDe(sm.hi && sm.hf ? (sm.hi + '–' + sm.hf) : (sm.quando || ''));
+      var ds = diaDaData(sm.dataISO);
+      if (fs && ds != null) {
+        var cq = choqueDeAgenda({ dias: [ds], ini: fs[0], fim: fs[1], rot: sm.rot, de: sm.dataISO, ate: sm.dataISO });
+        if (cq) { avisoSim = avisoChoque(cq); }
+      }
+    }
+    /* presencial com vagas nas duas moedas: o aluno escolhe no pop-up,
+       igual à matrícula em turma (vagas separadas por moeda)            */
+    var vgc = simVagas(sm);
+    var duasMoedas = sm.tag === 'PRESENCIAL'
+      ? (vgc.temSala && vgc.dmnRest > 0 && vgc.qdcRest > 0)
+      : (sm.precoDmn > 0 && sm.precoQdc > 0);   /* digital: sem vagas, mas nas duas moedas */
+    if (duasMoedas) { escolherMoedaSim(sm, avisoSim); return; }
+    var mo = sm.tag === 'PRESENCIAL'
+      ? (vgc.temSala ? (vgc.dmnRest > 0 ? 'dmn' : 'qdc') : (sm.moeda === 'dmn' ? 'dmn' : 'qdc'))
+      : (sm.precoDmn > 0 ? 'dmn' : sm.precoQdc > 0 ? 'qdc' : (sm.moeda === 'dmn' ? 'dmn' : 'qdc'));
+    finalizarCompraSim(sm, mo, avisoSim);
+  }
+  /* pop-up "Creditar em" reaproveitado dos simulados presenciais */
+  function escolherMoedaSim(sm, avisoSim) {
+    var vg = simVagas(sm);
+    simMoedaAlvo = { sm: sm, aviso: avisoSim };
+    $('tuLayNome').textContent = sm.rot;
+    var dig = sm.tag === 'DIGITAL';
+    $('tuLayDesc').innerHTML = (dig ? 'Simulado digital · ' + sm.minutos + ' min · ' + sm.nq + ' questões' : 'Simulado presencial · ' + (sm.det || 'na sede')) +
+      '<br>Comprar em qual moeda?' + (dig ? ' O digital não tem limite de vagas.' : ' As vagas são separadas por moeda.');
+    $('tuDmnTxt').textContent = fmt(simPreco(sm, 'dmn')) + ' Dmn';
+    $('tuDmnVagas').textContent = dig ? 'sem limite de vagas' : vg.dmnRest + (vg.dmnRest === 1 ? ' vaga' : ' vagas');
+    $('tuQdcTxt').textContent = fmt(simPreco(sm, 'qdc')) + ' QdC';
+    $('tuQdcVagas').textContent = dig ? 'sem limite de vagas' : vg.qdcRest + (vg.qdcRest === 1 ? ' vaga' : ' vagas');
+    $('btnTuDmn').disabled = dig ? !(sm.precoDmn > 0) : vg.dmnRest <= 0;
+    $('btnTuQdc').disabled = dig ? !(sm.precoQdc > 0) : vg.qdcRest <= 0;
+    $('turmaLayer').classList.add('on');
+  }
+  function finalizarCompraSim(sm, mo, avisoSim) {
+    var preco = (sm.precoDmn || sm.precoQdc) ? simPreco(sm, mo) : sm.valor;
+    confirmarCompra({ nome: sm.rot, desc: sm.tag === 'DIGITAL' ? 'simulado digital' : 'simulado presencial', preco: preco, moeda: mo, aviso: avisoSim, ico: SIM_ICO }, function () {
+      if (saldoDe(mo) < preco) { toast(semSaldoMsg(mo)); return; }
+      if (sm.tag === 'PRESENCIAL' && !simTomaVaga(sm, simVagas(sm).temSala ? mo : 'gratis')) {
+        toast('Sala lotada — a última vaga em ' + moedaTxt(mo) + ' acabou de ser tomada.'); renderLojaSimulados(); return;
+      }
+      debitar(mo, preco, sm.rot + ' · −' + fmt(preco) + ' ' + moedaTxt(mo));
+      sm.comprado = true;
+      lojaCompraLog(sm.rot, preco, mo, 'simulado', sm.id);
+      if (sm.tag === 'PRESENCIAL') {
+        sm.insc = true;
+        simInscrever(sm);
+        toast(sm.rot + ' comprado — inscrição confirmada. Apareça na sede para liberarem sua entrada.');
+      } else {
+        toast(sm.rot + ' comprado — já pode responder no Calendário.');
+      }
+      renderLojaSimulados();
+      renderSimulados();
+      if (typeof renderAdmSimList === 'function') renderAdmSimList();
+    });
+  }
+  function renderSimHist() {
+    var card = $('simHistCard'), el = $('simHistList'); if (!el) return;
+    if (!SIM_HIST.length) { if (card) card.style.display = 'none'; return; }
+    if (card) card.style.display = '';
+    el.innerHTML = SIM_HIST.map(function (h) {
+      return '<div class="mission-row"><div class="m-dot">✓</div>' +
+        '<div class="grow"><div class="t">' + h.rot + '</div><div class="d">' + h.tipo + ' · ' + h.resultado + '</div></div>' +
+        '<span class="tag ok">REALIZADO</span></div>';
+    }).join('');
+  }
+  /* missões da noite = blocos vigentes do "Hoje" (nada de atrasadas/simulados) */
+  function missoesDaNoite() {
+    var agora = Date.now();
+    return diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
+    });
+  }
+  /* cartão herói "Bloco da noite": concluídas/total da NOITE; cada missão
+     registrada como concluída acende mais um segmento da trilha */
+  function heroTurno() {
+    var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    return (ta && ta.turno) || 'noite';
+  }
+  function heroSync() {
+    /* o herói fala a língua da turma ativa: Bloco da manhã/tarde/noite */
+    var tn = heroTurno();
+    var ht = $('heroTitulo'); if (ht) ht.textContent = 'Bloco da ' + tn;
+    var hs = $('heroSub'); if (hs) hs.textContent = 'Complete as missões desta ' + tn + ' para ganhar score e Quad Coins. Avante!';
+    var noite = missoesDaNoite();
+    var total = noite.length;      /* a Introdução (instrução) fica fora da conta */
+    var feitas = noite.filter(function (x) { return x.b.feito; }).length;
+    $('missCount').textContent = feitas + '/' + total;
+    var segs = '';
+    for (var s = 0; s < total; s++) { segs += '<span class="hseg' + (s < feitas ? ' on' : '') + '"></span>'; }
+    $('missSegs').innerHTML = segs;
+    $('missRestam').textContent = feitas >= total ? 'COMPLETO' : 'FALTAM ' + (total - feitas);
+    var btn = $('btnMissaoHome');
+    var wrap = btn.closest('.hero-btn-wrap');
+    wrap.classList.remove('reward', 'claimed');
+    btn.dataset.reward = '';
+    if (total > 0 && feitas >= total) {
+      btn.disabled = false;
+      if (noiteResgatada()) {
+        /* já retirou: estado calmo, sem nova recompensa */
+        wrap.classList.add('claimed');
+        btn.innerHTML = 'Benefícios retirados <svg class="hb-chev" viewBox="0 0 24 24" style="stroke:#2C5E1F"><path d="m5 12 5 5L20 7"/></svg>';
+        btn.disabled = true;
+      } else {
+        /* noite completa: botão dourado convida a retirar o prêmio */
+        wrap.classList.add('reward');
+        btn.dataset.reward = '1';
+        btn.innerHTML = coinSvg().replace('coin-img', 'hb-coin') + ' Retire aqui seus benefícios';
+      }
+    } else if (btn.disabled || wrap.classList.contains('reward') || wrap.classList.contains('claimed')) {
+      btn.disabled = false;
+      btn.innerHTML = 'Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>';
+    }
+  }
+  /* ---------- recompensa da noite concluída ----------
+     Cada bloco de questões da noite vale +1 de Score de carreira; a noite
+     inteira concluída ainda rende +1 Quad Coin. Um efeito de moeda voa até
+     o contador para reforçar positivamente a conquista.                    */
+  var NOITE_RESG = {};   /* bônus do dia completo — retirado POR TURMA */
+  function noiteResgatada() { return !!NOITE_RESG[(typeof turmaAtivaId !== 'undefined' && turmaAtivaId) || 'patamo-n']; }
+  function resgatarBeneficios(ev) {
+    if (noiteResgatada()) { return; }
+    var total = missoesDaNoite().length;
+    if (total <= 0 || missoesDaNoite().filter(function (x) { return x.b.feito; }).length < total) { return; }
+    NOITE_RESG[(typeof turmaAtivaId !== 'undefined' && turmaAtivaId) || 'patamo-n'] = true;
+    var scoreBonus = total;   /* +1 de Score por bloco concluído na noite */
+    carreira.scorePatente += scoreBonus;
+    carreira.scoreCarreira += scoreBonus;
+    carreira.scoreTemporada += scoreBonus;
+    if (typeof renderCarreira === 'function') renderCarreira();
+    /* efeito visual + a moeda entra no saldo ao "aterrissar" */
+    var origem = ev && ev.currentTarget ? ev.currentTarget : $('btnMissaoHome');
+    animarMoedaConquista(origem, function () {
+      addScore(1, 'Bloco da ' + heroTurno() + ' completo! +1 Quad Coin · +' + scoreBonus + ' de Score');
+    });
+    heroSync();
+  }
+  function animarMoedaConquista(origem, aoChegar) {
+    var alvo = $('coinsCard') || $('scoreVal');
+    if (!origem || !alvo) { if (aoChegar) aoChegar(); return; }
+    var ro = origem.getBoundingClientRect(), ra = alvo.getBoundingClientRect();
+    var x0 = ro.left + ro.width / 2, y0 = ro.top + ro.height / 2;
+    var x1 = ra.left + ra.width / 2, y1 = ra.top + ra.height / 2;
+    /* faíscas de reforço positivo ao redor do botão */
+    var sp = document.createElement('div');
+    sp.className = 'reward-sparks'; sp.style.left = x0 + 'px'; sp.style.top = y0 + 'px';
+    for (var k = 0; k < 10; k++) {
+      var ang = (Math.PI * 2 * k) / 10, dist = 34 + (k % 3) * 10, i = document.createElement('i');
+      i.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+      i.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+      i.style.animationDelay = (k * 12) + 'ms'; sp.appendChild(i);
+    }
+    document.body.appendChild(sp);
+    setTimeout(function () { sp.remove(); }, 950);
+    /* a moeda dourada sobe, gira e voa até o contador de Quad Coins */
+    var coin = document.createElement('img');
+    coin.className = 'coin-fly'; coin.src = QUAD_COIN_SRC; coin.alt = '';
+    coin.style.left = x0 + 'px'; coin.style.top = y0 + 'px';
+    coin.style.transition = 'none';
+    coin.style.animation = 'coinRise 0.62s ease-out forwards';
+    document.body.appendChild(coin);
+    setTimeout(function () {
+      coin.style.animation = 'none';
+      coin.style.transition = 'left 0.55s cubic-bezier(.5,-0.2,.7,1), top 0.55s cubic-bezier(.5,-0.2,.7,1), transform 0.55s ease-in, opacity 0.5s ease-in 0.25s';
+      coin.style.left = x1 + 'px'; coin.style.top = y1 + 'px';
+      coin.style.transform = 'translate(-50%,-50%) scale(0.35)'; coin.style.opacity = '0';
+    }, 640);
+    setTimeout(function () {
+      coin.remove();
+      if (alvo.animate) { try { alvo.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 420 }); } catch (e) {} }
+      if (aoChegar) aoChegar();
+    }, 1220);
+  }
+  function renderDia() {
+    var agora = Date.now();
+    var vivos = diaBlocos().map(function (b, i) { return { b: b, i: i }; }).filter(function (x) {
+      return !x.b.feito && (agora - x.b.criadoEm) < DIA_EXPIRA_DIAS * 864e5;
+    });
+    $('diaList').innerHTML = vivos.map(function (x) {
+      return '<div class="mission-row"><div class="m-dot">›</div>' +
+        '<div class="grow"><div class="t">' + x.b.rot + '</div><div class="d">' + x.b.det + ' · 10 rápidas</div></div>' +
+        '<button class="btn small" data-dia="' + x.i + '">Responder</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Tudo em dia por aqui — novos blocos chegam com as próximas aulas.</p>';
+    $('diaList').querySelectorAll('[data-dia]').forEach(function (bt) {
+      bt.addEventListener('click', function () { trAbrirBloco(parseInt(bt.dataset.dia, 10)); });
+    });
+    /* o cartão diz de qual turma são as questões do dia */
+    var dt = $('diaTurma');
+    if (dt) {
+      var ta = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+      dt.style.display = ta ? '' : 'none';
+      if (ta) dt.textContent = ta.nome.toUpperCase();
+    }
+    heroSync();   /* o cartão herói acompanha as missões da noite */
+  }
+
+  /* ---------- motor do treinamento ---------- */
+  var trTab = 'gerais', trFila = { gerais: [], esp: [] }, trPos = { gerais: 0, esp: 0 };
+  var trDeck = null, trCards = [], trIdx = 0, trAcertos = 0, trDia = -1, trDiaArr = null;
+  /* o rodízio (fila + posição) é POR TURMA: trocar de turma troca o
+     baralho em andamento e o traz de volta intacto ao retornar        */
+  var TR_ST = {}, trTurmaDoEstado = null;
+  function trTrocaTurma() {
+    if (trTurmaDoEstado) TR_ST[trTurmaDoEstado] = { fila: trFila, pos: trPos };
+    var id = (typeof turmaAtivaId !== 'undefined' && turmaAtivaId) ? turmaAtivaId : 'patamo-n';
+    var st = TR_ST[id] || { fila: { gerais: trMontarFila('gerais'), esp: trMontarFila('esp') }, pos: { gerais: 0, esp: 0 } };
+    trFila = st.fila; trPos = st.pos;
+    trTurmaDoEstado = id;
+  }
+  function trEhGeral(m) { return TR_GERAIS.indexOf(m) >= 0; }
+  function trMontarFila(tab) {
+    /* o rodízio segue o edital da turma ativa (o Domínio já trocou junto) */
+    var arvore = (typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO;
+    var mats = arvore.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
+    var fila = [], maxA = 0;
+    mats.forEach(function (m) { maxA = Math.max(maxA, m[1].length); });
+    for (var r = 0; r < maxA; r++) {
+      mats.forEach(function (m) {
+        if (!m[1][r]) return;
+        var a = m[1][r][0];
+        if (TR_BANK.some(function (c) { return c.m === m[0] && c.a === a; })) fila.push({ m: m[0], a: a });
+      });
+    }
+    return fila;
+  }
+  function trPeso(c) { return { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] !== undefined ? { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] : 2; }
+  function trCartasDo(deck) {
+    var cs = TR_BANK.filter(function (c) { return c.m === deck.m && c.a === deck.a; });
+    cs.sort(function (x, y) { return trPeso(y) - trPeso(x); });   /* difíceis primeiro na 2ª volta */
+    return cs.slice(0, TR_REW.blocoTam);
+  }
+  function trAbrir() {
+    trFila.gerais = trMontarFila('gerais');
+    trFila.esp = trMontarFila('esp');
+    trDeck = null; trDia = -1;
+    $('trLayer').style.display = 'flex';
+    trHome();
+  }
+  function trSetTab(t) {
+    trTab = t;
+    $('tabTrGerais').classList.toggle('on', t === 'gerais');
+    $('tabTrEsp').classList.toggle('on', t === 'esp');
+    trHome();
+  }
+  function trHome() {
+    var fila = trFila[trTab], pos = trPos[trTab];
+    $('trTitulo').textContent = trTab === 'gerais' ? 'Bloco de Gerais' : 'Bloco de Específicas (Direito)';
+    if (!fila.length) { $('trBody').innerHTML = '<div class="q-card"><p class="sub">Sem cartas ainda — as aulas alimentam este bloco.</p></div>'; return; }
+    if (pos >= fila.length) { trRedistribuir(); return; }
+    var prox = fila[pos];
+    var h = '<div class="q-card">' +
+      '<div class="k-label">Rodízio · 10 por assunto, alternando as matérias</div>' +
+      '<p class="sub" style="margin:6px 0 12px">Próximo: <strong>' + prox.a + '</strong> (' + prox.m + ')</p>' +
+      '<button class="btn" id="btnTrComecar" style="width:100%">Responder 10 de ' + prox.a + '</button>' +
+      '<div class="tr-fila" style="margin-top:14px">' +
+      fila.map(function (d, i) {
+        var cls = i < pos ? ' done' : (i === pos ? ' next' : '');
+        return '<div class="tr-fila-row' + cls + '"><div class="m-dot' + (i < pos ? ' done' : '') + '">' + (i < pos ? '✓' : (i + 1)) + '</div>' +
+          '<span class="nm">' + d.a + ' · ' + d.m + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="sub" style="margin-top:10px; font-size:11px">Novos assuntos entram conforme as aulas alimentam o banco (PDF 02 do operador).</p></div>';
+    $('trBody').innerHTML = h;
+    $('btnTrComecar').addEventListener('click', function () {
+      trDeck = prox; trCards = trCartasDo(prox); trIdx = 0; trAcertos = 0; trDia = -1;
+      trCarta();
+    });
+  }
+  function trAbrirBloco(i) {
+    var b = diaBlocos()[i];
+    trDia = i; trDiaArr = diaBlocos();   /* trocar de turma no meio não desvia o crédito */
+    if (b.fonte === 'aula') {
+      trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
+      trCards = AULA_DEMO.cards.slice(b.ini, b.ini + 10).map(function (r) {
+        return fc(AULA_DEMO.m, AULA_DEMO.a, r[0] === 'C', r[1], r[2]);
+      });
+    } else {
+      trDeck = { m: b.m, a: b.a };
+      trCards = trCartasDo(trDeck);
+    }
+    trIdx = 0; trAcertos = 0;
+    $('trLayer').style.display = 'flex';
+    $('trTitulo').textContent = b.rot + ' · ' + b.det;
+    trCarta();
+  }
+  function trCarta() {
+    var c = trCards[trIdx];
+    var h = '<div class="q-card">' +
+      '<div class="k-label">' + c.a + ' · ' + c.m + ' — carta ' + (trIdx + 1) + ' de ' + trCards.length + '</div>' +
+      '<p class="fc-enun">' + c.t + '</p>' +
+      '<div class="fc-ce"><button class="certo" id="fcCerto">CERTO</button><button class="errado" id="fcErrado">ERRADO</button></div>' +
+      '</div>';
+    $('trBody').innerHTML = h;
+    $('fcCerto').addEventListener('click', function () { trResponde(c, true); });
+    $('fcErrado').addEventListener('click', function () { trResponde(c, false); });
+  }
+  function trResponde(c, marcouCerto) {
+    var acertou = (marcouCerto === c.c);
+    if (acertou) trAcertos++;
+    c.resp = acertou;
+    var h = '<div class="q-card">' +
+      '<div class="k-label">' + c.a + ' · ' + c.m + ' — carta ' + (trIdx + 1) + ' de ' + trCards.length + '</div>' +
+      '<p class="fc-enun">' + c.t + '</p>' +
+      '<div class="fc-verd ' + (acertou ? 'ok' : 'bad') + '">' + (acertou ? '✓ Você acertou!' : '✗ Errou — gabarito: ' + (c.c ? 'CERTO' : 'ERRADO')) + '</div>' +
+      '<p class="fc-obs">' + c.o + '</p>' +
+      '<div class="fc-rate-lbl">Como foi essa pra você?</div>' +
+      '<div class="fc-rate">' +
+      '<button class="r0" data-nota="0">Errei</button><button class="r1" data-nota="1">Difícil</button>' +
+      '<button class="r2" data-nota="2">Bom</button><button class="r3" data-nota="3">Fácil</button></div></div>';
+    $('trBody').innerHTML = h;
+    $('trBody').querySelectorAll('[data-nota]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        c.nota = parseInt(b.dataset.nota, 10);
+        trIdx++;
+        if (trIdx < trCards.length) trCarta(); else trFimBloco();
+      });
+    });
+  }
+  function trFimBloco() {
+    /* pagamento: +1 score por acerto · +5 QdC pelo bloco · Domínio atualiza */
+    carreira.scorePatente += trAcertos * TR_REW.scorePorAcerto;
+    carreira.scoreCarreira += trAcertos * TR_REW.scorePorAcerto;
+    carreira.scoreTemporada += trAcertos * TR_REW.scorePorAcerto;
+    renderCarreira();
+    addScore(TR_REW.coinsPorBloco, '+' + TR_REW.coinsPorBloco + ' Quad Coins · bloco de flashcards');
+    /* o ajuste do Domínio é POR CONCURSO — acerto na turma da PC-BA não
+       mexe na barra homônima do CFO                                    */
+    var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
+    trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
+    if (typeof renderEdital === 'function') renderEdital();
+    var deDia = trDia >= 0;
+    if (deDia) {
+      var arrDia = trDiaArr || diaBlocos();
+      arrDia[trDia].feito = true;
+      if (arrDia[trDia].fonte === 'aula') {
+        /* respondidas, as cartas do PDF 01 entram no banco do Treinamento Rápido */
+        trCards.forEach(function (c) { TR_BANK.push(c); });
+        trFila.esp = trMontarFila('esp');
+        trFila.gerais = trMontarFila('gerais');
+      }
+      renderDia();
+      renderAtrasadas();
+    }
+    var h = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
+      '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
+      '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
+      'O Domínio de <strong>' + trDeck.a + '</strong> foi atualizado.' +
+      (deDia ? '<br>As 10 rápidas entraram no banco do Treinamento Rápido.' : '') + '</p>' +
+      '<button class="btn" id="btnTrProx" style="width:100%">' + (deDia ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
+    $('trBody').innerHTML = h;
+    $('btnTrProx').addEventListener('click', function () {
+      if (deDia) { $('trLayer').style.display = 'none'; return; }
+      trPos[trTab]++;
+      trHome();
+    });
+  }
+  function trRedistribuir() {
+    trPos[trTab] = 0;
+    trFila[trTab] = trMontarFila(trTab);
+    $('trBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">Você zerou o bloco! 🎖️</p>' +
+      '<p class="sub" style="margin:8px 0 14px">O baralho foi <strong>redistribuído pela dificuldade</strong> que você informou: as cartas marcadas como Errei e Difícil voltam primeiro.</p>' +
+      '<button class="btn" id="btnTrDeNovo" style="width:100%">Recomeçar o rodízio</button></div>';
+    $('btnTrDeNovo').addEventListener('click', trHome);
+  }
+  window.TR_BANK = TR_BANK; window.AULA_DEMO = AULA_DEMO;   /* exposto para a suíte de testes */
+  $('btnTrSair').addEventListener('click', function () { $('trLayer').style.display = 'none'; });
+  $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
+  $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
+  trTrocaTurma();   /* registra o rodízio da turma inicial */
+  renderDia();
+  renderAtrasadas();
+  renderSimulados();
+
+  /* ---------- missão demonstrativa (3 questões, feedback imediato) ---------- */
+  var TQ = [
+    { q: 'Quais são os princípios expressos da Administração Pública presentes no artigo 37 da Constituição Federal?', alts: ['LIMPE', 'PULME', 'LEMPA', 'SIMPE'], ok: 0 },
+    { q: 'Quanto é 1 + 1?', alts: ['1', '2', '3', '4'], ok: 1 },
+    { q: 'Quais são as duas bases das instituições militares?', alts: ['Hierarquia e disciplina', 'Força e coragem', 'Ordem e progresso', 'Comando e obediência'], ok: 0 }
+  ];
+  var TUT_REW = { score: 30, coins: 25 };
+  var tqI = 0, tqAcertos = 0, tqLock = false, blocoIntroFeito = false;
+  /* a Introdução no Quad é DA CONTA: feita uma vez (no tutorial do 1º
+     acesso), fica concluída para sempre — em qualquer turma. A linha
+     não some: vira o registro visível de que já foi feita.            */
+  function blocoIntroMarca(feito) {
+    blocoIntroFeito = feito;
+    /* concluída (no tutorial), a linha SOME do bloco — ela é da conta e
+       já foi feita; ficar ali só ocupava lugar (dec. do gestor, 28/07) */
+    $('blocoIntroRow').style.display = feito ? 'none' : '';
+    if (feito) lsSet('vq_intro_done', '1');
+  }
+  if (lsGet('vq_intro_done') === '1') blocoIntroMarca(true);
+  window.__introFeita = function (v) {   /* para a suíte de testes */
+    blocoIntroMarca(v);
+    if (!v) lsSet('vq_intro_done', '');
+  };
+  $('btnBlocoIntro').addEventListener('click', function () {
+    if (blocoIntroFeito) return;
+    tqAbrir();
+  });
+  function tqAbrir() {
+    tqI = 0; tqAcertos = 0;
+    $('tutLayer').classList.remove('on');
+    $('tqLayer').style.display = 'flex';
+    tqRender();
+  }
+  function tqRender() {
+    var st = TQ[tqI];
+    tqLock = false;
+    $('tqProg').textContent = 'Questão ' + (tqI + 1) + ' de ' + TQ.length;
+    var letras = ['A', 'B', 'C', 'D'];
+    $('tqBody').innerHTML = '<div class="q-card"><p class="q-enun">' + st.q + '</p>' +
+      st.alts.map(function (a, i) {
+        return '<button class="q-alt" data-i="' + i + '"><span>' + letras[i] + '</span><span>' + a + '</span></button>';
+      }).join('') + '</div>';
+    var alts = $('tqBody').querySelectorAll('.q-alt');
+    alts.forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (tqLock) return;
+        tqLock = true;   /* uma resposta por questão */
+        var certo = parseInt(b.dataset.i, 10) === st.ok;
+        if (certo) { tqAcertos++; b.classList.add('tq-alt-ok'); }
+        else { b.classList.add('tq-alt-bad'); alts[st.ok].classList.add('tq-alt-ok'); }
+        setTimeout(function () { tqI++; if (tqI < TQ.length) tqRender(); else tqResultado(); }, certo ? 700 : 1200);
+      });
+    });
+  }
+  function tqResultado() {
+    if (tqAcertos < TQ.length) {
+      /* errou alguma: sem as 3 não há 25 Coins — o QUAD relança em loop */
+      $('tqProg').textContent = 'Vamos de novo';
+      $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+        '<p class="q-enun" style="font-size:15px">Você ainda não conseguiu pontos suficientes para avançarmos — vou lançar as perguntas novamente!</p>' +
+        '<p class="sub" style="margin:8px 0 14px">— QUAD</p>' +
+        '<button class="btn" id="tqRetry" style="width:100%">Tentar novamente</button></div>';
+      $('tqRetry').addEventListener('click', function () { tqI = 0; tqAcertos = 0; tqRender(); });
+      return;
+    }
+    $('tqProg').textContent = 'Missão concluída';
+    $('tqBody').innerHTML = '<div class="q-card" style="text-align:center">' +
+      '<p class="q-enun" style="font-size:16px">✓ Primeira missão cumprida!</p>' +
+      '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + tqAcertos + ' de ' + TQ.length + '</strong> e ganhou <strong>+' + TUT_REW.score + ' de score</strong> e <strong>+' + TUT_REW.coins + ' Quad Coins</strong>.</p>' +
+      '<button class="btn" id="tqFim" style="width:100%">Continuar</button></div>';
+    $('tqFim').addEventListener('click', function () {
+      carreira.scorePatente += TUT_REW.score;
+      carreira.scoreCarreira += TUT_REW.score;
+      carreira.scoreTemporada += TUT_REW.score;
+      renderCarreira();
+      addScore(TUT_REW.coins, '+' + TUT_REW.coins + ' Quad Coins · Introdução concluída');
+      blocoIntroMarca(true);
+      $('tqLayer').style.display = 'none';
+      if (tutOn) {
+        showView('v-inicio', 'navAluno');
+        $('tutLayer').classList.add('on');
+        tutEvent('missao');
+      } else {
+        toast('Introdução no Quad concluída!');
+      }
+    });
+  }
+
+  function iniciarTutorial() {
+    tutOn = true; tourOn = true;
+    $('daniloFab').style.display = 'none';
+    $('daniloHint').style.display = 'none';
+    $('tutSprite').style.backgroundImage = getComputedStyle($('fabSprite')).backgroundImage;
+    $('tutSprite').style.backgroundPosition = '0 0';
+    /* é o começo do jogo: tutorial roda SEMPRE do zero — score e Coins zerados,
+       boina devolvida; ao fim o aluno sai com +30 score, 5 Coins e a boina
+       (estado final constante — refazer não acumula nada) */
+    tutSetCoins(0);
+    carreira.scorePatente = 0; carreira.scoreCarreira = 0; carreira.scoreTemporada = 0;
+    carreira.estado = 'acumulando'; renderCarreira();
+    tutResetBoina();
+    tutAvatarOk = false;   /* escolher o personagem faz parte da instrução, sempre */
+    blocoIntroMarca(false);   /* a Introdução no Quad volta a ficar disponível */
+    /* nome e telefone JÁ vêm do banco de dados geral (o aluno se cadastrou no site);
+       o tutorial só confirma. O nome de guerra ainda não existe → card mostra "______". */
+    $('nomeCompleto').value = DB_ALUNO.nome; $('foneAluno').value = DB_ALUNO.fone;
+    $('nomeGuerra').value = ''; carreira.nomeGuerra = ''; syncNametag();
+    showView('v-inicio', 'navAluno');
+    $('v-inicio').scrollTop = 0;
+    $('tutLayer').classList.add('on');
+    tutGo(0);
+  }
+  /* PULAR: o aluno entra direto no estado de quem concluiu a instrução —
+     boina equipada e os Quad Coins que sobram (25 ganhos − 20 da boina).
+     A Introdução no Quad segue disponível em Missões para ser feita. */
+  function tutPular() {
+    if (!tutOn) return;
+    /* pular reproduz o ESTADO FINAL de quem fez a instrução: ganha os 25 Quad
+       Coins e gasta 20 na boina — sobram 5 —, mais o score da Introdução. */
+    var elBoina = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
+    var precoBoina = elBoina ? (parseInt(elBoina.dataset.preco, 10) || 20) : 20;
+    var pctScore = TUT_REW.score;
+    var pctCoins = Math.max(0, TUT_REW.coins - precoBoina);
+    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
+    tutOn = false; tourOn = false; tutExpect = null;
+    $('tutLayer').classList.remove('on');
+    $('daniloFab').style.display = '';
+    /* estado de quem já passou pela instrução: boina garantida e equipada */
+    lojaOwned['Boina exclusiva'] = true;
+    boinaEquipada = true;
+    var bi = document.querySelector('.loja-item[data-nome="Boina exclusiva"]');
+    if (bi) { bi.style.display = 'none'; bi.classList.add('comprado'); }
+    if (typeof aplicarAvatar === 'function') aplicarAvatar();
+    carreira.scorePatente += pctScore; carreira.scoreCarreira += pctScore; carreira.scoreTemporada += pctScore;
+    renderCarreira();
+    addScore(pctCoins, '+' + pctCoins + ' Quad Coins · saldo da instrução');
+    blocoIntroMarca(true);   /* pular reproduz o estado final: a Introdução conta como feita */
+    showView('v-inicio', 'navAluno');
+    daniloHintMostra();
+    toast('Instrução pulada — você entrou como quem a concluiu: boina equipada, ' + pctCoins + ' Quad Coins (25 ganhos − ' + precoBoina + ' da boina) e a Introdução no Quad registrada como feita.');
+  }
+  var btnTutSkip = $('tutSkip');
+  if (btnTutSkip) btnTutSkip.addEventListener('click', function (e) { e.stopPropagation(); tutPular(); });
+  function tutFim() {
+    lsSet(TUT_LS.done, '1'); lsSet(TUT_LS.step, '0'); lsSet('vq_tut_skip', '1');
+    tutOn = false; tourOn = false; tutExpect = null;
+    $('tutLayer').classList.remove('on');
+    $('daniloFab').style.display = '';
+    daniloHintMostra();   /* reaparece por 10s e some sozinho */
+    toast('Instrução inicial concluída — plataforma liberada!');
+    daniloWave();
+  }
+  window.addEventListener('resize', function () { if (tutOn) tutGo(tutIdx); });
+
+  /* ---------- sair da conta ---------- */
+  function sairConta() {
+    $('loginEmail').value = '';
+    var w = $('logoWrap');
+    w.innerHTML = w.innerHTML; // recria os nós para reiniciar a animação da logo
+    $('loginSenha').value = '';
+    $('loginLayer').classList.remove('off');
+    fecharGate();
+    applyConnUI();
+    document.querySelector('[data-persona="aluno"]').click();
+  }
+  $('btnSairPerfil').addEventListener('click', sairConta);
+
+  /* ---------- botão + (mais) ---------- */
+  $('btnPlus').addEventListener('click', function () { $('plusPop').classList.add('on'); });
+  $('plusPop').addEventListener('click', function (e) { if (e.target === $('plusPop')) $('plusPop').classList.remove('on'); });
+  document.querySelectorAll('.plus-row').forEach(function (row) {
+    row.addEventListener('click', function () {
+      if (row.id === 'rowChat') { $('plusPop').classList.remove('on'); abrirChat(); return; }
+      if (row.dataset.goto) {
+        $('plusPop').classList.remove('on');
+        showView(row.dataset.goto, 'navAluno');
+      } else {
+        toast(row.dataset.lock || 'Em breve');
+      }
+    });
+  });
+
+  /* ---------- pré-taf ---------- */
+  $('btnTreino').addEventListener('click', function () {
+    $('tafDot').classList.add('done'); $('tafDot').textContent = '✓';
+    $('tafDesc').textContent = 'Hoje · registrado agora';
+    $('btnTreino').disabled = true; $('btnTreino').textContent = 'Feito';
+    addScore(10, '+10 Quad Coins · treino Pré-TAF registrado');
+    addPontos(5); // treino registrado também gera score
+  });
+
+
+  /* ---------- perfil do aluno: avatares da coleção PM ---------- */
+  var AVATAR_SPRITE = '__AVATARS__'; // coleção 3D · 6 homens + 6 mulheres (grade 6×2, embutida no build)
+  var AV_CX = [1/12, 3/12, 5/12, 7/12, 9/12, 11/12], AV_CY = [0.25, 0.75], AV_R = 1/12;
+  var AV_LABELS = [
+    'Homem · cabelo loiro', 'Homem · pele parda, corte raspado', 'Homem · ruivo', 'Homem · careca', 'Homem · negro, corte fade', 'Homem · corte militar',
+    'Mulher · cabelo preto liso', 'Mulher · loira', 'Mulher · ruiva', 'Mulher · castanho curto', 'Mulher · negra, cabelo curto', 'Mulher · negra, tranças'
+  ];
+  var avatarThumbs = [], avatarZoom = [], avatarIdx = 0;
+  /* segurar para ampliar a foto do personagem */
+  var zoomHold = { t: null, on: false, el: null };
+  var zoomSupTs = 0;   /* após soltar o zoom, cliques ficam suprimidos por instantes */
+  function zoomShow(src, nome) {
+    $('zoomImg').src = src;
+    $('zoomNome').textContent = nome || '';
+    $('zoomLayer').classList.add('on');
+    zoomHold.on = true;
+  }
+  function zoomHide() {
+    if (!zoomHold.on) return;
+    $('zoomLayer').classList.remove('on');
+    zoomHold.on = false;
+    if (tutOn && (tutExpect === 'zoom-foto' || tutExpect === 'zoom-final')) tutEvent(tutExpect);
+  }
+  /* segurar para ampliar — registrado por SELETOR e delegado no documento,
+     para funcionar também nas cópias da rolagem infinita do Início */
+  var HOLD_SELS = [];
+  function bindHold(sel, getDados) { HOLD_SELS.push({ sel: sel, dados: getDados }); }
+  document.addEventListener('pointerdown', function (e) {
+    for (var i = 0; i < HOLD_SELS.length; i++) {
+      var alvo = e.target.closest(HOLD_SELS[i].sel);
+      if (alvo) {
+        clearTimeout(zoomHold.t);
+        (function (h, el) {
+          zoomHold.el = el;
+          zoomHold.t = setTimeout(function () { var d = h.dados(el); zoomShow(d.src, d.nome); }, 350);
+        })(HOLD_SELS[i], alvo);
+        return;
+      }
+    }
+  }, true);
+  function holdSolta() {
+    clearTimeout(zoomHold.t);
+    if (zoomHold.on) {
+      zoomHide();
+      zoomSupTs = Date.now() + 300;   /* clique do mesmo gesto não navega/escolhe */
+      if (zoomHold.el) {
+        (function (el) { el.dataset.zoomed = '1'; setTimeout(function () { delete el.dataset.zoomed; }, 260); })(zoomHold.el);
+      }
+    }
+    zoomHold.el = null;
+  }
+  ['pointerup', 'pointercancel'].forEach(function (ev) { document.addEventListener(ev, holdSolta, true); });
+  document.addEventListener('contextmenu', function (e) {
+    if (HOLD_SELS.some(function (h) { return !!e.target.closest(h.sel); })) e.preventDefault();
+  });
+  /* [FOTOS PDF] guarda-roupa do personagem: cada variante (boina, gandola,
+     colete, fuzil, cipe, patamo, bope) mapeia o índice do avatar → recorte.
+     Os PDFs do gestor (6 imagens + classificação cada) preenchem este mapa;
+     a troca da foto na compra/equipar JÁ está ligada — é só popular. */
+  var AVATAR_VARIANTES = __FOTOS_VARIANTES__;   /* fotos oficiais por variante → índice do avatar */
+  window.AVATAR_VARIANTES = AVATAR_VARIANTES;   /* suíte de testes injeta variantes */
+  function fotoPersonagem() {
+    if (typeof skinAtual !== 'undefined' && skinAtual &&
+        AVATAR_VARIANTES[skinAtual.id] && AVATAR_VARIANTES[skinAtual.id][avatarIdx]) {
+      return AVATAR_VARIANTES[skinAtual.id][avatarIdx];   /* skin vestida tem prioridade */
+    }
+    if (typeof boinaEquipada !== 'undefined' && boinaEquipada && AVATAR_VARIANTES.boina[avatarIdx]) {
+      return AVATAR_VARIANTES.boina[avatarIdx];           /* personagem com a boina */
+    }
+    return avatarThumbs[avatarIdx];
+  }
+  function aplicarAvatar() {
+    if (!avatarThumbs.length) return;
+    var src = fotoPersonagem();
+    $('homeAvatar').innerHTML = '<img src="' + src + '" alt="">';
+    $('avPreview').src = src;
+    if (typeof queueSync === 'function') queueSync();
+  }
+  function montarAvatares() {
+    var img = new Image();
+    img.onload = function () {
+      var W = img.naturalWidth, H = img.naturalHeight, r = AV_R * W;
+      AV_CY.forEach(function (fy) { AV_CX.forEach(function (fx) {
+        var c = document.createElement('canvas'); c.width = 144; c.height = 144;
+        var x = c.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, 144, 144);
+        x.beginPath(); x.arc(72, 72, 72, 0, Math.PI * 2); x.clip();
+        x.drawImage(img, fx * W - r, fy * H - r, 2 * r, 2 * r, 0, 0, 144, 144);
+        avatarThumbs.push(c.toDataURL('image/jpeg', 0.85));
+        var cz = document.createElement('canvas'); cz.width = 320; cz.height = 320;
+        var xz = cz.getContext('2d');
+        xz.fillStyle = '#fff'; xz.fillRect(0, 0, 320, 320);
+        xz.beginPath(); xz.arc(160, 160, 160, 0, Math.PI * 2); xz.clip();
+        xz.drawImage(img, fx * W - r, fy * H - r, 2 * r, 2 * r, 0, 0, 320, 320);
+        avatarZoom.push(cz.toDataURL('image/jpeg', 0.88));
+      }); });
+      var grid = $('avGrid');
+      avatarThumbs.forEach(function (src, i) {
+        var b = document.createElement('button');
+        b.className = 'avatar-opt' + (i === avatarIdx ? ' sel' : '');
+        b.setAttribute('aria-label', AV_LABELS[i]);
+        b.innerHTML = '<img src="' + src + '" alt="">';
+        b.addEventListener('click', function () {
+          if (b.dataset.zoomed) return;   /* soltou depois de ampliar: não escolhe */
+          grid.querySelectorAll('.avatar-opt').forEach(function (x2) { x2.classList.remove('sel'); });
+          b.classList.add('sel');
+          avatarIdx = i;
+          aplicarAvatar();
+          // escolheu: a área de escolha desaparece e o personagem vira o ícone do card
+          grid.style.display = 'none';
+          toast('Personagem definido — já é o seu ícone no perfil!');
+        });
+        grid.appendChild(b);
+      });
+      aplicarAvatar();
+      /* inspeção na escolha: rótulo do catálogo (índice pela posição na grade) */
+      bindHold('.avatar-opt', function (el) {
+        var i2 = [].indexOf.call(el.parentElement.children, el);
+        return { src: avatarZoom[i2] || avatarThumbs[i2], nome: AV_LABELS[i2] };
+      });
+      /* foto já escolhida: o zoom identifica o militar (ex.: AL SD QUAD MOURA) */
+      var zoomIdent = function () { return carreira.nomeGuerra ? nomeCurto() : AV_LABELS[avatarIdx]; };
+      var zoomFoto = function () {
+        var base = avatarZoom[avatarIdx] || avatarThumbs[avatarIdx];
+        return fotoPersonagem() === avatarThumbs[avatarIdx] ? base : fotoPersonagem();
+      };
+      bindHold('#avPreview', function () { return { src: zoomFoto(), nome: zoomIdent() }; });
+      bindHold('#btnAvatarPerfil', function () { return { src: zoomFoto(), nome: zoomIdent() }; });
+    };
+    img.src = AVATAR_SPRITE;
+  }
+  if (AVATAR_SPRITE.indexOf('data:') === 0) montarAvatares();

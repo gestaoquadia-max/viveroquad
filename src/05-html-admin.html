@@ -1,0 +1,815 @@
+        <!-- ============ ADMIN · ESTRUTURA (turmas, modalidades, editais) ============ -->
+        <div class="view" id="v-turmas">
+          <div class="p-card">
+            <div class="k-label">Concursos &amp; editais · situação e Domínio</div>
+            <div id="admConcList"></div>
+            <p class="sub" style="margin-top:8px">Cada concurso carrega a <strong>sua árvore de edital</strong>. <strong>Definir Domínio</strong> troca a árvore que o aluno vê em Domínio. Lançar um edital novo é <span class="ref">[INTEGRAÇÃO REAL] upload do edital</span>.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Modalidades · teoria × questões</div>
+            <div id="admModList"></div>
+            <p class="sub" style="margin-top:8px">Quanto mais evoluída a turma, <strong>menos teoria e mais questões</strong>. O mesmo edital roda em qualquer modalidade.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Turmas · concurso × modalidade × período</div>
+            <div id="admTurmaList"></div>
+            <p class="sub" style="margin-top:8px">Esta é a <strong>lista viva</strong> das turmas: cada uma referencia o <strong>edital</strong> (concurso) e a <strong>modalidade</strong>, com <strong>início e término provável</strong>. Para <strong>abrir uma turma nova</strong> use o bloco <strong>“Criação de turmas · matrícula e vagas”</strong> no Painel de controle — é lá que entram preço, vagas e horário, e só assim ela chega à Quad Store.</p>
+            <button class="btn ghost small" id="btnEstrIrCriarTurma" style="margin-top:8px">Ir para a criação de turmas</button>
+          </div>
+
+          <div class="p-card" style="opacity:0.9">
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn ghost small" id="btnIrEdital">Ver árvore do edital</button>
+              <button class="btn ghost small" id="btnIrQuestoes">Banco de questões</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · EDITAL ============ -->
+        <div class="view" id="v-edital">
+          <div class="p-card">
+            <div class="k-label">Árvore de conteúdo</div>
+            <div class="tree">
+              <div class="node"><span class="nname">Polícia Civil BA</span><span class="nmeta">concurso</span>
+                <div class="lvl1">
+                  <div class="node"><span class="nname">Edital PC-BA 2025</span><span class="nmeta">lançado</span>
+                    <div class="lvl1">
+                      <div class="node"><span class="nname">Dir. Administrativo</span><span class="nmeta">4 assuntos</span></div>
+                      <div class="node"><span class="nname">Estatuto da polícia</span><span class="nmeta">2 assuntos</span></div>
+                      <div class="node"><span class="nname">Português</span><span class="nmeta">2 assuntos</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px">
+              <button class="btn small" id="btnLancarEdital">Lançar novo edital</button>
+              <button class="btn ghost small" id="btnReconciliar">Simular reconciliação</button>
+            </div>
+          </div>
+          <div class="p-card" id="reconCard" style="display:none">
+            <div class="k-label">Reconciliação · edital novo vs. anterior</div>
+            <table class="mini">
+              <tbody>
+                <tr><td>Informática <span class="tag">SAIU</span></td><td class="sub">dados descartados</td></tr>
+                <tr><td>Dir. Constitucional <span class="tag gold">ENTROU</span></td><td class="sub">nasce zerada</td></tr>
+                <tr><td>Português · +1 assunto</td><td class="sub">recalcula %, histórico preservado</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>O edital é a espinha</h3>
+            <p class="sub">Lançar o edital de referência é o que monta o painel de domínio e cria os baldes da planilha geral. Nada é digitado solto.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · QUESTÕES ============ -->
+        <div class="view" id="v-questoes">
+          <div class="p-card">
+            <div class="k-label">Banco geral · puxado por tag, sem duplicar</div>
+            <table class="mini">
+              <thead><tr><th>Questão</th><th>Tag</th><th>Uso</th></tr></thead>
+              <tbody>
+                <tr><td>Q-1042 · Poder de polícia…</td><td class="sub">Dir. Adm / Poderes</td><td><span class="tag">AULA</span></td></tr>
+                <tr><td>Q-1043 · Ato discricionário…</td><td class="sub">Dir. Adm / Poderes</td><td><span class="tag">MISSÃO</span></td></tr>
+                <tr><td>Q-0987 · Crase em locuções…</td><td class="sub">Português / Crase</td><td><span class="tag">MISSÃO</span></td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:12px"><button class="btn small" id="btnNovaQuestao">Cadastrar questão</button></div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Ajustável ao vivo</h3>
+            <p class="sub">Questão com erro detectado em sala pode ser corrigida na hora, sem parar o quiz. Cada questão carrega dificuldade e campo de uso (aula / missão).</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · PAINEL DE CONTROLE ============ -->
+        <div class="view" id="v-adm-controle">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · governança das contas</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Painel de controle</h3>
+              </div>
+            </div>
+            <p class="sub">Crédito manual de moedas, bloqueio de contas e mensagens exclusivas — ações diretas na conta do aluno.</p>
+            <div class="adm-jump" id="jumpControle">
+              <button class="jp" data-jump="doc">Corpo docente</button>
+              <button class="jp" data-jump="turmas">Criação de turma e isoladas</button>
+              <button class="jp" data-jump="salas">Mapa de salas</button>
+              <button class="jp" data-jump="credito">Inserir crédito</button>
+              <button class="jp" data-jump="contas">Permissões e acessos</button>
+              <button class="jp" data-jump="msg">Comunicação interna</button>
+              <button class="jp" data-jump="gift">Criar Gift cards</button>
+              <button class="jp" data-jump="estornos">Estornos e desistências</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
+            </div>
+          </div>
+
+          <div class="p-card" data-bl="doc">
+            <div class="k-label">Banco de professores · corpo docente</div>
+            <div class="adm-form">
+              <input class="fld" id="admDocNome" placeholder="Nome do professor (ex.: Cap. Silva)">
+              <div class="k-label sub-k" style="margin-top:10px">Matérias que ministra <span style="opacity:.7">(até 3)</span></div>
+              <div class="adm-row">
+                <select class="fld" id="admDocMat1" title="Matéria 1"></select>
+                <select class="fld" id="admDocMat2" title="Matéria 2 (opcional)"></select>
+                <select class="fld" id="admDocMat3" title="Matéria 3 (opcional)"></select>
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Turnos de disponibilidade <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
+              <div class="turno-pick" id="admDocTurnos">
+                <button type="button" class="turno-chip" data-turno="manhã">Manhã</button>
+                <button type="button" class="turno-chip" data-turno="tarde">Tarde</button>
+                <button type="button" class="turno-chip" data-turno="noite">Noite</button>
+              </div>
+              <div class="adm-row" style="margin-top:10px">
+                <input class="fld" id="admDocGrad" placeholder="Graduação (ex.: Mestre em Direito)">
+                <label class="chk"><input type="checkbox" id="admDocSemGrad"> sem graduação</label>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admDocFone" placeholder="Telefone (ex.: (71) 9 8888-0000)" inputmode="tel" style="max-width:200px">
+              </div>
+              <div class="adm-row" style="margin-top:10px">
+                <button class="btn small" id="btnAdmDoc">Cadastrar professor</button>
+                <button class="btn small ghost" id="btnAdmDocCancelar" style="display:none">Cancelar edição</button>
+              </div>
+              <div class="adm-alerta" id="admDocErro"></div>
+            </div>
+            <div class="adm-sep"><span>Professores cadastrados</span></div>
+            <div id="admDocList"></div>
+            <p class="sub" style="margin-top:8px">Este banco <strong>alimenta todos os lugares que precisam de professor</strong> — a começar por <strong>“Professores por matéria”</strong> na criação de turmas, que só oferece quem ministra aquela matéria e está ativo. <strong>Editar</strong> corrige nome, matérias, turnos, graduação e telefone — e a mudança segue para as turmas, isoladas, eventos e cronograma onde ele está. <strong>Desligar</strong> tira o professor das listas; <strong>bloquear</strong> o impede de acessar a área do professor.</p>
+          </div>
+
+          <div class="p-card" data-bl="salas">
+            <div class="k-label">Salas e estúdio · mapa de ocupação</div>
+            <div id="admSalasMapa"></div>
+            <p class="sub" style="margin-top:8px">A sede tem <strong>4 salas</strong> e o <strong>Estúdio</strong> (gravações e eventos online). Reservam sala: <strong>turmas, isoladas, simulados presenciais e eventos</strong> (aulões e minicursos entram como eventos) — cada um na sua criação, e uma sala não aceita duas atividades no mesmo dia e horário.</p>
+          </div>
+
+          <div class="p-card" data-bl="turmas">
+            <div class="k-label">Criação de turmas e isoladas · matrícula e vagas</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCtTipo" title="Tipo da turma"></select>
+                <input class="fld" id="admCtApelido" placeholder="Apelido (ex.: Turma Águia)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCtConc" title="Concurso da turma" style="width:100%"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCtSala" title="Sala da sede em que a turma vai funcionar"></select>
+              </div>
+              <p class="adm-hint" id="admCtSalaEco" style="display:none"></p>
+              <div id="admCtIsoBox" style="display:none">
+                <div class="k-label sub-k" style="margin-top:10px">Dias da semana <span style="opacity:.7; font-weight:600">— toque para marcar (mínimo 1)</span></div>
+                <div class="turno-pick" id="admCtDias">
+                  <button type="button" class="turno-chip" data-dia="segunda-feira">SEG</button>
+                  <button type="button" class="turno-chip" data-dia="terça-feira">TER</button>
+                  <button type="button" class="turno-chip" data-dia="quarta-feira">QUA</button>
+                  <button type="button" class="turno-chip" data-dia="quinta-feira">QUI</button>
+                  <button type="button" class="turno-chip" data-dia="sexta-feira">SEX</button>
+                  <button type="button" class="turno-chip" data-dia="sábado">SÁB</button>
+                  <button type="button" class="turno-chip" data-dia="domingo">DOM</button>
+                </div>
+                <div class="k-label sub-k" style="margin-top:10px">Professor da isolada</div>
+                <select class="fld" id="admCtIsoProf" style="width:100%"></select>
+              </div>
+              <div class="k-label sub-k" style="margin-top:12px">Período</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Início</span><input class="fld" id="admCtIni" type="date" title="Início da turma"></label>
+                <label class="ct-fld"><span>Término</span><input class="fld" id="admCtFim" type="date" title="Término da turma"></label>
+              </div>
+              <div class="k-label sub-k" style="margin-top:12px" id="admCtLbHor">Horário dos dois tempos</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span id="admCtLbH1">1º tempo começa</span><input class="fld" id="admCtH1i" type="time"></label>
+                <label class="ct-fld"><span id="admCtLbH1f">1º termina · 2º começa</span><input class="fld" id="admCtH1f" type="time" title="Fim do 1º tempo — o 2º começa aqui"></label>
+                <label class="ct-fld" id="admCtH2Box"><span id="admCtLbH2">2º tempo termina</span><input class="fld" id="admCtH2f" type="time"></label>
+              </div>
+              <div class="adm-eco" id="admCtEco"></div>
+              <div class="k-label sub-k" style="margin-top:12px">Preços e vagas</div>
+              <p class="adm-hint">A turma é vendida <strong>nas duas moedas</strong> — informe o preço e as <strong>vagas de cada moeda</strong> (escreva 0 na moeda que não terá vagas). A soma é o total da turma.</p>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admCtPrecoDmn" placeholder="ex.: 1800" inputmode="numeric"></label>
+                <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admCtPrecoQdc" placeholder="ex.: 2000" inputmode="numeric"></label>
+                <label class="ct-fld"><span id="admCtLbVagas">Vagas em Diamantes</span><input class="fld" id="admCtVagas" placeholder="ex.: 170" inputmode="numeric"></label>
+                <label class="ct-fld" id="admCtVagasQdcBox"><span>Vagas em Quad Coins</span><input class="fld" id="admCtVagasQdc" placeholder="ex.: 10" inputmode="numeric"></label>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCtArvore" type="file" accept=".pdf" title="Árvore do edital · PDF">
+              </div>
+              <div id="admCtProfsBox">
+                <div class="k-label sub-k" style="margin-top:10px">Professores por matéria · árvore do edital</div>
+                <p class="adm-hint" id="admCtArvoreOrigem">Matérias da árvore do concurso escolhido acima.</p>
+                <div id="admCtProfs" style="max-height:180px; overflow:auto"></div>
+              </div>
+              <div class="adm-row" style="margin-top:10px">
+                <button class="btn small" id="btnAdmCtAbrir">Abrir turma</button>
+                <button class="btn small ghost" id="btnAdmCtCancelar" style="display:none">Cancelar edição</button>
+              </div>
+              <div class="adm-alerta" id="admCtErro"></div>
+            </div>
+            <div class="adm-sep"><span>Turmas abertas</span></div>
+            <div id="admCtLista"></div>
+            <p class="sub" style="margin-top:8px">A turma <strong>nasce aqui</strong> e vai direto para a Quad Store com as <strong>vagas por moeda</strong> (gerais − QdC = Diamantes). O aluno escolhe a moeda num pop-up; comprou, as turmas do <strong>mesmo turno ficam bloqueadas</strong> para ele até o término. A <strong>árvore do edital em PDF</strong> define as matérias <span class="ref">[INTEGRAÇÃO REAL] leitura do arquivo</span>. A turma também aparece na Estrutura.</p>
+          </div>
+
+          <div class="p-card" data-bl="credito">
+            <div class="k-label">Crédito manual · Quad Coins e Diamantes</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCredAluno"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admCredMoeda">
+                  <option value="qdc">Quad Coins</option>
+                  <option value="dmn">Diamantes</option>
+                </select>
+                <input class="fld" id="admCredValor" placeholder="Valor" inputmode="numeric" style="max-width:90px">
+                <button class="btn small" id="btnAdmCred">Creditar</button>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admCredMotivo" placeholder="Motivo (ex.: recarga do site · gift card presencial)">
+              </div>
+            </div>
+            <div class="adm-sep"><span>Créditos lançados</span></div>
+            <div id="admCredList"></div>
+            <p class="sub" style="margin-top:8px">A adição de Quad Coins e Diamantes é <strong>livre para a administração</strong> — usada para recargas do site, gift cards presenciais e correções. Cai na conta do aluno <strong>na hora</strong>.</p>
+          </div>
+
+          <div class="p-card" data-bl="contas">
+            <div class="k-label">Contas · bloquear e desbloquear</div>
+            <div id="admContasList"></div>
+            <p class="sub" style="margin-top:8px">O bloqueio <strong>suspende o uso do app imediatamente</strong>: o aluno é desconectado e, ao tentar entrar com login e senha, vê o aviso de conta bloqueada com a orientação de procurar a administração.</p>
+          </div>
+
+          <div class="p-card" data-bl="msg">
+            <div class="k-label">Comunicação interna · mensagens</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admMsgTipo" title="Público da mensagem" style="max-width:160px">
+                  <option value="aluno">Um aluno</option>
+                  <option value="prof">Um professor</option>
+                  <option value="turma">Inscritos numa turma</option>
+                  <option value="isolada">Inscritos numa isolada</option>
+                  <option value="simulado">Inscritos num simulado</option>
+                  <option value="evento">Inscritos num evento</option>
+                  <option value="todos">Todos os alunos</option>
+                </select>
+                <select class="fld" id="admMsgAluno"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admMsgTexto" placeholder="Mensagem (ex.: Compareça à recepção para retirar seu material)">
+                <button class="btn small" id="btnAdmMsg">Enviar</button>
+              </div>
+            </div>
+            <div class="adm-sep"><span>Mensagens enviadas</span></div>
+            <div id="admMsgList"></div>
+            <p class="sub" style="margin-top:8px">Fale com <strong>um aluno</strong>, <strong>um professor</strong> ou com um <strong>público inteiro</strong>: os inscritos de uma turma, isolada, simulado ou evento — ou <strong>todos os alunos da plataforma</strong>. Para o aluno, chega no "+" com contador (estilo WhatsApp); para o professor, na sala dele. O chat ao vivo fica como próxima implementação.</p>
+          </div>
+
+          <div class="p-card" data-bl="gift">
+            <div class="k-label">Gift cards · lotes com QR code</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <input class="fld" id="admGiftQtd" placeholder="Quantidade (ex.: 100)" inputmode="numeric" style="max-width:150px">
+                <input class="fld" id="admGiftValor" placeholder="Valor (ex.: 1000)" inputmode="numeric" style="max-width:130px">
+                <select class="fld" id="admGiftMoeda" title="Moeda do gift card">
+                  <option value="qdc">Quad Coins</option>
+                  <option value="dmn">Diamantes</option>
+                </select>
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmGift">Criar lote de gift cards</button></div>
+            </div>
+            <div class="adm-sep"><span>Lotes criados</span></div>
+            <div id="admGiftLotes"></div>
+            <div id="admGiftQRs"></div>
+            <p class="sub" style="margin-top:8px">Cada gift card nasce com <strong>código e QR próprios</strong>, de <strong>liberação única</strong> — usou, invalidou na hora. A arte final dos QR para impressão é <span class="ref">[INTEGRAÇÃO REAL] geração/leitura de QR</span>; na demo o padrão é ilustrativo e o resgate vale pelo código.</p>
+          </div>
+
+          <div class="p-card" data-bl="estornos">
+            <div class="k-label">Estornos e desistências</div>
+            <div id="admEstList"></div>
+            <div class="adm-sep"><span>Itens mais estornados</span></div>
+            <div id="admEstTop"></div>
+            <p class="sub" style="margin-top:8px">Estornos feitos pelo aluno na Quad Store (até <strong>7 dias</strong> da compra) chegam aqui na hora — quem estornou, o que estornou e o ranking do que mais volta.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · PAINEL INTERNO (criação e operação) ============ -->
+        <div class="view" id="v-adm-hoje">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · criação e operação</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Painel interno</h3>
+              </div>
+            </div>
+            <p class="sub">O que o time cria daqui chega na hora ao aluno: avisos, cronograma, eventos, simulados e produtos.</p>
+            <div style="margin-top:10px"><button class="btn ghost small" id="btnIrEstrutura">Estrutura · turmas, concursos e editais</button></div>
+            <div class="adm-jump" id="jumpInterno">
+              <button class="jp" data-jump="avisos">Avisos gerais</button>
+              <button class="jp" data-jump="crono">Atualizações do dia</button>
+              <button class="jp" data-jump="eventos">Criar evento</button>
+              <button class="jp" data-jump="simulados">Criar simulados</button>
+              <button class="jp" data-jump="skins">Skin do personagem</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
+            </div>
+          </div>
+
+          <div class="p-card" data-bl="avisos">
+            <div class="k-label">Avisos gerais · enviar</div>
+            <div class="adm-form">
+              <input class="fld" id="admAvTitulo" placeholder="Título (ex.: Aulão de véspera confirmado)">
+              <input class="fld" id="admAvDet" placeholder="Detalhe (ex.: quinta 19h · traga o material impresso)">
+              <div class="adm-row">
+                <select class="fld" id="admAvEsc" title="Quem recebe o aviso"></select>
+                <button class="btn small" id="btnAdmAviso">Enviar</button>
+              </div>
+            </div>
+            <div class="adm-sep"><span>Avisos enviados</span></div>
+            <div id="admAvisosList"></div>
+            <p class="sub" style="margin-top:8px">Mensagens dos professores e do time entram por aqui e aparecem em <strong>Avisos gerais</strong> no Início do aluno. O aviso vai para <strong>todas as turmas</strong> ou para <strong>uma turma escolhida na lista</strong> — o aluno vê os avisos da turma que ele estiver usando no momento.</p>
+          </div>
+
+          <div class="p-card" data-bl="crono">
+            <div class="k-label">Cronograma semanal · atualizar</div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admCrTurma"></select>
+                <select class="fld" id="admCrDia"></select>
+              </div>
+              <div class="adm-row">
+                <select class="fld" id="admCrTempo"><option value="0">1º tempo · 19h–20h30</option><option value="1">2º tempo · 20h30–22h</option></select>
+                <select class="fld" id="admCrMat" title="Matéria da grade da turma"></select>
+              </div>
+              <div class="adm-row">
+                <select class="fld" id="admCrProf" title="Professor — vem do Banco de professores"></select>
+                <button class="btn small" id="btnAdmCrono">Atualizar</button>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:8px"><strong>Matéria</strong> e <strong>professor</strong> saem do <strong>Banco de professores</strong> e da árvore do edital da turma — sem digitar nome à mão. Ao trocar, muda na hora o card "Aula de hoje" do aluno, o <strong>calendário e a agenda do professor</strong> e fica registrado no histórico abaixo.</p>
+            <div class="adm-sep"><span>Histórico de alterações</span></div>
+            <div id="admCrLog"></div>
+          </div>
+
+          <div class="p-card" data-bl="crono">
+            <div class="k-label">Materiais da aula · enviar para os alunos</div>
+            <p class="adm-hint">O professor entrega o material à coordenação; a coordenação publica por aqui e ele aparece em <strong>Materiais das aulas</strong>, dentro do “+” do aluno, etiquetado por matéria e assunto.</p>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admMatTurma" title="Turma que recebe o material"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admMatMateria" title="Matéria — vem da árvore do edital da turma"></select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admMatAssunto" placeholder="Assunto da aula (ex.: Poderes administrativos)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admMatTipo" title="Tipo do material">
+                  <option value="slides">Slides da aula</option>
+                  <option value="resumo">Resumo esquematizado</option>
+                  <option value="lista">Lista de questões</option>
+                  <option value="mapa">Mapa mental</option>
+                  <option value="video">Vídeo</option>
+                  <option value="outro">Outro arquivo</option>
+                </select>
+                <input class="fld" id="admMatTitulo" placeholder="Título (opcional)">
+              </div>
+              <label class="sd-file" for="admMatArq" id="admMatArqBox"><span class="sd-file-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span><span id="admMatArqNome">Anexar o arquivo do material</span><input type="file" id="admMatArq" hidden></label>
+              <div class="adm-row" id="admMatLinkBox" style="margin-top:8px; display:none">
+                <input class="fld" id="admMatLink" placeholder="Link do vídeo (ex.: https://…)">
+                <input class="fld" id="admMatDur" placeholder="min" inputmode="numeric" style="max-width:80px" title="Duração em minutos">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmMat">Enviar aos alunos</button></div>
+              <div class="adm-alerta" id="admMatErro"></div>
+            </div>
+            <div class="adm-sep"><span>Materiais publicados</span></div>
+            <div id="admMatList"></div>
+          </div>
+
+          <div class="p-card" data-bl="eventos">
+            <div class="k-label">Eventos da semana · regras de score e Coins</div>
+            <div class="adm-sep"><span>Criar evento</span></div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <input class="fld" id="admEvNovoNome" placeholder="Novo evento (nome)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admEvNovoResumo" placeholder="Breve resumo do evento">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admEvNovoModal">
+                  <option value="presencial">Presencial</option>
+                  <option value="online">Online</option>
+                </select>
+                <select class="fld" id="admEvNovoTipo">
+                  <option value="gratuito">Gratuito (dá recompensa)</option>
+                  <option value="pago">Pago (vendido na Loja)</option>
+                </select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admEvNovoLink" placeholder="Link do evento online" disabled>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admEvNovoMoeda" title="Moeda de venda (evento pago)" disabled>
+                  <option value="dmn">Vender em Diamantes</option>
+                  <option value="qdc">Vender em Quad Coins</option>
+                </select>
+                <input class="fld" id="admEvNovoPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px" disabled>
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Professores no evento <span style="opacity:.7; font-weight:600">— toque para marcar</span></div>
+              <div class="turno-pick" id="admEvProfs"></div>
+              <div class="k-label sub-k" style="margin-top:10px" id="admEvReservaLb">Reserva de sala · dia e horário</div>
+              <div class="ct-grid">
+                <label class="ct-fld"><span>Data</span><input class="fld" id="admEvNovoData" type="date" title="Data do evento"></label>
+                <label class="ct-fld"><span>Começa às</span><input class="fld" id="admEvNovoInicio" type="time" value="19:00"></label>
+                <label class="ct-fld"><span>Termina às</span><input class="fld" id="admEvNovoFim" type="time" value="21:00"></label>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admEvSala" title="Sala da sede em que o evento acontece"></select>
+              </div>
+              <p class="adm-hint" id="admEvSalaEco" style="display:none"></p>
+              <div style="margin-top:8px"><button class="btn ghost small" id="btnAdmEvNovo">Criar evento</button></div>
+              <p class="sub" id="admEvNovoPrev" style="margin-top:6px">Escolha a data, o início e o término na agenda.</p>
+              <div class="adm-alerta" id="admEvErro"></div>
+            </div>
+            <div class="adm-sep"><span>Regras de score e Coins</span></div>
+            <div class="adm-form">
+              <div class="adm-row">
+                <select class="fld" id="admEvSel"></select>
+                <select class="fld" id="admEvTipo"><option value="score">Regra de score</option><option value="coins">Regra de Quad Coins</option></select>
+              </div>
+              <div class="adm-row">
+                <input class="fld" id="admEvRegra" placeholder="Regra (ex.: Check-in no evento)">
+                <input class="fld" id="admEvValor" placeholder="+10" style="max-width:90px">
+                <button class="btn small" id="btnAdmEvRegra">Adicionar</button>
+              </div>
+            </div>
+            <div class="adm-sep"><span>Eventos criados</span></div>
+            <div id="admEvList"></div>
+            <p class="sub" style="margin-top:8px"><strong>Online/presencial</strong> é a modalidade do evento (não o nome). <strong>Gratuito</strong> entra direto no Início e dá recompensa ao participar; <strong>pago</strong> vai para a Loja (em <strong>QdC ou Diamantes</strong>) e, ao ser comprado, migra para os Eventos do Início. Toque no ✕ para <strong>cancelar</strong> um evento.</p>
+          </div>
+
+          <div class="p-card" data-bl="simulados">
+            <div class="k-label">Lançamento de simulados</div>
+            <div class="adm-sep"><span>Lançar simulado</span></div>
+            <div class="adm-form">
+              <input class="fld" id="admSimNome" placeholder="Nome (ex.: Simulado 64 · SD PMBA)">
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admSimModal">
+                  <option value="presencial">Presencial</option>
+                  <option value="digital">Digital</option>
+                </select>
+                <select class="fld" id="admSimTipo" title="O presencial é sempre vendido — ele ocupa lugar na sala">
+                  <option value="pago">Pago (vendido na Loja)</option>
+                  <option value="gratis">Gratuito (só digital)</option>
+                </select>
+              </div>
+              <div id="admSimPres">
+                <div class="k-label sub-k" style="margin-top:10px">Reserva de sala · dia e horário</div>
+                <div class="ct-grid">
+                  <label class="ct-fld"><span>Data</span><input class="fld" id="admSimData" type="date" title="Data do simulado"></label>
+                  <label class="ct-fld"><span>Começa às</span><input class="fld" id="admSimIni" type="time" value="08:00"></label>
+                  <label class="ct-fld"><span>Termina às</span><input class="fld" id="admSimFim" type="time" value="12:00"></label>
+                </div>
+                <div class="adm-row" style="margin-top:8px">
+                  <select class="fld" id="admSimSala" title="Sala da sede em que o simulado acontece"></select>
+                </div>
+                <p class="adm-hint" id="admSimSalaEco" style="display:none"></p>
+              </div>
+              <div id="admSimDig" style="display:none">
+                <label class="sd-file" for="admSimPdf"><span class="sd-file-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span><span id="admSimPdfNome">Anexar PDF do simulado</span><input type="file" id="admSimPdf" accept="application/pdf" hidden></label>
+                <div class="adm-row" style="margin-top:8px">
+                  <input class="fld" id="admSimDia" type="date" aria-label="Dia de disponibilização" style="max-width:150px" title="Dia em que fica disponível">
+                  <input class="fld" id="admSimMin" type="number" min="1" placeholder="min" inputmode="numeric" style="max-width:80px" title="Tempo em minutos">
+                  <span class="pct">min</span>
+                  <input class="fld" id="admSimNq" type="number" min="1" placeholder="questões" inputmode="numeric" style="max-width:90px" title="Nº de questões">
+                </div>
+              </div>
+              <div class="k-label sub-k" style="margin-top:12px" id="admSimPvLb">Preços e vagas</div>
+              <p class="adm-hint" id="admSimPrecosHint">O simulado é vendido <strong>nas duas moedas</strong> — informe o preço e as <strong>vagas de cada moeda</strong> (0 vale). A soma é a lotação da sala.</p>
+              <div class="ct-grid" id="admSimPrecosBox">
+                <label class="ct-fld"><span>Preço em Diamantes</span><input class="fld" id="admSimPrecoDmn" placeholder="ex.: 150" inputmode="numeric"></label>
+                <label class="ct-fld"><span>Preço em Quad Coins</span><input class="fld" id="admSimPrecoQdc" placeholder="ex.: 180" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasBox"><span>Vagas em Diamantes</span><input class="fld" id="admSimVagas" placeholder="ex.: 30" inputmode="numeric"></label>
+                <label class="ct-fld" id="admSimVagasQdcBox"><span>Vagas em Quad Coins</span><input class="fld" id="admSimVagasQdc" placeholder="ex.: 70" inputmode="numeric"></label>
+              </div>
+              <div class="adm-eco" id="admSimEco"></div>
+              <div class="adm-row" id="admSimValorBox" style="margin-top:8px">
+                <select class="fld" id="admSimMoeda" title="Moeda de venda (simulado pago)" style="display:none">
+                  <option value="dmn">Vender em Diamantes</option>
+                  <option value="qdc">Vender em Quad Coins</option>
+                </select>
+                <input class="fld" id="admSimValor" placeholder="Quad Coins por acerto (padrão: 2)" inputmode="numeric">
+                <span class="pct" id="admSimValorHint">recompensa</span>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <button class="btn small" id="btnAdmSimLancar">Lançar simulado</button>
+              </div>
+              <div class="adm-alerta" id="admSimErro"></div>
+            </div>
+            <div class="adm-sep"><span>Simulados lançados</span></div>
+            <div id="admSimList"></div>
+            <p class="sub" style="margin-top:8px"><strong>Presencial</strong> ocupa lugar na sala: é <strong>sempre vendido</strong>, com <strong>vagas divididas por moeda</strong> (as em Quad Coins e o restante em Diamantes), avisa o aluno quando <strong>choca com outro compromisso</strong> e a entrada é liberada na sede pela aba Liberações. <strong>Digital</strong> <strong>não tem limite de vagas</strong> nem trava por choque de horário: o PDF vira <strong>quiz cronometrado</strong> <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span> e ele pode ser <strong>vendido nas duas moedas</strong> ou <strong>gratuito</strong> (aí premia em QdC por acerto). Toque no ✕ para remover.</p>
+          </div>
+
+          <div class="p-card" data-bl="skins">
+            <div class="k-label">Criar skin do personagem</div>
+            <div class="adm-form">
+              <div class="adm-row" style="margin-bottom:8px">
+                <select class="fld" id="admSkTipo" title="O que você está criando">
+                  <option value="skin">Skin do personagem (veste o avatar)</option>
+                  <option value="combate">Item de combate (vai para a mochila)</option>
+                </select>
+              </div>
+              <input class="fld" id="admSkNome" placeholder="Nome da skin (ex.: Boina de instrutor)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admSkDesc" placeholder="Descrição curta (ex.: edição limitada)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admSkMoeda" title="Moeda de venda">
+                  <option value="qdc">Vender em Quad Coins</option>
+                  <option value="dmn">Vender em Diamantes</option>
+                </select>
+                <input class="fld" id="admSkPreco" placeholder="Preço em Quad Coins" inputmode="numeric" style="max-width:150px">
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Visual da skin</div>
+              <div class="ico-pick" id="admSkIcones"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmSkin">Publicar skin</button></div>
+            </div>
+            <div class="adm-sep"><span>Skins e itens criados</span></div>
+            <div id="admSkinList"></div>
+            <p class="sub" style="margin-top:8px">A <strong>skin</strong> entra em <strong>Itens do personagem</strong> e veste o avatar; o <strong>item de combate</strong> entra em <strong>Itens de combate</strong> e vai para a <strong>mochila</strong> do aluno (sempre em Quad Coins). Toque no ✕ para tirar da Loja.</p>
+          </div>
+
+          <div class="p-card" data-bl="quests">
+            <div class="k-label">Quests · missões especiais</div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:6px">
+              <button class="btn ghost small" id="btnAdmQuests">Criar Quests</button>
+              <span class="tag">EM BREVE</span>
+            </div>
+            <p class="sub" style="margin-top:8px">Missões especiais criadas pela administração — caça a itens, desafios de equipe, eventos de skin. Estrutura reservada; próxima implementação.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · LIBERAÇÕES ============ -->
+        <div class="view" id="v-adm-liber">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6l-8-3Z"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · recepção e portaria</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Liberações</h3>
+              </div>
+            </div>
+            <p class="sub">Entrega de <strong>itens físicos</strong> na recepção, <strong>autorização de acesso</strong> às atividades presenciais e a <strong>lista de inscritos</strong> por atividade.</p>
+            <div class="adm-jump" id="jumpLiber">
+              <button class="jp" data-jump="fisicos">Liberar produtos físicos</button>
+              <button class="jp" data-jump="acessos">Autorizar acesso</button>
+              <button class="jp" data-jump="inscritos">Verificar inscritos</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
+            </div>
+          </div>
+
+          <div class="p-card" data-bl="fisicos">
+            <div class="k-label">Produtos físicos · retirada na recepção</div>
+            <div id="admPedidosList"></div>
+            <p class="sub" style="margin-top:8px">Garrafinhas, camisas, livros, vade mecum, chaveiros — a compra na Loja gera o pedido aqui. Na retirada, a administração <strong>confirma a entrega</strong> e dá baixa; o item volta ao estoque da Loja.</p>
+          </div>
+
+          <div class="p-card" data-bl="acessos">
+            <div class="k-label">Autorizações de acesso</div>
+            <p class="sub" style="margin-bottom:4px">Portaria das atividades presenciais: libere a entrada de quem chega à sede. Onde a atividade gera QdC na presença, a liberação também pontua.</p>
+            <div id="admAcessos"></div>
+            <div class="ac-cat">Simulados presenciais</div>
+            <div id="admSpLista"></div>
+          </div>
+
+          <div class="p-card" data-bl="inscritos">
+            <div class="k-label">Inscritos por atividade</div>
+            <select class="fld" id="admAtivSel" style="margin-top:6px"></select>
+            <div id="admAtivInscritos" style="margin-top:10px"></div>
+            <button class="btn ghost small" id="btnAtivPdf" style="width:100%; margin-top:10px">Gerar lista de conferência (PDF)</button>
+            <p class="sub" style="margin-top:8px">Escolha qualquer atividade presencial do banco (turmas, aulões, isoladas, eventos, simulados, excursões, TAF) para ver <strong>quem está inscrito</strong>. Listas grandes abrem com <strong>“ver todos”</strong>. A <strong>lista de conferência</strong> sai com todos os nomes e uma coluna de presença para assinar no papel.</p>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · ALUNOS ============ -->
+        <div class="view" id="v-adm-alunos">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 3 3 4-6"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · leitura de dados</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Relatórios</h3>
+              </div>
+            </div>
+            <p class="sub">Painéis com gráficos para decisão: por aluno, por turma, gerais e da Loja. Blocos grandes abrem com <strong>“ver completo”</strong>.</p>
+            <div class="rel-tabs" id="relTabs">
+              <button class="rel-tab on" data-rel="ind">Individuais</button>
+              <button class="rel-tab" data-rel="turma">Turmas</button>
+              <button class="rel-tab" data-rel="geral">Gerais</button>
+              <button class="rel-tab" data-rel="loja">Loja</button>
+            </div>
+          </div>
+
+          <!-- ===== INDIVIDUAIS ===== -->
+          <div class="rel-panel on" data-relpanel="ind">
+            <div class="p-card">
+              <div class="k-label">Aluno</div>
+              <select class="fld" id="relIndAluno" style="margin-top:6px"></select>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Uso do app · logins por semana</div>
+              <div class="rchart" id="relIndUso"></div>
+              <div id="relIndUsoResumo" class="sub" style="margin-top:8px"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Compras · Quad Coins × Diamantes</div>
+              <div class="rdonut-wrap" style="margin-top:8px">
+                <div class="rdonut" id="relIndDonut"></div>
+                <div class="rlegend" id="relIndLegenda"></div>
+              </div>
+              <div class="adm-sep"><span>Histórico de compras</span></div>
+              <div id="relIndCompras"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Pedagógico · pontos fracos no Domínio</div>
+              <div id="relIndPedag"></div>
+              <p class="sub" style="margin-top:8px">Vem da mesma árvore de Domínio e dos blocos de questões respondidos.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Pedagógico por turma · pontos fracos no Domínio</div>
+              <div id="relPedagTurmas"></div>
+              <p class="sub" style="margin-top:8px">Um bloco por turma aberta, cada um lido na <strong>árvore do edital daquela turma</strong> — a PATAMO pelo CFO, a turma da Polícia Civil pelo PC-BA, e assim por diante.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Reclamações e atendimentos</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Canal de reclamações do aluno — histórico e status entram aqui.</div>
+            </div>
+          </div>
+
+          <!-- ===== TURMAS ===== -->
+          <div class="rel-panel" data-relpanel="turma">
+            <div class="p-card">
+              <div class="k-label">Turma</div>
+              <select class="fld" id="relTurmaSel" style="margin-top:6px"></select>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Maiores dificuldades · sub-assuntos</div>
+              <div id="admDifSubs"></div>
+              <div class="k-label" style="margin-top:12px">Assuntos que mais pesam</div>
+              <div id="admDifAss"></div>
+              <div class="k-label" style="margin-top:12px">Matérias · domínio médio da sala</div>
+              <div id="admDifMat"></div>
+              <p class="sub" style="margin-top:8px">Calculado da mesma árvore de Domínio que o aluno vê — o Treinamento Rápido move estes números ao vivo.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Uso do app na sala · logins por dia</div>
+              <div class="rchart" id="relTurmaUso"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Alunos que precisam de apoio</div>
+              <div id="admApoioList"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Presença nas aulas</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Chamada por aula e frequência da turma entram aqui.</div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Feedbacks da turma</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Pesquisa de satisfação e comentários da sala.</div>
+            </div>
+          </div>
+
+          <!-- ===== GERAIS ===== -->
+          <div class="rel-panel" data-relpanel="geral">
+            <div class="p-card">
+              <div class="k-label">Perfil médio da base</div>
+              <table class="mini"><tbody>
+                <tr><td>Alunos ativos na plataforma</td><td><strong>412</strong></td></tr>
+                <tr><td>Missões da noite em dia</td><td><strong>76%</strong></td></tr>
+                <tr><td>Idade média · concurso-alvo</td><td><strong>24 anos · Soldado</strong></td></tr>
+                <tr><td>Turnos ativos</td><td><strong>Noite</strong> · manhã e tarde na V1</td></tr>
+              </tbody></table>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Dificuldade pedagógica · matérias da base</div>
+              <div id="relGeralMat"></div>
+              <p class="sub" style="margin-top:8px">Média de domínio por matéria em toda a base — quanto menor, mais atenção pedagógica.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Satisfação geral</div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>NPS e pesquisa de satisfação da base entram aqui.</div>
+            </div>
+          </div>
+
+          <!-- ===== LOJA ===== -->
+          <div class="rel-panel" data-relpanel="loja">
+            <div class="p-card">
+              <div class="k-label">Vendas por período · últimas semanas</div>
+              <div class="rchart" id="relLojaVendas"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Mais vendidos</div>
+              <div id="relLojaTop"></div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Faturamento · Quad Coins × Diamantes</div>
+              <div class="rdonut-wrap" style="margin-top:8px">
+                <div class="rdonut" id="relLojaDonut"></div>
+                <div class="rlegend" id="relLojaLegenda"></div>
+              </div>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Entradas × saídas de Quad Coins · base</div>
+              <div class="rchart" id="relLojaFluxo"></div>
+              <p class="sub" style="margin-top:8px">Entradas = QdC conquistados em missões/eventos; saídas = QdC gastos na Loja.</p>
+            </div>
+            <div class="p-card">
+              <div class="k-label">Compradores · últimas compras</div>
+              <div id="admComprasList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ADMIN · LOJA (governança) ============ -->
+        <div class="view" id="v-adm-loja">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">N.P.P. · catálogo e preços</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Loja</h3>
+              </div>
+            </div>
+            <p class="sub">Cadastro de produtos e serviços da Quad Store e a atualização geral de preços — da Loja e das turmas e isoladas.</p>
+            <div class="adm-jump" id="jumpLojaAdm">
+              <button class="jp" data-jump="cadastro">Cadastrar produto ou serviço</button>
+              <button class="jp" data-jump="precos">Preços da Loja</button>
+              <button class="jp" data-jump="precoturmas">Preços e vagas · turmas e simulados</button>
+              <button class="jp todos" data-jump="*">Ver todos os blocos</button>
+            </div>
+          </div>
+
+          <div class="p-card" data-bl="cadastro">
+            <div class="k-label">Cadastrar produto ou serviço</div>
+            <div class="adm-form">
+              <input class="fld" id="admProdNome" placeholder="Nome (ex.: Caneca Quad)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admProdDesc" placeholder="Descrição curta (ex.: brinde da tropa)">
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admProdCat" title="Onde o item entra na Loja">
+                  <option value="pres:modulos">Módulos · vade mecum, apostilas e cadernos</option>
+                  <option value="pres:excursao">Excursões para concursos</option>
+                  <option value="pres:taf">Treinamento para o TAF</option>
+                  <option value="pres:outros">Outros · retirada na recepção</option>
+                  <option value="dig:cursos">Cursos online</option>
+                  <option value="dig:mentoria">Mentoria</option>
+                </select>
+              </div>
+              <div class="adm-row" style="margin-top:8px">
+                <select class="fld" id="admProdMoeda" title="Moeda de venda">
+                  <option value="qdc">Vender em Quad Coins</option>
+                  <option value="dmn">Vender em Diamantes</option>
+                </select>
+                <input class="fld" id="admProdPreco" placeholder="Preço" inputmode="numeric" style="max-width:80px">
+                <input class="fld" id="admProdQtd" placeholder="Qtd." inputmode="numeric" style="max-width:70px" title="Estoque (itens presenciais)">
+              </div>
+              <div class="adm-row" id="admProdDataBox" style="margin-top:8px; display:none">
+                <span class="pct" id="admProdDataLb">Data</span>
+                <input class="fld" id="admProdData" type="date" style="max-width:150px" aria-label="Data da atividade" title="Data — entra no calendário do aluno que comprar">
+                <span class="pct" id="admProdAteLb" style="display:none">até</span>
+                <input class="fld" id="admProdDataFim" type="date" style="max-width:150px; display:none" aria-label="Término" title="Término — a mentoria é como uma turma online, com começo e fim">
+              </div>
+              <div class="adm-alerta" id="admProdErro"></div>
+              <div class="k-label sub-k" style="margin-top:10px">Ícone do produto</div>
+              <div class="ico-pick" id="admProdIcones"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmProd">Publicar na Loja</button></div>
+            </div>
+            <div id="admProdList" style="margin-top:10px"></div>
+            <p class="sub" style="margin-top:8px">O produto entra <strong>na hora</strong> na seção escolhida da Loja do aluno. Cada coisa nasce no seu lugar: <strong>turmas e isoladas</strong> em “Criação de turmas e isoladas”, <strong>simulados</strong> em “Lançamento de simulados”, <strong>eventos</strong> em “Eventos da semana” e <strong>itens do personagem e de combate</strong> em “Criar skin do personagem” — por isso eles não aparecem aqui. Itens de retirada usam a <strong>quantidade</strong> como estoque e geram <strong>pedido na recepção</strong>; <strong>Excursões, TAF e Mentoria</strong> aceitam <strong>data</strong> e, quando comprados, entram nos <strong>Eventos da semana</strong> e no <strong>calendário</strong> do aluno. Toque no ✕ para remover.</p>
+          </div>
+
+          <div class="p-card" data-bl="precos">
+            <div class="k-label">Preços da Loja · atualizar</div>
+            <div id="admPrecosList"></div>
+            <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecos">Aplicar preços</button></div>
+            <p class="sub" style="margin-top:8px">Vale na hora para a Loja do aluno — inclusive a cadeia de skins. O log de <strong>compradores</strong> agora fica em <strong>Relatórios · Loja</strong>.</p>
+          </div>
+
+          <div class="p-card" data-bl="precoturmas">
+            <div class="k-label">Preços e vagas · turmas, isoladas e simulados</div>
+            <div id="admPrecoTurmas"></div>
+            <div style="margin-top:10px"><button class="btn small" id="btnAdmPrecoTurma">Aplicar nas turmas</button></div>
+            <p class="sub" style="margin-top:8px">Ajuste o valor em <strong>Diamantes</strong> e em <strong>Quad Coins</strong> e as <strong>vagas restantes</strong> de cada moeda <strong>sem apagar a turma</strong> — quem já está matriculado continua matriculado. As <strong>isoladas</strong> vêm logo abaixo, com o preço na moeda em que foram abertas, e os <strong>simulados presenciais</strong> fecham a lista — dá para <strong>abrir ou reduzir vagas de cada moeda</strong> e mudar os preços sem relançar o simulado.</p>
+          </div>
+
+        </div>
+

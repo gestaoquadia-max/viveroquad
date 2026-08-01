@@ -1,0 +1,931 @@
+  /* ---------- Loja: compra exclusiva em Quad Coins (simulada) ---------- */
+  var lojaOwned = {};
+  /* ---------- moedas da Loja: Quad Coin (esforço) e Diamante (dinheiro) ---------- */
+  function moedaTxt(m) { return m === 'dmn' ? 'Dmn' : 'QdC'; }
+  function saldoDe(m) { return m === 'dmn' ? diamantes : score; }
+  function debitar(m, valor, msg) { if (m === 'dmn') addDiamante(-valor, msg); else addScore(-valor, msg); }
+  function semSaldoMsg(m) {
+    return m === 'dmn' ? 'Diamantes insuficientes — recarregue no site do Quad ou resgate um gift card.'
+                       : 'Quad Coins insuficientes — complete missões para ganhar mais.';
+  }
+  function bindLojaItem(it) {
+    it.addEventListener('click', function () {
+      if (it.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
+      /* isolada ocupa dia e horário — não entra por cima do que o aluno já tem */
+      var avisoIso = '';
+      if (it.dataset.isolada && typeof ISOLADAS !== 'undefined') {
+        var isoAlvo = ISOLADAS.filter(function (x) { return x.id === it.dataset.isolada; })[0];
+        var chq = isoAlvo ? choqueDeAgenda(agendaDaIsolada(isoAlvo)) : null;
+        if (chq) { avisoIso = avisoChoque(chq); }
+      }
+      var preco = parseInt(it.dataset.preco, 10), nome = it.dataset.nome;
+      var moeda = it.dataset.moeda === 'dmn' ? 'dmn' : 'qdc';
+      function executa() {
+        if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
+        it.classList.add('comprado');
+        it.querySelector('.li-preco').textContent = 'ADQUIRIDO';
+        lojaOwned[nome] = true;
+        if (typeof refreshChips === 'function') refreshChips();
+        debitar(moeda, preco, nome + ' adquirido · −' + preco + ' ' + moedaTxt(moeda));
+        lojaCompraLog(nome, preco, moeda, 'item', nome);             /* governança da Loja */
+        /* estoque (vagas): decrementa; esgotou → o item desaparece do sistema */
+        if (it.dataset.estoque) {
+          var resta = parseInt(it.dataset.estoque, 10) - 1;
+          it.dataset.estoque = resta;
+          var bd = it.querySelector('.li-estoque');
+          if (bd) bd.textContent = resta + (resta === 1 ? ' vaga' : ' vagas');
+          if (resta <= 0) setTimeout(function () { it.remove(); if (typeof queueSync === 'function') queueSync(); }, 900);
+        }
+        /* a boina do tutorial sai da vitrine assim que comprada */
+        if (nome === 'Boina exclusiva') it.style.display = 'none';
+        if (it.dataset.isolada && typeof isoladaComprada === 'function') { isoladaComprada(nome); }
+        if (typeof agendaDoProduto === 'function') { agendaDoProduto(nome); }
+        var presencial = it.dataset.presencial === '1' || PRESENCIAIS.indexOf(nome) >= 0;
+        if (presencial) pedidoNovo(nome);                           /* retirada na recepção */
+        if (LINKS_ONLINE[nome]) {                                   /* atividade online: link junto */
+          setTimeout(function () { toast('Acesso liberado — ' + LINKS_ONLINE[nome]); }, 1500);
+        }
+      }
+      /* toda compra pede confirmação (no tutorial o QUAD conduz — sem modal) */
+      if (typeof tutOn !== 'undefined' && tutOn) { executa(); return; }
+      var descEl = it.querySelector('.li-desc'), icoEl = it.querySelector('.li-ico');
+      confirmarCompra({ nome: nome, desc: descEl ? descEl.textContent : '', preco: preco, moeda: moeda,
+        aviso: avisoIso, ico: icoEl ? icoEl.innerHTML : '' }, executa);
+    });
+  }
+  document.querySelectorAll('.loja-item').forEach(bindLojaItem);
+
+  /* ---------- turmas na Quad Store: item único com vagas POR MOEDA ----------
+     MATRICULADO = a turma do aluno · INDISPONÍVEL = turno já ocupado
+     (independe da moeda usada na compra) · ESGOTADA = sem vagas.        */
+  var TURMA_ICO = '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  function renderTurmasLoja() {
+    var host = $('lojaTurmasCore'); if (!host) return;
+    host.innerHTML = TURMAS_LOJA.map(function (t) {
+      var minha = matriculasAtivas().some(function (m) { return m.turmaId === t.id; });
+      var esgotada = t.vagasDmn <= 0 && t.vagasQdc <= 0;
+      var ocupadoPor = minha ? null : turnoOcupadoPor(t.turno);
+      var preco = minha ? 'MATRICULADO' : ocupadoPor ? 'INDISPONÍVEL' : esgotada ? 'ESGOTADA'
+        : fmt(t.precoDmn) + ' Dmn ou ' + fmt(t.precoQdc) + ' QdC';
+      return '<button class="loja-item' + (minha ? ' comprado' : '') + ((ocupadoPor || esgotada) && !minha ? ' indisponivel' : '') + '" data-turma="' + t.id + '">' +
+        '<span class="li-estoque">' + t.vagasDmn + ' Dmn · ' + t.vagasQdc + ' QdC</span>' +
+        '<span class="li-ico">' + TURMA_ICO + '</span>' +
+        '<span class="li-nome">' + t.nome + '</span>' +
+        '<span class="li-desc">' + t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + (t.sala ? ' · ' + t.sala : '') + '</span>' +
+        '<span class="li-preco">' + preco + '</span></button>';
+    }).join('');
+    host.querySelectorAll('[data-turma]').forEach(function (bt) {
+      bt.addEventListener('click', function () { turmaClick(bt.dataset.turma); });
+    });
+    if (typeof queueSync === 'function') queueSync();
+  }
+  var turmaAberta = null, simMoedaAlvo = null;
+  function turmaClick(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var t = turmaDe(id); if (!t) return;
+    if (matriculasAtivas().some(function (m) { return m.turmaId === id; })) { toast('Esta já é a sua turma — bom serviço!'); return; }
+    var ocupadoPor = turnoOcupadoPor(t.turno);
+    if (ocupadoPor) { toast('Você já estuda no turno da ' + t.turno + ' (' + ocupadoPor + ') — turmas no mesmo horário ficam bloqueadas até a sua turma terminar.'); return; }
+    if (t.vagasDmn <= 0 && t.vagasQdc <= 0) { toast('Turma esgotada — aguarde o lançamento da próxima.'); return; }
+    turmaAberta = t; simMoedaAlvo = null;
+    $('tuLayNome').textContent = t.nome;
+    $('tuLayDesc').innerHTML = t.tipoDesc + ' · ' + t.turno + ' · ' + t.hor + '<br>Creditar em qual moeda? As vagas são separadas por moeda.';
+    $('tuDmnTxt').textContent = fmt(t.precoDmn) + ' Dmn';
+    $('tuDmnVagas').textContent = t.vagasDmn + (t.vagasDmn === 1 ? ' vaga' : ' vagas');
+    $('tuQdcTxt').textContent = fmt(t.precoQdc) + ' QdC';
+    $('tuQdcVagas').textContent = t.vagasQdc + (t.vagasQdc === 1 ? ' vaga' : ' vagas');
+    $('btnTuDmn').disabled = t.vagasDmn <= 0;
+    $('btnTuQdc').disabled = t.vagasQdc <= 0;
+    $('turmaLayer').classList.add('on');
+  }
+  function matricular(moeda) {
+    var t = turmaAberta; if (!t) return;
+    var fx = faixaCompleta(t.hor);
+    var chq = fx ? choqueDeAgenda({ dias: [1, 2, 3, 4, 5], ini: fx[0], fim: fx[1], rot: t.nome, de: t.inicio, ate: t.fim }) : null;
+    if (chq) { toast('Você já tem “' + chq + '” nesse horário — matrícula em turma não pode se sobrepor.'); return; }
+    var preco = moeda === 'dmn' ? t.precoDmn : t.precoQdc;
+    if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
+    debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda));
+    if (moeda === 'dmn') t.vagasDmn--; else t.vagasQdc--;
+    var primeira = matriculasAtivas().length === 0;
+    MATRICULAS.push({ turmaId: t.id, rot: t.tipo.toUpperCase() + ' ' + t.turno.toUpperCase(), tipo: t.tipo, turno: t.turno, concurso: t.concurso, fim: t.fim });
+    if (typeof lojaCompraLog === 'function') lojaCompraLog(t.nome + ' · matrícula', preco, moeda, 'matricula', t.id);
+    $('turmaLayer').classList.remove('on');
+    var ml = $('matLayer'); if (ml) ml.classList.remove('on');
+    turmaAberta = null;
+    if (primeira) {
+      /* primeira matrícula ativa → ela comanda o app sem perguntar nada */
+      appLock = false;
+      definirTurmaAtiva(t.id, true);
+      renderTurmasLoja();
+      toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
+      return;
+    }
+    renderTurmasLoja();
+    if (typeof renderCarreira === 'function') renderCarreira();   /* o topo vira seletor: agora há mais de uma turma */
+    if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* turma nova traz o material dela */
+    if (typeof renderRankings === 'function') renderRankings();
+    /* 2ª turma em diante: quem decide por qual delas o app fala é o aluno */
+    if (!abrirTrocaTurma(t.id)) {
+      toast('Matrícula confirmada na ' + t.nome + ' — turmas do turno da ' + t.turno + ' ficam bloqueadas até o término.');
+    }
+  }
+  $('btnTuDmn').addEventListener('click', function () { escolheuMoeda('dmn'); });
+  $('btnTuQdc').addEventListener('click', function () { escolheuMoeda('qdc'); });
+  function escolheuMoeda(mo) {
+    if (simMoedaAlvo) {
+      var alvo = simMoedaAlvo; simMoedaAlvo = null;
+      $('turmaLayer').classList.remove('on');
+      finalizarCompraSim(alvo.sm, mo, alvo.aviso);
+      return;
+    }
+    matricular(mo);
+  }
+  $('btnTuCancel').addEventListener('click', function () { $('turmaLayer').classList.remove('on'); turmaAberta = null; simMoedaAlvo = null; });
+  $('turmaLayer').addEventListener('click', function (e) { if (e.target === $('turmaLayer')) { $('turmaLayer').classList.remove('on'); turmaAberta = null; } });
+  $('btnMatOk').addEventListener('click', function () { $('matLayer').classList.remove('on'); });
+  $('btnMatLoja').addEventListener('click', function () { $('matLayer').classList.remove('on'); showView('v-loja', 'navAluno'); });
+  renderTurmasLoja();
+
+  /* ---------- catálogo de ícones (seletor do admin + render da Loja) ---------- */
+  var ICON_CAT = {
+    turma:      '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+    aula:       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg>',
+    aulao:      '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>',
+    evento:     '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
+    presencial: '<svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    simulado:   '<svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6"/></svg>',
+    garrafinha: '<svg viewBox="0 0 24 24"><path d="M10 2h4v2.5l1 2V9H9V6.5l1-2Z"/><rect x="8.5" y="9" width="7" height="12" rx="2.5"/><path d="M8.5 13h7"/></svg>',
+    modulo:     '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="17" rx="1.5"/><path d="M17 7h4v14H7"/><path d="M6 8h8M6 11h8M6 14h5"/></svg>',
+    vademecum:  '<svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2Z"/><path d="M19 20H6a2 2 0 0 1-2-2"/><path d="M8 6h7M8 9h7"/></svg>',
+    chaveiro:   '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="5"/><path d="M11.5 11.5 20 20M17 17l2-2M15 15l2-2"/></svg>',
+    camiseta:   '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2H10Z"/></svg>',
+    caneca:     '<svg viewBox="0 0 24 24"><path d="M4 5h12v11a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M16 8h2a3 3 0 0 1 0 6h-2"/></svg>',
+    medalha:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="6"/><path d="m9 8.5-3-6M15 8.5l3-6M12 11.5l1 2 2 .2-1.5 1.4.4 2.1L12 17l-1.9 -.9.4-2.1L9 12.7l2-.2Z"/></svg>',
+    boina:      '<svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg>',
+    farda:      '<svg viewBox="0 0 24 24"><path d="M8 2 4 5l2 3 2-1v12h8V7l2 1 2-3-4-3-2 2h-4Z"/><path d="M12 6v13"/><path d="M9 9h1.6M13.4 9H15"/></svg>',
+    colete:     '<svg viewBox="0 0 24 24"><path d="M9 3v3l-2.5 3v11H11V9L10 6V3Z"/><path d="M15 3v3l2.5 3v11H13V9l1-3V3Z"/><path d="M7 15h4M13 15h4"/></svg>',
+    fuzil:      '<svg viewBox="0 0 24 24"><path d="m2.5 13.5 14.5-8 1.8 3.2-12.6 7H3.5Z"/><path d="m13.5 11.5 3.2 4.8M8.5 14.2 6.5 20"/></svg>'
+  };
+  var ICON_POR_CAT = { turmas: 'turma', eventos: 'evento', personagem: 'camiseta', presencial: 'presencial' };
+  function icoDe(chave, cat) { return ICON_CAT[chave] || ICON_CAT[ICON_POR_CAT[cat]] || ICON_CAT.presencial; }
+
+  /* ---------- produtos/serviços cadastrados pela administração ----------
+     Entram nas categorias da Loja do aluno em tempo real. Presenciais têm
+     estoque, compra por quantidade e pedido de retirada.                  */
+  var LOJA_CAT_NOME = { turmas: 'Turmas e aulas', eventos: 'Eventos', digitais: 'Cursos online', mentoria: 'Mentoria', personagem: 'Itens do personagem', presencial: 'Itens presenciais' };
+  /* cada opção do "Cadastrar produto ou serviço" aponta para UMA seção da Loja.
+     Turmas, isoladas, simulados, eventos e itens do personagem nascem nos
+     blocos próprios — por isso não estão aqui.                             */
+  var PROD_DESTINOS = {
+    'pres:modulos':  { via: 'pres', cat: 'modulos',  rot: 'Módulos · vade mecum, apostilas e cadernos', estoque: true },
+    'pres:excursao': { via: 'pres', cat: 'excursao', rot: 'Excursões para concursos', estoque: true, data: true },
+    'pres:taf':      { via: 'pres', cat: 'taf',      rot: 'Treinamento para o TAF', estoque: true, data: true },
+    'pres:outros':   { via: 'pres', cat: 'outros',   rot: 'Outros · retirada na recepção', estoque: true },
+    'dig:cursos':    { via: 'dig',  cat: 'digitais', rot: 'Cursos online' },
+    'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true, periodo: true }
+  };
+  function prodDestino(v) { return PROD_DESTINOS[v] || PROD_DESTINOS['pres:outros']; }
+  var LOJA_EXTRAS = [
+    { nome: 'Mentoria Quad', desc: 'acompanhamento individual com o time', cat: 'mentoria', preco: 900, moeda: 'dmn', icone: 'mentoria', dataISO: '2026-08-12' }
+  ];
+  function renderLojaExtras() {
+    ['turmas', 'digitais', 'mentoria', 'personagem'].forEach(function (cat) {
+      var host = document.getElementById('lojaExtras-' + cat);
+      if (!host) return;
+      host.innerHTML = LOJA_EXTRAS.filter(function (p) { return p.cat === cat; }).map(function (p) {
+        var comprado = lojaOwned[p.nome];
+        var mo = p.moeda === 'dmn' ? 'dmn' : 'qdc';
+        return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + p.nome + '" data-preco="' + p.preco + '" data-moeda="' + mo + '">' +
+          '<span class="li-ico">' + icoDe(p.icone, cat) + '</span>' +
+          '<span class="li-nome">' + p.nome + '</span>' +
+          '<span class="li-desc">' + (p.ate && p.dataISO ? dataBRcompleta(p.dataISO) + ' → ' + dataBRcompleta(p.ate) : (p.desc || 'novidade')) + '</span>' +
+          '<span class="li-preco">' + (comprado ? 'ADQUIRIDO' : fmt(p.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+      }).join('');
+      host.querySelectorAll('.loja-item').forEach(bindLojaItem);
+    });
+  }
+
+  /* ---------- itens presenciais: estoque, quantidade e entrega ----------
+     cat: excursao · modulos · taf · outros — cada uma vira uma sub-área
+     da Loja; moeda: qdc | dmn                                             */
+  var ITENS_PRESENCIAIS = [
+    { id: 'excursao',   nome: 'Excursão · concurso PM-BA', desc: 'viagem organizada pelo Quad', preco: 600, moeda: 'dmn', icone: 'presencial', estoque: 40, cat: 'excursao', estado: 'disp' },
+    { id: 'vademecum',  nome: 'Vade Mecum',       desc: 'legislação da carreira', preco: 200, moeda: 'qdc', icone: 'vademecum', estoque: 8,  cat: 'modulos', estado: 'disp' },
+    { id: 'modulo',     nome: 'Módulo impresso',  desc: 'apostila da matéria',    preco: 150, moeda: 'qdc', icone: 'modulo',    estoque: 15, cat: 'modulos', estado: 'disp' },
+    { id: 'simufis',    nome: 'Caderno de simulados impresso', desc: 'apostila com provas anteriores', preco: 120, moeda: 'qdc', icone: 'simulado', estoque: 30, cat: 'modulos', estado: 'disp' },
+    { id: 'taf',        nome: 'Treinamento TAF',  desc: 'preparação para a prova física', preco: 450, moeda: 'dmn', icone: 'medalha', estoque: 30, cat: 'taf', estado: 'disp' },
+    { id: 'garrafinha', nome: 'Garrafinha Quad',  desc: 'squeeze da tropa',       preco: 90,  moeda: 'qdc', icone: 'garrafinha', estoque: 12, cat: 'outros', estado: 'disp' },
+    { id: 'chaveiro',   nome: 'Chaveiro Quad',    desc: 'brinde da marca',        preco: 40,  moeda: 'qdc', icone: 'chaveiro',  estoque: 25, cat: 'outros', estado: 'disp' },
+    { id: 'camiseta',   nome: 'Camiseta Quad',    desc: 'camisa temática',        preco: 180, moeda: 'qdc', icone: 'camiseta',  estoque: 20, cat: 'outros', estado: 'disp' }
+  ];
+  /* ---------- ISOLADAS: matérias avulsas com dias fixos e período ----------
+     Nascem no bloco "Criação de turmas e isoladas". Compradas, viram evento
+     recorrente: entram no carrossel do Início e no calendário do aluno.   */
+  var ISOLADAS = [
+    { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura', sala: 'Sala 4',
+      dias: ['terça-feira'], hi: '20:00', hf: '22:00', ini: '2026-08-04', fim: '2026-10-20', preco: 350, moeda: 'dmn', vagas: 30 },
+    { id: 'iso-port', materia: 'Língua Portuguesa', nome: 'Isolada de Português', prof: 'Prof.ª Ritha Galvão', sala: 'Sala 1',
+      dias: ['sábado'], hi: '14:00', hf: '17:00', ini: '2026-08-08', fim: '2026-10-24', preco: 350, moeda: 'dmn', vagas: 25 },
+    { id: 'iso-livre', materia: 'qualquer matéria', nome: 'Aula isolada', prof: '',
+      dias: [], hi: '', hf: '', ini: '', fim: '', preco: 40, moeda: 'qdc', vagas: 60 }
+  ];
+  var DIA_ABREV = { 'segunda-feira': 'SEG', 'terça-feira': 'TER', 'quarta-feira': 'QUA', 'quinta-feira': 'QUI', 'sexta-feira': 'SEX', 'sábado': 'SÁB', 'domingo': 'DOM' };
+  function isoDiasTxt(iso) { return (iso.dias || []).map(function (d) { return DIA_ABREV[d] || d; }).join(' e '); }
+  /* =============== AGENDA DO ALUNO · choque de horário ===============
+     Turma, isolada, evento e simulado presencial ocupam dia + faixa de
+     horário. Nada pode ser comprado por cima de algo que o aluno já tem. */
+  var DIA_IDX = { 'domingo': 0, 'segunda-feira': 1, 'terça-feira': 2, 'quarta-feira': 3,
+    'quinta-feira': 4, 'sexta-feira': 5, 'sábado': 6 };
+  function horaMin(t) {
+    var m = /(\d{1,2})\s*[:hH]\s*(\d{2})?/.exec(String(t || ''));
+    return m ? (+m[1]) * 60 + (m[2] ? +m[2] : 0) : null;
+  }
+  function faixaDe(txt) {
+    var partes = String(txt || '').split(/–|—|-/);
+    if (partes.length < 2) return null;
+    var a = horaMin(partes[0]), b = horaMin(partes[partes.length - 1]);
+    if (a == null || b == null) return null;
+    if (b <= a) b += 24 * 60;   /* 22h–00h atravessa a meia-noite */
+    return [a, b];
+  }
+  function faixaCompleta(hor) {
+    if (!hor) return null;
+    var blocos = String(hor).split(' e ');
+    var f1 = faixaDe(blocos[0]), f2 = faixaDe(blocos[blocos.length - 1]);
+    if (!f1) return null;
+    return [f1[0], f2 ? f2[1] : f1[1]];
+  }
+
+  /* ---------- espaço físico da sede: 4 salas + estúdio ----------
+     Turma e isolada presenciais funcionam numa das salas; o estúdio é
+     reservado às gravações e eventos online. Uma sala não aceita duas
+     atividades no mesmo dia da semana com horários que se cruzam.     */
+  var SALAS = ['Sala 1', 'Sala 2', 'Sala 3', 'Sala 4'];
+  /* lotação máxima de cada sala (cadeiras) — definida pelo gestor */
+  var SALA_CAP = { 'Sala 1': 155, 'Sala 2': 85, 'Sala 3': 125, 'Sala 4': 185 };
+  function salaCap(sala) {
+    /* o boot chama renders antes desta região rodar — sem a tabela ainda,
+       responda 0 (sem limite) em vez de quebrar o carregamento         */
+    return (typeof SALA_CAP !== 'undefined' && SALA_CAP && SALA_CAP[sala]) || 0;
+  }
+  var ESTUDIO = 'Estúdio';
+  /* tudo o que ocupa sala, num formato só: dias da semana + faixa de
+     minutos + período de datas                                        */
+  /* atividade de UM DIA (evento, simulado): vira uma ocupação no dia da
+     semana daquela data, com de = ate = a própria data                  */
+  function ocPontual(sala, rot, tipo, dataISO, hi, hf, id) {
+    if (!sala || !dataISO || !hi || !hf) return null;
+    var fx = faixaDe(hi + '–' + hf); if (!fx) return null;
+    var pr = dataISO.split('-');
+    var dt = new Date(+pr[0], +pr[1] - 1, +pr[2]);
+    var hl = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
+    return { sala: sala, rot: rot, tipo: tipo, hor: DIA_SEM[dt.getDay()] + ' · ' + pr[2] + '/' + pr[1] + ' · ' + hl(hi) + '–' + hl(hf),
+      turno: '', dias: [dt.getDay()], ini: fx[0], fim: fx[1], de: dataISO, ate: dataISO, id: id, pontual: true };
+  }
+  function salaOcupacoes() {
+    var oc = [];
+    TURMAS_LOJA.forEach(function (t) {
+      var fx = faixaCompleta(t.hor); if (!t.sala || !fx) return;
+      oc.push({ sala: t.sala, rot: t.nome, tipo: 'turma', hor: t.hor, turno: t.turno,
+        dias: [1, 2, 3, 4, 5], ini: fx[0], fim: fx[1], de: t.inicio, ate: t.fim, id: t.id });
+    });
+    ISOLADAS.forEach(function (i) {
+      if (!i.sala || !i.dias || !i.dias.length || !i.hi || !i.hf) return;
+      var fx = faixaDe(i.hi + '–' + i.hf); if (!fx) return;
+      oc.push({ sala: i.sala, rot: i.nome, tipo: 'isolada', hor: isoDiasTxt(i) + ' · ' + isoHorarioTxt(i), turno: '',
+        dias: i.dias.map(function (d) { return DIA_IDX[d]; }), ini: fx[0], fim: fx[1], de: i.ini, ate: i.fim, id: i.id });
+    });
+    /* eventos presenciais (aulões, minicursos…) tomam sala no dia deles;
+       os online tomam o Estúdio                                        */
+    (typeof EVENTOS !== 'undefined' ? EVENTOS : []).forEach(function (ev) {
+      if (typeof evAcabou === 'function' && evAcabou(ev)) return;
+      var p = ocPontual(ev.online || ev.modalidade === 'online' ? ESTUDIO : ev.sala, ev.nome, 'evento', ev.dataISO, ev.hi, ev.hf, ev.id);
+      if (p) oc.push(p);
+    });
+    /* simulados presenciais tomam as mesmas salas */
+    (typeof SIMULADOS !== 'undefined' ? SIMULADOS : []).forEach(function (sm) {
+      if (sm.tag !== 'PRESENCIAL' || sm.realizado) return;
+      var p = ocPontual(sm.sala, sm.rot, 'simulado', sm.dataISO, sm.hi, sm.hf, sm.id);
+      if (p) oc.push(p);
+    });
+    return oc;
+  }
+  /* choca? mesmos sala + dia da semana + horários cruzados + períodos cruzados */
+  function salaConflito(alvo) {
+    var hits = salaOcupacoes().filter(function (o) {
+      if (o.sala !== alvo.sala || o.id === alvo.id) return false;
+      if (!o.dias.some(function (d) { return alvo.dias.indexOf(d) >= 0; })) return false;
+      if (!(alvo.ini < o.fim && o.ini < alvo.fim)) return false;
+      if (alvo.de && alvo.ate && o.de && o.ate && !(alvo.de <= o.ate && o.de <= alvo.ate)) return false;
+      return true;
+    });
+    return hits.length ? hits[0] : null;
+  }
+  /* resumo de uma sala para o seletor e para o mapa */
+  function salaResumo(sala) {
+    return salaOcupacoes().filter(function (o) { return o.sala === sala; });
+  }
+  /* ---------- seletor de sala, régua única ----------
+     A opção do seletor diz SÓ o nome do espaço (numa tela de celular o
+     rótulo longo virava uma linha ilegível). Quem conta o que já está
+     reservado é a linha de eco logo abaixo — e ela responde ao dia e ao
+     horário que o administrador acabou de digitar, não à sala em geral. */
+  function salaOpcoesHTML(sel, placeholder, lista) {
+    var atual = sel.value;
+    return '<option value="">' + placeholder + '</option>' +
+      (lista || SALAS).map(function (sl) {
+        return '<option value="' + sl + '"' + (sl === atual ? ' selected' : '') + '>' + sl + '</option>';
+      }).join('');
+  }
+  function salaAgendaTxt(sala, id) {
+    return salaResumo(sala).filter(function (o) { return !id || o.id !== id; })
+      .map(function (o) { return o.rot + ' (' + (o.turno ? o.turno + ' · ' : '') + o.hor + ')'; }).join(' · ');
+  }
+  /* alvo = null quando o dia/horário ainda não estão completos */
+  function salaEcoHTML(sala, alvo) {
+    var agenda = salaAgendaTxt(sala, alvo && alvo.id);
+    if (!alvo) {
+      return 'Espaço escolhido: <strong>' + sala + '</strong>' + (salaCap(sala) ? ' (' + salaCap(sala) + ' lugares)' : '') + '. Complete o <b>dia</b> e o <b>horário</b> para eu conferir se ele está vago nesse momento.' +
+        (agenda ? ' Já ocupam este espaço: ' + agenda + '.' : ' Nada mais está marcado nele.');
+    }
+    var ch = salaConflito(alvo);
+    if (ch) {
+      return '<strong>' + sala + '</strong> já tem <b>' + ch.rot + '</b> nesse dia e horário (' + ch.hor +
+        (ch.ate && !ch.pontual ? ', até ' + dataBRcompleta(ch.ate) : '') + ') — escolha outro espaço ou outro horário.';
+    }
+    return '<strong>' + sala + '</strong>' + (salaCap(sala) ? ' (' + salaCap(sala) + ' lugares)' : '') + ' está <b>livre</b> nesse dia e horário — a reserva vale ao confirmar.' +
+      (agenda ? ' Fora dele, o espaço tem: ' + agenda + '.' : '');
+  }
+  var TURNO_ORDEM = { 'manhã': 0, 'tarde': 1, 'noite': 2, '': 3 };
+  function renderSalas() {
+    var el = $('admSalasMapa'); if (!el) return;
+    var html = SALAS.map(function (sl) {
+      var oc = salaResumo(sl).sort(function (a, b) { return (TURNO_ORDEM[a.turno] || 0) - (TURNO_ORDEM[b.turno] || 0) || a.ini - b.ini; });
+      var linhas = oc.map(function (o) {
+        var cls = o.tipo === 'isolada' ? ' iso' : o.tipo === 'evento' ? ' ev' : o.tipo === 'simulado' ? ' sim' : '';
+        return '<div class="so' + cls + '"><span>' + o.rot + '</span>' +
+          '<small>' + (o.turno ? o.turno + ' · ' : '') + o.hor +
+          (!o.pontual && o.de && o.ate ? ' · ' + dataBRcompleta(o.de) + ' → ' + dataBRcompleta(o.ate) : '') + '</small></div>';
+      }).join('');
+      return '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + sl + ' · ' + salaCap(sl) + ' lugares</span>' +
+        (oc.length ? '<span class="tag ok">' + oc.length + (oc.length === 1 ? ' ATIVIDADE' : ' ATIVIDADES') + '</span>' : '<span class="tag">LIVRE</span>') + '</div>' +
+        (oc.length ? '<div class="sala-oc">' + linhas + '</div>' : '<p class="sala-livre">Nenhuma turma ou isolada funciona nesta sala.</p>') + '</div>';
+    }).join('');
+    /* estúdio: as reservas dos eventos online, com dia e horário; eventos
+       antigos sem horário registrado aparecem pelo "quando"             */
+    var estOc = salaResumo(ESTUDIO);
+    var estSolto = (typeof EVENTOS !== 'undefined' ? EVENTOS : []).filter(function (ev) {
+      return (ev.online || ev.modalidade === 'online') && !(typeof evAcabou === 'function' && evAcabou(ev)) &&
+        !estOc.some(function (o) { return o.id === ev.id; });
+    });
+    html += '<div class="sala-row"><div class="sala-top"><span class="sala-nome">' + ESTUDIO + '</span><span class="tag">GRAVAÇÕES · ONLINE</span></div>' +
+      (estOc.length || estSolto.length ? '<div class="sala-oc">' +
+        estOc.map(function (o) { return '<div class="so est"><span>' + o.rot + '</span><small>' + o.hor + '</small></div>'; }).join('') +
+        estSolto.map(function (ev) { return '<div class="so est"><span>' + ev.nome + '</span><small>' + ev.quando + '</small></div>'; }).join('') +
+        '</div>' : '<p class="sala-livre">Nenhuma gravação ou evento online agendado.</p>') + '</div>';
+    el.innerHTML = html;
+  }
+  function diaDaData(iso) {
+    if (!iso) return null;
+    var q = String(iso).split('-');
+    if (q.length !== 3) return null;
+    return new Date(+q[0], +q[1] - 1, +q[2]).getDay();
+  }
+  function periodosCruzam(a, b) {
+    if (!a.de || !a.ate || !b.de || !b.ate) return true;   /* sem período definido: assume que cruza */
+    return a.de <= b.ate && b.de <= a.ate;
+  }
+  /* tudo que o aluno JÁ tem ocupando agenda */
+  function agendaOcupada() {
+    var out = [];
+    if (typeof matriculasAtivas === 'function') {
+      matriculasAtivas().forEach(function (m) {
+        var t = turmaDe(m.turmaId); if (!t) return;
+        var f = faixaCompleta(t.hor); if (!f) return;
+        out.push({ dias: [1, 2, 3, 4, 5], ini: f[0], fim: f[1], rot: t.nome, de: t.inicio, ate: t.fim });
+      });
+    }
+    if (typeof ISOLADAS !== 'undefined') {
+      ISOLADAS.forEach(function (iso) {
+        if (!lojaOwned[iso.nome] || !iso.dias || !iso.dias.length) return;
+        var f = faixaDe(isoHorarioTxt(iso)); if (!f) return;
+        out.push({ dias: iso.dias.map(function (d) { return DIA_IDX[d]; }), ini: f[0], fim: f[1],
+          rot: iso.nome, de: iso.ini, ate: iso.fim });
+      });
+    }
+    if (typeof EVENTOS !== 'undefined') {
+      EVENTOS.forEach(function (ev) {
+        var st = evState[ev.id];
+        if (!st || !(st.comprado || st.inscrito)) return;
+        var a = agendaDoEvento(ev); if (!a) return;
+        out.push(a);
+      });
+    }
+    return out;
+  }
+  function agendaDoEvento(ev) {
+    var partes = String(ev.quando || '').split(' · ');
+    var f = faixaDe(partes[partes.length - 1]); if (!f) return null;
+    var dias = [];
+    if (ev.ate && ev.dataISO && ev.ate !== ev.dataISO) {
+      /* recorrente (isolada virada evento): usa os dias da isolada de origem */
+      var iso = (typeof ISOLADAS !== 'undefined') ? ISOLADAS.filter(function (x) { return 'ev-' + x.id === ev.id; })[0] : null;
+      if (iso && iso.dias) { dias = iso.dias.map(function (d) { return DIA_IDX[d]; }); }
+    }
+    if (!dias.length) {
+      var d = diaDaData(ev.dataISO);
+      if (d == null) return null;
+      dias = [d];
+    }
+    return { dias: dias, ini: f[0], fim: f[1], rot: ev.nome, de: ev.dataISO, ate: ev.ate || ev.dataISO };
+  }
+  /* devolve o nome do compromisso que bate de frente, ou null */
+  function choqueDeAgenda(cand) {
+    if (!cand || cand.ini == null || !cand.dias || !cand.dias.length) return null;
+    var ocupada = agendaOcupada(), achado = null;
+    ocupada.forEach(function (o) {
+      if (achado) return;
+      if (o.rot === cand.rot) return;                      /* é ele mesmo */
+      if (!periodosCruzam(o, cand)) return;
+      var mesmoDia = o.dias.some(function (d) { return cand.dias.indexOf(d) >= 0; });
+      if (!mesmoDia) return;
+      if (cand.ini < o.fim && o.ini < cand.fim) { achado = o.rot; }
+    });
+    return achado;
+  }
+  /* o aluno decide: o app informa o conflito e a escolha continua com ele */
+  function avisoChoque(rot) {
+    return '<strong>Atenção ao horário.</strong> Nesse dia e horário você já tem <strong>' + rot + '</strong>. ' +
+      'Se seguir com a compra, a escolha de qual atividade frequentar é sua — o Quad não faz reposição de aula ' +
+      'nem devolve o valor por ausência. Em caso de dúvida, fale com a recepção antes de confirmar.';
+  }
+  function isoHorarioTxt(iso) {
+    if (!iso.hi || !iso.hf) return '';
+    var h = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
+    return h(iso.hi) + '–' + h(iso.hf);
+  }
+  function isoDesc(iso) {
+    var p = [];
+    if (iso.sala) p.push(iso.sala);
+    if (isoDiasTxt(iso)) p.push(isoDiasTxt(iso) + (isoHorarioTxt(iso) ? ' · ' + isoHorarioTxt(iso) : ''));
+    if (iso.prof) p.push('com ' + iso.prof);
+    if (iso.ini && iso.fim) p.push(dataBRcompleta(iso.ini) + ' a ' + dataBRcompleta(iso.fim));
+    return p.join(' · ') || iso.materia;
+  }
+  function renderIsoladas() {
+    var g = $('lojaIsoladas'); if (!g) return;
+    g.innerHTML = ISOLADAS.map(function (iso) {
+      var comprado = lojaOwned[iso.nome];
+      var mo = iso.moeda === 'dmn' ? 'dmn' : 'qdc';
+      var chq = comprado ? null : choqueDeAgenda(agendaDaIsolada(iso));
+      return '<button class="loja-item' + (comprado ? ' comprado' : '') + '" data-nome="' + iso.nome + '" data-preco="' + iso.preco + '" data-moeda="' + mo + '" data-isolada="' + iso.id + '">' +
+        (chq ? '<span class="li-estoque">EM CHOQUE</span>' : iso.vagas ? '<span class="li-estoque">' + iso.vagas + ' vagas</span>' : '') +
+        '<span class="li-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg></span>' +
+        '<span class="li-nome">' + iso.nome + '</span>' +
+        '<span class="li-desc">' + isoDesc(iso) + '</span>' +
+        '<span class="li-preco' + (chq ? ' em-choque' : '') + '">' + (comprado ? 'ADQUIRIDO' : fmt(iso.preco) + ' ' + moedaTxt(mo)) + '</span></button>';
+    }).join('');
+    g.querySelectorAll('.loja-item').forEach(bindLojaItem);
+  }
+  /* comprada, a isolada vira um EVENTO recorrente — carrossel e calendário de graça */
+  function agendaDaIsolada(iso) {
+    var f = faixaDe(isoHorarioTxt(iso));
+    if (!f || !iso.dias || !iso.dias.length) return null;
+    return { dias: iso.dias.map(function (d) { return DIA_IDX[d]; }), ini: f[0], fim: f[1],
+      rot: iso.nome, de: iso.ini, ate: iso.fim };
+  }
+  function isoladaComprada(nome) {
+    var iso = ISOLADAS.filter(function (x) { return x.nome === nome; })[0];
+    if (!iso || !iso.dias || !iso.dias.length) { renderIsoladas(); return; }
+    var evId = 'ev-' + iso.id;
+    if (!EVENTOS.some(function (e) { return e.id === evId; })) {
+      EVENTOS.push({ id: evId, nome: iso.nome, tipo: 'ISOLADA · PRESENCIAL', modalidade: 'presencial', online: false,
+        pago: false, preco: 0, profs: iso.prof ? [iso.prof] : [],
+        quando: isoDiasTxt(iso) + ' · ' + dataBRcompleta(iso.ini).slice(0, 5) + ' · ' + isoHorarioTxt(iso).toUpperCase(),
+        dataISO: iso.ini, ate: iso.fim, cor: 'teal', meta: iso.materia + ' · isolada',
+        desc: 'Matéria isolada de ' + iso.materia + ', ' + isoDesc(iso) + '.',
+        score: [['Presença na aula', '+20 score']], coins: [['Check-in na aula', '+5']] });
+    }
+    evState[evId] = evState[evId] || {};
+    evState[evId].inscrito = true;
+    renderIsoladas();
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderCalendario === 'function') renderCalendario();
+  }
+  function presDe(id) { return ITENS_PRESENCIAIS.filter(function (x) { return x.id === id; })[0]; }
+  function renderPresenciais() {
+    ['excursao', 'modulos', 'taf', 'outros'].forEach(function (cat) {
+      var g = document.getElementById('lojaPres-' + cat); if (!g) return;
+      var itens = ITENS_PRESENCIAIS.filter(function (p) { return (p.cat || 'outros') === cat; });
+      g.innerHTML = itens.map(function (p) {
+        /* item físico só sai da vitrine quando ACABA de verdade. Ter um
+           pedido em aberto não fecha a loja: sobrando peça, dá para
+           comprar de novo — o "seu pedido" vira etiqueta, não preço.   */
+        if (p.estoque <= 0) return '';
+        var mo = moedaTxt(p.moeda || 'qdc');
+        var meus = pedidosMeus(p.id);
+        var selo = meus ? '<span class="li-estoque meu">' + (meus > 1 ? meus + ' seus' : 'seu pedido') + '</span>' : '';
+        var badge = '<span class="li-estoque' + (p.estoque <= 5 ? ' baixo' : '') + '">' + p.estoque + (p.estoque === 1 ? ' restante' : ' em estoque') + '</span>';
+        return '<button class="loja-item" data-nome="' + p.nome + '" data-preco="' + p.preco + '" data-moeda="' + (p.moeda || 'qdc') + '" data-presencial="1" data-pres-id="' + p.id + '">' +
+          badge + selo +
+          '<span class="li-ico">' + icoDe(p.icone, 'presencial') + '</span>' +
+          '<span class="li-nome">' + p.nome + '</span>' +
+          '<span class="li-desc">' + p.desc + '</span>' +
+          '<span class="li-preco">' + fmt(p.preco) + ' ' + mo + '</span></button>';
+      }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nada disponível nesta área agora.</p>';
+      g.querySelectorAll('[data-pres-id]').forEach(function (bt) {
+        bt.addEventListener('click', function () { presClick(bt.dataset.presId); });
+      });
+    });
+    if (typeof queueSync === 'function') queueSync();
+  }
+  /* quantos pedidos MEUS deste item ainda estão em aberto — é isso que
+     vira a etiqueta "seu pedido"; o estoque continua livre para todos  */
+  function pedidosMeus(presId) {
+    if (typeof PEDIDOS === 'undefined') return 0;
+    var eu = nomeCurto();
+    return PEDIDOS.filter(function (pd) {
+      return pd.presId === presId && pd.aluno === eu && pd.status === 'aguardando';
+    }).reduce(function (n, pd) { return n + (pd.qtd || 1); }, 0);
+  }
+  function presClick(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var p = presDe(id); if (!p) return;
+    if (p.estoque <= 0) { toast('“' + p.nome + '” acabou — o item saiu da Loja.'); renderPresenciais(); return; }
+    abrirCompra(p);
+  }
+  /* ---------- overlay de compra: quantidade (estoque) OU confirmação simples ---------- */
+  var compraAtual = null, compraQtd = 1;
+  function compraMax() { return compraAtual ? Math.max(1, compraAtual.estoque) : 1; }
+  function compraMoeda() { return (compraAtual && compraAtual.moeda) === 'dmn' ? 'dmn' : 'qdc'; }
+  function compraAtualiza() {
+    $('qtdVal').textContent = compraQtd;
+    $('compraTotal').textContent = fmt(compraQtd * compraAtual.preco) + ' ' + moedaTxt(compraMoeda());
+    $('qtdMenos').disabled = compraQtd <= 1;
+    $('qtdMais').disabled = compraQtd >= compraMax();
+  }
+  function abrirCompra(p) {
+    compraAtual = p; compraQtd = 1;
+    $('compraIco').innerHTML = icoDe(p.icone, 'presencial');
+    $('compraNome').textContent = p.nome;
+    $('compraDesc').textContent = p.desc;
+    $('compraEstoque').textContent = p.estoque + ' em estoque · ' + fmt(p.preco) + ' ' + moedaTxt(compraMoeda()) + ' cada';
+    document.querySelector('.qtd-row').style.display = '';
+    $('btnCompraOk').firstChild.textContent = 'Comprar · ';
+    compraAtualiza();
+    $('compraLayer').classList.add('on');
+  }
+  /* confirmação simples (itens de unidade única) — evita compra sem querer */
+  function confirmarCompra(info, onOk) {
+    compraAtual = { unit: true, onOk: onOk, nome: info.nome, preco: info.preco, moeda: info.moeda || 'qdc' };
+    compraQtd = 1;
+    $('compraIco').innerHTML = info.ico || (typeof ICON_CAT !== 'undefined' ? ICON_CAT.presencial : '');
+    $('compraNome').textContent = info.nome;
+    $('compraDesc').textContent = info.desc || '';
+    $('compraEstoque').textContent = 'Confirmar esta compra?';
+    document.querySelector('.qtd-row').style.display = 'none';
+    $('btnCompraOk').firstChild.textContent = 'Confirmar · ';
+    var av = $('compraAviso');
+    if (av) {
+      if (info.aviso) { av.innerHTML = info.aviso; av.style.display = 'block'; }
+      else { av.innerHTML = ''; av.style.display = 'none'; }
+    }
+    $('compraTotal').textContent = fmt(info.preco) + ' ' + moedaTxt(info.moeda || 'qdc');
+    $('compraLayer').classList.add('on');
+  }
+  function fecharCompra() { $('compraLayer').classList.remove('on'); compraAtual = null; }
+  $('qtdMenos').addEventListener('click', function () { if (compraQtd > 1) { compraQtd--; compraAtualiza(); } });
+  $('qtdMais').addEventListener('click', function () { if (compraQtd < compraMax()) { compraQtd++; compraAtualiza(); } });
+  $('btnCompraFechar').addEventListener('click', fecharCompra);
+  $('compraLayer').addEventListener('click', function (e) { if (e.target === $('compraLayer')) fecharCompra(); });
+  $('btnCompraOk').addEventListener('click', function () {
+    var p = compraAtual; if (!p) return;
+    if (p.unit) { var fn = p.onOk; fecharCompra(); if (fn) fn(); return; }
+    var mo = compraMoeda();
+    var total = compraQtd * p.preco;
+    if (compraQtd > p.estoque) { toast('Estoque insuficiente.'); return; }
+    if (saldoDe(mo) < total) { toast(semSaldoMsg(mo)); return; }
+    debitar(mo, total, compraQtd + '× ' + p.nome + ' · −' + fmt(total) + ' ' + moedaTxt(mo));
+    p.estoque -= compraQtd;
+    lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo, 'pres', p.id, { qtd: compraQtd });
+    pedidoPresencial(p, compraQtd);
+    if (typeof agendaDoProduto === 'function') { agendaDoProduto(p.nome); }
+    var q = compraQtd, resta = p.estoque;
+    fecharCompra();
+    renderPresenciais();
+    toast(q + '× ' + p.nome + ' — pedido gerado para retirada na recepção.' +
+      (resta > 0 ? ' Restam ' + resta + ' na Loja.' : ' Era a última unidade — o item saiu da Loja.'));
+  });
+  /* gift card: liberação única de Diamantes */
+  var btnGiftEl = $('btnGift');
+  if (btnGiftEl) btnGiftEl.addEventListener('click', function () {
+    if (resgatarGift($('giftCode').value)) $('giftCode').value = '';
+  });
+  /* validação pelo QR: o leitor abre da própria Quad Store, ao lado do resgate */
+  var btnGiftScanEl = $('btnGiftScan');
+  if (btnGiftScanEl) btnGiftScanEl.addEventListener('click', function () { $('scanLayer').classList.add('on'); });
+
+  function renderAdmProdList() {
+    var el = document.getElementById('admProdList'); if (!el) return;
+    var linhas = LOJA_EXTRAS.map(function (p, i) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>' + LOJA_CAT_NOME[p.cat] + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
+        '<button class="btn ghost small" data-ed-extra="' + i + '">Editar</button>' +
+        '<button class="adm-x" data-rm-extra="' + i + '" aria-label="Remover">✕</button></div>';
+    }).concat(ITENS_PRESENCIAIS.map(function (p) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + '<small>Itens presenciais · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + ' · ' + p.estoque + ' em estoque</small></span>' +
+        '<button class="btn ghost small" data-ed-pres="' + p.id + '">Editar</button>' +
+        '<button class="adm-x" data-rm-pres="' + p.id + '" aria-label="Remover">✕</button></div>';
+    }));
+    el.innerHTML = linhas.join('');
+    el.querySelectorAll('[data-rm-extra]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var p = LOJA_EXTRAS[+bt.dataset.rmExtra]; if (!p) return;
+        LOJA_EXTRAS.splice(+bt.dataset.rmExtra, 1);
+        renderLojaExtras(); renderAdmProdList();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('“' + p.nome + '” removido da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-rm-pres]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var id = bt.dataset.rmPres, p = presDe(id); if (!p) return;
+        ITENS_PRESENCIAIS = ITENS_PRESENCIAIS.filter(function (x) { return x.id !== id; });
+        renderPresenciais(); renderAdmProdList();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('“' + p.nome + '” removido da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-ed-extra]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarProduto('extra', LOJA_EXTRAS[+bt.dataset.edExtra]); });
+    });
+    el.querySelectorAll('[data-ed-pres]').forEach(function (bt) {
+      bt.addEventListener('click', function () { editarProduto('pres', presDe(bt.dataset.edPres)); });
+    });
+  }
+  /* edição de produto: traz de volta ao formulário; o item continua na Loja
+     e só muda quando salvamos. */
+  var admProdEdit = null;
+  function editarProduto(tipo, p) {
+    if (!p) return;
+    admProdEdit = { tipo: tipo, ref: p };
+    $('admProdNome').value = p.nome;
+    $('admProdDesc').value = p.desc || '';
+    $('admProdCat').value = tipo === 'pres' ? ('pres:' + (p.cat || 'outros')) : (p.cat === 'mentoria' ? 'dig:mentoria' : 'dig:cursos');
+    admProdDataToggle();
+    if ($('admProdData')) $('admProdData').value = p.dataISO || '';
+    if ($('admProdDataFim')) $('admProdDataFim').value = p.ate || '';
+    if ($('admProdMoeda')) $('admProdMoeda').value = p.moeda || 'qdc';
+    $('admProdPreco').value = p.preco;
+    $('admProdQtd').value = tipo === 'pres' ? p.estoque : '';
+    admProdIcone = p.icone || 'presencial';
+    var host = $('admProdIcones');
+    if (host) host.querySelectorAll('.ico-opt').forEach(function (o) { o.classList.toggle('sel', o.dataset.ico === admProdIcone); });
+    var btn = $('btnAdmProd'); if (btn) btn.textContent = 'Salvar alterações';
+    var kl = document.querySelector('#v-adm-loja .k-label'); if (kl) kl.scrollIntoView({ block: 'start' });
+    toast('Editando “' + p.nome + '” — ele segue na Loja até você salvar.');
+  }
+  function admProdEditReset() {
+    admProdEdit = null;
+    var btn = $('btnAdmProd'); if (btn) btn.textContent = 'Publicar na Loja';
+  }
+  function admProdDataToggle() {
+    var box = $('admProdDataBox'); if (!box) return;
+    var d = prodDestino($('admProdCat').value);
+    box.style.display = d.data ? 'flex' : 'none';
+    if (!d.data && $('admProdData')) $('admProdData').value = '';
+    if ($('admProdQtd')) $('admProdQtd').style.display = d.estoque ? '' : 'none';
+    /* mentoria é turma online: tem começo e fim */
+    var per = !!d.periodo;
+    if ($('admProdDataLb')) $('admProdDataLb').textContent = per ? 'De' : 'Data';
+    if ($('admProdAteLb')) $('admProdAteLb').style.display = per ? '' : 'none';
+    if ($('admProdDataFim')) {
+      $('admProdDataFim').style.display = per ? '' : 'none';
+      if (!per) $('admProdDataFim').value = '';
+    }
+  }
+  if ($('admProdCat')) $('admProdCat').addEventListener('change', admProdDataToggle);
+  admProdDataToggle();
+  /* item com data, comprado, entra nos Eventos da semana e no calendário */
+  var PROD_AGENDA = {};   /* nome do item → { dataISO, rot } */
+  /* itens do catálogo semente que já nascem com data seguem a mesma regra dos criados agora */
+  (function () {
+    LOJA_EXTRAS.concat(typeof ITENS_PRESENCIAIS !== 'undefined' ? ITENS_PRESENCIAIS : []).forEach(function (p) {
+      if (p.dataISO) { PROD_AGENDA[p.nome] = { dataISO: p.dataISO, ate: p.ate || '', rot: p.cat === 'mentoria' ? 'Mentoria' : 'Atividade' }; }
+    });
+  })();
+  function agendaDoProduto(nome) {
+    var a = PROD_AGENDA[nome]; if (!a) return;
+    var evId = 'pr-' + nome.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+    if (!EVENTOS.some(function (e) { return e.id === evId; })) {
+      var pr = a.dataISO.split('-');
+      var dt = new Date(+pr[0], +pr[1] - 1, +pr[2]);
+      var DS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+      EVENTOS.push({ id: evId, nome: nome, tipo: a.rot.toUpperCase(), modalidade: 'presencial', online: false,
+        pago: false, preco: 0, profs: [],
+        quando: DS[dt.getDay()] + ' · ' + pr[2] + '/' + pr[1] + ' · ' + a.rot,
+        dataISO: a.dataISO, ate: a.ate || '', cor: 'gold',
+        meta: a.ate ? (a.rot + ' · até ' + dataBRcompleta(a.ate)) : a.rot,
+        desc: 'Atividade contratada na Quad Store — ' + a.rot + '.',
+        score: [['Presença confirmada', '+30 score']], coins: [['Check-in', '+10']] });
+    }
+    evState[evId] = evState[evId] || {};
+    evState[evId].inscrito = true;
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderCalendario === 'function') renderCalendario();
+  }
+  var PROD_CAMPOS = ['admProdNome', 'admProdPreco', 'admProdQtd', 'admProdData', 'admProdDataFim'];
+  function prodFalta(cond, campo, msg) {
+    if (!cond) return false;
+    admAlerta('admProdErro', msg);
+    if (campo) admMarcaErro(campo);
+    return true;
+  }
+  PROD_CAMPOS.forEach(function (id) {
+    var el = $(id); if (el) el.addEventListener('input', function () { el.classList.remove('err'); });
+  });
+  var btnAdmProdEl = $('btnAdmProd');
+  if (btnAdmProdEl) btnAdmProdEl.addEventListener('click', function () {
+    var nome = $('admProdNome').value.trim(), desc = $('admProdDesc').value.trim();
+    var cat = $('admProdCat').value, preco = parseInt($('admProdPreco').value, 10);
+    var moeda = $('admProdMoeda') ? $('admProdMoeda').value : 'qdc';
+    var qtd = parseInt($('admProdQtd').value, 10);
+    var icone = admProdIcone;
+    var destCat = prodDestino(cat);
+    var dIni = $('admProdData') ? $('admProdData').value : '';
+    var dFim = $('admProdDataFim') ? $('admProdDataFim').value : '';
+    admAlerta('admProdErro', ''); admLimpaErro(PROD_CAMPOS);
+    if (prodFalta(!nome || /["<>]/.test(nome), 'admProdNome', 'Para publicar falta o <b>nome</b> do produto (sem aspas ou sinais).')) return;
+    if (prodFalta(!preco || preco < 1, 'admProdPreco', 'Para publicar falta o <b>preço</b> em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.')) return;
+    if (destCat.periodo) {
+      if (prodFalta(!dIni, 'admProdData', 'A <b>mentoria</b> é como uma turma online — informe a <b>data de início</b>.')) return;
+      if (prodFalta(!dFim, 'admProdDataFim', 'A <b>mentoria</b> precisa também da <b>data de término</b>.')) return;
+      if (prodFalta(dFim < dIni, 'admProdDataFim', 'O <b>término</b> da mentoria precisa ser depois do início.')) return;
+    }
+    /* SALVAR EDIÇÃO: atualiza no lugar, sem tirar da Loja */
+    if (admProdEdit) {
+      var ref = admProdEdit.ref;
+      if (nome !== ref.nome && (ITENS_PRESENCIAIS.concat(LOJA_EXTRAS).some(function (p) { return p !== ref && p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]:not([data-turma])'))) {
+        toast('Já existe outro item com esse nome na Loja.'); return;
+      }
+      ref.nome = nome; ref.desc = desc; ref.preco = preco; ref.moeda = moeda; ref.icone = icone;
+      if (destCat.data) { ref.dataISO = dIni; ref.ate = destCat.periodo ? dFim : ''; }
+      if (destCat.data && dIni) { PROD_AGENDA[nome] = { dataISO: dIni, ate: destCat.periodo ? dFim : '', rot: destCat.rot.split('·')[0].trim() }; }
+      if (admProdEdit.tipo === 'pres' && qtd && qtd >= 1) ref.estoque = qtd;
+      if (admProdEdit.tipo === 'pres') renderPresenciais(); else renderLojaExtras();
+      $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
+      admProdEditReset();
+      renderAdmProdList();
+      if (typeof renderPrecos === 'function') renderPrecos();
+      toast('“' + nome + '” atualizado na Loja.');
+      return;
+    }
+    if (ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) || LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+      toast('Já existe um item com esse nome na Loja.'); return;
+    }
+    var dest = destCat;
+    var dataAt = dIni;
+    if (dest.data && dataAt) { PROD_AGENDA[nome] = { dataISO: dataAt, ate: dest.periodo ? dFim : '', rot: dest.rot.split('·')[0].trim() }; }
+    if (dest.via === 'pres') {
+      if (prodFalta(!qtd || qtd < 1, 'admProdQtd', 'Item de retirada na recepção precisa de <b>quantidade em estoque</b>.')) return;
+      ITENS_PRESENCIAIS.push({ id: 'p' + Date.now(), nome: nome, desc: desc, preco: preco, moeda: moeda, icone: icone, estoque: qtd, cat: dest.cat, estado: 'disp' });
+      renderPresenciais();
+    } else {
+      /* itens digitais não têm estoque — ficam disponíveis até serem removidos */
+      LOJA_EXTRAS.push({ nome: nome, desc: desc, cat: dest.cat, preco: preco, moeda: moeda, icone: icone,
+        dataISO: dest.data ? dataAt : '', ate: dest.periodo ? dFim : '' });
+      renderLojaExtras();
+    }
+    $('admProdNome').value = ''; $('admProdDesc').value = ''; $('admProdPreco').value = ''; $('admProdQtd').value = '';
+    if ($('admProdData')) $('admProdData').value = '';
+    if ($('admProdDataFim')) $('admProdDataFim').value = '';
+    renderAdmProdList();
+    if (typeof renderPrecos === 'function') renderPrecos();   /* entra também no editor de preços */
+    admAlerta('admProdErro', '<b>' + nome + '</b> publicado em “' + dest.rot + '”, em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') +
+      (dest.periodo && dFim ? ' — de ' + dataBRcompleta(dataAt) + ' a ' + dataBRcompleta(dFim) + ', no calendário de quem comprar.'
+       : dest.data && dataAt ? ' — com data, entra no calendário de quem comprar.' : '.'), true);
+    toast('Publicado em “' + dest.rot + '” · em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') +
+      (dest.data && dataAt ? ' — com data, entra no calendário de quem comprar.' : '.'));
+  });
+  /* seletor de ícones do formulário de produto */
+  var admProdIcone = 'presencial';
+  (function () {
+    var host = $('admProdIcones'); if (!host) return;
+    var ordem = ['turma', 'aula', 'aulao', 'evento', 'simulado', 'garrafinha', 'modulo', 'vademecum', 'chaveiro', 'camiseta', 'caneca', 'medalha', 'boina', 'farda', 'colete', 'fuzil', 'presencial'];
+    host.innerHTML = ordem.map(function (k, i) {
+      return '<button type="button" class="ico-opt' + (k === admProdIcone ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
+    }).join('');
+    if (ordem.indexOf(admProdIcone) < 0) { host.querySelector('.ico-opt').classList.add('sel'); admProdIcone = ordem[0]; }
+    host.querySelectorAll('.ico-opt').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        admProdIcone = bt.dataset.ico;
+        host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+      });
+    });
+  })();
+  renderLojaExtras();
+
+  /* ---------- criador de skins (Painel interno) ----------
+     A skin publicada entra em Itens do personagem, com confirmação de
+     compra e preço em QdC ou Dmn. Aplicação no boneco é da V1.           */
+  var admSkIco = 'boina';
+  function renderSkinsAdm() {
+    var el = $('admSkinList'); if (!el) return;
+    var sk = LOJA_EXTRAS.filter(function (p) { return p.skin; });
+    var cb = (typeof ITENS_COMBATE !== 'undefined') ? ITENS_COMBATE.filter(function (i) { return i.criado; }) : [];
+    el.innerHTML = sk.map(function (p) {
+      return '<div class="adm-bar"><span class="nm">' + p.nome + ' <span class="tag">SKIN</span>' +
+        '<small>' + p.desc + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
+        '<button class="adm-x" data-rm-skin="' + p.nome + '" aria-label="Remover">✕</button></div>';
+    }).join('') + cb.map(function (i) {
+      return '<div class="adm-bar"><span class="nm">' + i.nome + ' <span class="tag gold">COMBATE</span>' +
+        '<small>' + i.desc + ' · ' + fmt(i.preco) + ' QdC · vai para a mochila</small></span>' +
+        '<button class="adm-x" data-rm-comb="' + i.id + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma skin ou item de combate criado ainda.</p>';
+    el.querySelectorAll('[data-rm-skin]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== b.dataset.rmSkin; });
+        renderLojaExtras(); renderSkinsAdm();
+        toast('Skin “' + b.dataset.rmSkin + '” removida da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-rm-comb]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var it = ITENS_COMBATE.filter(function (x) { return x.id === b.dataset.rmComb; })[0];
+        ITENS_COMBATE = ITENS_COMBATE.filter(function (x) { return x.id !== b.dataset.rmComb; });
+        /* item fora do catálogo sai também das mochilas — senão a mochila
+           tenta desenhar um item que não existe mais e quebra           */
+        if (typeof MOCHILA !== 'undefined') MOCHILA = MOCHILA.filter(function (x) { return x !== b.dataset.rmComb; });
+        renderLojaCombate(); renderSkinsAdm();
+        if (typeof renderMochila === 'function') renderMochila();
+        toast('Item de combate “' + (it ? it.nome : '') + '” removido da Loja.');
+      });
+    });
+  }
+  (function () {
+    var host = $('admSkIcones'); if (!host) return;
+    var ordem = ['boina', 'camiseta', 'farda', 'colete', 'fuzil', 'medalha'];
+    host.innerHTML = ordem.map(function (k) {
+      return '<button type="button" class="ico-opt' + (k === admSkIco ? ' sel' : '') + '" data-ico="' + k + '">' + ICON_CAT[k] + '</button>';
+    }).join('');
+    host.querySelectorAll('.ico-opt').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        admSkIco = bt.dataset.ico;
+        host.querySelectorAll('.ico-opt').forEach(function (x) { x.classList.remove('sel'); });
+        bt.classList.add('sel');
+      });
+    });
+    var skMoeda = $('admSkMoeda');
+    function skPrecoLabel() {
+      var comb = $('admSkTipo') && $('admSkTipo').value === 'combate';
+      var mo = comb ? 'qdc' : (skMoeda ? skMoeda.value : 'qdc');
+      $('admSkPreco').placeholder = 'Preço em ' + (mo === 'dmn' ? 'Diamantes' : 'Quad Coins');
+    }
+    if (skMoeda) skMoeda.addEventListener('change', skPrecoLabel);
+    var skTipo = $('admSkTipo');
+    if (skTipo) skTipo.addEventListener('change', function () {
+      var comb = skTipo.value === 'combate';
+      skPrecoLabel();
+      $('admSkMoeda').style.display = comb ? 'none' : '';
+      $('admSkNome').placeholder = comb ? 'Nome do item (ex.: Rádio comunicador)' : 'Nome da skin (ex.: Boina de instrutor)';
+      $('admSkDesc').placeholder = comb ? 'Descrição curta (ex.: comunicação em campo)' : 'Descrição curta (ex.: edição limitada)';
+      $('btnAdmSkin').textContent = comb ? 'Publicar item de combate' : 'Publicar skin';
+    });
+    $('btnAdmSkin').addEventListener('click', function () {
+      var nome = $('admSkNome').value.trim(), desc = $('admSkDesc').value.trim();
+      var ehCombate = $('admSkTipo') && $('admSkTipo').value === 'combate';
+      var moeda = ehCombate ? 'qdc' : $('admSkMoeda').value;   /* mochila é sempre em Quad Coins */
+      var preco = parseInt($('admSkPreco').value, 10);
+      if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao item.'); return; }
+      if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+      if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) ||
+          (typeof ITENS_COMBATE !== 'undefined' && ITENS_COMBATE.some(function (p) { return p.nome === nome; })) ||
+          document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
+        toast('Já existe um item com esse nome na Loja.'); return;
+      }
+      if (ehCombate) {
+        ITENS_COMBATE.push({ id: 'cb' + Date.now(), nome: nome, desc: desc || 'utilitário de campo', preco: preco, ico: admSkIco, criado: true });
+        renderLojaCombate(); renderSkinsAdm();
+        $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = '';
+        toast('Item de combate “' + nome + '” publicado — vai para a mochila de quem comprar.');
+        return;
+      }
+      LOJA_EXTRAS.push({ nome: nome, desc: desc || 'skin do personagem', cat: 'personagem', preco: preco, moeda: moeda, icone: admSkIco, skin: true });
+      renderLojaExtras(); renderSkinsAdm();
+      if (typeof renderPrecos === 'function') renderPrecos();
+      $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = '';
+      toast('Skin “' + nome + '” publicada em Itens do personagem.');
+    });
+  })();
+  renderSkinsAdm();
+
+  /* ---------- Quests · estrutura reservada ---------- */
+  $('btnAdmQuests').addEventListener('click', function () {
+    toast('Quests — missões especiais da administração. Próxima implementação.');
+  });
+  renderPresenciais();
+  renderIsoladas();
+  renderEventosLoja();   /* vitrine de eventos pagos (ICON_CAT já existe aqui) */
+  renderAdmProdList();
+

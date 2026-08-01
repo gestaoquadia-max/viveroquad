@@ -1,0 +1,550 @@
+
+<script>
+(function () {
+  var score = 1240;   // Quad Coins (moeda da Loja — NÃO é o score de carreira)
+
+  /* ==================================================================
+     MÓDULO GAMIFICAÇÃO · configuração central (o admin ajustará no
+     sistema real — nada de valores fixos espalhados pelo código)
+     ================================================================== */
+  var GAMI = {
+    provaQuestoes: 20,
+    tentativaHoras: 24,
+    fases: [
+      { nome: 'Formação inicial',     notaMin: 0.70 },
+      { nome: 'Formação de liderança', notaMin: 0.75 },
+      { nome: 'Formação de oficial',  notaMin: 0.80 },
+      { nome: 'Alto comando',         notaMin: 0.85 }
+    ],
+    // pontos = score necessário para liberar a prova rumo à PRÓXIMA patente
+    patentes: [
+      { nome: 'Aluno Soldado Quad',   abrev: 'AL SD',  fase: 0, pontos: 900 },
+      { nome: 'Soldado Quad',         abrev: 'SD',     fase: 0, pontos: 3300 },
+      { nome: 'Aluno Cabo Quad',      abrev: 'AL CB',  fase: 0, pontos: 4200 },
+      { nome: 'Cabo Quad',            abrev: 'CB',     fase: 0, pontos: 5500 },
+      { nome: 'Aluno Sargento Quad',  abrev: 'AL SGT', fase: 1, pontos: 7000 },
+      { nome: 'Sargento Quad',        abrev: 'SGT',    fase: 1, pontos: 8500 },
+      { nome: 'Subtenente Quad',      abrev: 'ST',     fase: 1, pontos: 9500 },
+      { nome: 'Aluno Oficial Quad',   abrev: 'AL OF',  fase: 2, pontos: 11000 },
+      { nome: 'Aspirante Quad',       abrev: 'ASP',    fase: 2, pontos: 12500 },
+      { nome: 'Tenente Quad',         abrev: 'TEN',    fase: 2, pontos: 12500 },
+      { nome: 'Capitão Quad',         abrev: 'CAP',    fase: 3, pontos: 12500 },
+      { nome: 'Major Quad',           abrev: 'MAJ',    fase: 3, pontos: 12500 },
+      { nome: 'Tenente-Coronel Quad', abrev: 'TC',     fase: 3, pontos: 12500 },
+      { nome: 'Coronel Quad',         abrev: 'CEL',    fase: 3, pontos: null }  // patente máxima
+    ]
+  };
+
+  // estado do aluno (simulado; no sistema real vem validado do servidor —
+  // a interface nunca decide sozinha quantos pontos foram conquistados)
+  var carreira = {
+    nomeCompleto: 'Danilo Ribeiro Moura',
+    nomeGuerra: 'Moura',
+    patenteIdx: 0,
+    scorePatente: 620,
+    scoreCarreira: 620,
+    scoreTemporada: 310,
+    estado: 'acumulando', // acumulando · disponivel · aguardando-fiscal · prova · bloqueada
+    provaBloqueadaAte: null,
+    historico: [ { patente: 'Aluno Soldado Quad', data: '10/07/2026', obs: 'entrada no aplicativo' } ]
+  };
+  function patenteAtual() { return GAMI.patentes[carreira.patenteIdx]; }
+  function proximaPatente() { return GAMI.patentes[carreira.patenteIdx + 1] || null; }
+  function tituloCompleto() { return patenteAtual().nome + ' ' + carreira.nomeGuerra; }
+  function nomeCurto() {
+    var g = carreira.nomeGuerra ? carreira.nomeGuerra : '______';   /* sem nome de guerra ainda → lacuna */
+    return (patenteAtual().abrev + ' QUAD ' + g).toUpperCase();
+  }
+
+  // ---- estado de acesso e conectividade (SIMULADO no front-end) ----
+  // [INTEGRAÇÃO REAL] trocar por: verificação no servidor, envio de e-mail,
+  // biometria nativa e fila de sincronização. Aqui tudo é mock no navegador.
+  var online = true;          // rede simulada (alternável pelo toggle da statusbar)
+  var currentEmail = '';      // e-mail do fluxo de acesso em andamento
+  var scenario = 'ativo';     // ativo | dificuldade | nao_ativado
+  var pendingRunTour = false; // se o próximo entrarApp deve rodar o tour
+  var CODE_OK = '123456';     // código de demonstração aceito
+  // persistência simulada só no navegador
+  var LS = { auth: 'vq_device_authorized', sync: 'vq_last_sync', pend: 'vq_pending' };
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+  var deviceAuthorized = lsGet(LS.auth) === '1';
+  var pendingAnswers = parseInt(lsGet(LS.pend) || '0', 10) || 0;
+
+  function $(id) { return document.getElementById(id); }
+  function fmt(n) { return n.toLocaleString('pt-BR'); }
+
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('go');
+    void t.offsetWidth;
+    t.classList.add('go');
+    if (typeof queueSync === 'function') queueSync(); // estado mudou → replica nos clones do loop
+  }
+
+  function addScore(n, msg) {
+    score += n;
+    $('scoreVal').textContent = fmt(score);
+    $('scorePerfil').textContent = fmt(score);
+    var ls = $('lojaSaldo'); if (ls) ls.textContent = fmt(score);
+    var pop = $('scorePop');
+    pop.textContent = (n > 0 ? '+' : '') + n;
+    pop.classList.remove('go');
+    void pop.offsetWidth;
+    pop.classList.add('go');
+    if (msg) toast(msg);
+  }
+
+  /* ---------- Diamante: moeda comprada em dinheiro (site/gift card) ----------
+     Não é conquistado em missões. Chega por recarga do site (checkout) ou por
+     gift card presencial de liberação única. [INTEGRAÇÃO REAL] crédito do site */
+  var diamantes = 150;   // recarga vinda do checkout do site (demo)
+  function addDiamante(n, msg) {
+    diamantes += n;
+    var el = $('dmnVal'); if (el) el.textContent = fmt(diamantes);
+    var ls = $('lojaSaldoDmn'); if (ls) ls.textContent = fmt(diamantes);
+    if (msg) toast(msg);
+    if (typeof queueSync === 'function') queueSync();
+  }
+  /* [DEMO] códigos de recarga usados só para demonstrar a tela — os gift cards
+     de verdade nascem em lote no Painel de controle, no formato QG<lote>-<código>. */
+  var GIFT_CARDS = { 'QUAD-100': 100, 'QUAD-500': 500 };
+  var giftUsados = {};
+  var GIFT_LOTES = [];   /* lotes criados no Painel de controle: cada código com QR e liberação única */
+  function giftDoLote(c) {
+    for (var i = 0; i < GIFT_LOTES.length; i++) {
+      var g = GIFT_LOTES[i].codes.filter(function (x) { return x.c === c; })[0];
+      if (g) return { g: g, lote: GIFT_LOTES[i] };
+    }
+    return null;
+  }
+  function resgatarGift(codigo) {
+    var c = (codigo || '').trim().toUpperCase();
+    var hit = giftDoLote(c);
+    if (hit) {
+      if (hit.g.usado) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
+      hit.g.usado = true;   /* invalida o QR na mesma hora */
+      if (hit.lote.moeda === 'dmn') addDiamante(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Diamantes!');
+      else addScore(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Quad Coins!');
+      if (typeof renderGiftLotes === 'function') renderGiftLotes();
+      return true;
+    }
+    if (!GIFT_CARDS[c]) { toast('Gift card inválido — confira o código.'); return false; }
+    if (giftUsados[c]) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
+    giftUsados[c] = true;
+    addDiamante(GIFT_CARDS[c], 'Gift card resgatado — +' + GIFT_CARDS[c] + ' Diamantes!');
+    return true;
+  }
+
+  /* ---------- turmas: catálogo da Quad Store + matrículas do aluno ----------
+     Turma nasce no Painel de controle e vende em DUAS moedas com vagas
+     separadas (gerais − QdC = Dmn). Matrícula bloqueia o turno; sem
+     matrícula ativa, o app trava até entrar numa nova turma.            */
+  /* banco de professores (Painel de controle) — fonte de verdade do corpo
+     docente. Alimenta a criação de turmas e a área do professor.        */
+  var DOCENTES = [
+    { nome: 'Danilo Moura',        materias: ['Direito Administrativo', 'Direito Constitucional'], turnos: ['manhã', 'noite'], grad: 'Especialista em Direito Público', fone: '(71) 9 8877-2301', desligado: false, bloqueado: false },
+    { nome: 'Cap. Silva',          materias: ['Direito Penal', 'Direito Penal Militar'],           turnos: ['noite'],          grad: 'Bacharel em Direito',              fone: '(71) 9 8811-1020', desligado: false, bloqueado: false },
+    { nome: 'Prof. Ferraz',        materias: ['Matemática', 'Informática'],                        turnos: ['manhã', 'tarde'], grad: 'Mestre em Matemática',             fone: '(71) 9 8822-3040', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ritha Galvão', materias: ['Língua Portuguesa', 'Redação oficial'],             turnos: ['manhã', 'tarde', 'noite'], grad: 'Doutora em Letras',       fone: '(71) 9 8833-5060', desligado: false, bloqueado: false },
+    { nome: 'Prof. Nascimento',    materias: ['História', 'Geografia', 'Direitos Humanos'],         turnos: ['tarde', 'noite'], grad: '',                                 fone: '(71) 9 8844-7080', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ana Beatriz',  materias: ['Língua Inglesa', 'Direito Processual Penal'],        turnos: ['noite'],          grad: 'Especialista em Idiomas',          fone: '(71) 9 8855-9010', desligado: false, bloqueado: false }
+  ];
+  function docenteDe(nome) { return DOCENTES.filter(function (d) { return d.nome === nome; })[0]; }
+  function docentesAtivos() { return DOCENTES.filter(function (d) { return !d.desligado; }); }
+  function matNorm(x) { return (x || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  function materiaCasa(docMat, treeMat) {
+    var a = matNorm(docMat), b = matNorm(treeMat);
+    return a === b || b.indexOf(a) === 0 || a.indexOf(b) === 0;   /* "Matemática" cobre "Matemática e Raciocínio Lógico" */
+  }
+  function docentesDaMateria(mat) {
+    return docentesAtivos().filter(function (d) {
+      return d.materias.some(function (m) { return materiaCasa(m, mat); });
+    });
+  }
+  /* PROFESSORES continua existindo (usado como fallback) e reflete os ativos */
+  var PROFESSORES = DOCENTES.map(function (d) { return d.nome; });
+  function sincProfessores() {
+    PROFESSORES.length = 0;
+    docentesAtivos().forEach(function (d) { PROFESSORES.push(d.nome); });
+  }
+  sincProfessores();
+  var TURMAS_LOJA = [
+    { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'Turma de nivelamento', sala: 'Sala 1', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 145, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'Turma regular', sala: 'Sala 2', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 75, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
+    { id: 'bope-n',    nome: 'Turma BOPE',    tipo: 'BOPE',    tipoDesc: 'Turma de questões', sala: 'Sala 3', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2600, precoQdc: 2800, vagasDmn: 115, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'rondesp-m', nome: 'Turma RONDESP Manhã', tipo: 'RONDESP', tipoDesc: 'Turma de nivelamento', sala: 'Sala 1', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 600, precoQdc: 700, vagasDmn: 54, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'bope-m',    nome: 'Turma BOPE Manhã',    tipo: 'BOPE',    tipoDesc: 'Turma de questões',    sala: 'Sala 2', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 800, precoQdc: 900, vagasDmn: 44, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' }
+  ];
+  /* o aluno da demo veio do site já matriculado na PATAMO Noite (CFO) */
+  var MATRICULAS = [{ turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' }];
+  function turmaDe(id) { return TURMAS_LOJA.filter(function (t) { return t.id === id; })[0]; }
+  function hojeISO() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  function matriculasAtivas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return !m.fim || m.fim >= h; }); }
+  /* ---------- turma ATIVA: por qual matrícula o app fala ----------
+     O aluno pode ter mais de uma turma. Uma delas comanda a tela —
+     Aula de hoje, avisos, ranking da sala, Domínio e quiz — e ele troca
+     quando quiser, sem sair da conta. Antes valia sempre a matrícula
+     mais antiga, e a turma nova entrava muda.                        */
+  var turmaAtivaId = 'patamo-n';
+  function turmaAtiva() {
+    var ats = matriculasAtivas();
+    if (!ats.length) { turmaAtivaId = null; return null; }
+    var m = ats.filter(function (x) { return x.turmaId === turmaAtivaId; })[0] || ats[0];
+    turmaAtivaId = m.turmaId;
+    return turmaDe(m.turmaId) || null;
+  }
+  function definirTurmaAtiva(id, silencioso) {
+    var m = matriculasAtivas().filter(function (x) { return x.turmaId === id; })[0];
+    if (!m) return false;
+    turmaAtivaId = id;
+    var t = turmaDe(id);
+    if (t) {
+      /* a chave do cronograma continua sendo tipo + turno; o nome e a
+         sala mostrados na Aula de hoje saem da turma de verdade      */
+      if (typeof cronoKey === 'function') ALUNO_TURMA = cronoKey(t);
+      if (typeof definirDominio === 'function' && typeof concursoDe === 'function' && concursoDe(t.concurso)) definirDominio(t.concurso);
+    }
+    if (typeof renderCarreira === 'function') renderCarreira();
+    if (typeof renderAulaHoje === 'function') renderAulaHoje();
+    if (typeof renderAvisos === 'function') renderAvisos();
+    if (typeof renderRankings === 'function') renderRankings();
+    if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+    if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
+    if (typeof refreshQuizAula === 'function') refreshQuizAula();
+    if (typeof renderCalendario === 'function') renderCalendario();
+    if (typeof renderDomTurma === 'function') renderDomTurma();
+    /* a aba Missões inteira fala pela turma ativa */
+    if (typeof trTrocaTurma === 'function') trTrocaTurma();
+    if (typeof renderDia === 'function') renderDia();          /* + heroSync */
+    if (typeof renderAtrasadas === 'function') renderAtrasadas();
+    if (!silencioso && t) toast('Você está na ' + t.nome + ' — Início, avisos, ranking e Domínio passam a ser desta turma.');
+    return true;
+  }
+  window.__turmaAtiva = function () { return turmaAtivaId; };
+  function turnoOcupadoPor(turno) {
+    var at = matriculasAtivas().filter(function (m) { return m.turno === turno; })[0];
+    return at ? ('Turma ' + at.tipo) : null;
+  }
+  var appLock = false;
+  function checarMatricula() {
+    appLock = matriculasAtivas().length === 0;
+    if (appLock) { var ml = $('matLayer'); if (ml) ml.classList.add('on'); }
+  }
+  /* exposto para a suíte de testes: simula o fim da turma sem viajar no tempo */
+  window.__mat = {
+    encerrar: function () { MATRICULAS.length = 0; checarMatricula(); if (typeof renderTurmasLoja === 'function') renderTurmasLoja(); },
+    ativas: function () { return matriculasAtivas().length; }
+  };
+
+  /* ---------- personas ---------- */
+  var personaAtiva = 'aluno';
+  var personaViews = {
+    aluno: { nav: 'navAluno', home: 'v-inicio' },
+    professor: { nav: 'navProfessor', home: 'v-prof-painel' },
+    admin: { nav: 'navAdmin', home: 'v-adm-controle' }
+  };
+  document.querySelectorAll('.persona-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.persona-btn').forEach(function (x) {
+        x.classList.remove('active'); x.setAttribute('aria-selected', 'false');
+      });
+      b.classList.add('active'); b.setAttribute('aria-selected', 'true');
+      var p = b.dataset.persona;
+      personaAtiva = p;
+      document.querySelectorAll('.app-top').forEach(function (t) {
+        t.style.display = (t.dataset.scope === p) ? 'flex' : 'none';
+      });
+      ['navAluno', 'navProfessor', 'navAdmin'].forEach(function (n) {
+        $(n).style.display = (n === personaViews[p].nav) ? 'flex' : 'none';
+      });
+      showView(personaViews[p].home, personaViews[p].nav);
+      /* cadastro específico do administrador: exige liberação da direção */
+      var ag = $('admGate');
+      if (ag) ag.classList.toggle('on', p === 'admin' && !admLiberado);
+      var pg = $('profGate');
+      if (pg) pg.classList.toggle('on', p === 'professor' && !profLiberado);
+      /* o robô de ajuda é do aluno — na área do administrador ele some */
+      /* o robô de ajuda é do aluno — some nas áreas de professor e administrador */
+      $('daniloFab').style.display = (p !== 'aluno' || (typeof tutOn !== 'undefined' && tutOn)) ? 'none' : '';
+      if (p !== 'aluno') { $('daniloHint').style.display = 'none'; }
+    });
+  });
+
+  /* dados que chegam do banco de dados geral (o aluno se cadastrou no site).
+     [INTEGRAÇÃO REAL] preenchidos a partir da matrícula ativa do aluno. */
+  var DB_ALUNO = { nome: 'Danilo de Almeida Moura', fone: '(71) 9 8877-2301' };
+
+  /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
+  var LOOP_VIEWS = ['v-inicio']; // rolagem infinita apenas no Início
+  var tourOn = false;
+  function spotlight(view) {
+    var cards = view.querySelectorAll('.p-card');
+    if (!cards.length) return;
+    /* a "engrenagem" 3D é exclusiva do Início — nas demais views (Loja,
+       Missões, Domínio, admin) os blocos ficam PLANOS, senão um card alto
+       tomba e invade o vizinho (ex.: presenciais × itens digitais). */
+    if (LOOP_VIEWS.indexOf(view.id) < 0) {
+      cards.forEach(function (c) { c.style.transform = ''; c.style.opacity = ''; c.classList.remove('spot'); });
+      return;
+    }
+    var rect = view.getBoundingClientRect();
+    var mid = rect.top + rect.height / 2;
+    var half = rect.height / 2 + 40;
+    // fase 1: só leituras (evita layout thrashing durante o scroll)
+    var offs = [], hts = [], best = null, bestD = Infinity;
+    cards.forEach(function (c, i) {
+      var r = c.getBoundingClientRect();
+      var off = (r.top + r.height / 2) - mid;
+      offs[i] = off; hts[i] = r.height;
+      var d = Math.abs(off);
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    // fase 2: só escritas
+    cards.forEach(function (c, i) {
+      var n = Math.max(-1, Math.min(1, offs[i] / half));
+      /* cards altos giram menos — senão a borda de um card gigante invade o
+         vizinho (ex.: herói da Quad Store × bloco de itens presenciais) */
+      var att = Math.min(1, 320 / Math.max(120, hts[i]));
+      c.style.transform = 'perspective(1100px) rotateX(' + (n * -7 * att).toFixed(2) + 'deg) scale(' + (1 - Math.abs(n) * 0.04 * att).toFixed(3) + ')';
+      c.style.opacity = (1 - Math.abs(n) * 0.22).toFixed(3);
+      c.classList.toggle('spot', c === best);
+    });
+  }
+  function loopPeriod(v) {
+    var segs = v.querySelectorAll(':scope > .loop-seg');
+    return segs.length > 1 ? segs[1].offsetTop - segs[0].offsetTop : 0;
+  }
+  function initLoop(v) {
+    if (v.dataset.loop) return;
+    v.dataset.loop = '1';
+    // triplica o conteúdo: [original][clone][clone] — o fim liga com o início
+    var seg = document.createElement('div');
+    seg.className = 'loop-seg';
+    while (v.firstChild) seg.appendChild(v.firstChild);
+    v.appendChild(seg);
+    var c1 = seg.cloneNode(true), c2 = seg.cloneNode(true);
+    c1.setAttribute('aria-hidden', 'true'); c2.setAttribute('aria-hidden', 'true');
+    v.appendChild(c1); v.appendChild(c2);
+    // clique num clone dispara o botão equivalente do original (mapeado pela ordem)
+    [c1, c2].forEach(function (clone) {
+      clone.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b || !clone.contains(b)) return;
+        if (Date.now() < zoomSupTs) return;   /* soltar do zoom não vira clique */
+        var i = [].indexOf.call(clone.querySelectorAll('button'), b);
+        var alvo = seg.querySelectorAll('button')[i];
+        if (alvo) { alvo.click(); queueSync(); }
+      });
+    });
+    v.scrollTop = loopPeriod(v);
+  }
+  function loopJump(v) {
+    if (tourOn || v.dataset.loop !== '1') return;
+    var H = loopPeriod(v);
+    if (!H) return;
+    if (v.scrollTop < H * 0.5) v.scrollTop += H;
+    else if (v.scrollTop > H * 1.5) v.scrollTop -= H;
+  }
+  function syncLoops() {
+    document.querySelectorAll('.view[data-loop="1"]').forEach(function (v) {
+      var segs = v.querySelectorAll(':scope > .loop-seg');
+      if (segs.length === 3) {
+        segs[1].innerHTML = segs[0].innerHTML;
+        segs[2].innerHTML = segs[0].innerHTML;
+      }
+      v.querySelectorAll('.ev-strip').forEach(function (st) {
+        if (st.scrollLeft === 0 && typeof evPeriod === 'function') st.scrollLeft = evPeriod(st);
+      });
+      if (v.classList.contains('on')) spotlight(v);
+    });
+  }
+  var syncT = null;
+  function queueSync() { clearTimeout(syncT); syncT = setTimeout(syncLoops, 300); }
+  document.querySelectorAll('.view').forEach(function (v) {
+    v.addEventListener('scroll', function () { loopJump(v); spotlight(v); }, { passive: true });
+  });
+
+  /* ---------- nav ---------- */
+  var currentView = 'v-inicio';
+  function showView(id, navId) {
+    currentView = id;
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('on'); });
+    $(id).classList.add('on');
+    if (navId) {
+      document.querySelectorAll('#' + navId + ' .nav-btn').forEach(function (nb) {
+        nb.classList.toggle('active', nb.dataset.view === id);
+      });
+    }
+    if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
+    /* área do admin abre limpa (ou no bloco que estava aberto) */
+    if (id.indexOf('v-adm-') === 0 && typeof admJumpRestaura === 'function') admJumpRestaura(id);
+    /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
+    if (id === 'v-inicio' && typeof renderAulaHoje === 'function') renderAulaHoje();
+    if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
+    if (id === 'v-loja' && typeof renderEventosLoja === 'function') renderEventosLoja(); /* e da vitrine */
+    if (id === 'v-loja' && typeof renderRelCompras === 'function') renderRelCompras();   /* relatório de compras sempre atual */
+    /* abrir Missões revalida os 7 dias: o que venceu sai de "Hoje" e entra em "Atrasadas" */
+    if (id === 'v-missoes') {
+      if (typeof renderDia === 'function') renderDia();
+      if (typeof renderAtrasadas === 'function') renderAtrasadas();
+    }
+    if (id === 'v-adm-loja' && typeof renderPrecos === 'function') renderPrecos();   /* editores nunca com preço velho */
+    if (id === 'v-adm-liber' && typeof renderAcessos === 'function') renderAcessos(); /* portaria sempre sincronizada */
+    if (id === 'v-calendario') {
+      if (typeof renderCalendario === 'function') renderCalendario();
+      /* os simulados moraram em Missões até 28/07; a casa deles é a agenda */
+      if (typeof renderSimulados === 'function') renderSimulados();
+      if (typeof renderSimHist === 'function') renderSimHist();
+    }
+    if (id.indexOf('v-prof-') === 0 && typeof renderProfTudo === 'function') renderProfTudo();
+    /* abrir a Recepção é o que marca os recados como lidos */
+    if (id === 'v-prof-chat' && typeof renderProfRecados === 'function') renderProfRecados();
+    spotlight($(id));
+  }
+  initLoop($('v-inicio'));
+  spotlight($('v-inicio'));
+  document.querySelectorAll('.nav-btn').forEach(function (nb) {
+    nb.addEventListener('click', function () {
+      if (appLock && personaAtiva === 'aluno' && nb.closest('nav').id === 'navAluno' && nb.dataset.view !== 'v-loja') {
+        toast('Funções bloqueadas — matricule-se em uma turma na Quad Store para liberar.');
+        return;
+      }
+      showView(nb.dataset.view, nb.closest('nav').id);
+    });
+  });
+
+  /* ---------- árvore do edital · CFO PM-BA ----------
+     Progresso simulado na V0, determinístico por nome (hash) com viés por matéria.
+     Regra de agregação (de baixo para cima):
+       barra do assunto  = média das barras dos sub-assuntos
+       barra da matéria  = média das barras dos assuntos                    */
+  var EDITAL_CFO = [["Língua Portuguesa",[["Interpretação de textos",["Textos verbais","Textos não verbais","Textos mistos","Textos publicitários"]],["Classes de palavras",["Nomes","Verbos","Flexões nominais","Flexões verbais","Advérbios","Preposições","Conjunções"]],["Estrutura da oração",["Frase","Oração","Período","Termos essenciais","Termos integrantes","Termos acessórios"]],["Relações entre orações",["Coordenação","Subordinação"]],["Sintaxe",["Colocação pronominal","Concordância","Regência","Crase"]],["Formas de discurso",["Discurso direto","Discurso indireto","Discurso indireto livre"]],["Semântica",["Sinonímia","Antonímia","Heteronímia"]],["Escrita correta",["Pontuação","Acentuação","Ortografia"]],["Redação oficial",["Redação técnica","Redação estilística","Correspondência oficial","Tipos de documentos","Ofício","Memorando"]]]],["Língua Inglesa",[["Interpretação de textos",["Textos verbais","Textos não verbais"]],["Substantivos",["Formação do plural","Plural regular","Plural irregular","Casos especiais","Gênero","Contáveis","Não contáveis","Formas possessivas"]],["Artigos e demonstrativos",["Artigos definidos","Artigos indefinidos","Demonstrativos","Singular e plural","Posição dos demonstrativos"]],["Adjetivos",["Grau comparativo","Grau superlativo","Formas regulares","Formas irregulares","Adjetivos indefinidos"]],["Numerais",["Cardinais","Ordinais"]],["Pronomes",["Pessoais","Sujeito","Objeto","Possessivos","Reflexivos","Indefinidos","Interrogativos","Relativos"]],["Verbos",["Verbos regulares","Verbos irregulares","Modos e tempos","Verbos auxiliares","Verbos impessoais","Verbos modais","Phrasal verbs","Voz ativa","Voz passiva","Gerúndio"]],["Estrutura das frases",["Discurso direto","Discurso indireto","Sentenças condicionais"]],["Advérbios",["Frequência","Modo","Lugar","Tempo","Intensidade","Dúvida","Afirmação","Expressões adverbiais"]],["Palavras de ligação",["Preposições","Conjunções"]],["Formação e significado das palavras",["Prefixação","Sufixação","Sinonímia","Antonímia"]]]],["Informática",[["Editores de texto",["Microsoft Word","LibreOffice Writer"]],["Planilhas eletrônicas",["Microsoft Excel","LibreOffice Calc"]],["Apresentações",["Microsoft PowerPoint","LibreOffice Impress"]],["Sistemas operacionais",["Windows 7","Windows 10","Linux"]],["Arquivos e programas",["Arquivos","Pastas","Programas","Organização de informações","Gerenciamento de informações"]],["Interface e atalhos",["Atalhos de teclado","Ícones","Área de trabalho","Lixeira"]],["Internet",["Internet","Intranet","Ferramentas de navegação","Aplicativos","Procedimentos de uso"]],["Comunicação digital",["Correio eletrônico","Computação em nuvem"]],["Segurança digital",["Certificação digital","Assinatura digital","Segurança da informação"]],["Hardware",["Componentes do computador","Processadores","Memórias","Dispositivos de armazenamento","Periféricos"]]]],["Matemática",[["Conjuntos numéricos",["Números naturais","Números inteiros","Números racionais","Números reais","Números complexos","Operações","Propriedades","Aplicações"]],["Sequências",["Sequências numéricas","Progressão aritmética","Progressão geométrica"]],["Álgebra",["Expressões algébricas","Polinômios","Operações com polinômios","Equações polinomiais","Inequações"]],["Funções",["Conceitos gerais","Função do 1º grau","Função do 2º grau","Função modular","Função exponencial","Função logarítmica","Gráficos","Propriedades"]],["Matrizes e sistemas",["Sistemas lineares","Matrizes","Determinantes","Propriedades","Aplicações"]],["Análise combinatória",["Arranjos","Permutações","Combinações","Binômio de Newton"]],["Probabilidade",["Espaço amostral","Probabilidade em conjuntos finitos"]],["Geometria plana",["Figuras geométricas","Congruência","Semelhança","Perímetro","Área"]],["Geometria espacial",["Retas e planos","Paralelismo","Perpendicularismo","Prismas","Pirâmides","Cilindros","Cones","Esferas","Áreas","Volumes"]],["Geometria analítica",["Retas","Circunferência","Distâncias"]],["Trigonometria",["Razões trigonométricas","Funções trigonométricas","Transformações","Equações","Triângulos"]],["Proporcionalidade",["Razão","Proporção","Porcentagem","Acréscimos","Descontos"]],["Matemática financeira",["Juros simples","Juros compostos"]],["Estatística",["Estatística descritiva","Tabelas","Gráficos","Tendência central","Dispersão"]],["Resolução de problemas",["Frações","Conjuntos","Porcentagens","Sequências numéricas","Sequências com figuras","Sequências com palavras"]]]],["História",[["História Geral",["Antiguidade","Mundo Medieval","Mundo Moderno","Mundo Contemporâneo"]],["História do Brasil",["Brasil Colônia","Brasil Império","Brasil República","Desenvolvimento cultural","Desenvolvimento científico"]],["Mundo atual",["Globalização","Questões ambientais","Atualidades"]],["História da Bahia",["Independência da Bahia","Revolta de Canudos","Revolta dos Malês","Conjuração Baiana","Sabinada"]]]],["Geografia",[["Sociedade e natureza",["Mecanismos da natureza","Recursos naturais","Sobrevivência humana","Distribuição dos recursos","Uso dos recursos","Preservação ambiental"]],["Espaço mundial",["Capitalismo","Industrialização","Transnacionalização do capital","Economias industriais","Economias não industriais","Desigualdades econômicas","Relação cidade-campo","Desenvolvimento tecnológico","Atuação do Estado","Organizações político-econômicas"]],["População mundial",["Mobilidade espacial","Crescimento demográfico","Divisão internacional do trabalho","Divisão territorial do trabalho"]],["Ordem mundial",["Guerra Fria","Fim da União Soviética","Nova ordem econômica mundial"]],["Espaço brasileiro",["Formação territorial","Relação com a natureza","Industrialização","Internacionalização do capital"]],["Urbanização brasileira",["Urbanização","Metropolização","Qualidade de vida"]],["Espaço agrário",["Estrutura agrária","Produção agrária","Impactos ambientais"]],["População brasileira",["Crescimento populacional","Estrutura populacional","Migrações","Condições de vida","Condições de trabalho"]],["Organização territorial do Brasil",["Atuação do Estado","Políticas territoriais","Regionalização","Desigualdades regionais"]]]],["Direito Constitucional",[["Princípios fundamentais",["Fundamentos da República","Objetivos fundamentais","Princípios constitucionais"]],["Direitos e garantias fundamentais",["Direitos individuais","Direitos coletivos","Deveres individuais","Deveres coletivos","Nacionalidade","Direitos políticos"]],["Organização do Estado",["Administração Pública","Militares dos Estados","Militares do Distrito Federal","Militares dos Territórios"]],["Defesa do Estado",["Instituições democráticas","Forças Armadas","Segurança pública"]],["Constituição do Estado da Bahia",["Servidores públicos militares","Poder Executivo","Disposições gerais","Atribuições do governador","Justiça Militar","Segurança pública"]],["Proteção constitucional",["Família","Direitos da mulher","Criança e adolescente","Pessoa idosa","Pessoa com deficiência","População negra","Povos indígenas"]]]],["Direitos Humanos",[["Sistema global de Direitos Humanos",["Declaração Universal dos Direitos Humanos","Direitos econômicos, sociais e culturais","Direitos civis e políticos"]],["Sistema Interamericano",["Convenção Americana de Direitos Humanos","Pacto de São José da Costa Rica"]],["Combate à discriminação",["Discriminação racial","Discriminação contra a mulher","Igualdade racial","Intolerância religiosa"]],["Tratados e normas",["Convenção contra a discriminação racial","Convenção contra a discriminação da mulher","Estatuto da Igualdade Racial da Bahia"]]]],["Direito Administrativo",[["Princípios administrativos",["Princípios da Administração Pública"]],["Poderes administrativos",["Poder vinculado","Poder discricionário","Poder hierárquico","Poder disciplinar","Poder regulamentar","Poder de polícia","Uso do poder","Abuso de poder"]],["Atos administrativos",["Conceito","Atributos","Requisitos","Classificação","Extinção"]],["Organização administrativa",["Órgãos públicos","Conceito de órgão","Classificação dos órgãos","Entidades administrativas","Conceito de entidade","Espécies de entidades"]],["Agentes públicos",["Conceito","Classificação"]],["Improbidade administrativa",["Lei de Improbidade Administrativa"]],["Regime dos militares estaduais",["Estatuto dos Policiais Militares da Bahia","Artigos 1º ao 92"]]]],["Direito Penal",[["Aplicação da lei penal",["Lei penal no tempo","Lei penal no espaço"]],["Teoria do crime",["Elementos do crime","Consumação","Tentativa","Desistência voluntária","Arrependimento eficaz","Arrependimento posterior","Crime impossível","Exclusão da ilicitude","Exclusão da culpabilidade"]],["Crimes contra a pessoa",["Homicídio","Lesão corporal","Rixa","Injúria"]],["Crimes contra a liberdade pessoal",["Constrangimento ilegal","Ameaça","Sequestro","Cárcere privado"]],["Crimes contra o patrimônio",["Furto","Roubo","Extorsão","Apropriação indébita","Receptação"]],["Crimes contra a dignidade sexual",["Estupro","Importunação sexual","Assédio sexual","Estupro de vulnerável","Corrupção de menores"]],["Crimes contra a paz pública",["Incitação ao crime","Apologia de crime","Apologia de criminoso"]],["Crimes contra a Administração Pública",["Peculato","Concussão","Corrupção passiva","Prevaricação","Condescendência criminosa","Resistência","Desobediência","Desacato","Corrupção ativa","Contrabando"]]]],["Direito Processual Penal",[["Princípios processuais",["Princípios do Processo Penal"]],["Inquérito policial",["Conceito","Finalidade","Procedimento"]],["Provas",["Conceito","Finalidade","Obrigatoriedade","Exame de corpo de delito"]],["Prisão",["Prisão no Código de Processo Penal","Artigos 283 a 309"]],["Contravenções penais",["Lei das Contravenções Penais","Contravenções relacionadas ao preconceito"]],["Abuso de autoridade",["Sanções civis","Sanções administrativas","Crimes","Penas"]],["Proteção da criança e do adolescente",["Estatuto da Criança e do Adolescente","Artigos indicados no edital"]],["Crimes de preconceito",["Preconceito de raça","Preconceito de cor"]],["Proteção da pessoa com deficiência",["Estatuto da Pessoa com Deficiência","Crimes previstos no estatuto"]],["Leis penais especiais",["Crimes de tortura","Estatuto da Pessoa Idosa","Lei Maria da Penha","Lei de Drogas"]]]],["Direito Penal Militar",[["Crimes militares",["Crimes militares em tempo de paz"]],["Crimes contra a autoridade e a disciplina",["Motim","Revolta","Aliciação","Incitamento","Violência contra superior","Violência contra militar de serviço","Desrespeito a superior","Desrespeito a símbolo nacional","Desrespeito à farda","Insubordinação","Resistência"]],["Crimes contra o serviço e o dever militar",["Insubmissão","Simulação de incapacidade","Criação de incapacidade física","Deserção","Abandono de posto","Descumprimento de missão","Embriaguez em serviço","Dormir em serviço"]],["Crimes contra a Administração Militar",["Desacato","Desobediência"]]]],["Direito Processual Penal Militar",[["Inquérito Policial Militar",["Instauração","Investigação militar"]],["Prisão militar",["Prisão em flagrante"]],["Processo de deserção",["Deserção em geral","Deserção de oficial","Deserção de praça","Deserção de praça graduada","Deserção de praça especial"]]]]];
+  var ED_BASE = [72, 48, 60, 55, 42, 46, 64, 52, 58, 38, 33, 28, 24];
+  /* ---------- Estrutura: concursos, editais, modalidades e turmas ----------
+     Cada concurso tem a sua árvore de edital. O CFO usa a árvore completa
+     acima; os demais trazem árvores-exemplo compactas na V0 (a árvore real
+     entra pelo lançamento do edital — [INTEGRAÇÃO REAL]). Definir o edital de
+     um concurso para a turma troca o Domínio que o aluno vê.               */
+  var EDITAL_SOLDADO = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Textos não verbais']], ['Sintaxe', ['Concordância', 'Regência', 'Crase']]]],
+    ['Matemática e Raciocínio Lógico', [['Raciocínio lógico', ['Proposições', 'Sequências']], ['Proporcionalidade', ['Razão', 'Porcentagem']]]],
+    ['Noções de Direito', [['Direito Constitucional', ['Direitos fundamentais', 'Segurança pública']], ['Direito Penal', ['Crimes contra a pessoa', 'Crimes contra o patrimônio']]]],
+    ['Atualidades e História da Bahia', [['Atualidades', ['Segurança', 'Sociedade']], ['História da Bahia', ['Independência da Bahia', 'Canudos']]]]
+  ];
+  var EDITAL_PPBA = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Coesão']], ['Gramática', ['Concordância', 'Crase']]]],
+    ['Legislação Penal', [['Execução penal', ['Lei de Execução Penal', 'Regimes']], ['Direito Penal', ['Teoria do crime', 'Penas']]]],
+    ['Direitos Humanos', [['Sistema global', ['Declaração Universal', 'Tratados']], ['Sistema penitenciário', ['Regras de Mandela', 'Ressocialização']]]]
+  ];
+  var EDITAL_PCBA = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Coesão']], ['Sintaxe', ['Concordância', 'Regência']]]],
+    ['Direito Administrativo', [['Poderes administrativos', ['Poder de polícia', 'Poder disciplinar']], ['Atos administrativos', ['Requisitos', 'Atributos']]]],
+    ['Direito Penal', [['Teoria do crime', ['Elementos', 'Tentativa']], ['Crimes contra a Administração', ['Peculato', 'Corrupção']]]],
+    ['Investigação Criminal', [['Inquérito policial', ['Instauração', 'Procedimento']], ['Cadeia de custódia', ['Coleta', 'Preservação']]]]
+  ];
+  var EDITAL_PRF = [
+    ['Língua Portuguesa', [['Interpretação de textos', ['Textos verbais', 'Argumentação']], ['Gramática', ['Concordância', 'Regência']]]],
+    ['Legislação de Trânsito', [['Código de Trânsito', ['Normas gerais', 'Infrações']], ['Habilitação', ['Categorias', 'Penalidades']]]],
+    ['Direito Administrativo', [['Princípios', ['Legalidade', 'Moralidade']], ['Poderes', ['Poder de polícia', 'Hierárquico']]]],
+    ['Física aplicada', [['Cinemática', ['Velocidade', 'Aceleração']], ['Dinâmica', ['Forças', 'Atrito']]]]
+  ];
+  var CONCURSOS = [
+    { id: 'cfo',     nome: 'PM-BA · CFO (Oficiais)',     edital: 'CFO 2024',   situacao: 'reta-final', arvore: EDITAL_CFO },
+    { id: 'sdba',    nome: 'PM-BA · Soldado',            edital: 'CFSd 2025',  situacao: 'aberto',     arvore: EDITAL_SOLDADO },
+    { id: 'sdfront', nome: 'PM Fronteiras · Soldado',    edital: '—',          situacao: 'proposta',   arvore: EDITAL_SOLDADO },
+    { id: 'ppba',    nome: 'Polícia Penal · BA',         edital: '—',          situacao: 'proposta',   arvore: EDITAL_PPBA },
+    { id: 'pcba',    nome: 'Polícia Civil · BA',         edital: 'PC-BA 2025', situacao: 'aberto',     arvore: EDITAL_PCBA },
+    { id: 'prf',     nome: 'Polícia Rodoviária Federal', edital: 'PRF 2025',   situacao: 'reta-final', arvore: EDITAL_PRF }
+  ];
+  var SITUACOES = [['aberto', 'Edital aberto'], ['proposta', 'Proposta de edital para este ano'], ['reta-final', 'Reta final · pós-edital']];
+  function situacaoNome(s) { for (var i = 0; i < SITUACOES.length; i++) if (SITUACOES[i][0] === s) return SITUACOES[i][1]; return s; }
+  /* o tipo da turma é o QUE ela é; RONDESP/PATAMO/BOPE são apelidos que o
+     Quad usa hoje e que o administrador troca no campo "Apelido"        */
+  var MODALIDADES = [
+    { id: 'RONDESP', nome: 'Turma de nivelamento', apelido: 'RONDESP', teoria: 70, questoes: 30, desc: 'mais teoria — base do conteúdo' },
+    { id: 'PATAMO',  nome: 'Turma regular',        apelido: 'PATAMO',  teoria: 50, questoes: 50, desc: 'teoria e questões equilibradas' },
+    { id: 'BOPE',    nome: 'Turma de questões',    apelido: 'BOPE',    teoria: 20, questoes: 80, desc: 'mais questões — alta intensidade' }
+  ];
+  function modalidadeDe(id) { for (var i = 0; i < MODALIDADES.length; i++) if (MODALIDADES[i].id === id) return MODALIDADES[i]; return null; }
+  /* o turno SAI do horário — não há como marcar "noite" e digitar 8h */
+  function turnoDoHorario(hi) {
+    var h = parseInt(String(hi || '').split(':')[0], 10);
+    if (isNaN(h)) return '';
+    return h < 12 ? 'manhã' : h < 18 ? 'tarde' : 'noite';
+  }
+  var EDITAL_ATUAL = EDITAL_CFO;     /* árvore que o Domínio do aluno mostra */
+  var CONCURSO_ATUAL_ID = 'cfo';
+  function concursoDe(id) { for (var i = 0; i < CONCURSOS.length; i++) if (CONCURSOS[i].id === id) return CONCURSOS[i]; return null; }
+  function edHash(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+    return h;
+  }
+  var trAj = {};   /* 'matéria|assunto' → deslocamento vindo do Treinamento Rápido */
+  function edSubPct(mi, mat, ass, sub) {
+    var base = (ED_BASE[mi] != null) ? ED_BASE[mi] : (40 + (edHash(mat) % 40));
+    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[CONCURSO_ATUAL_ID + '|' + mat + '|' + ass] || 0);
+    return Math.max(0, Math.min(100, v));
+  }
+  function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
+  /* escala térmica: 0% = vermelho → 50% = âmbar → 100% = azul Quad.
+     Curva em dois trechos para o quente dominar a metade baixa da escala. */
+  function edHue(pct) {
+    if (pct <= 50) { return Math.round((pct / 50) * 45); }        /* 0..45: vermelho → âmbar */
+    return Math.round(45 + ((pct - 50) / 50) * 172);              /* 45..217: âmbar → azul  */
+  }
+  function edFill(pct) {
+    return '<i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i>';
+  }
+  function edPcColor(pct) { return 'hsl(' + edHue(pct) + ',78%,38%)'; }
+  function edBar(pct) { return '<span class="ed-bar">' + edFill(pct) + '</span>'; }
+  function renderEdital() {
+    var box = $('editalTree');
+    if (!box) { return; }
+    var html = '';
+    EDITAL_ATUAL.forEach(function (mat, mi) {
+      var matNm = mat[0], assuntos = mat[1];
+      var assPcts = assuntos.map(function (ass) {
+        return edAvg(ass[1].map(function (sub) { return edSubPct(mi, matNm, ass[0], sub); }));
+      });
+      var matPct = edAvg(assPcts);
+      var assHtml = assuntos.map(function (ass, ai) {
+        var q = encodeURIComponent(matNm + ' ' + ass[0]);
+        var acoes = '<div class="ed-actions">' +
+          '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent('aula ' + matNm + ' ' + ass[0] + ' concurso') + '" target="_blank" rel="noopener">\u25B6 Assistir aula</a>' +
+          '<a href="https://www.qconcursos.com/questoes-de-concursos/questoes?q=' + q + '" target="_blank" rel="noopener">\u270E Fazer quest\u00F5es</a>' +
+          '</div>';
+        var subHtml = ass[1].map(function (sub) {
+          var sp = edSubPct(mi, matNm, ass[0], sub);
+          return '<div class="ed-srow"><span class="ed-nm">' + sub + '</span>' + edBar(sp) +
+                 '<span class="ed-pc" style="color:' + edPcColor(sp) + '">' + Math.round(sp) + '%</span></div>';
+        }).join('');
+        return '<div class="ed-ass">' +
+          '<button class="ed-head" type="button"><span class="chev">\u25B8</span>' +
+          '<span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + ' ' + ass[0] + '</span>' +
+          '<span class="ed-pc" style="color:' + edPcColor(assPcts[ai]) + '">' + Math.round(assPcts[ai]) + '%</span></button>' +
+          '<div class="ed-bar">' + edFill(assPcts[ai]) + '</div>' +
+          '<div class="ed-sublist">' + acoes + subHtml + '</div></div>';
+      }).join('');
+      html += '<div class="ed-mat' + (mi === 0 ? ' open' : '') + '">' +
+        '<button class="ed-head" type="button"><span class="chev">' + (mi === 0 ? '\u25BE' : '\u25B8') + '</span>' +
+        '<span class="ed-nm">' + (mi + 1) + '. ' + matNm + '</span>' +
+        '<span class="ed-pc" style="color:' + edPcColor(matPct) + '">' + Math.round(matPct) + '%</span></button>' +
+        '<div class="ed-bar">' + edFill(matPct) + '</div>' +
+        '<div class="ed-asslist">' + assHtml + '</div></div>';
+    });
+    box.innerHTML = html;
+  }
+  renderEdital();
+  $('editalTree').addEventListener('click', function (ev) {
+    var head = ev.target.closest('.ed-head');
+    if (!head) { return; }
+    var item = head.parentElement;
+    item.classList.toggle('open');
+    head.querySelector('.chev').textContent = item.classList.contains('open') ? '\u25BE' : '\u25B8';
+    queueSync();
+  });
+

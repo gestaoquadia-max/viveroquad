@@ -1,0 +1,562 @@
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Quad Concursos · Documento-base rev. 2.3 · Protótipo navegável</div>
+    <div style="display:flex; align-items:center; gap:14px">
+      <img src="__QUAD_LOGO__" width="50" height="50" alt="" style="flex:none; border-radius:12px">
+      <h1>Viver o Quad — V0 · Prova de Vida</h1>
+    </div>
+    <p>Protótipo do escopo V0 conforme o relatório: o mínimo capaz de responder se o aluno abre o app sozinho, numa terça, sem ninguém mandar. Elementos de V1 aparecem marcados como prévia bloqueada. Alterne os três perfis do sistema abaixo.</p>
+  </header>
+
+  <div class="persona-bar" role="tablist" aria-label="Perfil do sistema">
+    <button class="persona-btn active" data-persona="aluno" role="tab" aria-selected="true">Aluno<small>usa e gera o dado</small></button>
+    <button class="persona-btn" data-persona="professor" role="tab" aria-selected="false">Professor<small>abre e fecha o quiz</small></button>
+    <button class="persona-btn" data-persona="admin" role="tab" aria-selected="false">Administrador — N.P.P.<small>turma · edital · questões</small></button>
+  </div>
+
+  <div class="stage">
+    <!-- ==================== PHONE ==================== -->
+    <div class="phone">
+      <div class="screen" id="screen">
+        <div class="statusbar">
+          <span>21:47</span>
+          <span class="sb-icons" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 20h3v-6H2Zm5 0h3V9H7Zm5 0h3V4h-3Zm5 0h3v-9h-3Z"/></svg><svg viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.2a5 5 0 0 1 7 0"/><circle cx="12" cy="18.5" r="1.1"/></svg></span>
+        </div>
+        <!-- app claro, padrão slate+azul do ecossistema Quad -->
+
+        <!-- topo identidade (aluno) -->
+        <div class="app-top idbar" data-scope="aluno">
+          <div class="id-row">
+            <button class="avatar-ring" id="btnAvatarPerfil" aria-label="Abrir o perfil do aluno">
+              <span class="insignia" id="homeAvatar" aria-hidden="true">▲</span>
+            </button>
+            <div class="who">
+              <div class="name mil" id="homeNome">AL SD QUAD MOURA</div>
+              <div class="rank-line"><span class="insig-img" id="cardInsig" aria-hidden="true"></span><span class="rank-name" id="rankNome">Aluno Soldado</span></div>
+              <button class="turma-line" id="cardTurma" aria-label="Turma em uso — toque para trocar"></button>
+            </div>
+            <div class="wallet-col">
+              <button class="coins-card" id="coinsCard" aria-label="Abrir a Loja">
+                <img class="coin-art" src="__QUAD_COIN__" alt="" aria-hidden="true">
+                <span class="coins-txt">
+                  <span class="coins-lbl">Quad Coins</span>
+                  <span class="coins-val"><span class="score-pop" id="scorePop">+30</span><span id="scoreVal">1.240</span></span>
+                </span>
+              </button>
+              <button class="dmn-card" id="dmnCard" aria-label="Diamantes — comprados no site ou com gift card">
+                <img class="dmn-art" src="__DIAMANTE__" alt="" aria-hidden="true">
+                <span class="coins-txt">
+                  <span class="coins-lbl">Diamantes</span>
+                  <span class="coins-val" id="dmnVal">150</span>
+                </span>
+              </button>
+            </div>
+          </div>
+          <div class="xp-row">
+            <span class="score-lbl">Score</span>
+            <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:68.9%"></div></div>
+            <span class="xp-num" id="xpNum">620 / 900</span>
+          </div>
+          <button class="promo-chip" id="promoChip" style="display:none">★ Promoção disponível — toque para realizar a prova</button>
+        </div>
+
+        <!-- topo professor -->
+        <div class="app-top" data-scope="professor" style="display:none">
+          <div class="insignia" aria-hidden="true">★</div>
+          <div class="who">
+            <div class="name" id="profTopNome">Professor</div>
+            <div class="rank" id="profTopSub">corpo docente do Quad</div>
+          </div>
+          <span class="tag live" id="liveTag" style="display:none">AO VIVO</span>
+        </div>
+
+        <!-- topo admin -->
+        <div class="app-top" data-scope="admin" style="display:none">
+          <div class="insignia" aria-hidden="true">⬢</div>
+          <div class="who">
+            <div class="name">Administrador</div>
+            <div class="rank">N.P.P. · camada estrutural</div>
+          </div>
+        </div>
+
+        <!-- ============ BANNER MODO OFFLINE (nível do app) ============ -->
+        <div class="offline-banner" id="offlineBanner">
+          <span class="oi" aria-hidden="true">▽</span>
+          <span id="offlineBannerText">Você está offline. Alguns conteúdos podem não aparecer até a conexão voltar.</span>
+          <span class="sync-chip" id="syncChip" style="display:none">0 respostas aguardando envio</span>
+        </div>
+
+        <!-- ============ ALUNO · INÍCIO ============ -->
+        <div class="view on" id="v-inicio">
+          <!-- aula de hoje -->
+          <div class="p-card" id="salaCard">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg></div>
+              <div class="card-eyebrow">Aula de hoje</div>
+              <span class="tag live sq" id="salaTag">SEM QUIZ ABERTO</span>
+            </div>
+            <h3 class="aula-title" id="aulaTurma">—</h3>
+            <p class="sub" id="aulaDia">—</p>
+            <div id="aulaSlots"></div>
+            <p class="sub aula-fonte" id="aulaFonte"></p>
+            <p class="sub" id="salaSub">Quando o professor abrir o quiz da aula, ele aparece aqui.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnEntrarQuiz" style="display:none">Entrar no quiz ao vivo</button></div>
+          </div>
+
+          <!-- missão principal (herói) — placa técnica chanfrada, arte de referência -->
+          <div class="p-card hero-mission">
+            <div class="hm-inner">
+              <svg class="hm-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#emblemaQuad"/></svg>
+              <div class="card-head">
+                <div class="hm-plaque" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.2v3.4M12 18.4v3.4M2.2 12h3.4M18.4 12h3.4"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+                <div class="k-label grow">Missão de hoje</div>
+                <span class="hm-status"><i class="dot" aria-hidden="true"></i><span id="missRestam">FALTAM 8</span></span>
+              </div>
+              <h2 class="mil hero-title" id="heroTitulo">Bloco da noite</h2>
+              <p class="hero-sub" id="heroSub">Complete as missões desta noite para ganhar score e Quad Coins. Avante!</p>
+              <div class="hero-prog">
+                <div class="hseg-track" id="missSegs" aria-hidden="true"></div>
+                <div class="hero-count-wrap"><span class="hero-count" id="missCount">0/8</span><span class="hero-count-lbl">missões</span></div>
+              </div>
+              <div class="hero-btn-wrap">
+                <button class="btn hero-btn" id="btnMissaoHome">Continuar missão <svg class="hb-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- avisos gerais (enviados pela administração) -->
+          <div class="p-card">
+            <div class="card-head slim">
+              <div class="hexi soft" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l8 5V5L6 10H4a1 1 0 0 0-1 1Z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
+              <div class="k-label">Avisos gerais</div>
+            </div>
+            <div id="avisosList"></div>
+          </div>
+
+          <!-- eventos da semana -->
+          <div class="p-card" id="mineCard">
+            <div class="k-label">Eventos da semana</div>
+            <div class="ev-strip" id="evStrip" aria-label="Eventos da semana — role para o lado"></div>
+            <p class="sub" style="margin-top:8px; font-size:11px">Eventos produzidos pelo Quad — cada um pontua score e Quad Coins pelas regras da sua página.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · MISSÕES ============ -->
+        <div class="view" id="v-missoes">
+          <div class="p-card" id="trCard">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="7" r="3.2"/><circle cx="18.5" cy="7" r="0.6"/><path d="M17 12.5h3M18.5 12.5V20"/><circle cx="5.5" cy="7.5" r="1.9"/><path d="M5.5 9.4V14"/><path d="m5.5 14-2 5.4M5.5 14l2.2 5.4"/><path d="m5.8 10.4 4.4-.9 3.6-.9"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">Treinamento Rápido · flashcards</div>
+                <h3 class="aula-title" style="margin:2px 0 0">Questões rápidas para revisão!</h3>
+              </div>
+            </div>
+            <p class="sub" id="trCardSub">Questões extraídas das aulas, em rodízio de 10 por assunto. Responda, veja o gabarito na hora e diga o quanto foi difícil — o baralho se adapta a você.</p>
+            <div style="margin-top:10px"><button class="btn small" id="btnTreinoRapido">Abrir treinamento</button></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Hoje · questões novas <span class="tag" id="diaTurma" style="display:none"></span></div>
+            <div class="dia-scroll">
+            <div class="mission-row" id="blocoIntroRow">
+              <div class="m-dot" id="biDot">1</div>
+              <div class="grow">
+                <div class="t">Introdução no Quad</div>
+                <div class="d" id="biDesc">3 questões · o seu primeiro score · vale uma vez, para a conta</div>
+              </div>
+              <button class="btn small" id="btnBlocoIntro">Iniciar</button>
+              <span class="tag ok" id="biFeito" style="display:none">FEITA · DA CONTA</span>
+            </div>
+            <div id="diaList"></div>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Atrasadas</div>
+            <div class="dia-scroll">
+              <div id="atrasadasList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · DOMÍNIO (prévia V1) ============ -->
+        <div class="view" id="v-dominio">
+          <div class="p-card" style="border-color:#BAE6FD">
+            <h3>Painel de Domínio <span class="tag v1">PRÉVIA · V1</span></h3>
+            <p class="sub">Edital do <strong id="domConcurso">CFO — PM-BA</strong>. Cada barra é calculada de baixo para cima: sub-assuntos alimentam o assunto, assuntos alimentam a matéria. Na V0 o sistema loga o cru; a metodologia calibrada entra na V1.</p>
+            <div class="estr-tur" id="domTurmaBox" style="display:none">
+              <span class="et-txt" id="domTurmaTxt"></span>
+              <button class="btn ghost small" id="btnDomTrocar">Trocar de turma</button>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="k-label" id="domTreeLabel">Árvore do edital · CFO · Polícia Militar da Bahia</div>
+            <div id="editalTree" class="ed-tree"></div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Quad Coin ≠ Domínio</h3>
+            <p class="sub"><strong>Quad Coin</strong> sobe por fazer (participação). <strong>Domínio</strong> sobe por acertar (evidência). Acertar não rende Quad Coin — as duas leituras nunca se confundem.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · QUADRÔMETRO ============ -->
+        <div class="view" id="v-perfil">
+          <div class="p-card">
+            <div class="k-label">Quadrômetro · sua jornada em números</div>
+            <h3 id="quadNome">Aluno Soldado Quad Moura</h3>
+            <div class="turma-line" id="quadTurma" style="margin:2px 0 6px"></div>
+            <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong id="qPos">#12</strong> da turma · presença 9/10.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Minhas turmas · matrículas ativas</div>
+            <div id="minhasTurmasList"></div>
+            <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A turma marcada <strong>EM USO</strong> é a que comanda o Início, os avisos, o Domínio, o quiz e o ranking da sala — toque em <strong>“Usar esta”</strong> na outra para trocar, sem sair da conta.</p>
+            <div class="priv-box" id="privBox">
+              <div class="priv-info">
+                <div class="priv-t">Perfil nos rankings</div>
+                <div class="priv-d" id="privDesc">Público — seu nome de guerra aparece por inteiro.</div>
+              </div>
+              <button class="priv-switch" id="btnPriv" role="switch" aria-checked="false" aria-label="Alternar entre perfil público e privado nos rankings"><span class="priv-knob"></span></button>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="k-label" id="rankSalaHead">Ranking da sala · 42 alunos</div>
+            <div id="rankSalaList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Ranking geral · 1.286 usuários</div>
+            <div id="rankGeralList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Jornada de patentes · Aluno Soldado ao Coronel</div>
+            <div id="trilhaList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Constância · últimos 7 dias</div>
+            <div style="display:flex; gap:6px; margin-top:4px">
+              <span class="tag live">S</span><span class="tag live">T</span><span class="tag live">Q</span>
+              <span class="tag">Q</span><span class="tag live">S</span><span class="tag live">S</span><span class="tag gold">HOJE</span>
+            </div>
+            <p class="sub" style="margin-top:10px">A economia (V1) premia constância — nunca volume bruto.</p>
+          </div>
+          <div class="p-card" style="opacity:0.7">
+            <div class="k-label">Telemetria desta sessão · invisível ao aluno na versão real</div>
+            <p class="sub" style="font-family:Consolas,monospace; font-size:11px" id="telemetry">origem: OPEN_ORGANIC · eventos: 14 · linha de base: ativa</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · LOJA QUAD ============ -->
+        <div class="view" id="v-loja">
+          <div class="p-card loja-hero">
+            <div class="lh-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+            <h2 class="mil lh-title">Quad Store</h2>
+            <p class="lh-sub">Todos os produtos do Quad, comprados aqui dentro — com <strong>Quad Coins</strong> (esforço) ou <strong>Diamantes</strong> (recarga do site / gift card).</p>
+            <div class="lh-saldos">
+              <span class="loja-saldo"><img src="__QUAD_COIN__" alt="" aria-hidden="true"><b id="lojaSaldo">1.240</b>&nbsp;QdC</span>
+              <span class="loja-saldo dmn"><img src="__DIAMANTE__" alt="" aria-hidden="true"><b id="lojaSaldoDmn">150</b>&nbsp;Dmn</span>
+            </div>
+            <div class="lh-gift">
+              <input class="fld" id="giftCode" placeholder="Código do gift card (ex.: QG1-4KZ7)" autocomplete="off">
+              <button class="btn small" id="btnGift">Resgatar</button>
+              <button class="btn small ghost" id="btnGiftScan">Validar pelo QR</button>
+            </div>
+          </div>
+
+          <!-- ================= ITENS PRESENCIAIS ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></svg></span>Atividades e itens · presenciais</div>
+
+            <div class="loja-sec">Turmas · modalidades do Quad</div>
+            <div class="loja-grid" id="lojaTurmas">
+              <span id="lojaTurmasCore" style="display:contents"></span>
+              <span id="lojaExtras-turmas" style="display:contents"></span>
+            </div>
+
+            <div class="loja-sec" style="margin-top:14px">Isoladas</div>
+            <div class="loja-grid"><span id="lojaIsoladas" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Simulados presenciais · na sede</div>
+            <div class="loja-grid"><span id="lojaSim-pres" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Eventos · aulões, corujões, semana insana…</div>
+            <div class="loja-grid">
+              <span id="lojaEventos-pres" style="display:contents"></span>
+              <span id="lojaExtras-eventos" style="display:contents"></span>
+            </div>
+
+            <div class="loja-sec" style="margin-top:14px">Excursões para concursos</div>
+            <div class="loja-grid"><span id="lojaPres-excursao" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Módulos · vade mecum, apostilas e cadernos</div>
+            <div class="loja-grid"><span id="lojaPres-modulos" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Treinamento para o TAF</div>
+            <div class="loja-grid"><span id="lojaPres-taf" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Outros · retirada na recepção</div>
+            <div class="loja-grid"><span id="lojaPres-outros" style="display:contents"></span></div>
+            <p class="sub" style="margin-top:8px">Produtos físicos geram <strong>pedido de retirada</strong> — a administração confirma a entrega na recepção. O <strong>estoque</strong> é definido pela administração e o item <strong>sai da Loja quando esgota</strong>.</p>
+          </div>
+
+          <!-- ================= ITENS DIGITAIS ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>Itens digitais</div>
+
+            <div class="loja-sec">Cursos online</div>
+            <div class="loja-grid">
+              <button class="loja-item" data-nome="Curso online · teoria completa" data-preco="1500" data-moeda="dmn">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m10 7 5 3.5-5 3.5Z"/></svg></span>
+                <span class="li-nome">Curso · teoria completa</span>
+                <span class="li-desc">turma online completa</span>
+                <span class="li-preco">1.500 Dmn</span>
+              </button>
+              <button class="loja-item" data-nome="Curso online · questões" data-preco="1200" data-moeda="dmn">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M7 8h10M7 12h6"/></svg></span>
+                <span class="li-nome">Curso · questões</span>
+                <span class="li-desc">turma online de questões</span>
+                <span class="li-preco">1.200 Dmn</span>
+              </button>
+              <button class="loja-item" data-nome="Curso isolado · uma matéria" data-preco="400" data-moeda="dmn">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2Z"/><path d="M19 20H6a2 2 0 0 1-2-2"/></svg></span>
+                <span class="li-nome">Curso isolado</span>
+                <span class="li-desc">uma só matéria</span>
+                <span class="li-preco">400 Dmn</span>
+              </button>
+              <span id="lojaExtras-digitais" style="display:contents"></span>
+            </div>
+
+            <div class="loja-sec" style="margin-top:14px">Simulados digitais · no app</div>
+            <div class="loja-grid"><span id="lojaSim-dig" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Mentoria</div>
+            <div class="loja-grid">
+              <span id="lojaExtras-mentoria" style="display:contents"></span>
+            </div>
+
+            <div class="loja-sec" style="margin-top:14px">Eventos online · YouTube e lives exclusivas</div>
+            <div class="loja-grid"><span id="lojaEventos-dig" style="display:contents"></span></div>
+
+            <div class="loja-sec" style="margin-top:14px">Itens do personagem</div>
+            <div class="loja-grid">
+              <button class="loja-item" data-nome="Boina exclusiva" data-preco="20">
+                <span class="li-ico"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 4-8 8-8s8 3 8 8"/><path d="M4 14h16"/><circle cx="12" cy="4.5" r="1.2"/></svg></span>
+                <span class="li-nome">Boina exclusiva</span>
+                <span class="li-desc">decoração do avatar</span>
+                <span class="li-preco">20 QdC</span>
+              </button>
+              <!-- cadeia de skins: gandola → capa de colete → fuzil → fardas CIPE · PATAMO · BOPE -->
+              <span id="skinChain" style="display:contents"></span>
+              <span id="lojaExtras-personagem" style="display:contents"></span>
+            </div>
+            <div class="loja-sec" style="margin-top:14px">Itens de combate · vão para a mochila</div>
+            <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
+            <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
+          </div>
+
+          <!-- ================= ESTORNOS · ATÉ 7 DIAS ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>Estornos · até 7 dias</div>
+            <div id="lojaEstornos"></div>
+            <p class="sub" style="margin-top:8px">Compras feitas há até <strong>7 dias</strong> podem ser estornadas — as moedas voltam para a sua conta na hora e a administração é avisada. A contagem regressiva mostra o prazo de cada item.</p>
+          </div>
+
+          <!-- ================= RELATÓRIO DE COMPRAS ================= -->
+          <div class="p-card" id="rcCard">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M15 3v5h5"/><path d="M8 13h8M8 17h5"/></svg></span>Relatório de compras</div>
+            <div class="rc-tabs" id="rcTabs">
+              <button class="rc-tab on" data-rc="7">Semanal</button>
+              <button class="rc-tab" data-rc="30">Mensal</button>
+              <button class="rc-tab" data-rc="90">Trimestral</button>
+              <button class="rc-tab" data-rc="180">Semestral</button>
+            </div>
+            <div class="rc-resumo" id="rcResumo"></div>
+            <div class="loja-sec" style="margin-top:14px">Em andamento · turmas, isoladas e mentorias</div>
+            <div id="rcAndamento"></div>
+            <div class="loja-sec" style="margin-top:14px">Comprado · aguardando retirada ou realização</div>
+            <div id="rcPendente"></div>
+            <div class="loja-sec" style="margin-top:14px">Entregue e concluído</div>
+            <div id="rcEntregue"></div>
+            <p class="sub" style="margin-top:10px">Tudo o que você comprou no período escolhido, com a <strong>situação de cada item</strong>: o que ainda espera retirada na recepção, o que já foi entregue e as <strong>turmas em andamento</strong> com a evolução do curso. Compras estornadas saem do relatório.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->
+        <div class="view" id="v-aluno">
+          <div class="p-card">
+            <div class="k-label">Classificação do aluno</div>
+            <div class="rank-tiles">
+              <div class="rank-tile">
+                <span class="rt-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <b id="rankSala">#12</b>
+                <span class="rt-lbl">na sala</span>
+                <small id="rankSalaTotal">de 42 alunos</small>
+              </div>
+              <div class="rank-tile gold">
+                <span class="rt-ico"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0Z"/><path d="M7 6H4a1 1 0 0 0-1 1c0 2.5 1.5 4 4 4.5M17 6h3a1 1 0 0 1 1 1c0 2.5-1.5 4-4 4.5"/></svg></span>
+                <b id="rankGeral">#87</b>
+                <span class="rt-lbl">geral</span>
+                <small id="rankGeralTotal">de 1.286 usuários</small>
+              </div>
+            </div>
+            <p class="sub" style="margin-top:10px">Sua posição pelo <strong>score de carreira</strong> — sobe conforme você e a tropa pontuam.</p>
+          </div>
+
+          <!-- progressão de carreira (gamificação) -->
+          <div class="p-card" id="progCard">
+            <div class="card-head">
+              <span class="insig-img big" aria-hidden="true" id="progInsig"></span>
+              <div class="grow">
+                <div class="card-eyebrow" id="progFase">Formação inicial · Patente 1 de 14</div>
+                <h3 class="aula-title" style="margin:2px 0 0" id="progTitulo">Aluno Soldado Quad Moura</h3>
+                <div class="turma-line" id="progTurma"></div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin:10px 0 6px">
+              <div class="xp-track" style="flex:1"><div class="xp-fill" id="progFill" style="width:68.9%"></div></div>
+              <span class="xp-num" id="progNum">620 / 900</span>
+            </div>
+            <div class="uso-row"><span>Score de carreira</span><b id="progCarreira">620</b></div>
+            <div class="uso-row"><span>Score da temporada (semana)</span><b id="progTemporada">310</b></div>
+            <div class="uso-row"><span>Próxima patente</span><b id="progProxima">Soldado Quad · faltam 280 pts</b></div>
+            <div class="uso-row"><span>Status</span><b id="progEstado">Acumulando score</b></div>
+            <div id="promoBox" style="display:none; margin-top:12px">
+              <div class="gate-warn" style="margin-bottom:10px; border-color:#F1D488; background:#FFF6DF; color:#9A6B00"><strong id="promoMsg">Promoção disponível para Soldado Quad</strong></div>
+              <button class="btn" id="btnProva" style="width:100%">Realizar prova de promoção</button>
+            </div>
+            <button class="btn ghost small" id="btnDiaEstudo" style="width:100%; margin-top:12px">Registrar dia de estudo (simulação · +275 pts)</button>
+            <!-- [DEMO PROVISÓRIO — REMOVER] atalho para percorrer todas as patentes -->
+            <button class="btn ghost small" id="btnDemoPatente" style="width:100%; margin-top:10px; border-color:#C99B2F; color:#9A6B00">▶ Passar prova pelo gabarito (demo) · sobe 1 patente</button>
+            <p class="sub" style="margin-top:8px">O score representa esforço — <strong>não é moeda e não promove sozinho</strong>. Ao atingir a meta, você ganha o direito à <strong>prova de promoção</strong>: acertando <strong>80%</strong> você sobe de patente na hora.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Seu personagem</div>
+            <div class="avatar-preview">
+              <img id="avPreview" alt="Personagem do aluno">
+              <span class="nametag" id="avNametag">AL SD QUAD MOURA</span>
+            </div>
+            <!-- a escolha do personagem acontece uma única vez, no tutorial; depois fica travada -->
+            <div class="avatar-grid" id="avGrid" style="display:none"></div>
+            <p class="sub" style="margin-top:10px">A <strong>boina</strong> e as <strong>skins/fardas</strong> que você conquista já aparecem vestidas na foto acima — não há o que gerenciar aqui.</p>
+            <div class="k-label" style="margin-top:16px">Mochila de combate</div>
+            <button class="mochila-btn" id="btnMochila">
+              <span class="m-ico"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M6 13h12"/><path d="M10 13v3h4v-3"/></svg></span>
+              <span class="m-txt"><b>Abrir mochila</b><small id="mochilaQtd">0 itens guardados</small></span>
+              <span class="m-chev">›</span>
+            </button>
+            <p class="sub" style="margin-top:8px"><strong>Armas, broches e utilitários</strong> comprados na Loja ficam guardados aqui na sua mochila de combate.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Dados do aluno</div>
+            <div class="login-field"><label for="nomeCompleto">Nome completo</label><input id="nomeCompleto" class="fld" value="Danilo de Almeida Moura"></div>
+            <div class="login-field" style="margin-bottom:0"><label for="foneAluno">Telefone</label><input id="foneAluno" class="fld" value="(71) 9 8877-2301" inputmode="tel"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Nome de guerra</div>
+            <div class="login-field" style="margin-bottom:0">
+              <label for="nomeGuerra">Qual é o seu nome de guerra?</label>
+              <input id="nomeGuerra" class="fld" value="Moura" maxlength="12" aria-label="Nome de guerra">
+            </div>
+            <p class="sub" style="margin-top:10px">Seu título: <strong id="gwPreview">Aluno Soldado Quad Moura</strong><br>A patente vem da sua evolução (não se escolhe) e o <strong>Quad</strong> é fixo — é a nossa casa. O <strong>nome de guerra</strong> pode ser mudado refazendo a <strong>instrução inicial</strong>, na central do QUAD.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Histórico de carreira</div>
+            <div id="histCarreira"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Conta e senha</div>
+            <p class="sub">E-mail do curso: <strong id="contaEmail">aluno@quadconcursos.com.br</strong></p>
+            <div style="display:flex; gap:8px; margin-top:10px; align-items:center">
+              <input id="novaSenha" class="fld" type="password" placeholder="Nova senha" style="flex:1" aria-label="Nova senha">
+              <button class="btn small" id="btnSenha">Alterar</button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Tempo de uso do aplicativo</div>
+            <div class="uso-row"><span>Hoje</span><b>42 min</b></div>
+            <div class="uso-row"><span>Esta semana</span><b>5h 10min</b></div>
+            <div class="uso-row"><span>Desde o primeiro acesso</span><b>37h 20min</b></div>
+            <p class="sub" style="margin-top:8px">Constância vale mais que volume — o Quadrômetro acompanha sua jornada.</p>
+          </div>
+
+          <button class="btn" id="btnSalvarPerfil" style="width:100%">Salvar alterações</button>
+          <button class="btn ghost small btn-sair-conta" id="btnSairPerfil" style="width:100%; margin-top:10px">Sair da conta</button>
+        </div>
+
+        <!-- ============ ALUNO · PRÉ-TAF ============ -->
+        <div class="view" id="v-pretaf">
+          <div class="p-card">
+            <div class="k-label">Pré-TAF · preparo físico</div>
+            <h3>Rumo ao TAF <span class="tag gold">NOVO</span></h3>
+            <p class="sub">Treinos que preparam você para as provas físicas do concurso. Registrar treino alimenta sua constância e seus Quad Coins de participação — desempenho físico não entra no Domínio.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Suas marcas vs. meta do edital</div>
+            <div class="result-bar"><span class="q" style="width:72px">Corrida 12'</span><div class="bar-track"><div class="bar-fill" style="width:87%"></div></div><span class="n" style="width:88px">2.100/2.400 m</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Barra fixa</span><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><span class="n" style="width:88px">4/5</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Flexão</span><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><span class="n" style="width:88px">18/20</span></div>
+            <div class="result-bar"><span class="q" style="width:72px">Abdominal</span><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span class="n" style="width:88px">30/35</span></div>
+            <p class="sub" style="margin-top:8px">Metas de referência do edital PC-BA 2025. Suas marcas atualizam a cada teste registrado.</p>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Treino desta semana</div>
+            <div class="mission-row">
+              <div class="m-dot done">✓</div>
+              <div class="grow"><div class="t">Corrida intervalada · 30 min</div><div class="d">Segunda · feito</div></div>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot" id="tafDot">2</div>
+              <div class="grow"><div class="t">Força · barra + flexão</div><div class="d" id="tafDesc">Hoje · 3 séries até a falha</div></div>
+              <button class="btn small" id="btnTreino">Registrar</button>
+            </div>
+            <div class="mission-row">
+              <div class="m-dot">3</div>
+              <div class="grow"><div class="t">Circuito TAF completo</div><div class="d">Sábado · simule a prova inteira</div></div>
+            </div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Teste oficial de corrida</h3>
+            <p class="sub">28/07 · 6h30 · pista do quartel. O resultado atualiza suas marcas — está no Calendário.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · CALENDÁRIO ============ -->
+        <div class="view" id="v-calendario">
+          <div class="p-card">
+            <div class="k-label">Calendário · agendamentos e momentos importantes</div>
+            <div id="calList"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Simulados</div>
+            <div class="dia-scroll">
+              <div id="simuladosList"></div>
+            </div>
+          </div>
+          <div class="p-card" id="simHistCard" style="display:none">
+            <div class="k-label">Histórico de simulados realizados</div>
+            <div id="simHistList"></div>
+          </div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Sincronizado com a plataforma</h3>
+            <p class="sub">Aulas e matrículas vêm do calendário da plataforma-base; simulados, eventos, prazos de missão e testes do Pré-TAF nascem aqui no app. Materiais de cada aula ficam na aba Materiais.</p>
+          </div>
+        </div>
+
+        <!-- ============ ALUNO · MATERIAIS ============ -->
+        <div class="view" id="v-materiais">
+          <div class="p-card">
+            <div class="k-label">Materiais das aulas · por matéria e assunto</div>
+            <p class="sub" id="matVazio" style="display:none">Nenhum material publicado ainda para as suas turmas.</p>
+          </div>
+          <div id="matLista"></div>
+          <div class="p-card" style="opacity:0.85">
+            <h3>Sempre da aula para cá</h3>
+            <p class="sub">O professor entrega o material e a coordenação publica em <strong>Atualizações do dia</strong>; ele chega aqui etiquetado por <strong>matéria e assunto</strong> — mesmo padrão do banco de questões. Sem caçar link em grupo.</p>
+          </div>
+        </div>
+

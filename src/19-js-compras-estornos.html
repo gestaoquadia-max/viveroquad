@@ -1,0 +1,250 @@
+  /* ---------- relatório de compras (último bloco da Quad Store) ----------
+     Junta o log de compras do aluno com a situação de cada coisa: pedido
+     na recepção, inscrição em simulado, evento e matrícula em turma.    */
+  var rcPeriodo = 7;
+  function rcTurmaPct(t) {
+    if (!t || !t.inicio || !t.fim) return null;
+    var ini = new Date(t.inicio).getTime(), fim = new Date(t.fim).getTime(), hj = Date.now();
+    if (!(fim > ini)) return null;
+    return Math.max(0, Math.min(100, Math.round((hj - ini) / (fim - ini) * 100)));
+  }
+  /* situação de uma compra: entregue, aguardando ou em andamento */
+  function rcSituacao(cp) {
+    var tipo = cp.tipo || 'item';
+    if (tipo === 'matricula') {
+      var t = (typeof turmaDe === 'function') ? turmaDe(cp.ref) : null;
+      var pct = rcTurmaPct(t);
+      if (t && t.fim && t.fim < hojeISO()) return { est: 'ok', txt: 'turma concluída em ' + dataBRcompleta(t.fim) };
+      return { est: 'and', pct: pct == null ? 0 : pct,
+               txt: t ? (t.turno + ' · ' + t.hor + (t.fim ? ' · até ' + dataBRcompleta(t.fim) : '')) : 'turma em andamento' };
+    }
+    if (tipo === 'pres') {
+      var pd = PEDIDOS.filter(function (x) { return x.aluno === cp.aluno && x.presId === cp.ref; })[0];
+      if (pd && pd.status === 'entregue') return { est: 'ok', txt: 'entregue na recepção' };
+      return { est: 'pend', txt: 'aguardando retirada na recepção' };
+    }
+    if (tipo === 'simulado') {
+      var sm = null; SIMULADOS.forEach(function (x) { if (x.id === cp.ref) sm = x; });
+      if (sm && (sm.realizado || sm.feito)) return { est: 'ok', txt: 'simulado realizado' };
+      if (sm && sm.tag === 'DIGITAL') return { est: 'pend', txt: 'simulado digital · pronto para responder' };
+      var ins = SIM_INSC.filter(function (x) { return x.euSou && x.simRot === (sm ? sm.rot : cp.item); })[0];
+      if (ins && ins.liberado) return { est: 'ok', txt: 'entrada liberada na sede' };
+      return { est: 'pend', txt: 'inscrito · aguardando liberação na sede' + (sm && sm.det ? ' · ' + sm.det : '') };
+    }
+    if (tipo === 'evento') {
+      var ev = null; EVENTOS.forEach(function (x) { if (x.id === cp.ref) ev = x; });
+      if (ev && typeof evAcabou === 'function' && evAcabou(ev)) return { est: 'ok', txt: 'evento realizado' };
+      /* mentoria e cursos com período viram evento de vários dias */
+      if (ev && ev.ate) return { est: 'and', pct: rcPctPeriodo(ev.dataISO, ev.ate), txt: 'de ' + dataBRcompleta(ev.dataISO) + ' a ' + dataBRcompleta(ev.ate) };
+      return { est: 'pend', txt: 'inscrito · ' + (ev ? ev.quando : 'aguardando a data') };
+    }
+    if (tipo === 'skin') return { est: 'ok', txt: 'no seu personagem' };
+    if (tipo === 'combate') return { est: 'ok', txt: 'na sua mochila de combate' };
+    /* itens digitais entram na hora */
+    var ag = PROD_AGENDA[cp.item];
+    if (ag && ag.ate) return { est: 'and', pct: rcPctPeriodo(ag.dataISO, ag.ate), txt: 'de ' + dataBRcompleta(ag.dataISO) + ' a ' + dataBRcompleta(ag.ate) };
+    return { est: 'ok', txt: 'acesso liberado na hora' };
+  }
+  function rcPctPeriodo(ini, fim) {
+    if (!ini || !fim) return 0;
+    var a = new Date(ini).getTime(), b = new Date(fim).getTime(), h = Date.now();
+    if (!(b > a)) return 0;
+    return Math.max(0, Math.min(100, Math.round((h - a) / (b - a) * 100)));
+  }
+  function rcLinha(cp, sit) {
+    return '<div class="rc-row"><span class="rc-nm">' + cp.item + '<small>' + cp.quando + ' · ' + sit.txt + '</small></span>' +
+      '<span class="rc-val">' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
+  }
+  function renderRelCompras() {
+    var host = $('rcResumo'); if (!host) return;
+    var corte = Date.now() - rcPeriodo * DIA_MS;
+    var minhas = COMPRAS.filter(function (cp) {
+      return cp.aluno === nomeCurto() && !cp.estornado && (cp.ts || 0) >= corte;
+    });
+    var qdc = 0, dmn = 0, andamento = [], pend = [], ok = [];
+    minhas.forEach(function (cp) {
+      if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor;
+      var sit = rcSituacao(cp);
+      (sit.est === 'and' ? andamento : sit.est === 'pend' ? pend : ok).push({ cp: cp, sit: sit });
+    });
+    host.innerHTML =
+      '<div class="rc-kpi"><b>' + minhas.length + '</b><span>compras</span></div>' +
+      '<div class="rc-kpi"><b>' + fmt(qdc) + '</b><span>Quad Coins</span></div>' +
+      '<div class="rc-kpi"><b>' + fmt(dmn) + '</b><span>Diamantes</span></div>' +
+      '<div class="rc-kpi"><b>' + pend.length + '</b><span>a receber</span></div>';
+    $('rcAndamento').innerHTML = andamento.map(function (x) {
+      return '<div class="rc-prog"><div class="rc-top"><span class="rc-nm">' + x.cp.item + '<small>' + x.sit.txt + '</small></span>' +
+        '<span class="rc-pct">' + (x.sit.pct || 0) + '%</span></div>' +
+        '<div class="rc-track"><i style="width:' + (x.sit.pct || 0) + '%"></i></div></div>';
+    }).join('') || '<p class="rc-vazio">Nada em andamento neste período.</p>';
+    $('rcPendente').innerHTML = pend.map(function (x) { return rcLinha(x.cp, x.sit); }).join('')
+      || '<p class="rc-vazio">Nada esperando retirada — tudo em dia.</p>';
+    $('rcEntregue').innerHTML = ok.map(function (x) { return rcLinha(x.cp, x.sit); }).join('')
+      || '<p class="rc-vazio">Nenhuma entrega concluída neste período.</p>';
+  }
+  (function () {
+    var tabs = $('rcTabs'); if (!tabs) return;
+    tabs.querySelectorAll('.rc-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        rcPeriodo = parseInt(bt.dataset.rc, 10);
+        tabs.querySelectorAll('.rc-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        renderRelCompras();
+      });
+    });
+  })();
+
+  /* ---------- estornos: até 7 dias, moedas de volta e aviso ao admin ---------- */
+  function estornoDias(cp) { return 7 - Math.floor((Date.now() - (cp.ts || 0)) / DIA_MS); }
+  function renderEstornos() {
+    var el = $('lojaEstornos'); if (!el) return;
+    /* consumida (entregue na recepção ou entrada liberada) sai daqui */
+    var minhas = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto() && !cp.estornado && !cp.consumido; });
+    el.innerHTML = minhas.map(function (cp) {
+      var dias = estornoDias(cp), i = COMPRAS.indexOf(cp);
+      var prazo = dias > 0
+        ? '<span class="tag' + (dias <= 2 ? ' warn' : '') + '">' + (dias === 7 ? 'FALTAM 7 DIAS' : dias === 1 ? 'ÚLTIMO DIA' : 'FALTAM ' + dias + ' DIAS') + '</span>'
+        : '<span class="tag">PRAZO ENCERRADO</span>';
+      var btn = dias > 0
+        ? '<button class="btn ghost small" data-est="' + i + '">Estornar</button>'
+        : '<button class="btn ghost small" disabled>Estornar</button>';
+      return '<div class="mission-row"><div class="grow"><div class="t">' + cp.item + '</div>' +
+        '<div class="d">' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + ' · ' + cp.quando + '</div></div>' + prazo + btn + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma compra recente para estornar.</p>';
+    el.querySelectorAll('[data-est]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        /* confirmação em dois toques — evita estorno sem querer */
+        if (bt.dataset.conf !== '1') {
+          bt.dataset.conf = '1'; bt.textContent = 'Confirmar estorno?'; bt.classList.add('warn');
+          setTimeout(function () { bt.dataset.conf = ''; bt.textContent = 'Estornar'; bt.classList.remove('warn'); }, 4000);
+          return;
+        }
+        estornar(+bt.dataset.est);
+      });
+    });
+  }
+  /* estornar NÃO é só devolver a moeda: o que foi comprado volta para a Loja
+     e sai da posse do aluno — cada tipo de compra desfaz do seu jeito.      */
+  function desfazerCompra(cp, mo) {
+    var tipo = cp.tipo || 'item', ref = cp.ref;
+    if (tipo === 'matricula' || / · matrícula$/.test(cp.item)) {
+      var t = turmaDe(ref) || TURMAS_LOJA.filter(function (x) { return x.nome === cp.item.replace(/ · matrícula$/, ''); })[0];
+      if (t) {
+        if (mo === 'dmn') t.vagasDmn++; else t.vagasQdc++;
+        MATRICULAS = MATRICULAS.filter(function (m) { return m.turmaId !== t.id; });
+        if (typeof renderTurmasLoja === 'function') renderTurmasLoja();
+        if (typeof checarMatricula === 'function') checarMatricula();
+        /* estornou a turma que estava EM USO? o app passa a falar pela
+           matrícula restante — turmaAtiva() se autocorrige e tudo redesenha */
+        if (typeof definirTurmaAtiva === 'function' && typeof turmaAtivaId !== 'undefined') definirTurmaAtiva(turmaAtivaId, true);
+        if (typeof renderMinhasTurmas === 'function') renderMinhasTurmas();
+        if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();   /* estornou: o material sai junto */
+      }
+      return;
+    }
+    if (tipo === 'combate') {
+      MOCHILA = MOCHILA.filter(function (x) { return x !== ref; });
+      if (typeof renderLojaCombate === 'function') renderLojaCombate();
+      if (typeof renderMochila === 'function') renderMochila();
+      return;
+    }
+    if (tipo === 'evento') {
+      var st = evState[ref];
+      if (st) { st.comprado = false; st.inscrito = false; }
+      if (typeof renderEventosLoja === 'function') renderEventosLoja();
+      if (typeof renderEvStrip === 'function') renderEvStrip();
+      if (typeof renderCalendario === 'function') renderCalendario();
+      if (typeof renderAdmEventos === 'function') renderAdmEventos();
+      return;
+    }
+    if (tipo === 'simulado') {
+      var sm = null; SIMULADOS.forEach(function (x) { if (x.id === ref) sm = x; });
+      if (sm) {
+        sm.comprado = false; sm.insc = false;
+        if (typeof SIM_INSC !== 'undefined') {   /* sai da lista da recepção */
+          var tirou = false;
+          SIM_INSC = SIM_INSC.filter(function (x) {
+            if (!tirou && x.euSou && x.simRot === sm.rot) { tirou = true; return false; }
+            return true;
+          });
+          if (typeof renderSimPres === 'function') renderSimPres();
+        }
+        if (typeof renderSimulados === 'function') renderSimulados();
+      }
+      return;
+    }
+    if (tipo === 'skin') {
+      var sk = (typeof skinDados === 'function') ? skinDados(ref) : null;
+      if (sk) {
+        lojaOwned[sk.nome] = false;
+        if (typeof skinEtapa !== 'undefined' && typeof SKIN_CADEIA !== 'undefined') {
+          var idx = -1; SKIN_CADEIA.forEach(function (x, k) { if (x.id === sk.id) idx = k; });
+          if (idx >= 0 && skinEtapa === idx + 1) { skinEtapa = idx; }
+        }
+        if (typeof fardaEscolhida !== 'undefined' && fardaEscolhida === sk.id) { fardaEscolhida = null; }
+        if (typeof renderSkins === 'function') renderSkins();
+      }
+      return;
+    }
+    if (tipo === 'pres') {
+      var pr = (typeof presDe === 'function') ? presDe(ref) : null;
+      var qtd = (cp.extra && cp.extra.qtd) ? cp.extra.qtd : 1;
+      if (pr) { pr.estoque += qtd; }
+      if (typeof PEDIDOS !== 'undefined') {
+        var achou = false;
+        PEDIDOS = PEDIDOS.filter(function (pd) {
+          if (!achou && pd.presId === ref && pd.aluno === cp.aluno) { achou = true; return false; }
+          return true;
+        });
+        if (typeof renderPedidos === 'function') renderPedidos();
+      }
+      if (typeof renderPresenciais === 'function') renderPresenciais();
+      return;
+    }
+    /* item avulso da vitrine: volta a ficar à venda, com preço e estoque de volta */
+    var el = document.querySelector('.loja-item[data-nome="' + String(ref).replace(/"/g, '') + '"]');
+    lojaOwned[ref] = false;
+    if (el) {
+      el.classList.remove('comprado');
+      var pr2 = el.querySelector('.li-preco');
+      if (pr2) pr2.textContent = fmt(parseInt(el.dataset.preco, 10)) + ' ' + moedaTxt(el.dataset.moeda === 'dmn' ? 'dmn' : 'qdc');
+      if (el.dataset.estoque) {
+        var resta = parseInt(el.dataset.estoque, 10) + 1;
+        el.dataset.estoque = resta;
+        var bd = el.querySelector('.li-estoque');
+        if (bd) bd.textContent = resta + (resta === 1 ? ' vaga' : ' vagas');
+      }
+    }
+    if (typeof refreshChips === 'function') refreshChips();
+  }
+  function estornar(i) {
+    var cp = COMPRAS[i]; if (!cp || cp.estornado || estornoDias(cp) <= 0) return;
+    cp.estornado = true;
+    var mo = cp.moeda || 'qdc';
+    if (mo === 'dmn') addDiamante(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Diamantes de volta.');
+    else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
+    desfazerCompra(cp, mo);
+    ESTORNOS.push({ aluno: cp.aluno, item: cp.item, valor: cp.valor, moeda: mo, quando: 'agora' });
+    renderEstornos(); renderCompras(); renderRelCompras();
+    if (typeof renderAdmEstornos === 'function') renderAdmEstornos();
+    toast('Estorno concluído — “' + cp.item + '” voltou para a Loja e o valor foi devolvido.');
+  }
+  var relOpen = { compras: false };
+  function compraRow(cp) {
+    return '<div class="adm-bar"><span class="nm">' + cp.item + '<small>' + cp.aluno + ' · ' + cp.quando + '</small></span>' +
+      (cp.estornado ? '<span class="tag warn">ESTORNADO</span>' : '') +
+      '<span class="pct">−' + fmt(cp.valor) + ' ' + moedaTxt(cp.moeda || 'qdc') + '</span></div>';
+  }
+  function renderCompras() {
+    var el = $('admComprasList'); if (!el) return;
+    if (!COMPRAS.length) { el.innerHTML = '<p class="sub" style="padding:8px 0">Nenhuma compra ainda.</p>'; return; }
+    var lista = relOpen.compras ? COMPRAS : COMPRAS.slice(0, 5);
+    var html = lista.map(compraRow).join('');
+    if (COMPRAS.length > 5) {
+      html += '<button class="btn ghost small rk-toggle" id="relComprasBtn">' +
+        (relOpen.compras ? 'Mostrar menos' : 'Ver completo · ' + COMPRAS.length + ' compras') + '</button>';
+    }
+    el.innerHTML = html;
+    if ($('relComprasBtn')) $('relComprasBtn').onclick = function () { relOpen.compras = !relOpen.compras; renderCompras(); };
+  }
+

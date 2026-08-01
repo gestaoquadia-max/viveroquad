@@ -1,0 +1,649 @@
+  /* ==================================================================
+     GAMIFICAÇÃO · progressão, estados, prova de promoção e histórico
+     (dados simulados; no sistema real o servidor valida tudo)
+     ================================================================== */
+  function syncNametag() {
+    var bruto = $('nomeGuerra').value.trim();
+    carreira.nomeGuerra = bruto
+      ? bruto.split(/\s+/).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ')
+      : '';   /* vazio → o card mostra a lacuna "______" até o aluno escolher */
+    $('avNametag').textContent = nomeCurto();
+    $('gwPreview').textContent = tituloCompleto();
+    $('homeNome').textContent = nomeCurto();   /* o nome principal muda ao vivo */
+  }
+  $('nomeGuerra').addEventListener('input', syncNametag);
+  $('btnSalvarPerfil').addEventListener('click', function () {
+    if (!tutOn && !tutGuerraOk()) {
+      toast('O nome de guerra precisa vir do seu nome completo — um dos nomes ou uma combinação.');
+      return;
+    }
+    syncNametag();
+    renderCarreira();
+    aplicarAvatar();
+    showView('v-inicio', 'navAluno'); // salvar leva de volta ao Início
+    toast('Perfil salvo — bem-vindo de volta ao Início!');
+  });
+
+  // 10 artes para 14 patentes: pares Aluno/efetivo compartilham a insígnia
+  // (Aluno Oficial usa a do Aspirante — sem arte própria no PDF)
+  var INSIG_MAP = [0, 0, 1, 1, 2, 2, 3, 4, 4, 5, 6, 7, 8, 9];
+  function insigPos(idx) { return (INSIG_MAP[idx] * (100 / 9)) + '% 0'; }
+  function setInsig(el, idx) { if (el) el.style.backgroundPosition = insigPos(idx); }
+
+  function estadoLabel() {
+    return { 'acumulando': 'Acumulando score', 'disponivel': 'Promoção disponível',
+             'prova': 'Prova em andamento',
+             'bloqueada': 'Nova tentativa em ' + GAMI.tentativaHoras + 'h' }[carreira.estado] || carreira.estado;
+  }
+  function renderCarreira() {
+    var p = patenteAtual(), prox = proximaPatente(), req = p.pontos;
+    var pct = req ? Math.min(100, carreira.scorePatente / req * 100) : 100;
+    // card de perfil (Início)
+    setInsig($('cardInsig'), carreira.patenteIdx);
+    setInsig($('progInsig'), carreira.patenteIdx);
+    $('homeNome').textContent = nomeCurto();
+    $('rankNome').textContent = p.nome.replace(/ Quad$/, '').toUpperCase();
+    $('cardTurma').textContent = turmaLabel();
+    /* com mais de uma matrícula, o nome da turma no topo vira o seletor */
+    var varias = (typeof matriculasAtivas === 'function') && matriculasAtivas().length > 1;
+    $('cardTurma').classList.toggle('trocavel', !!varias);
+    $('cardTurma').disabled = !varias;
+    var pt = $('progTurma'); if (pt) pt.textContent = turmaLabel();
+    var qt = $('quadTurma'); if (qt) qt.textContent = turmaLabel();
+    renderMinhasTurmas();
+    if (typeof renderDomTurma === 'function') renderDomTurma();
+    var rh = $('rankSalaHead'); if (rh) rh.textContent = 'Ranking da sala · ' + turmaLabel().replace('Turma ', '') + ' · ' + salaTotal() + ' alunos';
+    /* classificação viva: os tiles do perfil e a linha do Quadrômetro
+       seguem a turma ativa (eram números decorativos fixos)          */
+    var sT = salaTotal(), sP = salaPos(sT);
+    var e1 = $('rankSala'); if (e1) e1.textContent = '#' + sP;
+    var e2 = $('rankSalaTotal'); if (e2) e2.textContent = 'de ' + sT + ' alunos';
+    var e3 = $('qPos'); if (e3) e3.textContent = '#' + sP;
+    $('xpNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : fmt(carreira.scorePatente) + ' · patente máxima';
+    $('xpFill').style.width = pct + '%';
+    $('promoChip').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
+    // aba perfil
+    $('progFase').textContent = GAMI.fases[p.fase].nome + ' · Patente ' + (carreira.patenteIdx + 1) + ' de ' + GAMI.patentes.length;
+    $('progTitulo').textContent = tituloCompleto();
+    $('progFill').style.width = pct + '%';
+    $('progNum').textContent = req ? fmt(carreira.scorePatente) + ' / ' + fmt(req) : 'máxima';
+    $('progCarreira').textContent = fmt(carreira.scoreCarreira);
+    $('progTemporada').textContent = fmt(carreira.scoreTemporada);
+    $('progProxima').textContent = prox
+      ? prox.nome + (req && carreira.scorePatente < req ? ' · faltam ' + fmt(req - carreira.scorePatente) + ' pts' : ' · pronta para a prova')
+      : 'Patente máxima — rumo ao Prestígio';
+    $('progEstado').textContent = estadoLabel();
+    $('promoBox').style.display = (carreira.estado === 'disponivel') ? 'block' : 'none';
+    if (prox) $('promoMsg').textContent = 'Promoção disponível para ' + prox.nome;
+    // quadrômetro
+    $('quadNome').textContent = tituloCompleto();
+    $('qCarreira').textContent = fmt(carreira.scoreCarreira);
+    $('qTemporada').textContent = fmt(carreira.scoreTemporada);
+    syncNametag();
+    renderTrilha();
+    renderHistorico();
+    renderRankings();
+    queueSync();
+  }
+  function renderTrilha() {
+    var el = $('trilhaList'); if (!el) return;
+    var html = '', faseAtual = -1;
+    GAMI.patentes.forEach(function (p, i) {
+      if (p.fase !== faseAtual) { faseAtual = p.fase; html += '<div class="tr-fase">' + GAMI.fases[p.fase].nome + '</div>'; }
+      var cls = 'lock', dot = '', meta = p.pontos ? fmt(p.pontos) + ' pts' : 'máxima';
+      if (i < carreira.patenteIdx) { cls = 'done'; dot = '✓'; }
+      else if (i === carreira.patenteIdx) {
+        cls = (carreira.estado === 'disponivel') ? 'prova' : 'atual';
+        dot = (carreira.estado === 'disponivel') ? '★' : '●';
+        meta = (carreira.estado === 'disponivel') ? 'prova disponível'
+             : (p.pontos ? fmt(carreira.scorePatente) + '/' + fmt(p.pontos) + ' pts' : 'patente máxima');
+      }
+      html += '<div class="tr-item ' + cls + '"><span class="tr-dot">' + dot + '</span><span class="insig-img" style="background-position:' + insigPos(i) + '"></span><span class="tr-nome">' + p.nome + '</span><span class="tr-meta">' + meta + '</span></div>';
+    });
+    el.innerHTML = html;
+  }
+  /* rankings simulados: a posição do aluno é fixa (viria do servidor);
+     o nome e o score dele acompanham o estado real do protótipo */
+  var RK_NOMES = ['Braga','Nunes','Rocha','Teixeira','Dutra','Farias','Sales','Pires','Ramos','Costa','Lima','Souza','Prado','Viana','Barros','Melo','Freitas','Cunha','Aragão','Tavares','Xavier','Peixoto','Dantas','Moraes','Sampaio','Rezende','Queiroz','Amaral','Fontes','Guedes','Serra','Lacerda','Brandão','Camargo','Siqueira','Torres','Valente','Mattos','Azevedo','Furtado','Neves','Antunes','Ferraz','Galvão','Bastos','Coelho','Duarte','Jardim'];
+  var RK_OFF = [38,25,63,41,19,52,30,74,22,47,58,33,29,66,21,44,71,26,55,37,49,60,24,68,31,53,42,77,28,36,64,45,23,59,50,70,27,62,35,48];
+  /* ---------- perfil privado nos rankings ----------
+     Quem escolhe privado tem o nome de guerra mascarado: sobra a última
+     letra ("AL SD QUAD ****A"). No hall dos 10 primeiros a máscara cai —
+     quem chega lá precisa ser visto.                                   */
+  var perfilPrivado = false;
+  function mascararNome(nome) {
+    /* mascara só o nome de guerra (o que vem depois de QUAD) */
+    var m = /^(.*QUAD )(.+)$/.exec(nome);
+    if (!m) return nome;
+    var g = m[2];
+    if (g.length <= 1) return nome;
+    return m[1] + new Array(g.length).join('*') + g.charAt(g.length - 1);
+  }
+  /* a máscara é de MÃO DUPLA: quem se esconde também não enxerga.
+     - top 10: sempre por inteiro, para todo mundo;
+     - eu privado: do 11º em diante NÃO vejo o nome de ninguém;
+     - eu público: vejo quem também é público, e só quem escolheu
+       privado continua mascarado para mim.                            */
+  function rkNomeExibido(nome, pos, privado) {
+    if (pos <= 10) return nome;   /* hall seleto: o top 10 é sempre visto */
+    if (!privado) return nome;
+    return mascararNome(nome);
+  }
+  function rkRow(pos, nome, pts, me, top3, privado) {
+    var escondido = me ? perfilPrivado : (perfilPrivado || !!privado);
+    var exibido = rkNomeExibido(nome, pos, escondido);
+    return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
+      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
+      '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
+  }
+  function rkScores(total, meuPos, meuScore) {
+    var arr = new Array(total + 1);
+    arr[meuPos] = meuScore;
+    for (var i = meuPos - 1; i >= 1; i--) arr[i] = arr[i + 1] + RK_OFF[(i * 3) % RK_OFF.length];
+    for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, arr[j - 1] - RK_OFF[(j * 5) % RK_OFF.length]);
+    return arr;
+  }
+  /* todas as matrículas ativas do aluno — inclusive a 2ª turma comprada na Quad Store */
+  function renderMinhasTurmas() {
+    var el = $('minhasTurmasList'); if (!el) return;
+    var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    var ativa = (typeof turmaAtiva === 'function' && turmaAtiva()) ? turmaAtivaId : null;
+    el.innerHTML = ats.map(function (m) {
+      var t = (typeof turmaDe === 'function') ? turmaDe(m.turmaId) : null;
+      var nome = t ? t.nome : ('Turma ' + m.tipo);
+      var det = [(t && (t.focoNome || nomeConcurso(t.concurso))) || '', m.turno, t ? t.hor : ''].filter(Boolean).join(' · ');
+      var per = (t && t.inicio) ? (dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim)) : ('até ' + (m.fim ? dataBRcompleta(m.fim) : '—'));
+      var eh = m.turmaId === ativa;
+      return '<div class="mission-row"><div class="m-dot">◉</div>' +
+        '<div class="grow"><div class="t">' + nome + '</div><div class="d">' + det + '<br>' + per + '</div></div>' +
+        (eh ? '<span class="tag ok">EM USO</span>'
+            : '<button class="tu-troca" data-usar="' + m.turmaId + '">Usar esta</button>') + '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matrícula ativa — abra a Quad Store para entrar numa turma.</p>';
+    el.querySelectorAll('[data-usar]').forEach(function (b) {
+      b.addEventListener('click', function () { definirTurmaAtiva(b.dataset.usar); });
+    });
+  }
+  /* pop-up "por qual turma o app fala": abre logo depois da matrícula e
+     também a qualquer momento, pelo nome da turma no topo ou pelo botão
+     do Domínio (é lá que se pergunta "de qual turma é esta estrutura?") */
+  function abrirTrocaTurma(novaId) {
+    var box = $('trocaOpts'), lay = $('trocaLayer');
+    if (!box || !lay) return false;
+    var ats = matriculasAtivas();
+    if (ats.length < 2) return false;
+    var nova = novaId ? turmaDe(novaId) : null;
+    var tit = $('trocaTitulo'), d = $('trocaDesc');
+    if (tit) tit.textContent = nova ? 'Matrícula confirmada' : 'Suas turmas';
+    if (d) d.innerHTML = nova
+      ? 'Você entrou na <strong>' + nova.nome + '</strong> e já tinha outra turma. Qual delas o app deve abrir agora?'
+      : 'Você tem <strong>' + ats.length + ' turmas</strong>. Qual delas o app deve abrir?';
+    box.innerHTML = ats.map(function (m) {
+      var t = turmaDe(m.turmaId); if (!t) return '';
+      var eh = m.turmaId === turmaAtivaId;
+      return '<button class="troca-opt' + (eh ? ' on' : '') + '" data-abrir="' + m.turmaId + '">' +
+        '<b>Abrir o perfil da ' + t.nome + '</b>' +
+        '<small>' + [(t.focoNome || nomeConcurso(t.concurso)), t.turno, t.hor, t.sala].filter(Boolean).join(' · ') +
+        (eh ? ' · em uso agora' : '') + '</small></button>';
+    }).join('');
+    box.querySelectorAll('[data-abrir]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        lay.classList.remove('on');
+        definirTurmaAtiva(b.dataset.abrir);
+        /* só a matrícula leva para o Início; trocar pelo topo ou pelo
+           Domínio mantém a tela, para o aluno ver a estrutura mudar   */
+        if (nova) showView('v-inicio', 'navAluno');
+      });
+    });
+    lay.classList.add('on');
+    return true;
+  }
+  /* faixa do Domínio: de qual turma é a estrutura que está na tela */
+  function renderDomTurma() {
+    var box = $('domTurmaBox'); if (!box) return;
+    var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    var t = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+    if (!t || ats.length < 2) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    $('domTurmaTxt').innerHTML = 'Esta é a estrutura da <b>' + t.nome + '</b> — você tem ' + ats.length + ' turmas.';
+  }
+  /* os dois caminhos rápidos para trocar: o nome no topo e o Domínio */
+  (function () {
+    var ct = $('cardTurma');
+    if (ct) ct.addEventListener('click', function () { abrirTrocaTurma(null); });
+    var bd = $('btnDomTrocar');
+    if (bd) bd.addEventListener('click', function () { abrirTrocaTurma(null); });
+  })();
+  /* tocar fora não prende ninguém: fica na turma que já estava em uso */
+  (function () {
+    var lay = $('trocaLayer'); if (!lay) return;
+    lay.addEventListener('click', function (e) {
+      if (e.target !== lay) return;
+      lay.classList.remove('on');
+      var t = (typeof turmaAtiva === 'function') ? turmaAtiva() : null;
+      if (t) toast('Você segue na ' + t.nome + ' — para trocar, toque no nome da turma no topo.');
+    });
+  })();
+  /* quantos alunos a sala tem de verdade: sai da turma ATIVA do aluno */
+  function turmaPrincipal() { return (typeof turmaAtiva === 'function') ? turmaAtiva() : null; }
+  function salaTotal() {
+    var t = turmaPrincipal();
+    var n = (t && typeof turmaInscritos === 'function') ? turmaInscritos(t) : 0;
+    return Math.max(12, n);
+  }
+  function salaPos(total) { return Math.min(total, Math.max(3, Math.round(total * 0.29))); }
+  /* interruptor público × privado (bloco "Minhas turmas") */
+  (function () {
+    var bt = $('btnPriv'); if (!bt) return;
+    function pinta() {
+      bt.setAttribute('aria-checked', perfilPrivado ? 'true' : 'false');
+      var d = $('privDesc');
+      if (d) d.innerHTML = perfilPrivado
+        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong> e, em troca, <strong>também não vê o nome de ninguém</strong> do 11º lugar em diante. O <strong>hall dos 10 primeiros</strong> continua visível dos dois lados.'
+        : 'Público — seu nome de guerra aparece por inteiro e você <strong>vê o nome de quem também está público</strong>. Quem escolheu privado segue mascarado.';
+    }
+    bt.addEventListener('click', function () {
+      perfilPrivado = !perfilPrivado;
+      pinta();
+      if (typeof renderRankings === 'function') renderRankings();
+      toast(perfilPrivado
+        ? 'Perfil privado — seu nome fica mascarado e você também deixa de ver os outros, do 11º em diante.'
+        : 'Perfil público — seu nome aparece por inteiro e você volta a ver quem também está público.');
+    });
+    pinta();
+    window.__privPinta = pinta;   /* o nome de guerra pode mudar depois */
+  })();
+  var rkOpen = { sala: false, geral: false };
+  function renderRankings() {
+    var elS = $('rankSalaList'), elG = $('rankGeralList');
+    if (!elS || !elG) return;
+    // sala: o total vem da turma real do aluno (matrícula principal)
+    var sTot = salaTotal(), sPos = salaPos(sTot), sc = rkScores(sTot, sPos, carreira.scoreCarreira);
+    function salaRow(i) {
+      if (i === sPos) return rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false);
+      var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+      /* parte da sala escolheu o perfil privado (demo: 1 a cada 4) */
+      return rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3, i % 4 === 2);
+    }
+    var html = '';
+    if (rkOpen.sala) {
+      for (var i = 1; i <= sTot; i++) html += salaRow(i);
+    } else {
+      for (var i2 = sPos - 2; i2 <= sPos + 2; i2++) html += salaRow(i2);
+    }
+    html += '<button class="btn ghost small rk-toggle" id="rkSalaBtn">' + (rkOpen.sala ? 'Mostrar menos' : 'Ver ranking completo · ' + sTot + ' alunos') + '</button>';
+    elS.innerHTML = html;
+    $('rkSalaBtn').onclick = function () { rkOpen.sala = !rkOpen.sala; renderRankings(); };
+    // geral: 1.286 usuários, aluno em 87º
+    var gTot = 1286, gPos = 87;
+    var topPref = ['CEL QUAD ', 'TC QUAD ', 'MAJ QUAD ', 'CAP QUAD ', 'TEN QUAD ', 'ASP QUAD ', 'SGT QUAD ', 'SGT QUAD ', 'CB QUAD ', 'CB QUAD '];
+    var gv = rkScores(gPos + 12, gPos, carreira.scoreCarreira);
+    function geralRow(v) {
+      if (v === gPos) return rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false);
+      var pf = (v % 2 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
+      return rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false, v % 4 === 2);
+    }
+    var g = '';
+    if (rkOpen.geral) {
+      var topBase = 24870;
+      /* hall dos 10 primeiros: a máscara cai mesmo para quem é privado */
+      for (var t = 1; t <= 10; t++) g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3, t % 4 === 2);
+      g += '<div class="rk-sep">···</div>';
+      for (var v = gPos - 10; v <= gPos + 10; v++) g += geralRow(v);
+      g += '<div class="rk-sep">···</div>';
+      g += rkRow(gTot, 'AL SD QUAD ' + RK_NOMES[19], 15, false, false);
+    } else {
+      for (var v2 = gPos - 2; v2 <= gPos + 2; v2++) g += geralRow(v2);
+    }
+    g += '<button class="btn ghost small rk-toggle" id="rkGeralBtn">' + (rkOpen.geral ? 'Mostrar menos' : 'Ver ranking completo · 1.286 usuários') + '</button>';
+    elG.innerHTML = g;
+    $('rkGeralBtn').onclick = function () { rkOpen.geral = !rkOpen.geral; renderRankings(); };
+  }
+
+  function renderHistorico() {
+    var el = $('histCarreira'); if (!el) return;
+    el.innerHTML = carreira.historico.map(function (h) {
+      return '<div class="uso-row"><span>' + h.patente + (h.obs ? ' <small style="color:var(--p-dim)">(' + h.obs + ')</small>' : '') + '</span><b>' + h.data + (h.prova ? ' · ' + h.prova : '') + '</b></div>';
+    }).join('');
+  }
+  // pontos de score (esforço) — separados dos Quad Coins (moeda)
+  function addPontos(n, msg) {
+    carreira.scorePatente += n;
+    carreira.scoreCarreira += n;
+    carreira.scoreTemporada += n;
+    var req = patenteAtual().pontos;
+    if (req && carreira.scorePatente >= req && carreira.estado === 'acumulando') {
+      carreira.estado = 'disponivel';
+      toast('Promoção disponível para ' + proximaPatente().nome + '!');
+    }
+    if (msg) toast(msg);
+    renderCarreira();
+  }
+  $('btnDiaEstudo').addEventListener('click', function () {
+    addPontos(275, '+275 pts · dia de estudo registrado (simulação)');
+  });
+  $('promoChip').addEventListener('click', function () { showView('v-aluno', 'navAluno'); });
+
+  /* ---------- prova de promoção (automática, sem fiscal) ----------
+     20 questões que o aluno JÁ fez e classificou como difíceis ao longo da
+     jornada (Errei/Difícil nos flashcards). O aluno não sabe que são as
+     difíceis — vê só as questões, no mesmo formato das do tutorial.
+     Acertou 80% (16/20): sobe de patente na hora. Abaixo disso: nova
+     tentativa em 24h. */
+  var PROVA_APROV = 0.80;   /* aproveitamento mínimo para promover */
+  var prova = { qs: [], idx: 0, sel: null, hits: 0 };
+  window.__prova = prova;   /* exposto para a suíte de testes */
+  /* internos da "Bloco da noite" expostos para a suíte de testes */
+  window.__noite = {
+    blocos: diaBlocos, missoes: missoesDaNoite, heroSync: heroSync, renderDia: renderDia,
+    concluirTudo: function () { missoesDaNoite().forEach(function (x) { x.b.feito = true; }); renderDia(); heroSync(); },
+    resgatado: function () { return noiteResgatada(); }
+  };
+  function embaralhar(arr) { return arr.map(function (x) { return [Math.random(), x]; }).sort(function (a, b) { return a[0] - b[0]; }).map(function (x) { return x[1]; }); }
+  function provaNorm(c) { return { t: c.t, c: c.c, o: c.o }; }
+  function provaColeta() {
+    // 1) as que o aluno marcou como Errei (0) ou Difícil (1)
+    var dificeis = embaralhar(TR_BANK.filter(function (c) { return c.nota === 0 || c.nota === 1; }).map(provaNorm));
+    var pool = dificeis.slice(0, GAMI.provaQuestoes);
+    // 2) completa (sem repetir enunciado) para sempre fechar as 20 na demo
+    if (pool.length < GAMI.provaQuestoes) {
+      var vistos = {}; pool.forEach(function (q) { vistos[q.t] = 1; });
+      var reserva = embaralhar(TR_BANK.map(provaNorm).concat(
+        AULA_DEMO.cards.map(function (r) { return { t: r[1], c: r[0] === 'C', o: r[2] }; })));
+      for (var i = 0; i < reserva.length && pool.length < GAMI.provaQuestoes; i++) {
+        if (!vistos[reserva[i].t]) { vistos[reserva[i].t] = 1; pool.push(reserva[i]); }
+      }
+    }
+    return pool;
+  }
+  function abrirProva() {
+    if (carreira.estado === 'bloqueada') { toast('Nova tentativa disponível em ' + GAMI.tentativaHoras + 'h.'); return; }
+    if (carreira.estado !== 'disponivel') { toast('A prova abre quando você atinge a meta de score.'); return; }
+    prova.qs = provaColeta();
+    prova.idx = 0; prova.sel = null; prova.hits = 0;
+    carreira.estado = 'prova'; renderCarreira();
+    $('provaLayer').classList.add('on');
+    $('provaKicker').textContent = 'Prova de promoção';
+    renderQuestaoProva();
+  }
+  function renderQuestaoProva() {
+    var q = prova.qs[prova.idx];
+    $('provaProgress').textContent = 'Questão ' + (prova.idx + 1) + ' de ' + prova.qs.length;
+    $('provaSub').textContent = 'Responda com calma — o resultado sai no fim.';
+    $('btnProvaNext').textContent = prova.idx === prova.qs.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnProvaNext').disabled = true;
+    prova.sel = null;
+    var body = $('provaBody');
+    body.innerHTML = '';
+    var pEl = document.createElement('p');
+    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 16px;font-weight:600';
+    pEl.textContent = q.t;
+    body.appendChild(pEl);
+    [['CERTO', true], ['ERRADO', false]].forEach(function (par, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + (i === 0 ? 'C' : 'E') + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = par[0];
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel');
+        prova.sel = par[1];
+        $('btnProvaNext').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+  function resultadoProva() {
+    var minAcertos = Math.ceil(GAMI.provaQuestoes * PROVA_APROV);
+    var aprovado = prova.hits >= minAcertos;
+    var prox = proximaPatente();
+    $('provaProgress').textContent = 'Resultado';
+    $('provaSub').textContent = '';
+    var body = $('provaBody');
+    if (aprovado) {
+      var req = patenteAtual().pontos;
+      var excedente = Math.max(0, carreira.scorePatente - req);
+      carreira.patenteIdx++;
+      carreira.scorePatente = excedente;
+      carreira.estado = 'acumulando';
+      carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes });
+      body.innerHTML = '<div class="p-card" style="text-align:center">' +
+        '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
+        '<span class="insig-img xl" style="display:block;margin:0 auto 12px;background-position:' + insigPos(carreira.patenteIdx) + '"></span>' +
+        '<h3 class="mil" style="font-size:22px">Promoção confirmada</h3>' +
+        '<p class="sub" style="margin-top:8px">Parabéns, ' + (carreira.nomeGuerra || 'aluno') + '. Você foi promovido a <strong>' + prox.nome + '</strong>.</p>' +
+        '<p class="sub" style="margin-top:6px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (' + Math.round(prova.hits / GAMI.provaQuestoes * 100) + '%)' + (excedente ? ' · ' + fmt(excedente) + ' pts transferidos para a próxima etapa' : '') + '.</p></div>';
+      renderCarreira();
+      toast('PROMOÇÃO CONFIRMADA — ' + tituloCompleto());
+    } else {
+      carreira.estado = 'bloqueada';
+      carreira.provaBloqueadaAte = Date.now() + GAMI.tentativaHoras * 3600e3;
+      renderCarreira();
+      body.innerHTML = '<div class="p-card" style="text-align:center">' +
+        '<div class="gate-badge warn" style="margin:0 auto 12px">!</div>' +
+        '<h3 class="mil" style="font-size:20px">Ainda não foi desta vez</h3>' +
+        '<p class="sub" style="margin-top:8px">' + prova.hits + ' de ' + GAMI.provaQuestoes + ' acertos (' + Math.round(prova.hits / GAMI.provaQuestoes * 100) + '%). O mínimo é ' + Math.round(PROVA_APROV * 100) + '% (' + minAcertos + ' acertos). Uma nova tentativa fica disponível em ' + GAMI.tentativaHoras + ' horas.</p>' +
+        '<button class="btn ghost small" id="btnLiberarTentativa" style="margin-top:10px">Liberar nova tentativa (simulação)</button></div>';
+      var bl = document.getElementById('btnLiberarTentativa');
+      if (bl) bl.addEventListener('click', function () { carreira.estado = 'disponivel'; carreira.provaBloqueadaAte = null; renderCarreira(); toast('Nova tentativa liberada (simulação).'); });
+    }
+    $('btnProvaNext').textContent = 'Concluir';
+    $('btnProvaNext').disabled = false;
+    prova.idx = 'done';
+  }
+  $('btnProva').addEventListener('click', abrirProva);
+  $('btnProvaNext').addEventListener('click', function () {
+    if (prova.idx === 'done') { $('provaLayer').classList.remove('on'); return; }
+    if (prova.sel === prova.qs[prova.idx].c) prova.hits++;
+    if (prova.idx < prova.qs.length - 1) { prova.idx++; renderQuestaoProva(); }
+    else { resultadoProva(); }
+  });
+  $('btnSairProva').addEventListener('click', function () {
+    $('provaLayer').classList.remove('on');
+    if (carreira.estado === 'prova') {
+      carreira.estado = 'disponivel';
+      renderCarreira();
+      toast('Prova interrompida — você pode tentar novamente.');
+    }
+  });
+
+  /* ============ SIMULADO DIGITAL: quiz cronometrado ============
+     O PDF vira um quiz padrão [INTEGRAÇÃO REAL: extração do PDF]; na demo
+     as questões saem do banco. O cronômetro é o que o admin definiu; ao
+     terminar (ou zerar o tempo), pontua score + Quad Coins.               */
+  var simDig = { sm: null, qs: [], idx: 0, sel: null, hits: 0, restante: 0, timer: null };
+  function simDigColeta(nq) {
+    var pool = embaralhar(TR_BANK.map(provaNorm).concat(
+      AULA_DEMO.cards.map(function (r) { return { t: r[1], c: r[0] === 'C', o: r[2] }; })));
+    var vistos = {}, out = [];
+    for (var i = 0; i < pool.length && out.length < nq; i++) {
+      if (!vistos[pool[i].t]) { vistos[pool[i].t] = 1; out.push(pool[i]); }
+    }
+    return out;
+  }
+  function simDigFmtTempo(s) { var m = Math.floor(s / 60), ss = s % 60; return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0'); }
+  function simDigTick() {
+    simDig.restante--;
+    var t = $('simDigTimer');
+    t.textContent = simDigFmtTempo(Math.max(0, simDig.restante));
+    t.classList.toggle('urgente', simDig.restante <= 30);
+    if (simDig.restante <= 0) { clearInterval(simDig.timer); simDig.timer = null; simDigResultado(true); }
+  }
+  function abrirSimDig(sm) {
+    simDig.sm = sm;
+    simDig.qs = simDigColeta(sm.nq || 10);
+    simDig.idx = 0; simDig.sel = null; simDig.hits = 0;
+    simDig.restante = (sm.minutos || 30) * 60;
+    $('simDigLayer').classList.add('on');
+    $('simDigKicker').textContent = sm.rot;
+    $('simDigTimer').textContent = simDigFmtTempo(simDig.restante);
+    $('simDigTimer').classList.remove('urgente');
+    clearInterval(simDig.timer);
+    simDig.timer = setInterval(simDigTick, 1000);
+    renderQuestaoSimDig();
+  }
+  function renderQuestaoSimDig() {
+    var q = simDig.qs[simDig.idx];
+    $('simDigProgress').textContent = 'Questão ' + (simDig.idx + 1) + ' de ' + simDig.qs.length;
+    $('simDigSub').textContent = 'Cronômetro rodando — o resultado sai no fim.';
+    $('btnSimDigNext').textContent = simDig.idx === simDig.qs.length - 1 ? 'Finalizar' : 'Responder';
+    $('btnSimDigNext').disabled = true;
+    simDig.sel = null;
+    var body = $('simDigBody'); body.innerHTML = '';
+    var pEl = document.createElement('p');
+    pEl.style.cssText = 'font-size:14px;line-height:1.55;margin:0 0 16px;font-weight:600';
+    pEl.textContent = q.t;
+    body.appendChild(pEl);
+    [['CERTO', true], ['ERRADO', false]].forEach(function (par, i) {
+      var b = document.createElement('button');
+      b.className = 'q-alt';
+      b.innerHTML = '<span class="letter">' + (i === 0 ? 'C' : 'E') + '</span><span></span>';
+      b.querySelector('span:last-child').textContent = par[0];
+      b.addEventListener('click', function () {
+        body.querySelectorAll('.q-alt').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel'); simDig.sel = par[1]; $('btnSimDigNext').disabled = false;
+      });
+      body.appendChild(b);
+    });
+  }
+  function simDigResultado(porTempo) {
+    clearInterval(simDig.timer); simDig.timer = null;
+    var sm = simDig.sm, total = simDig.qs.length, hits = simDig.hits;
+    var scoreG = hits * 10;             /* +10 score por acerto */
+    /* Quad Coins por acerto: o que a administração definiu no lançamento
+       (padrão 2, para os simulados que não trazem o campo preenchido)   */
+    var porAcerto = sm ? simRec(sm) : 2;
+    var coinsG = hits * porAcerto;
+    if (sm) sm.feito = true;
+    carreira.scorePatente += scoreG; carreira.scoreCarreira += scoreG; carreira.scoreTemporada += scoreG;
+    if (typeof renderCarreira === 'function') renderCarreira();
+    addScore(coinsG, 'Simulado digital · +' + coinsG + ' QdC');
+    var body = $('simDigBody');
+    $('simDigProgress').textContent = 'Resultado';
+    $('simDigSub').textContent = porTempo ? 'O tempo acabou — veja como foi.' : '';
+    $('simDigTimer').classList.remove('urgente');
+    body.innerHTML = '<div class="p-card" style="text-align:center">' +
+      '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
+      '<h3 class="mil" style="font-size:20px">Simulado concluído</h3>' +
+      '<p class="sub" style="margin-top:8px">Você acertou <strong>' + hits + ' de ' + total + '</strong> (' + (total ? Math.round(hits / total * 100) : 0) + '%)' + (porTempo ? ' antes do tempo esgotar' : '') + '.</p>' +
+      '<p class="sub" style="margin-top:6px"><strong>+' + scoreG + ' score</strong> · <strong>+' + coinsG + ' Quad Coins</strong></p></div>';
+    $('btnSimDigNext').textContent = 'Concluir';
+    $('btnSimDigNext').disabled = false;
+    simDig.idx = 'done';
+    /* realizado, o digital sai da lista e entra no histórico */
+    if (sm) SIM_HIST.unshift({ rot: sm.rot, tipo: 'Digital', resultado: hits + '/' + total + ' · +' + coinsG + ' QdC' });
+    renderSimulados();
+    if (typeof renderSimHist === 'function') renderSimHist();
+    toast('Simulado digital concluído — +' + scoreG + ' score · +' + coinsG + ' QdC.');
+  }
+  $('btnSimDigNext').addEventListener('click', function () {
+    if (simDig.idx === 'done') { $('simDigLayer').classList.remove('on'); return; }
+    if (simDig.sel === simDig.qs[simDig.idx].c) simDig.hits++;
+    if (simDig.idx < simDig.qs.length - 1) { simDig.idx++; renderQuestaoSimDig(); }
+    else { simDigResultado(false); }
+  });
+  $('btnSairSimDig').addEventListener('click', function () {
+    clearInterval(simDig.timer); simDig.timer = null;
+    $('simDigLayer').classList.remove('on');
+    toast('Simulado interrompido — você pode retomar depois.');
+  });
+  window.__simDig = simDig;   /* exposto para a suíte de testes */
+
+  /* ================= [DEMO PROVISÓRIO — REMOVER] =================
+     Atalho de teste: sobe uma patente por clique (como se a prova de
+     promoção tivesse sido aprovada pelo gabarito). Serve só para o gestor
+     percorrer TODAS as patentes e ver a evolução (insígnia, título, trilha).
+     Para remover: apague este bloco e o botão #btnDemoPatente no HTML. */
+  function demoSobePatente() {
+    if (carreira.patenteIdx >= GAMI.patentes.length - 1) { toast('Você já está na patente máxima do jogo!'); return; }
+    var prox = proximaPatente();
+    carreira.patenteIdx++;
+    carreira.scorePatente = 0;
+    carreira.estado = 'acumulando';
+    carreira.provaBloqueadaAte = null;
+    carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: 'gabarito demo' });
+    renderCarreira();
+    toast('DEMO · promovido a ' + tituloCompleto());
+  }
+  var btnDemoP = $('btnDemoPatente');
+  if (btnDemoP) btnDemoP.addEventListener('click', demoSobePatente);
+  /* =============== fim do bloco provisório =============== */
+
+  /* itens do personagem: conquistados na jornada, já vestidos na foto
+     (a boina e as skins não têm gestão manual — quem possui, veste) */
+  var boinaEquipada = false;
+  function refreshChips() {
+    if (lojaOwned['Boina exclusiva']) { boinaEquipada = true; aplicarAvatar(); }
+  }
+  $('btnSenha').addEventListener('click', function () {
+    if (!$('novaSenha').value) { toast('Digite a nova senha'); return; }
+    $('novaSenha').value = '';
+    toast('Senha alterada com sucesso');
+  });
+
+  /* ---------- Danilo, o guia ---------- */
+  // vídeo do personagem embutido no build (token substituído pelo script de build)
+  var DANILO_VIDEO = '__DANILO_VIDEO__';
+  if (DANILO_VIDEO.indexOf('data:') === 0) {
+    ['popVideo'].forEach(function (id) {
+      $(id).src = DANILO_VIDEO;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        $(id).removeAttribute('autoplay'); $(id).pause();
+      }
+    });
+  }
+  /* ---------- central de tutoriais do QUAD ----------
+     O mascote é quem ensina: clicou nele, a tela escurece, ele cresce e
+     pergunta qual função o aluno quer aprender. Cada opção levará a um
+     tutorial guiado como o inicial (na V0, aviso de "em construção"). */
+  var HELP_TUTS = [
+    'Como realizar uma missão',
+    'Como funciona a lógica dos Quad Coins',
+    'Como funciona o Pré-TAF',
+    'Como funciona a Árvore do edital',
+    'Como funciona a Aula de hoje',
+    'Como funciona a prova de promoção'
+  ];
+  var helpGestoT = null;
+  function helpPos() {
+    $('helpQuad').style.bottom = ($('helpBox').offsetHeight + 26) + 'px';
+  }
+  function helpRender() {
+    $('helpBody').innerHTML = HELP_TUTS.map(function (t, i) {
+      return '<button class="help-opt" data-i="' + i + '">' + (i + 1) + ' · ' + t + '</button>';
+    }).join('') +
+      '<button class="help-opt destaque" id="btnHelpInstrucao">↻ Refazer a instrução inicial</button>' +
+      '<button class="help-fechar" id="btnHelpFechar">AGORA NÃO</button>';
+    $('helpBody').querySelectorAll('.help-opt[data-i]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        $('helpBody').innerHTML =
+          '<p class="help-fala">“Este tutorial está em construção — logo logo eu te guio por ele, pode deixar!”</p>' +
+          '<button class="help-opt" id="btnHelpVoltar">‹ Voltar às opções</button>' +
+          '<button class="help-fechar" id="btnHelpFechar2">FECHAR</button>';
+        $('btnHelpVoltar').addEventListener('click', helpRender);
+        $('btnHelpFechar2').addEventListener('click', helpClose);
+        helpPos();
+      });
+    });
+    $('btnHelpInstrucao').addEventListener('click', function () { helpClose(); iniciarTutorial(); });
+    $('btnHelpFechar').addEventListener('click', helpClose);
+    helpPos();
+  }
+  function helpOpen() {
+    $('daniloHint').style.display = 'none';
+    $('helpSprite').style.backgroundImage = getComputedStyle($('fabSprite')).backgroundImage;
+    $('helpLayer').classList.add('on');
+    helpRender();
+    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], gi = 0;
+    clearInterval(helpGestoT);
+    helpGestoT = setInterval(function () {
+      $('helpSprite').style.backgroundPosition = (-seq[gi % seq.length] * 118) + 'px 0'; gi++;
+    }, 185);
+  }
+  function helpClose() {
+    clearInterval(helpGestoT);
+    $('helpLayer').classList.remove('on');
+  }
+  $('daniloFab').addEventListener('click', helpOpen);
+  $('helpLayer').addEventListener('click', function (e) { if (e.target === $('helpLayer')) helpClose(); });
+
+

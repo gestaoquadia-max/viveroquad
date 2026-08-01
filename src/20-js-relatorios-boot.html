@@ -1,0 +1,206 @@
+  /* ==================================================================
+     RELATÓRIOS (Fase 3) — painéis com gráficos: individuais, turmas,
+     gerais e Loja. Sub-navegação por chips; blocos grandes com "ver
+     completo". Gráficos em CSS/HTML (colunas e rosca), tema da marca.
+     ================================================================== */
+  function relCols(id, data, alt) {
+    var el = $(id); if (!el) return;
+    var max = data.reduce(function (m, d) { return Math.max(m, d.v); }, 0) || 1;
+    el.innerHTML = data.map(function (d) {
+      var h = Math.max(3, Math.round(d.v / max * 100));
+      return '<div class="col"><b>' + d.v + '</b><i class="' + (alt ? 'alt' : '') + '" style="height:' + h + '%"></i><span>' + d.lab + '</span></div>';
+    }).join('');
+  }
+  function relDonut(donutId, legId, qdc, dmn) {
+    var tot = (qdc + dmn) || 1, pq = Math.round(qdc / tot * 100);
+    if ($(donutId)) $(donutId).style.setProperty('--a', pq + '%');
+    if ($(legId)) $(legId).innerHTML =
+      '<div><i class="dot qdc"></i><span class="txt">Quad Coins<small>' + fmt(qdc) + ' QdC · ' + pq + '%</small></span></div>' +
+      '<div><i class="dot dmn"></i><span class="txt">Diamantes<small>' + fmt(dmn) + ' Dmn · ' + (100 - pq) + '%</small></span></div>';
+  }
+  /* dados sintéticos por aluno, estáveis (derivados do nome) + os dados
+     reais da conta desta sessão ('eu'): compras e pontos fracos vivos.   */
+  var REL_SEM = ['S-1', 'S-2', 'S-3', 'S-4', 'S-5', 'S-6'];
+  function relDadosAluno(id) {
+    var c = contaDe(id); if (!c) return null;
+    var nome = contaNome(c).replace(' · esta conta', ''), h = edHash(nome);
+    var uso = REL_SEM.map(function (lab, i) { return { lab: lab, v: 2 + ((h >>> (i * 2)) % 5) + (i % 2) }; });
+    var compras, qdc = 0, dmn = 0;
+    if (!c.seed) {
+      compras = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto(); });
+      if (!compras.length) compras = COMPRAS.slice(0, 2);
+    } else {
+      var cat = ['Aula isolada', 'Módulo impresso', 'Aulão especial', 'Garrafinha Quad', 'Curso online'];
+      compras = [0, 1, 2].map(function (k) {
+        var md = ((h >>> k) % 3 === 0) ? 'dmn' : 'qdc';
+        return { aluno: nome, item: cat[(h + k) % cat.length], valor: 40 + ((h >>> (k + 1)) % 9) * 20, moeda: md, quando: ['hoje', 'ontem', 'esta semana'][k] };
+      });
+    }
+    compras.forEach(function (cp) { if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor; });
+    /* pontos fracos: árvore de Domínio com deslocamento por aluno */
+    var dd = relComputeDif();
+    var fracos = dd.subs.map(function (x) { return { n: x.n, det: x.det, pct: Math.max(4, Math.min(98, x.pct + ((h % 21) - 10))) }; })
+      .sort(function (a, b) { return a.pct - b.pct; }).slice(0, 5);
+    return { nome: nome, uso: uso, compras: compras, qdc: qdc, dmn: dmn, fracos: fracos };
+  }
+  function renderRelInd() {
+    var sel = $('relIndAluno'); if (!sel) return;
+    var d = relDadosAluno(sel.value || 'eu'); if (!d) return;
+    relCols('relIndUso', d.uso);
+    var total = d.uso.reduce(function (a, x) { return a + x.v; }, 0);
+    $('relIndUsoResumo').innerHTML = '<strong>' + total + '</strong> logins nas últimas ' + d.uso.length + ' semanas · média <strong>' + Math.round(total / d.uso.length) + '</strong>/semana.';
+    relDonut('relIndDonut', 'relIndLegenda', d.qdc, d.dmn);
+    $('relIndCompras').innerHTML = d.compras.length
+      ? d.compras.map(compraRow).join('')
+      : '<p class="sub" style="padding:8px 0">Sem compras registradas.</p>';
+    $('relIndPedag').innerHTML = d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+  }
+  /* ---------- pedagógico POR TURMA ----------
+     Cada turma é lida na árvore do edital DELA (t.concurso), com uma
+     semente estável por turma — o mesmo truque que os relatórios já
+     usam por aluno. Um bloco por turma aberta, como o gestor pediu.  */
+  function relDadosTurma(turmaId) {
+    var t = (typeof turmaDe === 'function') ? turmaDe(turmaId) : null; if (!t) return null;
+    var c = (typeof concursoDe === 'function') ? concursoDe(t.concurso) : null;
+    var h = edHash(t.id);
+    var d = relComputeDif({ arvore: (c && c.arvore) || null, desloc: (h % 21) - 10 });
+    return { turma: t, concurso: c, fracos: d.subs.slice(0, 5) };
+  }
+  function renderRelPedagTurmas() {
+    var el = $('relPedagTurmas'); if (!el) return;
+    var turmas = (typeof TURMAS_LOJA !== 'undefined') ? TURMAS_LOJA : [];
+    el.innerHTML = turmas.map(function (t) {
+      var d = relDadosTurma(t.id); if (!d) return '';
+      var edital = d.concurso ? d.concurso.nome + (d.concurso.edital && d.concurso.edital !== '—' ? ' · ' + d.concurso.edital : '') : 'sem árvore de edital';
+      return '<div class="ac-cat" style="margin-top:14px">' + t.nome + '<span class="tag">' + (t.turno || '') + '</span></div>' +
+        '<p class="sub" style="margin:0 0 6px">Árvore lida: <strong>' + edital + '</strong></p>' +
+        d.fracos.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma aberta para analisar.</p>';
+  }
+  /* o seletor de turmas do relatório é a lista viva — turma aberta hoje já dá para analisar */
+  function relTurmasInit() {
+    var selT = $('relTurmaSel'); if (!selT) return;
+    var atual = selT.value;
+    selT.innerHTML = (typeof TURMAS_LOJA !== 'undefined' ? TURMAS_LOJA : []).map(function (t) {
+      return '<option value="' + t.id + '"' + (t.id === atual ? ' selected' : '') + '>' + turmaRotulo(t) + '</option>';
+    }).join('') || '<option value="">— nenhuma turma aberta —</option>';
+  }
+  function renderRelTurma() {
+    renderDificuldades();   /* dificuldades da sala + apoio (mesma árvore) */
+    var sel = $('relTurmaSel');
+    var h = sel ? edHash(sel.value || 'sala') : 7;
+    var dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    relCols('relTurmaUso', dias.map(function (lab, i) { return { lab: lab, v: 8 + ((h >>> i) % 14) + (i === 5 ? -4 : 0) }; }));
+  }
+  function renderRelGeral() {
+    var mm = relComputeDif().matMap;
+    if ($('relGeralMat')) $('relGeralMat').innerHTML = mm.map(function (x) { return admBarRow(x.n, x.det, x.pct); }).join('');
+  }
+  var REL_LOJA_TOP = [
+    { n: 'Aulão especial', det: 'evento presencial', v: 128 },
+    { n: 'Módulo impresso', det: 'itens presenciais', v: 96 },
+    { n: 'Curso online · Direito Penal', det: 'itens digitais', v: 74 },
+    { n: 'Garrafinha Quad', det: 'itens presenciais', v: 61 },
+    { n: 'Vade Mecum', det: 'itens presenciais', v: 43 }
+  ];
+  function renderRelLoja() {
+    relCols('relLojaVendas', [
+      { lab: 'S-1', v: 34 }, { lab: 'S-2', v: 41 }, { lab: 'S-3', v: 29 },
+      { lab: 'S-4', v: 52 }, { lab: 'S-5', v: 47 }, { lab: 'S-6', v: 63 }
+    ]);
+    var maxv = REL_LOJA_TOP[0].v;
+    if ($('relLojaTop')) $('relLojaTop').innerHTML = REL_LOJA_TOP.map(function (x) {
+      return '<div class="adm-bar"><span class="nm">' + x.n + '<small>' + x.det + '</small></span>' +
+        '<span class="mini-track"><i style="width:' + Math.round(x.v / maxv * 100) + '%;background:var(--p-blue)"></i></span>' +
+        '<span class="pct">' + x.v + '</span></div>';
+    }).join('');
+    /* faturamento QdC×Dmn: base da operação + compras vivas desta sessão */
+    var qdc = 18600, dmn = 9400;
+    COMPRAS.forEach(function (cp) { if ((cp.moeda || 'qdc') === 'dmn') dmn += cp.valor; else qdc += cp.valor; });
+    relDonut('relLojaDonut', 'relLojaLegenda', qdc, dmn);
+    relCols('relLojaFluxo', [
+      { lab: 'Entra', v: 42000 }, { lab: 'Sai', v: 18600 }
+    ]);
+    renderCompras();
+  }
+  function renderRelatorios() {
+    renderRelInd(); renderRelPedagTurmas(); renderRelTurma(); renderRelGeral(); renderRelLoja();
+  }
+  (function () {
+    var tabs = $('relTabs'); if (!tabs) return;
+    /* seletores de aluno e turma */
+    var selA = $('relIndAluno');
+    if (selA) selA.innerHTML = CONTAS.map(function (c) {
+      return '<option value="' + c.id + '">' + contaNome(c) + '</option>';
+    }).join('');
+    relTurmasInit();
+    var selT = $('relTurmaSel');
+    tabs.querySelectorAll('.rel-tab').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        tabs.querySelectorAll('.rel-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        document.querySelectorAll('#v-adm-alunos .rel-panel').forEach(function (pn) {
+          pn.classList.toggle('on', pn.dataset.relpanel === bt.dataset.rel);
+        });
+      });
+    });
+    if (selA) selA.addEventListener('change', renderRelInd);
+    if (selT) selT.addEventListener('change', renderRelTurma);
+  })();
+  /* eventos/simulados online carregam o próprio link (ev.link); o cadastro
+     avulso de "links de acesso" saiu da governança da Loja por estar obsoleto */
+  var LINKS_ONLINE = {};
+  window.lojaCompraLog = lojaCompraLog;   /* exposto para a suíte de testes */
+
+  /* estrutura (edital e questões saíram da nav, entram pela Estrutura) */
+  $('btnIrEdital').addEventListener('click', function () { showView('v-edital', 'navAdmin'); });
+  $('btnIrQuestoes').addEventListener('click', function () { showView('v-questoes', 'navAdmin'); });
+
+  renderAvisos(); admCronoInit(); renderAdmEventos();
+  renderPedidos(); renderSimPres(); renderAdmSimList();
+  if (typeof renderAcessos === 'function') renderAcessos();
+  if (typeof renderAtivInscritos === 'function') renderAtivInscritos();
+  renderRelatorios(); renderPrecos(); renderEstornos(); renderRelCompras();
+  renderSimulados(); renderLojaSimulados(); renderSimHist(); admEstruturaInit();
+  if (typeof renderSalas === 'function') renderSalas();
+  if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+  if (typeof window.__evSalaRefresh === 'function') window.__evSalaRefresh();
+  if (typeof window.__simSalaRefresh === 'function') window.__simSalaRefresh();
+  /* "Turmas abertas" só fica completa aqui: ISOLADAS é declarada depois
+     do bloco de criação, e a primeira pintura ainda não a enxergava   */
+  if (typeof renderCtLista === 'function') renderCtLista();
+  if (typeof window.__matRefresh === 'function') window.__matRefresh();
+  if (typeof admAvEscInit === 'function') admAvEscInit();
+  if (typeof definirTurmaAtiva === 'function' && turmaAtivaId) definirTurmaAtiva(turmaAtivaId, true);
+
+  /* ---------- "Precisa de ajuda?": aparece ao logar e some em 10s ---------- */
+  var daniloHintT = null;
+  function daniloHintMostra() {
+    if (personaAtiva !== 'aluno') { return; }   /* o balão de ajuda é só do aluno */
+    var h = $('daniloHint');
+    h.style.display = '';
+    clearTimeout(daniloHintT);
+    daniloHintT = setTimeout(function () { h.style.display = 'none'; }, 10000);
+  }
+
+  /* ---------- Danilo acena e depois fica parado (sprite de 7 poses) ---------- */
+  var fabSpriteEl = $('fabSprite'), waveTimers = [];
+  function daniloWave() {
+    if (!fabSpriteEl) return;
+    waveTimers.forEach(clearTimeout); waveTimers = [];
+    // parado → levanta o braço → acena (vai-e-vem, 3x) → abaixa → parado
+    var seq = [0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0];
+    seq.forEach(function (fr, i) {
+      waveTimers.push(setTimeout(function () {
+        fabSpriteEl.style.backgroundPosition = (-fr * 118) + 'px 0';
+      }, i * 230));
+    });
+  }
+  setTimeout(daniloWave, 1200); // acena ao chegar; depois fica quieto
+
+  /* ---------- init do estado de acesso/conectividade ---------- */
+  renderCarreira();
+  applyConnUI();
+  updatePending();
+})();
+</script>

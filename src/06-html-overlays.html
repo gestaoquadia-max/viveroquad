@@ -1,0 +1,552 @@
+        <!-- ============ PROVA DE PROMOÇÃO (overlay próprio) ============ -->
+        <div class="quiz-layer" id="provaLayer">
+          <div class="quiz-head">
+            <div class="k-label" id="provaKicker">Prova de promoção</div>
+            <h3 style="margin:0; font-size:15px" id="provaProgress">Prova de promoção</h3>
+            <p class="sub" style="margin-top:4px" id="provaSub">20 questões · você sobe de patente acertando 80%.</p>
+          </div>
+          <div class="quiz-body" id="provaBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairProva">Sair</button>
+            <button class="btn" id="btnProvaNext" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ SIMULADO DIGITAL (quiz cronometrado) ============ -->
+        <div class="quiz-layer" id="simDigLayer">
+          <div class="quiz-head">
+            <div class="sd-head-row">
+              <div class="k-label" id="simDigKicker">Simulado digital</div>
+              <span class="sd-timer" id="simDigTimer">--:--</span>
+            </div>
+            <h3 style="margin:0; font-size:15px" id="simDigProgress">Questão 1</h3>
+            <p class="sub" style="margin-top:4px" id="simDigSub">Cronômetro rodando — responda antes do tempo acabar.</p>
+          </div>
+          <div class="quiz-body" id="simDigBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairSimDig">Sair</button>
+            <button class="btn" id="btnSimDigNext" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ QUIZ DA AULA (professor ativa · sem premiação) ============ -->
+        <div class="quiz-layer" id="qaLayer">
+          <div class="quiz-head">
+            <div class="sd-head-row">
+              <div class="k-label" id="qaKicker">Quiz da aula</div>
+              <span class="sd-timer" id="qaTimer">--:--</span>
+            </div>
+            <h3 style="margin:0; font-size:15px" id="qaProgress">Questão 1</h3>
+            <p class="sub" style="margin-top:4px" id="qaSub">Sem gabarito agora — suas respostas vão direto para o relatório do professor.</p>
+          </div>
+          <div class="quiz-body" id="qaBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairQa">Sair</button>
+            <button class="btn" id="btnQaNext" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ QUIZ OVERLAY ============ -->
+        <div class="quiz-layer" id="quizLayer">
+          <div class="quiz-head">
+            <div class="k-label" id="quizKicker">Missão · Bloco 3</div>
+            <h3 style="margin:0; font-size:15px" id="quizProgress">Questão 1 de 3</h3>
+            <p class="sub" style="margin-top:4px">Você não vê acerto ou erro agora — o resultado abre no fim.</p>
+          </div>
+          <div class="quiz-body" id="quizBody"></div>
+          <div class="quiz-foot">
+            <button class="btn ghost small" id="btnSairQuiz">Sair</button>
+            <button class="btn" id="btnProxima" disabled>Responder</button>
+          </div>
+        </div>
+
+        <!-- ============ PÁGINA DO EVENTO ============ -->
+        <div class="quiz-layer" id="evLayer">
+          <div class="ev-hero" id="evHero">
+            <div class="ev-hero-top">
+              <button class="ev-back" id="btnEvVoltar" aria-label="Voltar">‹ Voltar</button>
+              <span class="tag" id="evTipo"></span>
+            </div>
+            <div class="ev-date" id="evQuando"></div>
+            <h2 id="evNome"></h2>
+            <p id="evMetaP"></p>
+          </div>
+          <div class="quiz-body" id="evBody"></div>
+        </div>
+
+        <!-- ============ DANILO — vetorização da folha de personagem ============ -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <symbol id="daniloSvg" viewBox="0 0 200 236">
+              <!-- mochila -->
+              <rect x="66" y="66" width="68" height="46" rx="12" fill="#38517A" stroke="#2C3E5C" stroke-width="2"/>
+              <!-- ombros -->
+              <rect x="22" y="82" width="40" height="38" rx="14" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="138" y="82" width="40" height="38" rx="14" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- braços -->
+              <rect x="27" y="116" width="29" height="38" rx="11" fill="#6D8FB5" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="144" y="116" width="29" height="38" rx="11" fill="#6D8FB5" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="41" cy="163" r="11" fill="#4E71A0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="159" cy="163" r="11" fill="#4E71A0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- pernas -->
+              <rect x="69" y="156" width="25" height="40" rx="9" fill="#5578A8" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="106" y="156" width="25" height="40" rx="9" fill="#5578A8" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- botas -->
+              <rect x="61" y="192" width="39" height="24" rx="10" fill="#46648F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="100" y="192" width="39" height="24" rx="10" fill="#46648F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- quadril -->
+              <rect x="71" y="142" width="58" height="22" rx="10" fill="#3E5A85" stroke="#2C3E5C" stroke-width="2.5"/>
+              <!-- torso -->
+              <path d="M64 84 h72 a14 14 0 0 1 14 14 v20 a30 30 0 0 1 -30 30 h-40 a30 30 0 0 1 -30 -30 v-20 a14 14 0 0 1 14 -14 z"
+                    fill="#4E71A0" stroke="#2C3E5C" stroke-width="3"/>
+              <rect x="78" y="120" width="44" height="24" rx="11" fill="#7C9BC0" stroke="#2C3E5C" stroke-width="2.5"/>
+              <rect x="72" y="94" width="16" height="3.5" rx="1.75" fill="#2C3E5C" opacity="0.45"/>
+              <rect x="72" y="101" width="16" height="3.5" rx="1.75" fill="#2C3E5C" opacity="0.45"/>
+              <text x="118" y="110" font-family="Consolas, monospace" font-size="17" font-weight="700" fill="#C7DCEE">01</text>
+              <!-- cabeça -->
+              <circle cx="52" cy="52" r="9" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <circle cx="148" cy="52" r="9" fill="#45678F" stroke="#2C3E5C" stroke-width="2.5"/>
+              <path d="M58 54 a42 40 0 0 1 84 0 v6 a16 16 0 0 1 -16 16 h-52 a16 16 0 0 1 -16 -16 z"
+                    fill="#B9D2E6" stroke="#2C3E5C" stroke-width="3"/>
+              <rect x="70" y="33" width="60" height="41" rx="11" fill="#132A40"/>
+              <rect x="73" y="36" width="54" height="35" rx="9" fill="#D9EEF9"/>
+              <!-- logo Q oficial (três azuis + cauda de balão) -->
+              <path d="M94.7 62 A10.5 10.5 0 1 1 109 47.7" fill="none" stroke="#2B5A8C" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M92.6 57.2 A8.5 8.5 0 0 0 104.2 60.4" fill="none" stroke="#7ECBF1" stroke-width="3" stroke-linecap="round"/>
+              <path d="M105.2 43.9 A10.5 10.5 0 0 1 102.7 63.1" fill="none" stroke="#1B9CD9" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M100 61 L110 69 L107.5 57.5 Z" fill="#1B9CD9"/>
+            </symbol>
+          </defs>
+        </svg>
+
+        <!-- ============ ARTES DA HOME · insígnia, Quad Coin e emblema (vetor) ============ -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <defs>
+            <linearGradient id="insOut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4FAFF"/><stop offset="1" stop-color="#8FC1F2"/></linearGradient>
+            <linearGradient id="insIn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E55B2"/><stop offset="1" stop-color="#0A2A66"/></linearGradient>
+
+            <symbol id="emblemaQuad" viewBox="0 0 100 100">
+              <path d="M50 4 89 27 89 73 50 96 11 73 11 27Z" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round"/>
+              <path d="M50 20 55.9 35.8 72.8 36.6 59.6 47.1 64.1 63.4 50 54.1 35.9 63.4 40.4 47.1 27.2 36.6 44.1 35.8Z" fill="currentColor"/>
+              <path d="M24 72 50 84 76 72 76 80 50 92 24 80Z" fill="currentColor"/>
+            </symbol>
+
+            <linearGradient id="ptFace" x1="0" y1="0" x2="0.7" y2="1"><stop offset="0" stop-color="#2E62C8"/><stop offset="0.5" stop-color="#1B3F9E"/><stop offset="1" stop-color="#0C2258"/></linearGradient>
+            <linearGradient id="ptChev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#AFCFFA"/></linearGradient>
+            <symbol id="insigniaPatente" viewBox="0 0 100 110">
+              <path d="M50 3 C67 3 83 9 90 15 L90 57 L50 107 L10 57 L10 15 C17 9 33 3 50 3 Z" fill="url(#ptFace)" stroke="#8FC2FF" stroke-width="3.5" stroke-linejoin="round"/>
+              <path d="M50 9 C65 9 79 14 84 19 L84 54 L50 97 L16 54 L16 19 C21 14 35 9 50 9 Z" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="2"/>
+              <path d="M20 47 L50 77 L80 47 L80 60 L50 90 L20 60 Z" fill="url(#ptChev)" stroke="#7FB4F5" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M50 3 C67 3 83 9 90 15 L90 30 C75 22 60 18 50 18 C40 18 25 22 10 30 L10 15 C17 9 33 3 50 3 Z" fill="#FFFFFF" opacity="0.12"/>
+            </symbol>
+            <symbol id="insigniaQuad" viewBox="0 0 100 112">
+              <rect x="20" y="8" width="13" height="22" rx="2" fill="#A9D2F8" stroke="#E8F5FF" stroke-width="1"/>
+              <path d="M50 2 98 36 86 36 86 74 50 108 14 74 14 36 2 36Z" fill="url(#insOut)"/>
+              <path d="M50 13 87 39 78 39 78 69 50 95 22 69 22 39 13 39Z" fill="url(#insIn)"/>
+              <g color="#EAF4FF"><use href="#emblemaQuad" x="0" y="0" width="100" height="100" transform="translate(28,30) scale(0.45)"/></g>
+            </symbol>
+
+          </defs>
+        </svg>
+
+        <span class="danilo-hint" id="daniloHint" style="display:none"><b>Precisa de ajuda?</b><small>Clique aqui</small></span>
+        <button class="danilo-fab" id="daniloFab" aria-label="Falar com o QUAD, o guia">
+          <span class="fab-sprite" id="fabSprite" style="background-image:url(__DANILO_SPRITE__)" aria-hidden="true"></span>
+        </button>
+
+        <div class="danilo-pop" id="daniloPop">
+          <div class="danilo-sheet">
+            <div class="d-head">
+              <video id="popVideo" autoplay muted loop playsinline aria-hidden="true"></video>
+              <div>
+                <div class="d-name">QUAD</div>
+                <div class="d-role">Mascote e guia da jornada</div>
+              </div>
+            </div>
+            <div class="d-bubble" id="daniloText"></div>
+            <div style="margin-top:14px; text-align:right">
+              <button class="btn small" id="daniloOk">Entendi, QUAD</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ MENU + (MAIS) ============ -->
+        <div class="plus-pop" id="plusPop">
+          <div class="plus-sheet">
+            <div class="k-label">Mais do Viver o Quad</div>
+            <button class="plus-row" data-goto="v-perfil">
+              <span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
+              <span class="grow"><span class="t">Quadrômetro</span><span class="d">sua jornada em números</span></span>
+            </button>
+            <button class="plus-row" data-goto="v-calendario">
+              <span class="p-ico">▦</span>
+              <span class="grow"><span class="t">Calendário</span><span class="d">agendamentos, simulados e momentos importantes</span></span>
+            </button>
+            <button class="plus-row" data-goto="v-materiais">
+              <span class="p-ico">▤</span>
+              <span class="grow"><span class="t">Materiais das aulas</span><span class="d">slides, resumos, listas e vídeos por aula</span></span>
+            </button>
+            <!-- Quad Store e "Validar Gift Card" saíram daqui: a loja tem lugar
+                 próprio na barra de navegação e o leitor de QR mora no bloco do
+                 gift card, dentro da própria Quad Store. -->
+            <button class="plus-row" id="rowChat">
+              <span class="p-ico">✉</span>
+              <span class="grow"><span class="t">Chat · recados da administração</span><span class="d">mensagens exclusivas para você</span></span>
+              <span class="chat-badge" id="chatBadge" style="display:none">1</span>
+            </button>
+            <button class="plus-row locked" data-lock="Chat ao vivo com a administração — próxima implementação">
+              <span class="p-ico">✆</span>
+              <span class="grow"><span class="t">Chat ao vivo</span><span class="d">conversa em tempo real com o time Quad</span></span>
+              <span class="tag v1">EM BREVE</span>
+            </button>
+            <button class="plus-row locked" data-lock="Guarnições, GvG e PvP chegam na V2">
+              <span class="p-ico">⚔</span>
+              <span class="grow"><span class="t">Guarnições · GvG/PvP</span><span class="d">competição por velocidade, em equipe</span></span>
+              <span class="tag v2">V2</span>
+            </button>
+            <button class="plus-row locked" data-lock="Pré-TAF em planejamento — ainda não disponível nesta versão">
+              <span class="p-ico">⚑</span>
+              <span class="grow"><span class="t">Pré-TAF</span><span class="d">preparo físico para as provas do concurso</span></span>
+              <span class="tag v1">EM BREVE</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ VINHETA (toca logo após o login) ============ -->
+        <div class="splash-layer done" id="splashLayer" role="button" aria-label="Vinheta — toque para pular">
+          <div class="splash-symbol" style="background-image:url(__QUAD_SIMBOLO__)" aria-hidden="true"></div>
+          <div class="splash-phrase">Comece seu sonho por aqui<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+          <div class="splash-brand">Quad Concursos</div>
+          <div class="splash-verify" id="splashVerify"></div>
+        </div>
+
+        <!-- ============ PORTÃO: JÁ É ALUNO / PRIMEIRA VEZ ============ -->
+        <div class="gate-layer" id="gateLayer">
+          <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
+
+          <!-- verificação do e-mail: o símbolo do Quad é o carregamento -->
+          <div class="gate-step" id="gateVerify" style="display:none">
+            <div class="q-loader" role="status" aria-label="Verificando cadastro">
+              <img src="__QUAD_SIMBOLO__" alt="">
+            </div>
+            <p class="q-loader-txt">Verificando o cadastro de<br><strong id="verifyEmail">voce@exemplo.com</strong></p>
+          </div>
+
+          <!-- criar conta: o cadastro completo é feito no site (checkout geral) -->
+          <div class="gate-step" id="gateCriar" style="display:none">
+            <div class="gate-icon" aria-hidden="true">✦</div>
+            <h2>Cadastro no site do Quad</h2>
+            <p class="login-sub" style="max-width:300px">A conta é criada no <strong>checkout do site</strong>, junto com a sua matrícula. Assim que a matrícula é confirmada, seu acesso ao app é liberado automaticamente.</p>
+            <button class="btn" id="btnIrCheckout" style="width:100%">Ir para o cadastro no site</button>
+            <button class="btn ghost small" id="btnCriarVoltar" style="width:100%; margin-top:10px">Voltar ao login</button>
+          </div>
+        </div>
+
+        <!-- ============ ACESSO RESTRITO DO ADMINISTRADOR (cadastro com liberação) ============ -->
+        <div class="gate-layer" id="admGate">
+          <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
+          <div class="gate-step">
+            <h2>Acesso restrito · N.P.P.</h2>
+            <p class="login-sub">Área da administração — suporte ao aluno que opera o sistema. Informe seu e-mail funcional e a chave de liberação emitida pela direção.</p>
+            <div class="login-field" style="width:100%">
+              <label for="admEmail">E-mail funcional</label>
+              <input id="admEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
+            </div>
+            <div class="login-field" style="width:100%">
+              <label for="admChave">Chave de liberação</label>
+              <input id="admChave" placeholder="NPP-____" autocomplete="off">
+            </div>
+            <button class="btn" id="btnAdmEntrar" style="width:100%">Liberar acesso</button>
+            <p class="login-note">demo: chave NPP-2026 · no sistema real o cadastro de administrador é aprovado pela direção</p>
+          </div>
+        </div>
+
+        <!-- ============ ACESSO DO PROFESSOR (cadastro com liberação) ============ -->
+        <div class="gate-layer" id="profGate">
+          <img class="gate-logo" src="__QUAD_SIMBOLO__" alt="">
+          <div class="gate-step">
+            <h2>Acesso do professor</h2>
+            <p class="login-sub">Área do corpo docente — o e-mail funcional já identifica o professor e abre o perfil dele, com as turmas em que está inserido.</p>
+            <div class="login-field" style="width:100%">
+              <label for="profEmail">E-mail funcional</label>
+              <input id="profEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
+            </div>
+            <div class="login-field" style="width:100%">
+              <label for="profSenha">Senha</label>
+              <input id="profSenha" type="password" placeholder="••••••••" autocomplete="off">
+            </div>
+            <button class="btn" id="btnProfEntrar" style="width:100%">Entrar na sala</button>
+            <p class="sub" id="profSaidaMsg" style="display:none; margin-top:14px; text-align:center; background:var(--p-soft); border-radius:12px; padding:12px"></p>
+            <p class="login-note" id="profGateNota"></p>
+          </div>
+        </div>
+
+        <!-- ============ TUTORIAL OBRIGATÓRIO DO QUAD (1º acesso) ============ -->
+        <div class="tut-layer" id="tutLayer">
+          <div class="tut-shade" id="tutShT"></div>
+          <div class="tut-shade" id="tutShB"></div>
+          <div class="tut-shade" id="tutShL"></div>
+          <div class="tut-shade" id="tutShR"></div>
+          <div class="tut-ring" id="tutRing"></div>
+          <div class="tut-arrow" id="tutArrow">▼</div>
+          <div class="tut-bubble" id="tutBubble">
+            <div class="tut-name"><b>QUAD</b><span class="tut-etapa" id="tutStepN"></span></div>
+            <div class="tut-text" id="tutText"></div>
+            <div class="tut-opts" id="tutOpts"></div>
+          </div>
+          <div class="tut-quad" id="tutQuad" aria-hidden="true"><span class="fab-sprite" id="tutSprite"></span></div>
+          <button class="tut-skip" id="tutSkip">‹ Pular</button>
+          <button class="tut-next" id="tutNext">Avançar ›</button>
+        </div>
+
+        <!-- ============ ZOOM DO PERSONAGEM (segurar para ampliar) ============ -->
+        <div class="zoom-layer" id="zoomLayer" aria-hidden="true">
+          <img id="zoomImg" alt="">
+          <div class="zoom-nome" id="zoomNome"></div>
+        </div>
+
+        <!-- ============ MOCHILA DE COMBATE (storage de itens) ============ -->
+        <div class="storage-layer" id="storageLayer">
+          <div class="storage-head">
+            <span class="sh-ico"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M6 13h12"/><path d="M10 13v3h4v-3"/></svg></span>
+            <div><h3>Mochila de combate</h3><div class="sh-sub" id="mochilaSub">seus itens guardados</div></div>
+            <button class="storage-close" id="btnStorageFechar" aria-label="Fechar mochila">✕</button>
+          </div>
+          <div class="storage-grid" id="storageGrid"></div>
+          <div class="storage-quest">🎯 <strong>Quests em breve:</strong> reúna itens da sua mochila para forjar novos equipamentos.</div>
+        </div>
+
+        <!-- ============ COMPRA COM QUANTIDADE (itens presenciais) ============ -->
+        <div class="compra-layer" id="compraLayer">
+          <div class="compra-box">
+            <button class="storage-close" id="btnCompraFechar" aria-label="Fechar">✕</button>
+            <span class="compra-ico" id="compraIco"></span>
+            <h3 class="compra-nome" id="compraNome">Item</h3>
+            <p class="sub compra-desc" id="compraDesc"></p>
+            <div class="compra-aviso" id="compraAviso" style="display:none"></div>
+            <div class="compra-estoque" id="compraEstoque"></div>
+            <div class="qtd-row">
+              <button class="qtd-btn" id="qtdMenos" aria-label="Menos">−</button>
+              <span class="qtd-val" id="qtdVal">1</span>
+              <button class="qtd-btn" id="qtdMais" aria-label="Mais">+</button>
+            </div>
+            <button class="btn" id="btnCompraOk" style="width:100%">Comprar · <span id="compraTotal">0</span></button>
+          </div>
+        </div>
+
+        <!-- ============ CHAT · RECADOS DA ADMINISTRAÇÃO ============ -->
+        <div class="storage-layer" id="chatLayer">
+          <div class="storage-head">
+            <span class="sh-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.9-.9L3 20l1.2-4.4a8 8 0 0 1-1.2-4.1A8.4 8.4 0 0 1 11.5 3.2a8.4 8.4 0 0 1 9.5 8.3Z"/></svg></span>
+            <div><h3>Chat · recados</h3><div class="sh-sub" id="chatSub">mensagens da administração</div></div>
+            <button class="storage-close" id="btnChatFechar" aria-label="Fechar chat">✕</button>
+          </div>
+          <div class="chat-list" id="chatList"></div>
+          <div class="storage-quest">✆ <strong>Chat ao vivo em breve:</strong> por enquanto, os recados chegam por aqui — responda procurando a administração.</div>
+        </div>
+
+        <!-- ============ CONTA BLOQUEADA (pop-up) ============ -->
+        <div class="compra-layer" id="bloqLayer" style="z-index:70">
+          <div class="compra-box">
+            <span class="compra-ico" style="background:linear-gradient(160deg,#FBE9E9,#F5D6D6)"><svg viewBox="0 0 24 24" style="stroke:#C0392B"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.6"/></svg></span>
+            <h3 class="compra-nome">Conta bloqueada</h3>
+            <p class="sub compra-desc">O acesso desta conta foi suspenso pela administração.<br><strong>Entre em contato com a administração</strong> para regularizar.</p>
+            <button class="btn" id="btnBloqOk" style="width:100%">Entendi</button>
+          </div>
+        </div>
+
+        <!-- matrícula em turma: escolha da moeda (vagas separadas por moeda) -->
+        <div class="compra-layer" id="turmaLayer" style="z-index:68">
+          <div class="compra-box">
+            <span class="compra-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <h3 class="compra-nome" id="tuLayNome">Turma</h3>
+            <p class="sub compra-desc" id="tuLayDesc">Escolha a moeda da matrícula — as vagas são separadas por moeda.</p>
+            <div class="tu-opts">
+              <button class="tu-opt" id="btnTuDmn"><span class="to-rot">Diamantes</span><b id="tuDmnTxt">1.800 Dmn</b><small id="tuDmnVagas">145 vagas</small></button>
+              <button class="tu-opt qdc" id="btnTuQdc"><span class="to-rot">Quad Coins</span><b id="tuQdcTxt">2.000 QdC</b><small id="tuQdcVagas">10 vagas</small></button>
+            </div>
+            <button class="btn ghost small" id="btnTuCancel" style="width:100%; margin-top:10px">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- matriculou numa 2ª turma: por qual delas o app vai falar agora? -->
+        <div class="compra-layer" id="trocaLayer" style="z-index:69">
+          <div class="compra-box">
+            <span class="compra-ico"><svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></span>
+            <h3 class="compra-nome" id="trocaTitulo">Matrícula confirmada</h3>
+            <p class="sub compra-desc" id="trocaDesc">Você tem mais de uma turma. Qual delas o app deve abrir agora?</p>
+            <div class="troca-opts" id="trocaOpts"></div>
+            <p class="sub" style="margin-top:10px; font-size:11px">Início, avisos, ranking da sala, Domínio e quiz seguem a turma escolhida. Dá para trocar quando quiser pelo <strong>nome da turma no topo</strong>, no <strong>Domínio</strong> ou em <strong>Minhas turmas</strong>.</p>
+          </div>
+        </div>
+
+        <!-- validar gift card: leitor de QR (câmera simulada na demo) -->
+        <div class="compra-layer" id="scanLayer" style="z-index:67">
+          <div class="compra-box">
+            <h3 class="compra-nome">Validar Gift Card</h3>
+            <div class="scan-cam" aria-label="Câmera apontada para o QR code">
+              <div class="scan-frame"></div>
+              <div class="scan-line"></div>
+            </div>
+            <p class="sub compra-desc" id="scanHint">Aponte a câmera para o <strong>QR code</strong> do gift card — a leitura credita e <strong>invalida o cartão na hora</strong>. Câmera real é <span class="ref">[INTEGRAÇÃO REAL] leitura de QR</span>.</p>
+            <button class="btn" id="btnScanDemo" style="width:100%">Simular leitura do QR (demo)</button>
+            <button class="btn ghost small" id="btnScanFechar" style="width:100%; margin-top:10px">Fechar</button>
+          </div>
+        </div>
+
+        <!-- sem matrícula ativa: funções bloqueadas até entrar numa turma -->
+        <div class="compra-layer" id="matLayer" style="z-index:69">
+          <div class="compra-box">
+            <span class="compra-ico" style="background:linear-gradient(160deg,#FFF6E3,#FBE9C8)"><svg viewBox="0 0 24 24" style="stroke:#B45309"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/></svg></span>
+            <h3 class="compra-nome">Matrícula encerrada</h3>
+            <p class="sub compra-desc">Sua turma terminou e a matrícula não foi renovada.<br>As funções do app ficam <strong>bloqueadas</strong> até você entrar em uma nova turma.</p>
+            <button class="btn" id="btnMatLoja" style="width:100%">Ver turmas na Quad Store</button>
+            <button class="btn ghost small" id="btnMatOk" style="width:100%; margin-top:10px">Entendi</button>
+          </div>
+        </div>
+
+        <!-- ============ MENU DE TUTORIAIS DO QUAD ============ -->
+        <div class="help-layer" id="helpLayer">
+          <div class="help-quad" id="helpQuad" aria-hidden="true"><span class="fab-sprite" id="helpSprite"></span></div>
+          <div class="help-box" id="helpBox">
+            <div class="tut-name"><b>QUAD</b><span class="tut-etapa">central de tutoriais</span></div>
+            <h3 class="help-title">O que você quer aprender agora?</h3>
+            <div id="helpBody"></div>
+          </div>
+        </div>
+
+        <!-- ============ TREINAMENTO RÁPIDO (flashcards) ============ -->
+        <div class="quiz-layer" id="trLayer">
+          <div class="quiz-head">
+            <div class="tr-head-row">
+              <div>
+                <div class="k-label">Treinamento Rápido · flashcards</div>
+                <h3 style="margin:4px 0 0; font-size:15px" id="trTitulo">Escolha o bloco</h3>
+              </div>
+              <button class="btn ghost small" id="btnTrSair">Sair</button>
+            </div>
+            <div class="tr-tabs">
+              <button class="tr-tab on" id="tabTrGerais">Gerais</button>
+              <button class="tr-tab" id="tabTrEsp">Específicas</button>
+            </div>
+          </div>
+          <div class="quiz-body" id="trBody"></div>
+        </div>
+
+        <!-- ============ MISSÃO DEMONSTRATIVA (tutorial) ============ -->
+        <div class="quiz-layer" id="tqLayer">
+          <div class="quiz-head">
+            <div class="k-label">Missão de instrução · QUAD</div>
+            <h3 style="margin:0; font-size:15px" id="tqProg">Questão 1 de 3</h3>
+            <p class="sub" style="margin-top:4px">Feedback imediato: errou, tenta de novo — aqui é treino.</p>
+          </div>
+          <div class="quiz-body" id="tqBody"></div>
+        </div>
+
+        <!-- ============ LOGIN ============ -->
+        <div class="login-layer" id="loginLayer">
+          <div class="login-logo-wrap" id="logoWrap">
+            <img class="login-logo" src="__QUAD_SIMBOLO__" alt="Símbolo Quad Concursos">
+          </div>
+          <h2 class="login-title">VIVER O QUAD</h2>
+          <p class="login-sub">Entre com a conta que você criou no site do Quad.</p>
+          <div class="login-field">
+            <label for="loginEmail">Login (e-mail)</label>
+            <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
+          </div>
+          <div class="login-field">
+            <label for="loginSenha">Senha</label>
+            <input id="loginSenha" type="password" placeholder="••••••••" autocomplete="off" />
+          </div>
+          <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Entrar</button>
+          <button class="gate-link" id="btnCriarConta" style="margin-top:16px">Ainda não tem conta? <strong>Criar conta</strong></button>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <!-- ============ NAV ============ -->
+        <nav class="navbar" id="navAluno">
+          <button class="nav-btn active" data-view="v-inicio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 10.3 12 3l9 7.3"/><path d="M5.2 9.4V20a1 1 0 0 0 1 1h11.6a1 1 0 0 0 1-1V9.4"/><path d="M9.5 21v-6h5v6"/></svg></span>Início</button>
+          <button class="nav-btn" data-view="v-missoes"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.3"/><path d="M12 1.6v4M12 18.4v4M1.6 12h4M18.4 12h4"/></svg></span>Missões</button>
+          <button class="nav-plus" id="btnPlus" aria-label="Mais: chat, Pré-TAF, calendário, materiais e prévias"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="plus-badge" id="plusBadge" style="display:none">1</span></button>
+          <button class="nav-btn" data-view="v-dominio"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 5 5v6.2c0 4.4 3 7.3 7 8.8 4-1.5 7-4.4 7-8.8V5l-7-2.5Z"/><path d="m12 8.2 1.15 2.35 2.6.38-1.88 1.83.44 2.59L12 14.13l-2.31 1.22.44-2.59-1.88-1.83 2.6-.38Z" fill="currentColor" stroke="none"/></svg></span>Domínio</button>
+          <button class="nav-btn" data-view="v-loja"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Loja</button>
+        </nav>
+        <nav class="navbar" id="navProfessor" style="display:none">
+          <button class="nav-btn active" data-view="v-prof-painel"><span class="ico">⛭</span>Controle</button>
+          <button class="nav-btn" data-view="v-prof-eventos"><span class="ico">◈</span>Eventos</button>
+          <button class="nav-btn" data-view="v-sala"><span class="ico">◉</span>Quiz ao vivo</button>
+          <button class="nav-btn" data-view="v-prof-cal"><span class="ico">▤</span>Calendário</button>
+          <button class="nav-btn" data-view="v-prof-chat"><span class="ico">✉</span>Informações<span class="chat-badge" id="profRecBadgeNav" style="display:none">1</span></button>
+        </nav>
+        <nav class="navbar" id="navAdmin" style="display:none">
+          <button class="nav-btn active" data-view="v-adm-controle"><span class="ico">⛭</span>Controle</button>
+          <button class="nav-btn" data-view="v-adm-hoje"><span class="ico">◈</span>Interno</button>
+          <button class="nav-btn" data-view="v-adm-alunos"><span class="ico">◉</span>Relatórios</button>
+          <button class="nav-btn" data-view="v-adm-liber"><span class="ico">✓</span>Liberações</button>
+          <button class="nav-btn" data-view="v-adm-loja"><span class="ico">⬒</span>Loja</button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ==================== ASIDE ==================== -->
+    <aside class="aside">
+      <div class="note-card">
+        <h2>Faseamento do projeto</h2>
+        <div class="fase-strip">
+          <div class="fase now">
+            <div class="f-id">V0</div><div class="f-nm">Prova de vida</div>
+            <div class="f-ds">30 dias · retorno espontâneo D1/D7/D30 · sem economia</div>
+          </div>
+          <div class="fase">
+            <div class="f-id">V1</div><div class="f-nm">Expansão A·B·C</div>
+            <div class="f-ds">Geofencing, domínio, push · Quadcoin faseado</div>
+          </div>
+          <div class="fase">
+            <div class="f-id">V2</div><div class="f-nm">Camada viva</div>
+            <div class="f-ds">Chat, guarnições, GvG/PvP</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <h2>O que este protótipo cobre</h2>
+        <ul>
+          <li><strong>Identidade fixa + Quad Coins</strong> — patente Soldado, apelido, posição; Quad Coin sobe por fazer, nunca por acertar. <span class="ref">§7 · §9.3</span></li>
+          <li><strong>Quiz sem feedback imediato</strong> — o aluno responde às cegas e vê tudo no fim (com vídeo de resolução); o professor abre/finaliza e recebe a parcial da sala. <span class="ref">§7 · §9.2</span></li>
+          <li><strong>Missões 10+10 com expiração</strong> — aversão à perda no bloco do dia, recuperação até o corte de sábado. <span class="ref">§9.2 · §15</span></li>
+          <li><strong>Minerar Quad Coins</strong> — pontos escondidos em eventos para quem explora (mecânica comportamental da V0, distinta do Ciclo de Conquista). <span class="ref">§8</span></li>
+          <li><strong>Admin por edital</strong> — árvore Concurso→Edital→Matéria→Assunto separada de Turma = Edital × Modalidade, banco de questões por tag e simulação de reconciliação. <span class="ref">§5</span></li>
+          <li><strong>Fronteira V0/V1 explícita</strong> — Domínio como prévia bloqueada, Quadcoin/Intendência trancados, telemetria (origem da sessão + linha de base) registrada desde o dia 1. <span class="ref">§6 · §8 · Anexo A</span></li>
+          <li><strong>Danilo, o guia</strong> — mascote vetorizado a partir da folha de personagem (Unidade 01). Toque nele em qualquer tela: o popup traz as orientações daquela etapa da jornada, para aluno, professor e admin. <span class="ref">novo · rev. desta proposta</span></li>
+          <li><strong>Acesso por e-mail (código ou senha)</strong> — tela inicial pede só o e-mail e "Acessar o portal"; a verificação roteia três cenários (ativo · dificuldade com o código · conta não ativada). Aluno ativo valida por código, com "Entrar com senha" como alternativa online; conta não ativada cai no cadastro existente. <span class="ref">§14 · conta e acesso</span></li>
+          <li><strong>Autorização do dispositivo + modo offline</strong> — o 1º acesso online autoriza o aparelho ("reconhecimento facial/desbloqueio nos próximos acessos"). Depois disso, abrir sem internet mostra "Você está offline" com a última sincronização; no app, missões já carregadas funcionam e as respostas ficam "aguardando envio", o quiz ao vivo e novas missões pedem conexão, e o retorno da rede sincroniza tudo. <span class="ref">novo · offline-first</span></li>
+          <li><strong>Botão "+" — hub de módulos</strong> — Perfil do aluno (nome de guerra, avatar com fardamentos da PM, senha), Pré-TAF (metas do edital e treino da semana), Calendário e Materiais das aulas; prévias de V1 (Quadcoin, geofencing) e V2 (chat, guarnições) aparecem bloqueadas. <span class="ref">novo</span></li>
+          <li><strong>Quadrômetro</strong> — a antiga aba Perfil, rebatizada: Quad Coins, posição, presença e constância do aluno em números. <span class="ref">novo nome</span></li>
+        </ul>
+      </div>
+
+      <div class="note-card">
+        <h2>Testar o novo acesso (V0)</h2>
+        <p>Fluxo de acesso com dados simulados. A conexão é alternada pelo indicador <strong>ONLINE/OFFLINE</strong> na barra de status do celular (canto superior direito).</p>
+        <ul style="font-size:13px">
+          <li><strong>aluno@quad.com</strong> — cadastro ativo (código por e-mail)</li>
+          <li><strong>codigo@quad.com</strong> — cadastrado, com dificuldade para receber o código</li>
+          <li><strong>novo@quad.com</strong> — conta ainda não ativada (leva ao cadastro)</li>
+        </ul>
+        <p style="margin-top:4px">Código de demonstração: <strong>123456</strong> · senha: qualquer valor. O 1º acesso online autoriza o dispositivo e habilita o modo offline.</p>
+        <button id="btnResetDemo" style="margin-top:8px; cursor:pointer; font:600 12px var(--font); padding:9px 14px; border-radius:8px; border:1px solid var(--line); background:var(--gold-soft); color:var(--gold)">Resetar demonstração (dispositivo)</button>
+      </div>
+
+      <div class="note-card">
+        <h2>Decisões do documento que o protótipo respeita</h2>
+        <ul>
+          <li>Retorno espontâneo (só <span class="ref">OPEN_ORGANIC</span>) é a métrica-mãe — o app nunca "empurra" na V0.</li>
+          <li><strong>Atenção — divergência da rev. 2.3:</strong> a pontuação de participação foi rebatizada "Quad Coin" na UI por decisão do gestor (14/07). O documento trava "Score não é moeda"; recomenda-se revisar o Anexo A para realinhar as cinco camadas (participação × elegibilidade × moeda).</li>
+          <li>Dado → Cuidado → Valor → Oferta — nenhuma tela usa dificuldade para vender.</li>
+          <li>Nenhum rótulo de perfil (Amigo/Craca) aparece — comportamento é computado, não gravado.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>

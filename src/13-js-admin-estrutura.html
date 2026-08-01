@@ -1,0 +1,818 @@
+  /* ---------- Estrutura: concursos, modalidades, turmas e Domínio ---------- */
+  function contaArvore(arv) {
+    var mat = arv.length, ass = 0, sub = 0;
+    arv.forEach(function (m) { m[1].forEach(function (a) { ass++; sub += a[1].length; }); });
+    return mat + ' matérias · ' + ass + ' assuntos · ' + sub + ' sub-assuntos';
+  }
+  function definirDominio(id) {
+    var c = concursoDe(id); if (!c) return;
+    CONCURSO_ATUAL_ID = id;
+    EDITAL_ATUAL = c.arvore;
+    var dc = $('domConcurso'); if (dc) dc.textContent = c.nome + (c.edital && c.edital !== '—' ? ' · ' + c.edital : '');
+    var dl = $('domTreeLabel'); if (dl) dl.textContent = 'Árvore do edital · ' + c.nome;
+    renderEdital();
+    renderConcursos();
+    if (typeof renderRelatorios === 'function') renderRelatorios();   /* relatórios seguem a árvore/Domínio */
+    toast('Domínio do aluno agora segue o edital de ' + c.nome + '.');
+  }
+  window.__dominio = definirDominio;   /* exposto para a suíte de testes */
+  /* leitura da árvore de um concurso — usada pela suíte para provar que
+     "Professores por matéria" repete exatamente o edital escolhido     */
+  window.__arvoreDe = function (id) { var c = concursoDe(id); return (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : null; };
+  function renderConcursos() {
+    var el = $('admConcList'); if (!el) return;
+    el.innerHTML = CONCURSOS.map(function (c) {
+      var atual = c.id === CONCURSO_ATUAL_ID;
+      var opts = SITUACOES.map(function (s) { return '<option value="' + s[0] + '"' + (c.situacao === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('');
+      return '<div class="conc-row"><div class="conc-top">' +
+        '<span class="conc-nome">' + c.nome + '</span>' +
+        (atual ? '<span class="tag ok">DOMÍNIO ATUAL</span>' : '<button class="btn ghost small" data-dom="' + c.id + '">Definir Domínio</button>') + '</div>' +
+        '<div class="conc-meta">Edital: <strong>' + c.edital + '</strong> · ' + contaArvore(c.arvore) + '</div>' +
+        '<select class="fld conc-sit" data-sit="' + c.id + '">' + opts + '</select></div>';
+    }).join('');
+    el.querySelectorAll('[data-dom]').forEach(function (b) { b.addEventListener('click', function () { definirDominio(b.dataset.dom); }); });
+    el.querySelectorAll('[data-sit]').forEach(function (s) {
+      s.addEventListener('change', function () { var c = concursoDe(s.dataset.sit); if (c) { c.situacao = s.value; toast('Situação de ' + c.nome + ': ' + situacaoNome(s.value) + '.'); } });
+    });
+  }
+  function renderModalidades() {
+    var el = $('admModList'); if (!el) return;
+    el.innerHTML = MODALIDADES.map(function (m) {
+      /* o apelido em uso fica ao lado do tipo — é por ele que a casa
+         chama a turma, mas quem nomeia a modalidade é o tipo          */
+      return '<div class="mod-row"><div class="mod-top"><span class="mod-nome">' + m.nome + '</span>' +
+        '<span class="mod-desc">apelido: ' + m.apelido + ' · ' + m.desc + '</span></div>' +
+        '<div class="mod-bar"><span class="mod-teo" style="width:' + m.teoria + '%">' + m.teoria + '% teoria</span>' +
+        '<span class="mod-que" style="width:' + m.questoes + '%">' + m.questoes + '% questões</span></div></div>';
+    }).join('');
+  }
+  var DIA_SEM_TURMA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  function dataBRcompleta(iso) { if (!iso) return '—'; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  /* remover turma é uma operação só — vale para a Estrutura e para o Painel de controle */
+  function salasMudaram() {
+    if (typeof renderSalas === 'function') renderSalas();
+    if (typeof window.__ctSalaRefresh === 'function') window.__ctSalaRefresh();
+  }
+  function removerTurma(id) {
+    var t = turmaDe(id); if (!t) return;
+    var presos = (typeof matriculasAtivas === 'function')
+      ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
+    if (presos) { toast('“' + t.nome + '” tem ' + presos + ' matrícula' + (presos > 1 ? 's' : '') + ' ativa' + (presos > 1 ? 's' : '') + ' — estorne antes de remover.'); return; }
+    TURMAS_LOJA = TURMAS_LOJA.filter(function (x) { return x.id !== t.id; });
+    /* turma fora do ar leva junto o material publicado para ela */
+    if (typeof MATERIAIS !== 'undefined') {
+      MATERIAIS.forEach(function (m) { if (m.turma === t.id && m.arqUrl) URL.revokeObjectURL(m.arqUrl); });
+      MATERIAIS = MATERIAIS.filter(function (m) { return m.turma !== t.id; });
+      if (typeof renderAdmMat === 'function') renderAdmMat();
+      if (typeof renderMateriaisAluno === 'function') renderMateriaisAluno();
+    }
+    sincronizarCronoTurmas();
+    renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+    if (typeof admCronoInit === 'function') admCronoInit();
+    if (typeof relTurmasInit === 'function') relTurmasInit();
+    if (typeof ativInit === 'function') ativInit();
+    if (typeof renderPrecoTurmas === 'function') renderPrecoTurmas();
+    salasMudaram();   /* a sala volta a ficar livre no mapa e no seletor */
+    toast('Turma “' + t.nome + '” removida.');
+  }
+  function renderTurmasAdm() {
+    var el = $('admTurmaList'); if (!el) return;
+    el.innerHTML = TURMAS_LOJA.map(function (t) {
+      var c = concursoDe(t.concurso), m = modalidadeDe(t.tipo);
+      return '<div class="adm-bar"><span class="nm">' + t.nome +
+        '<small>' + (t.sala ? t.sala + ' · ' : '') + (t.focoNome || (c ? c.nome : '?')) + ' · ' + (m ? m.nome : t.tipo) + ' · ' + t.turno + ' · ' + t.hor +
+        ' · ' + dataBRcompleta(t.inicio) + ' → ' + dataBRcompleta(t.fim) + '</small></span>' +
+        '<button class="adm-x" data-rm-turma="' + t.id + '" aria-label="Remover">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma cadastrada.</p>';
+    el.querySelectorAll('[data-rm-turma]').forEach(function (b) {
+      b.addEventListener('click', function () { removerTurma(b.dataset.rmTurma); });
+    });
+  }
+  function admEstruturaInit() {
+    renderConcursos(); renderModalidades(); renderTurmasAdm();
+  }
+  /* criar turma acontece num lugar só: Painel de controle (com preço, vagas e horário) */
+  if ($('btnEstrIrCriarTurma')) $('btnEstrIrCriarTurma').addEventListener('click', function () {
+    showView('v-adm-controle', 'navAdmin');
+    var alvo = $('admCtApelido');
+    if (alvo) { alvo.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  });
+
+  /* ---------- Painel de CONTROLE · criação de turmas ----------
+     Nome pré-configurado pelo tipo + apelido; concurso por estado;
+     turno; dois horários seguidos; preços e VAGAS POR MOEDA; árvore
+     do edital em PDF; professores por matéria da árvore.              */
+  /* os concursos que a turma pode ter SÃO os da Estrutura — lista única.
+     Antes havia uma segunda lista aqui, e os dois concursos que só
+     existiam nela (GCM e PF) caíam calados nas matérias genéricas.    */
+  var TURMA_FOCOS = CONCURSOS.map(function (c) { return { id: c.id, nome: c.nome }; });
+  var MATERIAS_GENERICAS = ['Língua Portuguesa', 'Matemática', 'Direito Constitucional', 'Direito Penal', 'Legislação específica'];
+  function ctMaterias() {
+    var c = (typeof concursoDe === 'function') ? concursoDe($('admCtConc').value) : null;
+    return (c && c.arvore) ? c.arvore.map(function (m) { return m[0]; }) : MATERIAS_GENERICAS;
+  }
+  /* árvore do edital anexada no formulário: assim que o PDF entra, as
+     matérias de "Professores por matéria" passam a vir dele.            */
+  var ctArvoreArq = '';
+  function renderCtProfs() {
+    var el = $('admCtProfs'); if (!el) return;
+    var origem = $('admCtArvoreOrigem');
+    if (origem) {
+      var cNome = ($('admCtConc').selectedOptions[0] || {}).textContent || '';
+      var temArv = !!(typeof concursoDe === 'function' && (concursoDe($('admCtConc').value) || {}).arvore);
+      origem.innerHTML = ctArvoreArq
+        ? 'Matérias lidas de <strong>' + ctArvoreArq + '</strong> <span class="ref">[INTEGRAÇÃO REAL] leitura do PDF</span> — na demo valem as do edital de <strong>' + cNome + '</strong>.'
+        : temArv
+          ? 'Matérias da árvore do edital de <strong>' + cNome + '</strong>. Anexe o PDF acima para ler a árvore do arquivo.'
+          : '<strong>' + cNome + '</strong> ainda não tem árvore de edital na Estrutura — valem as <strong>matérias básicas</strong> abaixo. Anexe o PDF do edital para trocar.';
+    }
+    el.innerHTML = ctMaterias().map(function (mat, i) {
+      var docs = docentesDaMateria(mat);
+      var ops = docs.length
+        ? docs.map(function (d) { return '<option>' + d.nome + '</option>'; }).join('')
+        : '<option value="">— sem professor da matéria —</option>';
+      var aviso = docs.length ? '' : '<small style="color:#B45309">cadastre um professor desta matéria no banco</small>';
+      return '<div class="adm-bar"><span class="nm">' + mat + aviso + '</span>' +
+        '<select class="fld" data-ct-prof="' + i + '" style="max-width:170px">' + ops + '</select></div>';
+    }).join('');
+  }
+  /* "Turmas abertas" mostra TUDO o que está no ar — inclusive o que já
+     veio da coordenação —, porque é daqui que se edita e se apaga.     */
+  function renderCtLista() {
+    var el = $('admCtLista'); if (!el) return;
+    var isos = (typeof ISOLADAS !== 'undefined') ? ISOLADAS : [];
+    el.innerHTML = TURMAS_LOJA.map(function (t) {
+      var presos = (typeof matriculasAtivas === 'function')
+        ? matriculasAtivas().filter(function (m) { return m.turmaId === t.id; }).length : 0;
+      return '<div class="adm-bar col"><span class="nm">' + t.nome +
+        (presos ? ' <span class="tag ok">' + presos + ' matriculado' + (presos > 1 ? 's' : '') + '</span>' : '') +
+        '<small>' + (t.tipoDesc || t.tipo) + ' · ' + (t.sala ? t.sala + ' · ' : '') + (nomeConcurso(t.concurso) || t.focoNome || '') +
+        ' · ' + t.turno + ' · ' + t.hor + ' · ' + fmt(t.precoDmn) + ' Dmn/' + fmt(t.precoQdc) + ' QdC · ' +
+        t.vagasDmn + '+' + t.vagasQdc + ' vagas' + (t.edital ? ' · edital anexado' : '') + '</small></span>' +
+        '<span class="bar-acoes"><button class="btn ghost small" data-ed-ct="' + t.id + '">Editar</button>' +
+        '<button class="adm-x" data-rm-ct="' + t.id + '" aria-label="Remover ' + t.nome + '">✕</button></span></div>';
+    }).join('') + isos.map(function (i) {
+      return '<div class="adm-bar col"><span class="nm">' + i.nome + ' <span class="tag">ISOLADA</span>' +
+        '<small>' + isoDesc(i) + ' · ' + fmt(i.preco) + ' ' + moedaTxt(i.moeda) + ' · ' + i.vagas + ' vagas</small></span>' +
+        '<span class="bar-acoes"><button class="btn ghost small" data-ed-iso="' + i.id + '">Editar</button>' +
+        '<button class="adm-x" data-rm-iso="' + i.id + '" aria-label="Remover ' + i.nome + '">✕</button></span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma turma ou isolada aberta por aqui ainda.</p>';
+    el.querySelectorAll('[data-rm-iso]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = ISOLADAS.filter(function (x) { return x.id === b.dataset.rmIso; })[0]; if (!i) return;
+        ISOLADAS = ISOLADAS.filter(function (x) { return x.id !== i.id; });
+        EVENTOS = EVENTOS.filter(function (e) { return e.id !== 'ev-' + i.id; });
+        renderIsoladas(); renderCtLista(); renderEvStrip();
+        if (typeof salasMudaram === 'function') salasMudaram();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        toast('Isolada “' + i.nome + '” removida.');
+      });
+    });
+    el.querySelectorAll('[data-rm-ct]').forEach(function (b) {
+      b.addEventListener('click', function () { removerTurma(b.dataset.rmCt); });
+    });
+    el.querySelectorAll('[data-ed-ct]').forEach(function (b) {
+      b.addEventListener('click', function () { if (window.__ctEditar) window.__ctEditar(b.dataset.edCt); });
+    });
+    el.querySelectorAll('[data-ed-iso]').forEach(function (b) {
+      b.addEventListener('click', function () { if (window.__isoEditar) window.__isoEditar(b.dataset.edIso); });
+    });
+    /* o envio de materiais e o alvo dos avisos escolhem a turma nesta lista */
+    if (typeof admMatTurmasInit === 'function') admMatTurmasInit();
+    if (typeof admAvEscInit === 'function') admAvEscInit();
+  }
+  function nomeConcurso(id) { var c = concursoDe(id); return c ? c.nome : ''; }
+  /* ---------- banco de professores: cadastro, matérias, turnos, status ---------- */
+  function todasMaterias() {
+    var set = {};
+    (typeof CONCURSOS !== 'undefined' ? CONCURSOS : []).forEach(function (c) {
+      if (c.arvore) c.arvore.forEach(function (m) { set[m[0]] = 1; });
+    });
+    MATERIAS_GENERICAS.forEach(function (m) { set[m] = 1; });
+    ['Direito Administrativo', 'Redação oficial', 'Direito Penal Militar', 'Direito Processual Penal'].forEach(function (m) { set[m] = 1; });
+    return Object.keys(set).sort();
+  }
+  function preencheMatSelects() {
+    var mats = todasMaterias();
+    ['admDocMat1', 'admDocMat2', 'admDocMat3'].forEach(function (id, k) {
+      var sel = $(id); if (!sel) return;
+      var vazio = k === 0 ? '' : '<option value="">— (opcional) —</option>';
+      sel.innerHTML = vazio + mats.map(function (m) { return '<option>' + m + '</option>'; }).join('');
+    });
+  }
+  (function () {
+    var host = $('admDocTurnos'); if (!host) return;
+    host.querySelectorAll('.turno-chip').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+    var semGrad = $('admDocSemGrad');
+    if (semGrad) semGrad.addEventListener('change', function () { $('admDocGrad').disabled = semGrad.checked; if (semGrad.checked) $('admDocGrad').value = ''; });
+  })();
+  function renderDocList() {
+    var el = $('admDocList'); if (!el) return;
+    el.innerHTML = DOCENTES.map(function (d, i) {
+      var st = d.desligado ? '<span class="tag warn">DESLIGADO</span>' : d.bloqueado ? '<span class="tag warn">BLOQUEADO</span>' : '<span class="tag ok">ATIVO</span>';
+      return '<div class="adm-bar col"><span class="nm">' + d.nome + ' ' + st +
+        '<small>' + d.materias.join(', ') + ' · ' + d.turnos.join('/') + ' · ' + (d.grad || 'sem graduação') + ' · ' + (d.fone || '—') + '</small></span>' +
+        '<span class="bar-acoes">' +
+        '<button class="btn ghost small" data-doc-ed="' + i + '">Editar</button>' +
+        '<button class="btn ghost small" data-doc-desl="' + i + '">' + (d.desligado ? 'Readmitir' : 'Desligar') + '</button>' +
+        '<button class="btn ghost small" data-doc-bloq="' + i + '">' + (d.bloqueado ? 'Liberar' : 'Bloquear') + '</button>' +
+        '<button class="adm-x" data-doc-rm="' + i + '" aria-label="Apagar cadastro de ' + d.nome + '" title="Apagar o cadastro">✕</button></span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum professor cadastrado.</p>';
+    el.querySelectorAll('[data-doc-ed]').forEach(function (b) {
+      b.addEventListener('click', function () { editarDocente(+b.dataset.docEd); });
+    });
+    el.querySelectorAll('[data-doc-desl]').forEach(function (b) {
+      b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docDesl]; d.desligado = !d.desligado; if (d.desligado) d.bloqueado = false; docentesMudaram(d.desligado ? '“' + d.nome + '” desligado — saiu das listas.' : '“' + d.nome + '” readmitido.'); });
+    });
+    el.querySelectorAll('[data-doc-bloq]').forEach(function (b) {
+      b.addEventListener('click', function () { var d = DOCENTES[+b.dataset.docBloq]; d.bloqueado = !d.bloqueado; docentesMudaram(d.bloqueado ? 'Acesso de “' + d.nome + '” bloqueado.' : 'Acesso de “' + d.nome + '” liberado.'); });
+    });
+    /* apagar é definitivo — pede confirmação no próprio botão antes de sumir */
+    el.querySelectorAll('[data-doc-rm]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var d = DOCENTES[+b.dataset.docRm]; if (!d) return;
+        if (b.dataset.ok !== '1') {
+          el.querySelectorAll('[data-doc-rm]').forEach(function (o) { o.dataset.ok = ''; o.textContent = '✕'; o.classList.remove('x-conf'); });
+          b.dataset.ok = '1'; b.textContent = 'Apagar?'; b.classList.add('x-conf');
+          toast('Toque de novo para apagar o cadastro de “' + d.nome + '” — isso é definitivo.');
+          return;
+        }
+        apagarDocente(d);
+      });
+    });
+  }
+  /* se a coordenação bloqueia ou desliga QUEM ESTÁ LOGADO, a sessão cai na hora */
+  function checarAcessoProf() {
+    if (!profLiberado || !PROF_ATUAL) return;
+    var d = docenteDe(PROF_ATUAL);
+    if (!d || (!d.bloqueado && !d.desligado)) return;
+    var trat = /^(Prof\.ª|Prof\.ª)/.test(PROF_ATUAL) ? 'a sra.' : 'o sr.';
+    profLiberado = false; PROF_ATUAL = null;
+    pollParar();
+    SALA_ATUAL = null;
+    if ($('salaDetail')) $('salaDetail').style.display = 'none';
+    if ($('profTurmasCard')) $('profTurmasCard').style.display = 'block';
+    if ($('profEmail')) $('profEmail').value = '';
+    if ($('profSenha')) $('profSenha').value = '';
+    if ($('profSaidaMsg')) {
+      $('profSaidaMsg').style.display = 'block';
+      $('profSaidaMsg').textContent = 'Olá! Informamos que ' + trat + ' está temporariamente afastado das atividades. ' +
+        'Assim que ajustarmos as coisas por aqui, chamaremos novamente. Qualquer dúvida, fale com a coordenação — obrigado pela parceria.';
+    }
+    if (personaAtiva === 'professor' && $('profGate')) { $('profGate').classList.add('on'); }
+  }
+  /* apagar tira o professor do banco E de tudo que apontava para ele:
+     turmas, eventos e a própria sessão dele, se estiver logado. */
+  function apagarDocente(d) {
+    var nome = d.nome;
+    /* apagou quem estava aberto no formulário: sai do modo edição */
+    if (typeof docEdit !== 'undefined' && docEdit >= 0 && DOCENTES[docEdit] === d) {
+      docEditReset(); docLimpaCampos(); admAlerta('admDocErro', '');
+    }
+    DOCENTES = DOCENTES.filter(function (x) { return x !== d; });
+    if (typeof TURMAS_LOJA !== 'undefined') {
+      TURMAS_LOJA.forEach(function (t) {
+        if (!t.professores) return;
+        Object.keys(t.professores).forEach(function (m) { if (t.professores[m] === nome) delete t.professores[m]; });
+      });
+    }
+    if (typeof EVENTOS !== 'undefined') {
+      EVENTOS.forEach(function (ev) {
+        if (ev.profs) ev.profs = ev.profs.filter(function (n) { return n !== nome; });
+      });
+    }
+    if (typeof RECADOS_PROF !== 'undefined') { delete RECADOS_PROF[nome]; }
+    if (profLiberado && PROF_ATUAL === nome) { profLiberado = false; PROF_ATUAL = null; if ($('profGate')) $('profGate').classList.add('on'); }
+    if (typeof renderAdmEventos === 'function') renderAdmEventos();
+    if (typeof renderEvStrip === 'function') renderEvStrip();
+    if (typeof renderEventosLoja === 'function') renderEventosLoja();
+    docentesMudaram('Cadastro de “' + nome + '” apagado — saiu do banco, das turmas e dos eventos.');
+  }
+  function docentesMudaram(msg) {
+    sincProfessores();
+    checarAcessoProf();
+    renderDocList();
+    if (typeof renderCtProfs === 'function') renderCtProfs();
+    if (typeof profGateNota === 'function') profGateNota();
+    if (typeof renderEvProfChips === 'function') renderEvProfChips();
+    if (typeof renderProfTudo === 'function') renderProfTudo();
+    if (typeof admMsgSelects === 'function') admMsgSelects();
+    if (msg) toast(msg);
+  }
+  /* ---------- editar o cadastro do professor ----------
+     O mesmo formulário serve para cadastrar e para corrigir. O NOME é a
+     chave do professor em todo o app (turmas, isoladas, eventos, grade e
+     recados), então renomear propaga a troca — senão o professor sumiria
+     das aulas dele.                                                     */
+  var docEdit = -1;
+  function docBotao(txt) {
+    var b = $('btnAdmDoc'); if (b) b.textContent = txt;
+    var c = $('btnAdmDocCancelar'); if (c) c.style.display = (docEdit < 0 ? 'none' : '');
+  }
+  function docLimpaCampos() {
+    $('admDocNome').value = ''; $('admDocGrad').value = ''; $('admDocFone').value = '';
+    $('admDocSemGrad').checked = false; $('admDocGrad').disabled = false;
+    $('admDocMat1').selectedIndex = 0; $('admDocMat2').value = ''; $('admDocMat3').value = '';
+    $('admDocTurnos').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
+  }
+  function docEditReset() { docEdit = -1; docBotao('Cadastrar professor'); }
+  function editarDocente(i) {
+    var d = DOCENTES[i]; if (!d) return;
+    docEdit = i;
+    $('admDocNome').value = d.nome;
+    $('admDocMat1').value = d.materias[0] || '';
+    $('admDocMat2').value = d.materias[1] || '';
+    $('admDocMat3').value = d.materias[2] || '';
+    $('admDocTurnos').querySelectorAll('.turno-chip').forEach(function (c) {
+      c.classList.toggle('on', d.turnos.indexOf(c.dataset.turno) >= 0);
+    });
+    $('admDocSemGrad').checked = !d.grad;
+    $('admDocGrad').value = d.grad || '';
+    $('admDocGrad').disabled = !d.grad;
+    $('admDocFone').value = d.fone || '';
+    docBotao('Salvar alterações');
+    admAlerta('admDocErro', 'Editando <b>' + d.nome + '</b>. O e-mail de acesso dele é <b>' + emailDoProf(d.nome) +
+      '</b> — trocar o nome muda esse e-mail e atualiza as turmas, isoladas, eventos e a grade onde ele aparece.', true);
+    $('admDocNome').scrollIntoView({ block: 'center' });
+  }
+  /* o nome é chave: renomear tem de alcançar tudo o que aponta para ele */
+  function renomearDocente(de, para) {
+    if (de === para) return;
+    if (typeof TURMAS_LOJA !== 'undefined') {
+      TURMAS_LOJA.forEach(function (t) {
+        if (!t.professores) return;
+        Object.keys(t.professores).forEach(function (m) { if (t.professores[m] === de) t.professores[m] = para; });
+      });
+    }
+    if (typeof ISOLADAS !== 'undefined') {
+      ISOLADAS.forEach(function (i) { if (i.prof === de) i.prof = para; });
+    }
+    if (typeof EVENTOS !== 'undefined') {
+      EVENTOS.forEach(function (ev) {
+        if (ev.profs) ev.profs = ev.profs.map(function (n) { return n === de ? para : n; });
+      });
+    }
+    if (typeof CRONO !== 'undefined' && CRONO.turmas) {
+      Object.keys(CRONO.turmas).forEach(function (k) {
+        (CRONO.turmas[k].aulas || []).forEach(function (dia) {
+          dia.forEach(function (a) { if (a && a.p === de) a.p = para; });
+        });
+      });
+    }
+    if (typeof RECADOS_PROF !== 'undefined' && RECADOS_PROF[de]) {
+      RECADOS_PROF[para] = RECADOS_PROF[de]; delete RECADOS_PROF[de];
+    }
+    if (typeof PROF_ATUAL !== 'undefined' && PROF_ATUAL === de) PROF_ATUAL = para;
+  }
+  var btnAdmDocEl = $('btnAdmDoc');
+  if (btnAdmDocEl) btnAdmDocEl.addEventListener('click', function () {
+    admAlerta('admDocErro', '');
+    var editando = docEdit >= 0 ? DOCENTES[docEdit] : null;
+    var nome = $('admDocNome').value.trim();
+    function falta(cond, msg) { if (!cond) return false; admAlerta('admDocErro', msg); return true; }
+    if (falta(!nome || /["<>]/.test(nome), 'Informe um <b>nome válido</b> para o professor.')) return;
+    var homonimo = docenteDe(nome);
+    if (falta(homonimo && homonimo !== editando, 'Já existe um professor com esse nome.')) return;
+    var mats = ['admDocMat1', 'admDocMat2', 'admDocMat3'].map(function (id) { return $(id).value; }).filter(function (m) { return m; });
+    mats = mats.filter(function (m, i) { return mats.indexOf(m) === i; });   /* sem repetidas */
+    if (falta(!mats.length, 'Escolha <b>ao menos uma matéria</b>.')) return;
+    var turnos = [];
+    $('admDocTurnos').querySelectorAll('.turno-chip.on').forEach(function (c) { turnos.push(c.dataset.turno); });
+    if (falta(!turnos.length, 'Marque <b>ao menos um turno</b> de disponibilidade.')) return;
+    var semGrad = $('admDocSemGrad').checked;
+    var grad = semGrad ? '' : $('admDocGrad').value.trim();
+    var fone = $('admDocFone').value.trim();
+    if (editando) {
+      var antes = editando.nome;
+      var perdidas = editando.materias.filter(function (m) { return mats.indexOf(m) < 0; });
+      editando.nome = nome; editando.materias = mats; editando.turnos = turnos;
+      editando.grad = grad; editando.fone = fone;
+      renomearDocente(antes, nome);
+      docEditReset(); docLimpaCampos();
+      var aviso = '<b>' + nome + '</b> atualizado' + (antes !== nome ? ' (era “' + antes + '”)' : '') +
+        '. Vale nas turmas, isoladas, eventos e no cronograma.' +
+        (perdidas.length ? ' Ele deixou de dar <b>' + perdidas.join(', ') + '</b> — confira quem assume nas turmas.' : '');
+      admAlerta('admDocErro', aviso, true);
+      docentesMudaram('Cadastro de “' + nome + '” atualizado.');
+      return;
+    }
+    DOCENTES.push({ nome: nome, materias: mats, turnos: turnos, grad: grad, fone: fone, desligado: false, bloqueado: false });
+    docLimpaCampos();
+    admAlerta('admDocErro', 'Professor <b>' + nome + '</b> cadastrado — acesso por <b>' + emailDoProf(nome) +
+      '</b>, senha inicial <b>' + PROF_SENHA_DEMO + '</b>.', true);
+    docentesMudaram('Professor “' + nome + '” cadastrado — já aparece nas matérias que ministra.');
+  });
+  if ($('btnAdmDocCancelar')) $('btnAdmDocCancelar').addEventListener('click', function () {
+    docEditReset(); docLimpaCampos();
+    admAlerta('admDocErro', 'Edição cancelada — nada foi alterado.', true);
+  });
+  preencheMatSelects(); renderDocList();
+
+  (function () {
+    var tipoSel = $('admCtTipo'); if (!tipoSel) return;
+    tipoSel.innerHTML = MODALIDADES.map(function (m) {
+      return '<option value="' + m.id + '">' + m.nome + '</option>';
+    }).join('') + '<option value="ISOLADA">Matérias isoladas</option>';
+    function ehIsolada() { return tipoSel.value === 'ISOLADA'; }
+    function admCtIsoToggle() {
+      var iso = ehIsolada();
+      $('admCtIsoBox').style.display = iso ? 'block' : 'none';
+      $('admCtProfsBox').style.display = iso ? 'none' : 'block';
+      $('admCtApelido').placeholder = iso ? 'Matéria (ex.: Língua Portuguesa)' : 'Apelido (ex.: Turma Águia)';
+      $('admCtLbHor').textContent = iso ? 'Horário da aula' : 'Horário dos dois tempos';
+      $('admCtLbVagas').textContent = iso ? 'Vagas' : 'Vagas em Diamantes';
+      $('admCtVagasQdcBox').style.display = iso ? 'none' : '';
+      $('admCtLbH1').textContent = iso ? 'Começa às' : '1º tempo começa';
+      $('admCtLbH1f').textContent = iso ? 'Termina às' : '1º termina · 2º começa';
+      $('admCtH2Box').style.display = iso ? 'none' : '';
+      $('admCtH1f').title = iso ? 'Fim da aula isolada' : 'Fim do 1º tempo — o 2º começa aqui';
+      $('btnAdmCtAbrir').textContent = iso ? 'Abrir isolada' : 'Abrir turma';
+      if (iso) {
+        $('admCtIsoProf').innerHTML = (typeof docentesAtivos === 'function' ? docentesAtivos() : [])
+          .map(function (d) { return '<option>' + d.nome + '</option>'; }).join('')
+          || '<option value="">— sem professor no banco —</option>';
+      }
+    }
+    /* ---------- eco do que já foi preenchido ----------
+       O campo de hora não deixa claro se pegou; aqui o horário aparece
+       escrito, em verde, assim que os dois tempos estão completos.     */
+    function hLab(t) { var q = (t || '').split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; }
+    function admCtEco() {
+      var eco = $('admCtEco'); if (!eco) return;
+      var iso = ehIsolada();
+      var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      var chips = [];
+      if (ini && fim) chips.push(['ok', 'Período: ' + dataBRcompleta(ini) + ' → ' + dataBRcompleta(fim)]);
+      else chips.push(['', 'Período: escolha início e término']);
+      if (iso) {
+        if (h1i && h1f && h1i < h1f) chips.push(['ok', 'Horário: ' + hLab(h1i) + '–' + hLab(h1f)]);
+        else chips.push(['', 'Horário: das __ às __']);
+      } else if (h1i && h1f && h2f && h1i < h1f && h1f < h2f) {
+        chips.push(['ok', 'Horário: ' + hLab(h1i) + '–' + hLab(h1f) + ' e ' + hLab(h1f) + '–' + hLab(h2f)]);
+      } else {
+        chips.push(['', 'Horário: 1º e 2º tempos ainda incompletos']);
+      }
+      /* o turno é consequência do horário — mostrado aqui, nunca escolhido */
+      var tn = turnoDoHorario(h1i);
+      chips.push(tn ? ['ok', 'Turno: ' + tn + ' (pelo horário)'] : ['', 'Turno: sai do horário que você digitar']);
+      /* vagas por moeda: a soma é o total — dito em voz alta */
+      if (!iso) {
+        var evd = parseInt($('admCtVagas').value, 10), evq = parseInt($('admCtVagasQdc').value, 10);
+        if (!isNaN(evd) && !isNaN(evq)) {
+          chips.push([(evd + evq) > 0 ? 'ok' : '', 'Vagas: ' + evd + ' em Dmn + ' + evq + ' em QdC = ' + (evd + evq) + ' no total']);
+        } else {
+          chips.push(['', 'Vagas: informe as de cada moeda (0 vale)']);
+        }
+      }
+      eco.innerHTML = chips.map(function (c) { return '<span class="ec ' + c[0] + '">' + c[1] + '</span>'; }).join('');
+    }
+    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f', 'admCtVagas', 'admCtVagasQdc'].forEach(function (id) {
+      var el = $(id); if (!el) return;
+      ['input', 'change', 'blur'].forEach(function (ev) { el.addEventListener(ev, admCtEco); });
+    });
+    window.__ctEco = admCtEco;
+    /* seletor de sala: a opção diz só o nome da sala; o eco abaixo é que
+       confere a sala contra o dia e o horário já digitados             */
+    function ctSalaOpcoes() {
+      var sel = $('admCtSala'); if (!sel) return;
+      var iso = tipoSel.value === 'ISOLADA';
+      sel.innerHTML = salaOpcoesHTML(sel, iso ? 'Em qual sala a isolada funciona?' : 'Em qual sala a turma funciona?');
+    }
+    /* o que a turma/isolada vai ocupar, com o que já foi preenchido;
+       null enquanto faltar dia ou horário                              */
+    function ctSalaAlvo(sala) {
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      if (!ini || !fim || fim < ini) return null;
+      if (tipoSel.value === 'ISOLADA') {
+        var dias = [].slice.call($('admCtDias').querySelectorAll('.turno-chip.on'))
+          .map(function (c) { return DIA_IDX[c.dataset.dia]; });
+        var iHi = $('admCtH1i').value, iHf = $('admCtH1f').value;
+        if (!dias.length || !iHi || !iHf || !(iHi < iHf)) return null;
+        var fxI = faixaDe(iHi + '–' + iHf); if (!fxI) return null;
+        return { sala: sala, dias: dias, ini: fxI[0], fim: fxI[1], de: ini, ate: fim, id: null };
+      }
+      var h1i = $('admCtH1i').value, h2f = $('admCtH2f').value;
+      if (!h1i || !h2f || !(h1i < h2f)) return null;
+      var fxT = faixaCompleta(hl2(h1i) + '–' + hl2(h2f)); if (!fxT) return null;
+      return { sala: sala, dias: [1, 2, 3, 4, 5], ini: fxT[0], fim: fxT[1], de: ini, ate: fim, id: null };
+    }
+    function ctSalaEco() {
+      var eco = $('admCtSalaEco'); if (!eco) return;
+      var sl = $('admCtSala').value;
+      if (!sl) { eco.style.display = 'none'; return; }
+      eco.style.display = '';
+      eco.innerHTML = salaEcoHTML(sl, ctSalaAlvo(sl));
+    }
+    $('admCtSala').addEventListener('change', function () { ctSalaEco(); admLimpaErro(['admCtSala']); });
+    /* mudou data, horário ou dia da isolada? o eco reconfere a sala */
+    ['admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f'].forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('change', ctSalaEco);
+    });
+    $('admCtDias').addEventListener('click', function () { setTimeout(ctSalaEco, 0); });
+    window.__ctSalaRefresh = function () { ctSalaOpcoes(); ctSalaEco(); };
+    /* o preenchimento inicial roda no fim da carga, quando salas, isoladas
+       e turmas já existem (__ctSalaRefresh é chamado junto do renderSalas) */
+    tipoSel.addEventListener('change', function () { admCtIsoToggle(); admCtEco(); ctSalaOpcoes(); ctSalaEco(); });
+    $('admCtDias').querySelectorAll('.turno-chip').forEach(function (bt) {
+      bt.addEventListener('click', function () { bt.classList.toggle('on'); });
+    });
+    admCtIsoToggle(); admCtEco();
+    window.__isoToggle = admCtIsoToggle;
+    $('admCtConc').innerHTML = TURMA_FOCOS.map(function (fo) {
+      return '<option value="' + fo.id + '">' + fo.nome + '</option>';
+    }).join('');
+    $('admCtConc').addEventListener('change', renderCtProfs);
+    /* PDF do edital anexado → as matérias passam a sair dele, na hora */
+    var arvIn = $('admCtArvore');
+    if (arvIn) arvIn.addEventListener('change', function () {
+      ctArvoreArq = (this.files && this.files[0]) ? this.files[0].name : '';
+      renderCtProfs();
+      if (ctArvoreArq) toast('Árvore do edital anexada — “Professores por matéria” já está com as matérias desse edital.');
+    });
+    renderCtProfs();
+    /* aviso que fica na tela e marca o campo que falta */
+    var CT_CAMPOS = ['admCtApelido', 'admCtSala', 'admCtIni', 'admCtFim', 'admCtH1i', 'admCtH1f', 'admCtH2f',
+                     'admCtPrecoDmn', 'admCtPrecoQdc', 'admCtVagas', 'admCtVagasQdc'];
+    function hl2(t) { return t; }   /* horários já vêm como HH:MM */
+    function ctFalta(cond, campo, msg) {
+      if (!cond) return false;
+      admAlerta('admCtErro', msg);
+      if (campo) admMarcaErro(campo);
+      return true;
+    }
+    CT_CAMPOS.forEach(function (id) {
+      var el = $(id); if (!el) return;
+      ['input', 'change'].forEach(function (ev) { el.addEventListener(ev, function () { el.classList.remove('err'); }); });
+    });
+    /* ---------- editar uma turma ou isolada já aberta ----------
+       O mesmo formulário abre e fecha: "Editar" traz os dados para cá,
+       o botão vira "Salvar alterações" e a gravação é feita no lugar,
+       preservando matrículas e id.                                     */
+    var ctEdit = null, ctEditIso = null;
+    function ctBotao(txt) { var b = $('btnAdmCtAbrir'); if (b) b.textContent = txt; var c = $('btnAdmCtCancelar'); if (c) c.style.display = (txt === 'Abrir turma' ? 'none' : ''); }
+    function ctLimpaCampos() {
+      $('admCtApelido').value = ''; $('admCtIni').value = ''; $('admCtFim').value = '';
+      $('admCtH1i').value = ''; $('admCtH1f').value = ''; $('admCtH2f').value = '';
+      $('admCtPrecoDmn').value = ''; $('admCtPrecoQdc').value = ''; $('admCtVagas').value = ''; $('admCtVagasQdc').value = '';
+      $('admCtSala').value = ''; ctSalaOpcoes(); ctSalaEco();
+      $('admCtDias').querySelectorAll('.turno-chip.on').forEach(function (c) { c.classList.remove('on'); });
+      admCtEco();
+    }
+    function ctEditReset() { ctEdit = null; ctEditIso = null; ctBotao('Abrir turma'); }
+    /* "19h–20h30 e 20h30–22h" → ['19:00','20:30','22:00'] */
+    function horEmCampos(hor) {
+      var q = String(hor || '').match(/\d{1,2}h(?:\d{2})?/g) || [];
+      return q.map(function (x) {
+        var pr = x.split('h');
+        return (pr[0].length < 2 ? '0' : '') + pr[0] + ':' + (pr[1] || '00');
+      });
+    }
+    window.__ctEditar = function (id) {
+      var t = turmaDe(id); if (!t) return;
+      ctEdit = id; ctEditIso = null;
+      tipoSel.value = t.tipo; admCtIsoToggle();
+      $('admCtApelido').value = String(t.nome).replace(/^Turma\s+/, '');
+      $('admCtConc').value = t.concurso; renderCtProfs();
+      $('admCtIni').value = t.inicio || ''; $('admCtFim').value = t.fim || '';
+      var hs = horEmCampos(t.hor);
+      $('admCtH1i').value = hs[0] || ''; $('admCtH1f').value = hs[1] || ''; $('admCtH2f').value = hs[3] || hs[2] || '';
+      $('admCtPrecoDmn').value = t.precoDmn || ''; $('admCtPrecoQdc').value = t.precoQdc || '';
+      $('admCtVagas').value = t.vagasDmn || 0; $('admCtVagasQdc').value = t.vagasQdc || 0;
+      ctSalaOpcoes(); $('admCtSala').value = t.sala || ''; ctSalaEco();
+      admCtEco(); ctBotao('Salvar alterações');
+      admAlerta('admCtErro', 'Editando <b>' + t.nome + '</b> — as mudanças valem na Quad Store e para quem já está matriculado.', true);
+      $('admCtApelido').scrollIntoView({ block: 'center' });
+    };
+    window.__isoEditar = function (id) {
+      var i = ISOLADAS.filter(function (x) { return x.id === id; })[0]; if (!i) return;
+      ctEditIso = id; ctEdit = null;
+      tipoSel.value = 'ISOLADA'; admCtIsoToggle();
+      $('admCtApelido').value = i.materia || i.nome;
+      $('admCtDias').querySelectorAll('.turno-chip').forEach(function (c) {
+        c.classList.toggle('on', (i.dias || []).indexOf(c.dataset.dia) >= 0);
+      });
+      if ($('admCtIsoProf')) $('admCtIsoProf').value = i.prof || '';
+      $('admCtIni').value = i.ini || ''; $('admCtFim').value = i.fim || '';
+      $('admCtH1i').value = i.hi || ''; $('admCtH1f').value = i.hf || '';
+      var emDmn = i.moeda === 'dmn';
+      $('admCtPrecoDmn').value = emDmn ? i.preco : ''; $('admCtPrecoQdc').value = emDmn ? '' : i.preco;
+      $('admCtVagas').value = i.vagas || '';
+      ctSalaOpcoes(); $('admCtSala').value = i.sala || ''; ctSalaEco();
+      admCtEco(); ctBotao('Salvar alterações');
+      admAlerta('admCtErro', 'Editando <b>' + i.nome + '</b> — as mudanças valem na Quad Store.', true);
+      $('admCtApelido').scrollIntoView({ block: 'center' });
+    };
+    if ($('btnAdmCtCancelar')) $('btnAdmCtCancelar').addEventListener('click', function () {
+      ctEditReset(); ctLimpaCampos();
+      admAlerta('admCtErro', 'Edição cancelada — nada foi alterado.', true);
+    });
+    $('btnAdmCtAbrir').addEventListener('click', function () {
+      var tipo = tipoSel.value, ape = $('admCtApelido').value.trim();
+      admAlerta('admCtErro', ''); admLimpaErro(CT_CAMPOS);
+      /* ---------- MATÉRIAS ISOLADAS: dias fixos + período ---------- */
+      if (tipo === 'ISOLADA') {
+        var dias = [].slice.call($('admCtDias').querySelectorAll('.turno-chip.on')).map(function (c) { return c.dataset.dia; });
+        var iIni = $('admCtIni').value, iFim = $('admCtFim').value;
+        var iHi = $('admCtH1i').value, iHf = $('admCtH1f').value;
+        var iDmn = parseInt($('admCtPrecoDmn').value, 10), iQdc = parseInt($('admCtPrecoQdc').value, 10);
+        var iVagas = parseInt($('admCtVagas').value, 10);
+        if (ctFalta(!ape, 'admCtApelido', 'Para abrir a isolada falta a <b>matéria</b> — escreva-a no campo do topo.')) return;
+        if (ctFalta(/["<>]/.test(ape), 'admCtApelido', 'Use um nome sem aspas ou sinais.')) return;
+        if (ctFalta(!dias.length, '', 'Para abrir a isolada falta marcar <b>ao menos um dia da semana</b>.')) return;
+        if (ctFalta(!iIni, 'admCtIni', 'Para abrir a isolada falta a <b>data de início</b>.')) return;
+        if (ctFalta(!iFim, 'admCtFim', 'Para abrir a isolada falta a <b>data de término</b>.')) return;
+        if (ctFalta(iFim < iIni, 'admCtFim', 'O <b>término</b> precisa ser depois do início.')) return;
+        if (ctFalta(!iHi, 'admCtH1i', 'Para abrir a isolada falta a <b>hora de início</b> da aula.')) return;
+        if (ctFalta(!iHf, 'admCtH1f', 'Para abrir a isolada falta a <b>hora de término</b> da aula.')) return;
+        if (ctFalta(!(iHi < iHf), 'admCtH1f', 'A <b>hora de término</b> precisa ser depois da hora de início.')) return;
+        if (ctFalta((!iDmn || iDmn < 1) && (!iQdc || iQdc < 1), 'admCtPrecoDmn', 'Para abrir a isolada falta o <b>preço</b> em ao menos uma moeda.')) return;
+        if (ctFalta(!iVagas || iVagas < 1, 'admCtVagas', 'Para abrir a isolada faltam as <b>vagas</b>.')) return;
+        var salaIso = $('admCtSala').value;
+        if (ctFalta(!salaIso, 'admCtSala', 'Para abrir a isolada falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+        if (ctFalta(salaCap(salaIso) && iVagas > salaCap(salaIso), 'admCtVagas', 'A <b>' + salaIso + '</b> comporta <b>' + salaCap(salaIso) + '</b> pessoas — você pediu ' + iVagas + ' vagas.')) return;
+        var fxIso = faixaDe(iHi + '–' + iHf);
+        var chIso = salaConflito({ sala: salaIso, dias: dias.map(function (d) { return DIA_IDX[d]; }), ini: fxIso[0], fim: fxIso[1], de: iIni, ate: iFim, id: ctEditIso });
+        if (chIso && ctFalta(true, 'admCtSala', 'A <b>' + salaIso + '</b> já tem <b>' + chIso.rot + '</b> nesse horário (' + chIso.hor +
+          (chIso.ate ? ', até ' + dataBRcompleta(chIso.ate) : '') + ') — escolha outra sala ou outro horário.')) return;
+        var usaDmn = !!(iDmn && iDmn >= 1);
+        var novaIso = { id: ctEditIso || ('iso' + Date.now()), materia: ape, nome: 'Isolada ' + ape, sala: salaIso,
+          prof: $('admCtIsoProf') ? $('admCtIsoProf').value : '', dias: dias, hi: iHi, hf: iHf,
+          ini: iIni, fim: iFim, preco: usaDmn ? iDmn : iQdc, moeda: usaDmn ? 'dmn' : 'qdc', vagas: iVagas, criada: true };
+        var editandoIso = ctEditIso;
+        if (editandoIso) {
+          /* grava no lugar: o item da Loja e a agenda seguem os mesmos */
+          ISOLADAS = ISOLADAS.map(function (x) { return x.id === editandoIso ? novaIso : x; });
+          EVENTOS = EVENTOS.filter(function (e) { return e.id !== 'ev-' + editandoIso; });
+        } else {
+          ISOLADAS.push(novaIso);
+        }
+        ctEditReset();
+        renderIsoladas(); renderCtLista();
+        if (typeof renderEvStrip === 'function') renderEvStrip();
+        if (typeof renderPrecos === 'function') renderPrecos();
+        ctLimpaCampos();
+        $('admCtVagasQdc').value = ''; $('admCtArvore').value = '';
+        if (typeof renderSalas === 'function') renderSalas();
+        admAlerta('admCtErro', 'Isolada de <b>' + ape + '</b> ' + (editandoIso ? 'atualizada' : 'aberta') + ' na <b>' + salaIso + '</b> — ' + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.', true);
+        toast('Isolada de ' + ape + (editandoIso ? ' atualizada — ' : ' aberta — ') + isoDiasTxt(novaIso) + ' · ' + isoHorarioTxt(novaIso) + ', já na Quad Store.');
+        return;
+      }
+      var foco = TURMA_FOCOS.filter(function (fo) { return fo.id === $('admCtConc').value; })[0];
+      var ini = $('admCtIni').value, fim = $('admCtFim').value;
+      var h1i = $('admCtH1i').value, h1f = $('admCtH1f').value, h2f = $('admCtH2f').value;
+      var turno = turnoDoHorario(h1i);   /* o turno vem do horário, não de um seletor à parte */
+      var pDmn = parseInt($('admCtPrecoDmn').value, 10), pQdc = parseInt($('admCtPrecoQdc').value, 10);
+      var vDmn = parseInt($('admCtVagas').value, 10), vQdc = parseInt($('admCtVagasQdc').value, 10);
+      var vagas = (vDmn || 0) + (vQdc || 0);   /* total = soma das moedas */
+      if (ctFalta(/["<>]/.test(ape), 'admCtApelido', 'Use um apelido sem aspas ou sinais.')) return;
+      if (ctFalta(!ini, 'admCtIni', 'Para abrir a turma falta a <b>data de início</b>.')) return;
+      if (ctFalta(!fim, 'admCtFim', 'Para abrir a turma falta a <b>data de término</b>.')) return;
+      if (ctFalta(fim < ini, 'admCtFim', 'O <b>término</b> precisa ser depois do início.')) return;
+      if (ctFalta(!h1i, 'admCtH1i', 'Para abrir a turma falta a <b>hora em que o 1º tempo começa</b>.')) return;
+      if (ctFalta(!h1f, 'admCtH1f', 'Para abrir a turma falta a <b>hora em que o 1º tempo termina</b> — é quando o 2º começa.')) return;
+      if (ctFalta(!h2f, 'admCtH2f', 'Para abrir a turma falta a <b>hora em que o 2º tempo termina</b>.')) return;
+      if (ctFalta(!(h1i < h1f && h1f < h2f), 'admCtH1f', 'Os tempos precisam ser seguidos: o 2º começa quando o 1º termina.')) return;
+      if (ctFalta(!pDmn || pDmn < 1, 'admCtPrecoDmn', 'Para abrir a turma falta o <b>preço em Diamantes</b>.')) return;
+      if (ctFalta(!pQdc || pQdc < 1, 'admCtPrecoQdc', 'Para abrir a turma falta o <b>preço em Quad Coins</b>.')) return;
+      if (ctFalta(isNaN(vDmn), 'admCtVagas', 'Diga as <b>vagas em Diamantes</b> — escreva 0 se todas forem em Quad Coins.')) return;
+      if (ctFalta(isNaN(vQdc), 'admCtVagasQdc', 'Diga as <b>vagas em Quad Coins</b> — escreva 0 se todas forem em Diamantes.')) return;
+      if (ctFalta(vDmn < 0 || vQdc < 0, 'admCtVagas', 'Vagas não podem ser negativas.')) return;
+      if (ctFalta(vagas < 1, 'admCtVagas', 'A turma precisa de <b>ao menos 1 vaga</b> — informe as vagas de cada moeda.')) return;
+      var sala = $('admCtSala').value;
+      if (ctFalta(!sala, 'admCtSala', 'Para abrir a turma falta dizer <b>em qual sala da sede</b> ela vai funcionar.')) return;
+      if (ctFalta(salaCap(sala) && vagas > salaCap(sala), 'admCtVagas', 'A <b>' + sala + '</b> comporta <b>' + salaCap(sala) + '</b> pessoas — você pediu ' + vagas + ' vagas. Reduza as vagas ou escolha uma sala maior.')) return;
+      var fxNova = faixaCompleta(hl2(h1i) + '–' + hl2(h2f));
+      var choqueSala = salaConflito({ sala: sala, dias: [1, 2, 3, 4, 5], ini: fxNova[0], fim: fxNova[1], de: ini, ate: fim, id: ctEdit });
+      if (choqueSala && ctFalta(true, 'admCtSala', 'A <b>' + sala + '</b> já tem <b>' + choqueSala.rot + '</b> nesse horário (' + choqueSala.hor +
+        (choqueSala.ate ? ', até ' + dataBRcompleta(choqueSala.ate) : '') + ') — escolha outra sala, outro horário ou espere o período acabar.')) return;
+      var arq = ($('admCtArvore').files && $('admCtArvore').files[0]) ? $('admCtArvore').files[0].name : '';
+      var profs = {};
+      var mats = ctMaterias();
+      $('admCtProfs').querySelectorAll('[data-ct-prof]').forEach(function (sel, i) { profs[mats[i]] = sel.value; });
+      var hl = function (t) { var q = t.split(':'); return q[1] === '00' ? q[0] + 'h' : q[0] + 'h' + q[1]; };
+      var hor = hl(h1i) + '–' + hl(h1f) + ' e ' + hl(h1f) + '–' + hl(h2f);
+      var editando = ctEdit;
+      var id = editando || ('ct' + Date.now());
+      /* o nome da turma é o APELIDO — RONDESP, CORE, Águia… O tipo
+         (nivelamento / regular / questões) fica na ficha, ao lado.      */
+      var mod = modalidadeDe(tipo) || {};
+      var nome = ape ? (/^turma\b/i.test(ape) ? ape : 'Turma ' + ape) : (mod.nome || ('Turma ' + tipo));
+      var novaTurma = { id: id, criada: true, nome: nome, tipo: tipo, tipoDesc: mod.nome || tipo, sala: sala, turno: turno, hor: hor,
+        concurso: foco.id, focoNome: foco.nome, precoDmn: pDmn, precoQdc: pQdc, vagasDmn: vDmn, vagasQdc: vQdc,
+        inicio: ini, fim: fim, edital: arq, professores: profs };
+      if (editando) {
+        TURMAS_LOJA = TURMAS_LOJA.map(function (x) { return x.id === editando ? novaTurma : x; });
+      } else {
+        TURMAS_LOJA.push(novaTurma);
+      }
+      ctEditReset();
+      sincronizarCronoTurmas();   /* a turma nova já nasce no Cronograma semanal */
+      renderCtLista(); renderTurmasLoja(); renderTurmasAdm();
+      if (typeof admCronoInit === 'function') admCronoInit();
+      if (typeof relTurmasInit === 'function') relTurmasInit();
+      if (typeof ativInit === 'function') ativInit();
+      if (typeof renderPrecoTurmas === 'function') renderPrecoTurmas();
+      if (typeof renderAulaHoje === 'function') renderAulaHoje();   /* horário novo sincroniza a Aula de hoje */
+      if (typeof admCronoPrefill === 'function') admCronoPrefill();  /* e o editor de cronograma */
+      ctLimpaCampos();
+      $('admCtArvore').value = '';
+      if (typeof renderSalas === 'function') renderSalas();
+      ctArvoreArq = ''; renderCtProfs();
+      admAlerta('admCtErro', '<b>' + nome + '</b> ' + (editando ? 'atualizada' : 'aberta') + ' na <b>' + sala + '</b> (' + turno + ') — já está na Quad Store, em “Turmas · modalidades do Quad”, com ' + vDmn + ' vagas em Diamantes e ' + vQdc + ' em Quad Coins (' + vagas + ' no total).', true);
+      toast('“' + nome + '” ' + (editando ? 'atualizada' : 'aberta') + ' — na Quad Store com ' + vDmn + ' vagas em Dmn e ' + vQdc + ' em QdC.');
+    });
+    renderCtLista();
+  })();
+
+  /* ---------- atalhos das áreas do admin ----------
+     Cada botão do cabeçalho abre o seu bloco: os demais somem da tela e a
+     área volta ao topo. Tocar de novo (ou em "Ver todos") mostra tudo.   */
+  /* seleção por área: '' = nenhum bloco aberto (tela limpa, só os
+     atalhos) · '*' = todos · uma chave = só aquele bloco             */
+  var admJumpSel = {};
+  var ADM_AREAS = [['jumpControle', 'v-adm-controle'], ['jumpInterno', 'v-adm-hoje'],
+                   ['jumpLiber', 'v-adm-liber'], ['jumpLojaAdm', 'v-adm-loja']];
+  function admJumpPadrao() { return window.__admTudo ? '*' : ''; }   /* '*' é atalho da suíte de testes */
+  function admJumpAplica(view, chave) {
+    var v = document.getElementById(view); if (!v) return;
+    admJumpSel[view] = chave;
+    v.querySelectorAll('[data-bl]').forEach(function (c) {
+      c.style.display = (chave === '*' || c.dataset.bl === chave) ? '' : 'none';
+    });
+    v.querySelectorAll('.adm-jump .jp').forEach(function (b) {
+      b.classList.toggle('on', b.dataset.jump === chave);
+    });
+  }
+  function admJumpRestaura(view) {
+    admJumpAplica(view, admJumpSel[view] == null ? admJumpPadrao() : admJumpSel[view]);
+  }
+  window.__admBlocos = admJumpAplica;   /* exposto para a suíte de testes */
+  (function () {
+    ADM_AREAS.forEach(function (par) {
+      var host = document.getElementById(par[0]); if (!host) return;
+      host.querySelectorAll('.jp').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          var chave = bt.dataset.jump;
+          /* tocar de novo no bloco aberto o recolhe e devolve a tela limpa */
+          if (bt.classList.contains('on')) chave = '';
+          admJumpAplica(par[1], chave);
+          var topo = document.getElementById(par[1]);   /* a própria view é quem rola */
+          if (topo && topo.scrollTo) topo.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (topo) topo.scrollTop = 0;
+        });
+      });
+      admJumpRestaura(par[1]);   /* a área nasce limpa: só o painel de atalhos */
+    });
+  })();
+  /* ---------- avisos fixos de erro dentro do bloco ----------
+     O toast some sozinho; estes ficam na tela até o problema ser resolvido,
+     e o campo que falta fica marcado em vermelho.                        */
+  function admAlerta(id, msg, ok) {
+    var el = document.getElementById(id); if (!el) return;
+    if (!msg) { el.className = 'adm-alerta'; el.innerHTML = ''; return; }
+    el.className = 'adm-alerta on' + (ok ? ' ok' : '');
+    el.innerHTML = (ok ? '<span aria-hidden="true">✓</span>' : '<span aria-hidden="true">⚠</span>') + '<span>' + msg + '</span>';
+  }
+  function admLimpaErro(ids) {
+    ids.forEach(function (i) { var e = document.getElementById(i); if (e) e.classList.remove('err'); });
+  }
+  function admMarcaErro(id) {
+    var e = document.getElementById(id); if (!e) return;
+    e.classList.add('err');
+    /* só rola até o campo se ele estiver fora da tela — evitar o pulo é o
+       que mantém a área estável enquanto se corrige o formulário       */
+    var view = e.closest('.view');
+    if (!view || !e.getBoundingClientRect) return;
+    var r = e.getBoundingClientRect(), v = view.getBoundingClientRect();
+    if (r.top < v.top + 8 || r.bottom > v.bottom - 8) e.scrollIntoView({ block: 'center' });
+  }
+
+  /* ---------- admin ---------- */
+  $('btnLancarEdital').addEventListener('click', function () { toast('Edital lançado — painel de domínio e baldes criados'); });
+  $('btnReconciliar').addEventListener('click', function () {
+    var c = $('reconCard');
+    c.style.display = c.style.display === 'none' ? 'block' : 'none';
+  });
+  $('btnNovaQuestao').addEventListener('click', function () { toast('Cadastro: enunciado, alternativas, tag e campo de uso'); });
+
+  /* ---------- reset da demonstração (limpa a autorização do dispositivo) ---------- */
+  var btnReset = $('btnResetDemo');
+  if (btnReset) btnReset.addEventListener('click', function () {
+    lsDel(LS.auth); lsDel(LS.sync); lsDel(LS.pend);
+    lsDel(TUT_LS.step); lsDel(TUT_LS.done); lsDel(TUT_LS.rew); lsDel('vq_tut_skip');
+    deviceAuthorized = false; pendingAnswers = 0; online = true;
+    updatePending();
+    sairConta();
+    toast('Demonstração reiniciada — dispositivo não autorizado');
+  });
+
+  /* ---------- card de Quad Coins abre a Loja (onde os Coins valem) ---------- */
+  var coinsCardEl = $('coinsCard');
+  if (coinsCardEl) coinsCardEl.addEventListener('click', function () { showView('v-loja', 'navAluno'); });
+
+  var btnIrLojaEl = $('btnIrLoja');
+  if (btnIrLojaEl) btnIrLojaEl.addEventListener('click', function () { showView('v-loja', 'navAluno'); });
+

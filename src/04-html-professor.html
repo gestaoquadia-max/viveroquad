@@ -1,0 +1,169 @@
+        <!-- ============ PROFESSOR · PAINEL DE CONTROLE ============ -->
+        <div class="view" id="v-prof-painel">
+          <div class="p-card">
+            <div class="k-label">Painel de controle · seu cadastro</div>
+            <div class="pf-head" style="margin-top:10px">
+              <div class="pf-foto" id="profFoto">—</div>
+              <div class="grow">
+                <h3 style="margin:0" id="profPnNome">Professor</h3>
+                <p class="sub" id="profPnGrad" style="margin:2px 0 0">—</p>
+                <div class="pf-chips" id="profPnTurnos"></div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+              <button class="btn ghost small" id="btnProfFoto">Trocar foto</button>
+              <input id="profFotoFile" type="file" accept="image/*" style="display:none">
+              <button class="btn ghost small" id="btnProfFotoTirar" style="display:none">Remover foto</button>
+            </div>
+            <p class="sub" style="margin-top:8px">Nome, matérias, turnos e contato vêm do <strong>Banco de professores</strong> da coordenação. A <strong>foto</strong> é você quem escolhe.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Matérias que você leciona</div>
+            <div id="profPnMaterias"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Turmas em que você está inserido</div>
+            <div id="profPnTurmas"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Trocar senha</div>
+            <div class="adm-form" style="margin-top:8px">
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaAtual">Senha atual</label>
+                <input id="profSenhaAtual" type="password" placeholder="••••••••" autocomplete="off">
+              </div>
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaNova">Nova senha</label>
+                <input id="profSenhaNova" type="password" placeholder="mínimo 6 caracteres" autocomplete="off">
+              </div>
+              <div class="login-field" style="width:100%">
+                <label for="profSenhaConf">Repita a nova senha</label>
+                <input id="profSenhaConf" type="password" placeholder="••••••••" autocomplete="off">
+              </div>
+              <div style="margin-top:10px"><button class="btn small" id="btnProfSenha">Salvar nova senha</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · EVENTOS ============ -->
+        <div class="view" id="v-prof-eventos">
+          <div class="p-card">
+            <div class="k-label">Aula de hoje</div>
+            <div id="profAulasHoje" style="margin-top:8px"></div>
+          </div>
+          <div class="p-card">
+            <div class="k-label">Eventos da semana · com você</div>
+            <div id="profEvList" style="margin-top:8px"></div>
+            <p class="sub" style="margin-top:8px">Só aparecem os eventos em que a coordenação inseriu o seu nome. Quem inclui é o Painel de controle da administração.</p>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · CALENDÁRIO ============ -->
+        <div class="view" id="v-prof-cal">
+          <div class="p-card">
+            <div class="k-label">Seu calendário · aulas e eventos</div>
+            <div id="profCalList" style="margin-top:8px"></div>
+            <p class="sub" style="margin-top:8px">Aulas das suas turmas na semana e os eventos em que você está inserido.</p>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · RECEPÇÃO ============ -->
+        <div class="view" id="v-prof-chat">
+          <div class="p-card">
+            <div class="k-label">Seus números · aulas e eventos</div>
+            <div class="rel-tabs" id="profRelTabs" style="margin-top:8px">
+              <button class="rel-tab on" data-per="mes">Mês</button>
+              <button class="rel-tab" data-per="tri">Trimestre</button>
+              <button class="rel-tab" data-per="sem">Semestre</button>
+              <button class="rel-tab" data-per="ano">Ano</button>
+            </div>
+            <div id="profRelResumo" style="margin-top:10px"></div>
+            <div class="adm-sep"><span>Aulas por turma</span></div>
+            <div id="profRelTurmas"></div>
+            <div class="adm-sep"><span>Eventos com você</span></div>
+            <div id="profRelEventos"></div>
+            <p class="sub" style="margin-top:8px">Contagem a partir da <strong>grade das suas turmas</strong> e dos <strong>eventos em que a coordenação inseriu o seu nome</strong>. <span class="ref">[INTEGRAÇÃO REAL] presença confirmada por chamada</span></p>
+          </div>
+
+          <div class="p-card" id="profRecadosCard">
+            <div class="k-label">Comunicação com a recepção <span class="chat-badge" id="profRecBadge" style="display:none">1</span></div>
+            <p class="sub" style="margin-top:6px">Recados da administração do Quad chegam aqui — os mesmos enviados em <strong>Mensagens individuais</strong> no Painel de controle.</p>
+            <div id="profRecadosList" style="margin-top:10px"></div>
+            <div class="adm-form" style="margin-top:12px; opacity:.55">
+              <input class="fld" id="profChatTexto" placeholder="Escreva para a recepção…" disabled>
+              <div style="margin-top:8px"><button class="btn small" id="btnProfChat" disabled>Enviar</button></div>
+            </div>
+            <div class="rel-ph" style="margin-top:10px"><span class="tag">EM BREVE</span>Responder à recepção entra junto com as atividades online, na V1. Por enquanto o caminho de ida — administração → professor — já está valendo.</div>
+          </div>
+        </div>
+
+        <!-- ============ PROFESSOR · QUIZ AO VIVO ============ -->
+        <div class="view" id="v-sala">
+          <div class="p-card">
+            <div class="card-head">
+              <div class="hexi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg></div>
+              <div class="grow">
+                <div class="card-eyebrow">Corpo docente · quiz ao vivo</div>
+                <h3 class="aula-title" style="margin:2px 0 0" id="profNome">Professor</h3>
+              </div>
+            </div>
+            <p class="sub">Suas turmas aparecem automaticamente — você entra na sala, cria o quiz da aula por PDF e ativa quando a aula começar.</p>
+          </div>
+
+          <div class="p-card" id="profTurmasCard">
+            <div class="k-label">Minhas turmas</div>
+            <div id="profTurmasList"></div>
+            <p class="sub" style="margin-top:8px">Turmas em que você está inserido (definidas na criação da turma, no Painel de controle, por matéria da árvore do edital).</p>
+          </div>
+
+          <div id="salaDetail" style="display:none">
+            <div class="p-card">
+              <div class="k-label">Sala aberta</div>
+              <h3 id="salaHead" style="margin:6px 0 2px">—</h3>
+              <p class="sub" id="salaInfo">—</p>
+              <div style="margin-top:10px"><button class="btn ghost small" id="btnSalaVoltar">← Minhas turmas</button></div>
+            </div>
+
+            <div class="p-card">
+              <div class="k-label">Quiz da aula · criar por PDF</div>
+              <div class="adm-form">
+                <div class="adm-row">
+                  <select class="fld" id="qzTipo" title="Tipo das questões">
+                    <option value="multipla">Múltipla escolha</option>
+                    <option value="ce">Certo ou errado</option>
+                  </select>
+                  <input class="fld" id="qzNq" placeholder="Questões (1–30)" title="Número de questões: de 1 a 30" inputmode="numeric" style="max-width:130px" value="10">
+                  <input class="fld" id="qzMin" placeholder="Tempo (1–180 min)" title="Tempo do quiz: de 1 a 180 minutos" inputmode="numeric" style="max-width:140px" value="10">
+                </div>
+                <div class="adm-row" style="margin-top:8px">
+                  <input class="fld" id="qzPdf" type="file" accept=".pdf" title="PDF com as questões do quiz">
+                </div>
+                <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+                  <button class="btn small" id="btnQuizCriar">Criar quiz</button>
+                  <button class="btn small" id="btnQuizAtivar" disabled>Ativar quiz</button>
+                  <button class="btn ghost small" id="btnQuizEncerrar" disabled>Encerrar</button>
+                </div>
+              </div>
+              <p class="sub" id="qzStatus" style="margin-top:10px">Anexe o PDF com as questões — o sistema transforma no quiz da sala <span class="ref">[INTEGRAÇÃO REAL] extração do PDF</span>. Criado, o aluno vê "Aula com Quiz"; <strong>ativado</strong>, aparece o botão Quiz com o tempo valendo. Sem premiação em QdC ou score — as respostas vêm para o seu relatório.</p>
+            </div>
+
+            <div class="p-card" id="qzRelCard" style="display:none">
+              <div class="k-label">Relatório da sala · ao vivo</div>
+              <div id="pollBox" style="margin-top:8px">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <div class="bar-track" style="flex:1"><div class="bar-fill" id="pollBar" style="width:0%"></div></div>
+                  <span style="font:600 12px Consolas,monospace" id="pollCount">0/42</span>
+                </div>
+                <p class="sub" style="margin-top:6px" id="pollSub">Respostas chegando (polling) — quantos alunos concluíram o quiz.</p>
+              </div>
+              <div class="adm-sep"><span>Acertos por questão</span></div>
+              <div id="qzRelList"></div>
+              <div class="adm-sep"><span>Feedback dos alunos</span></div>
+              <div class="rel-ph"><span class="tag">EM BREVE</span>Avaliação da aula pelos alunos — entra na próxima implementação.</div>
+            </div>
+          </div>
+        </div>
+

@@ -1,9 +1,11 @@
 # Build do protótipo Viver o Quad
-# - lê src.html (fonte, com o token __DANILO_VIDEO__ no lugar do vídeo)
-# - embute danilo.mp4 como data URI
-# - gera index.html (abre com clique duplo; mesmo conteúdo publicado no artefato)
+# - monta o fonte concatenando as partes de src/ (NN-*.html, na ordem do prefixo)
+# - substitui os tokens __*__ pelas mídias em base64 (com validação: falha se um token faltar)
+# - gera artifact.html (conteúdo publicado no Artifact) e index.html (abre com clique duplo)
 $dir = $PSScriptRoot
-$src = [System.IO.File]::ReadAllText((Join-Path $dir "src.html"), [System.Text.Encoding]::UTF8)
+$partes = Get-ChildItem (Join-Path $dir "src") -Filter "??-*.html" | Sort-Object Name
+if ($partes.Count -ne 20) { throw "esperava 20 partes em src/, achei $($partes.Count)" }
+$src = ($partes | ForEach-Object { [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8) }) -join ""
 $vid = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "danilo.mp4")))
 $logo = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "logo.jpg")))
 $sim = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $dir "simbolo-quad-transparente.png")))
@@ -26,7 +28,26 @@ function Fotos-Variante($prefixo) {
 }
 $variantes = @("boina", "gandola", "colete", "fuzil", "cipe", "patamo", "bope")
 $fotosVar = '{ ' + (($variantes | ForEach-Object { '{0}: {1}' -f $_, (Fotos-Variante $_) }) -join ', ') + ' }'
-$out = $src.Replace("__FONTS__", $fonts).Replace("__DANILO_VIDEO__", "data:video/mp4;base64," + $vid).Replace("__DANILO_SPRITE__", "data:image/png;base64," + $dspr).Replace("__QUAD_LOGO__", "data:image/jpeg;base64," + $logo).Replace("__QUAD_SIMBOLO__", "data:image/png;base64," + $sim).Replace("__AVATARS__", "data:image/jpeg;base64," + $avs).Replace("__INSIGNIAS__", "data:image/jpeg;base64," + $ins).Replace("__QUAD_COIN__", "data:image/webp;base64," + $coin).Replace("__DIAMANTE__", "data:image/webp;base64," + $dmn).Replace("__FOTOS_VARIANTES__", $fotosVar)
+$rep = [ordered]@{
+  "__FONTS__" = $fonts
+  "__DANILO_VIDEO__" = "data:video/mp4;base64," + $vid
+  "__DANILO_SPRITE__" = "data:image/png;base64," + $dspr
+  "__QUAD_LOGO__" = "data:image/jpeg;base64," + $logo
+  "__QUAD_SIMBOLO__" = "data:image/png;base64," + $sim
+  "__AVATARS__" = "data:image/jpeg;base64," + $avs
+  "__INSIGNIAS__" = "data:image/jpeg;base64," + $ins
+  "__QUAD_COIN__" = "data:image/webp;base64," + $coin
+  "__DIAMANTE__" = "data:image/webp;base64," + $dmn
+  "__FOTOS_VARIANTES__" = $fotosVar
+}
+$out = $src
+foreach ($k in $rep.Keys) {
+  if (-not $out.Contains($k)) { throw "token ausente no fonte: $k" }
+  $out = $out.Replace($k, $rep[$k])
+}
+foreach ($k in $rep.Keys) {
+  if ($out.Contains($k)) { throw "sobrou token nao substituido: $k" }
+}
 $enc = New-Object System.Text.UTF8Encoding $false
 # artifact.html: conteúdo sem esqueleto (o Artifact adiciona doctype/head/body ao publicar)
 [System.IO.File]::WriteAllText((Join-Path $dir "artifact.html"), $out, $enc)

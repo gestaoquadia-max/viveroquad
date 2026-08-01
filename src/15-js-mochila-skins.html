@@ -1,0 +1,193 @@
+  /* ==================================================================
+     MOCHILA DE COMBATE (storage de itens)
+     · itens comprados com Quad Coins (armas, broches, utilitários) ficam
+       guardados aqui — não vão para o personagem
+     · base pronta para as quests futuras (reunir itens → forjar novos)
+     ================================================================== */
+  var ITEM_ICO = {
+    faca:     '<svg viewBox="0 0 24 24"><path d="M3 21l6-6"/><path d="M15 9l6-6-2 6-4 4"/><path d="M9 15l6-6"/><path d="M9 15l-2 2-4-1 1-3 2-2"/></svg>',
+    lanterna: '<svg viewBox="0 0 24 24"><path d="M9 2h6l-1 4H10Z"/><rect x="9" y="6" width="6" height="15" rx="1.5"/><path d="M11 11h2"/></svg>',
+    bussola:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 11 11l-2.5 4.5L13 13Z"/></svg>',
+    broche:   '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="m12 6 1 2 2 .2-1.5 1.4.4 2.1L12 12l-1.9 -.3.4-2.1L9 8.2 11 8Z"/><path d="M9 13.5 7.5 21 12 18l4.5 3-1.5-7.5"/></svg>',
+    cantil:   '<svg viewBox="0 0 24 24"><path d="M10 2h4v3h-4Z"/><rect x="7" y="5" width="10" height="16" rx="4"/><path d="M9 11h6"/></svg>',
+    corda:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="5"/><circle cx="12" cy="7" r="1.6"/><path d="M9 11.5 7 21m8-9.5L17 21"/></svg>'
+  };
+  var ITENS_COMBATE = [
+    { id: 'faca',     nome: 'Faca tática',        desc: 'utilitário de campo', preco: 40 },
+    { id: 'lanterna', nome: 'Lanterna tática',    desc: 'operações noturnas',  preco: 35 },
+    { id: 'bussola',  nome: 'Bússola de campanha',desc: 'orientação em campo', preco: 30 },
+    { id: 'broche',   nome: 'Broche de mérito',   desc: 'condecoração',        preco: 25 },
+    { id: 'cantil',   nome: 'Cantil',             desc: 'hidratação em marcha',preco: 20 },
+    { id: 'corda',    nome: 'Corda de rapel',     desc: 'transposição',        preco: 45 }
+  ];
+  var MOCHILA = [];   /* ids dos itens guardados */
+  function itemDe(id) { return ITENS_COMBATE.filter(function (x) { return x.id === id; })[0]; }
+  /* o sinal do item: os de fábrica têm desenho próprio; os criados no
+     painel guardam a escolha da paleta em .ico — a mochila e o pop-up
+     liam só o dicionário fixo e imprimiam "undefined"                 */
+  function itemIcoHtml(it) {
+    if (!it) return '';
+    return ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '');
+  }
+  function renderLojaCombate() {
+    var g = $('combatGrid'); if (!g) return;
+    /* item de combate NÃO acaba e NÃO é de compra única: fica sempre na
+       vitrine e pode ser comprado quantas vezes o aluno quiser (dec. 172).
+       Quantas unidades ele já tem aparece como etiqueta.               */
+    g.innerHTML = ITENS_COMBATE.map(function (it) {
+      var meus = MOCHILA.filter(function (x) { return x === it.id; }).length;
+      return '<button class="loja-item" data-combate="' + it.id + '">' +
+        (meus ? '<span class="li-estoque meu">' + meus + ' na mochila</span>' : '') +
+        '<span class="li-ico">' + itemIcoHtml(it) + '</span>' +
+        '<span class="li-nome">' + it.nome + '</span>' +
+        '<span class="li-desc">' + it.desc + '</span>' +
+        '<span class="li-preco">' + it.preco + ' QdC</span></button>';
+    }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum item de combate na Loja.</p>';
+    g.querySelectorAll('[data-combate]').forEach(function (bt) {
+      bt.addEventListener('click', function () { mochilaComprar(bt.dataset.combate); });
+    });
+    if (typeof queueSync === 'function') queueSync();
+  }
+  function mochilaComprar(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
+    var it = itemDe(id); if (!it) return;
+    var jaTem = MOCHILA.filter(function (x) { return x === id; }).length;
+    confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila' + (jaTem ? ' (você já tem ' + jaTem + ')' : ''),
+      preco: it.preco, moeda: 'qdc', ico: itemIcoHtml(it) }, function () {
+      if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
+      addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
+      MOCHILA.push(id);
+      if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
+      renderLojaCombate();
+      renderMochila();
+      var n = MOCHILA.filter(function (x) { return x === id; }).length;
+      toast(it.nome + ' foi para a mochila' + (n > 1 ? ' — agora você tem ' + n : '') + '!');
+    });
+  }
+  function renderMochila() {
+    var mq = $('mochilaQtd');
+    if (mq) mq.textContent = MOCHILA.length + (MOCHILA.length === 1 ? ' item guardado' : ' itens guardados');
+    var sub = $('mochilaSub');
+    if (sub) {
+      var tipos = MOCHILA.filter(function (x, i) { return MOCHILA.indexOf(x) === i; }).length;
+      sub.textContent = MOCHILA.length
+        ? MOCHILA.length + (MOCHILA.length === 1 ? ' unidade' : ' unidades') + ' · ' + tipos + (tipos === 1 ? ' tipo' : ' tipos')
+        : 'nenhum item guardado ainda';
+    }
+    var grid = $('storageGrid'); if (!grid) return;
+    var slots = Math.max(9, Math.ceil((MOCHILA.length + 1) / 3) * 3);
+    var html = '';
+    for (var i = 0; i < slots; i++) {
+      var id = MOCHILA[i];
+      var it = id ? itemDe(id) : null;
+      if (it) {
+        html += '<div class="st-slot cheio" title="' + it.nome + '"><span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span></div>';
+      } else {
+        html += '<div class="st-slot vazio"></div>';
+      }
+    }
+    grid.innerHTML = html;
+  }
+  $('btnMochila').addEventListener('click', function () {
+    if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, a mochila não abre — foco na escolha do personagem */
+    renderMochila(); $('storageLayer').classList.add('on');
+  });
+  $('btnStorageFechar').addEventListener('click', function () { $('storageLayer').classList.remove('on'); });
+  renderLojaCombate();
+  renderMochila();
+
+  /* ==================================================================
+     CADEIA DE SKINS DO PERSONAGEM (Loja · "Seu personagem")
+     gandola → capa de colete → fuzil → fardas finais (CIPE · PATAMO · BOPE)
+     · comprou um elo: ele some e o próximo aparece no lugar
+     · nas fardas finais o aluno escolhe qualquer uma (e pode juntar as três)
+     · cada compra TROCA A FOTO do personagem — o gestor está preparando o
+       PDF com todas as artes; [FOTOS PDF] basta preencher AVATAR_VARIANTES
+       (variante → índice do avatar → recorte) que a troca já acontece.
+       Até lá, o anel da foto muda de cor e o chip do Perfil mostra a skin.
+     ================================================================== */
+  var SKIN_ICO = {
+    gandola: '<svg viewBox="0 0 24 24"><path d="M20.4 6.5 17 4l-2 2h-6L7 4 3.6 6.5 5 10l2-1v11h10V9l2 1 1.4-3.5Z"/></svg>',
+    colete: '<svg viewBox="0 0 24 24"><path d="M8 3v4a4 4 0 0 0 8 0V3"/><path d="M8 3 5 5v16h14V5l-3-2"/><path d="M12 11v10"/></svg>',
+    fuzil: '<svg viewBox="0 0 24 24"><path d="M2 13l14-8 2 3.5L7 16H4l-2-3Z"/><path d="M7 16v5M10 14.5 12 21"/><path d="M16 5l4-2 2 3.5-4 2.5"/></svg>',
+    farda: '<svg viewBox="0 0 24 24"><path d="M20.4 6.5 17 4l-2 2h-6L7 4 3.6 6.5 5 10l2-1v11h10V9l2 1 1.4-3.5Z"/><path d="M9 13h6M9 16.5h6"/></svg>'
+  };
+  var SKIN_CADEIA = [
+    { id: 'gandola', nome: 'Gandola', desc: 'uniforme de instrução', preco: 60, ico: SKIN_ICO.gandola },
+    { id: 'colete', nome: 'Capa de colete', desc: 'proteção tática', preco: 120, ico: SKIN_ICO.colete },
+    { id: 'fuzil', nome: 'Fuzil', desc: 'equipamento de dotação', preco: 200, ico: SKIN_ICO.fuzil }
+  ];
+  var SKIN_FARDAS = [
+    { id: 'cipe', nome: 'Farda CIPE', desc: 'Cia. Indep. de Pol. Especializado', preco: 500, ico: SKIN_ICO.farda },
+    { id: 'patamo', nome: 'Farda PATAMO', desc: 'Patrulhamento Tático Móvel', preco: 750, ico: SKIN_ICO.farda },
+    { id: 'bope', nome: 'Farda BOPE', desc: 'Operações Especiais', preco: 1300, ico: SKIN_ICO.farda }
+  ];
+  var skinEtapa = 0;          /* elos da cadeia já comprados (0 = gandola à venda) */
+  var skinAtual = null;
+  var fardaEscolhida = null;  /* escolha ÚNICA: comprou uma farda, as outras fecham */
+  function skinItemHtml(sk) {
+    var comprada = fardaEscolhida === sk.id;
+    var fechada = fardaEscolhida && !comprada;   /* outra foi escolhida */
+    return '<button class="loja-item' + (comprada ? ' comprado' : '') + (fechada ? ' indisponivel' : '') + '" data-skin="' + sk.id + '" data-nome="' + sk.nome + '" data-preco="' + sk.preco + '">' +
+      '<span class="li-ico">' + sk.ico + '</span>' +
+      '<span class="li-nome">' + sk.nome + '</span>' +
+      '<span class="li-desc">' + sk.desc + '</span>' +
+      '<span class="li-preco">' + (comprada ? 'ADQUIRIDO' : fechada ? 'INDISPONÍVEL' : sk.preco + ' QdC') + '</span></button>';
+  }
+  function renderSkins() {
+    var alvo = $('skinChain');
+    alvo.innerHTML = skinEtapa < SKIN_CADEIA.length
+      ? skinItemHtml(SKIN_CADEIA[skinEtapa])          /* um elo por vez */
+      : SKIN_FARDAS.map(skinItemHtml).join('');       /* final: as três à escolha */
+    alvo.querySelectorAll('[data-skin]').forEach(function (bt) {
+      bt.addEventListener('click', function () { skinComprar(bt); });
+    });
+    queueSync();
+  }
+  function skinDados(id) {
+    return SKIN_CADEIA.concat(SKIN_FARDAS).filter(function (sk) { return sk.id === id; })[0];
+  }
+  function skinComprar(bt) {
+    if (tutOn) return;   /* no tutorial, o clique vira a orientação do QUAD */
+    var sk = skinDados(bt.dataset.skin);
+    if (bt.classList.contains('comprado')) { toast('Você já garantiu este item.'); return; }
+    if (bt.classList.contains('indisponivel')) { toast('Indisponível — você já escolheu a sua farda.'); return; }
+    confirmarCompra({ nome: sk.nome, desc: 'skin do personagem', preco: sk.preco, moeda: 'qdc',
+      ico: (typeof ICON_CAT !== 'undefined') ? ICON_CAT.camiseta : '' }, function () {
+      if (score < sk.preco) { toast('Quad Coins insuficientes — complete missões para ganhar mais.'); return; }
+      addScore(-sk.preco, sk.nome + ' adquirido · −' + sk.preco + ' QdC');
+      lojaCompraLog(sk.nome, sk.preco, 'qdc', 'skin', sk.id);
+      lojaOwned[sk.nome] = true;
+      if (skinEtapa < SKIN_CADEIA.length && SKIN_CADEIA[skinEtapa].id === sk.id) {
+        skinEtapa++;              /* o elo comprado desaparece; entra o próximo */
+      } else {
+        fardaEscolhida = sk.id;   /* escolha única: as outras fardas fecham */
+      }
+      skinVestir(sk);
+      renderSkins();
+    });
+  }
+  function skinVestir(sk) {
+    skinAtual = sk;
+    aplicarAvatar();   /* variante da skin em AVATAR_VARIANTES → foto troca */
+    /* o anel colorido é só um reserva: com a foto oficial no lugar, nada de moldura */
+    var temFoto = AVATAR_VARIANTES[sk.id] && AVATAR_VARIANTES[sk.id][avatarIdx];
+    var marca = temFoto ? '' : ' skin-' + sk.id;
+    ['btnAvatarPerfil'].forEach(function (id) {
+      var el = $(id);
+      el.className = el.className.replace(/\s*skin-[a-z]+/g, '') + marca;
+    });
+    var prev = document.querySelector('.avatar-preview');
+    if (prev) prev.className = prev.className.replace(/\s*skin-[a-z]+/g, '') + marca;
+    toast('Foto do personagem atualizada — ' + sk.nome + '.');
+    queueSync();
+  }
+  renderSkins();
+
+  /* ---------- foto do personagem abre o Perfil do aluno ---------- */
+  var btnAvatarEl = $('btnAvatarPerfil');
+  if (btnAvatarEl) btnAvatarEl.addEventListener('click', function () {
+    if (btnAvatarEl.dataset.zoomed) return;   /* soltar do zoom não navega */
+    showView('v-aluno', 'navAluno');
+  });
+

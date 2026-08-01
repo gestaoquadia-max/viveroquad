@@ -1,6 +1,15 @@
 import base64, pathlib
-root = pathlib.Path('/home/user/viveroquad')
-src = (root/'src.html').read_text(encoding='utf-8')
+
+# Build do protótipo Viver o Quad
+# - monta o fonte concatenando as partes de src/ (NN-*.html, na ordem do prefixo)
+# - substitui os tokens __*__ pelas mídias em base64
+# - gera artifact.html (conteúdo publicado no Artifact) e index.html (abre com duplo clique)
+root = pathlib.Path(__file__).resolve().parent
+
+partes = sorted((root / 'src').glob('[0-9][0-9]-*.html'))
+assert len(partes) == 20, 'esperava 20 partes em src/, achei %d' % len(partes)
+src = ''.join(p.read_text(encoding='utf-8') for p in partes)
+
 def b64(p, mime):
     return 'data:%s;base64,%s' % (mime, base64.b64encode((root/p).read_bytes()).decode())
 rep = {
@@ -29,6 +38,8 @@ out = src
 for k, v in rep.items():
     assert k in out, 'token ausente: ' + k
     out = out.replace(k, v)
+for k in rep:
+    assert k not in out, 'sobrou token não substituído: ' + k
 (root/'artifact.html').write_text(out, encoding='utf-8')
 page = '<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' + out + '\n</html>'
 (root/'index.html').write_text(page, encoding='utf-8')
