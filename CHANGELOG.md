@@ -6,7 +6,8 @@
   some mais quando a data passa. Se a recepção **liberou a entrada** na
   portaria, a etiqueta vira **CONCLUÍDO** ("presença registrada na
   portaria"); se o dia passou sem registro, vira **FALTOSO** ("a entrada
-  não foi registrada"). E **evento realizado sai da janela de estorno**
+  não foi registrada"). Vale para eventos **presenciais** — o online, que
+  não passa na portaria, segue saindo do calendário ao vencer. E **evento realizado sai da janela de estorno**
   — já aconteceu, não há o que devolver (a liberação já fazia isso pela
   dec. 178; agora a passagem da data também tira).
 - **Boina do tutorial sem estorno** (item 2): compra feita durante o

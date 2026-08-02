@@ -56,7 +56,7 @@ await nav('v-loja'); await p.waitForTimeout(600);
 ok(!/Mentoria Quad/.test(await p.evaluate(()=>document.getElementById('lojaEventos-pres').textContent+document.getElementById('lojaEventos-dig').textContent)),'3.3 e não fica na vitrine de eventos');
 await p.evaluate(()=>document.querySelector('[data-goto="v-calendario"]').click()); await p.waitForTimeout(500);
 console.log('   calendário depois:', (await txt('calList')).slice(0,120));
-ok(!/Mentoria Quad/.test(await txt('calList')),'3.4 e sai do calendário');
+ok(/Mentoria Quad[\s\S]*FALTOSO/.test(await txt('calList')),'3.4 vencida sem entrada registrada: fica no calendário como FALTOSO (dec. 192)');
 // histórico permanece
 await nav('v-loja'); await p.waitForTimeout(500);
 const hist = await txt('lojaEstornos');

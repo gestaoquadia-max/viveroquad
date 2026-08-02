@@ -349,6 +349,9 @@
          portaria) ou FALTOSO (o dia passou sem registro de entrada)      */
       var lib = ((typeof ACESSO_ST !== 'undefined' && ACESSO_ST[ev.id]) || []).some(function (p) { return p.euSou && p.liberado; });
       var acabou = typeof evAcabou === 'function' && evAcabou(ev);
+      /* online não passa na portaria — sem registro de entrada não há
+         CONCLUÍDO/FALTOSO justo: vencido, sai do calendário como antes  */
+      if (acabou && (ev.online || ev.modalidade === 'online')) return;
       var partes = ev.quando.split(' · ');   /* ['QUA','22/07','19H'] */
       var dsem = partes[0] || '', dm = partes[1] || '', hora = partes[2] || '';
       var dia = (dm.split('/')[0]) || dm || '·';
