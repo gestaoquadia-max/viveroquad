@@ -6,5 +6,5 @@ const p=await c.newPage();
 await p.goto(new URL('../index.html', import.meta.url).href,{waitUntil:'load'});
 await p.evaluate(()=>{ document.getElementById('loginLayer').classList.add('off'); const v=document.getElementById('v-inicio'); v.scrollTop=0; });
 await p.waitForTimeout(500);
-const el=await p.$('.phone'); await el.screenshot({path:'prem-top.png'});
+const el=await p.$('.phone'); await el.screenshot({path:'_out/prem-top.png'});
 console.log('ok'); await b.close();

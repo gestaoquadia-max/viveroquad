@@ -9,5 +9,5 @@ await p.evaluate(()=>{ document.getElementById('loginLayer').classList.add('off'
 await p.waitForTimeout(600);
 // screenshot do telefone inteiro (a .phone)
 const el=await p.$('.phone');
-await el.screenshot({path:'home-new.png'});
+await el.screenshot({path:'_out/home-new.png'});
 console.log('ok'); await b.close();

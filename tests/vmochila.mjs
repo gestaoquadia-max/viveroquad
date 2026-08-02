@@ -31,7 +31,7 @@ const cheios0 = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st
 if (cheios0!==0 || vazios<9) errors.push('3: storage inicial: cheios '+cheios0+' vazios '+vazios);
 const quest = await p.evaluate(()=>/Quests em breve/i.test(document.getElementById('storageLayer').textContent));
 if (!quest) errors.push('3: aviso de quests ausente');
-await p.locator('.phone').first().screenshot({path:'mochila-vazia.png'});
+await p.locator('.phone').first().screenshot({path:'_out/mochila-vazia.png'});
 log.push('✔ 3: mochila abre vazia, com slots e aviso de quests futuras');
 await p.evaluate(()=>document.getElementById('btnStorageFechar').click()); await p.waitForTimeout(200);
 
@@ -60,7 +60,7 @@ const cheios = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st-
 if (cheios!==2) errors.push('5: itens guardados na storage: '+cheios);
 const nomes = await p.evaluate(()=>[...document.querySelectorAll('#storageGrid .st-nome')].map(n=>n.textContent));
 if (!nomes.includes('Faca tática')||!nomes.includes('Broche de mérito')) errors.push('5: itens errados: '+nomes.join(','));
-await p.locator('.phone').first().screenshot({path:'mochila-cheia.png'});
+await p.locator('.phone').first().screenshot({path:'_out/mochila-cheia.png'});
 log.push('✔ 5: mochila mostra Faca e Broche guardados (2 itens)');
 
 // 6: dec. 172 — o item de combate se repete: comprar de novo empilha

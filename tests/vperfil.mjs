@@ -23,6 +23,6 @@ console.log('preview:', preview, '| card:', nome, '|', rank);
 // screenshot do perfil
 await p.evaluate(()=>{ document.getElementById('v-aluno').scrollTop=0; });
 await p.waitForTimeout(400);
-const el=await p.$('.phone'); await el.screenshot({path:'perfil-tab.png'});
+const el=await p.$('.phone'); await el.screenshot({path:'_out/perfil-tab.png'});
 console.log('erros:', errs.length?errs.join('|'):'nenhum');
 await b.close();

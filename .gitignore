@@ -6,3 +6,4 @@ artifact.html
 Thumbs.db
 desktop.ini
 tests/_out/
+tests/*.png
