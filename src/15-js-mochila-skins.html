@@ -27,13 +27,13 @@
     /* item de combate NÃO acaba e NÃO é de compra única: fica sempre na
        vitrine e pode ser comprado quantas vezes o aluno quiser (dec. 172).
        Quantas unidades ele já tem aparece como etiqueta.               */
-    g.innerHTML = ITENS_COMBATE.map(function (it) {
+    g.innerHTML = ITENS_COMBATE.filter(function (it) { return it.disp !== 'drop'; }).map(function (it) {
       var meus = MOCHILA.filter(function (x) { return x === it.id; }).length;
       return '<button class="loja-item" data-combate="' + it.id + '">' +
         (meus ? '<span class="li-estoque meu">' + meus + ' na mochila</span>' : '') +
         '<span class="li-ico">' + itemIcoHtml(it) + '</span>' +
         '<span class="li-nome">' + it.nome + '</span>' +
-        '<span class="li-desc">' + it.desc + '</span>' +
+        '<span class="li-desc">' + it.desc + (it.disp === 'ambos' ? ' · também cai no DROP (' + (+it.drop || 0) + '%)' : '') + '</span>' +
         '<span class="li-preco">' + it.preco + ' QdC</span></button>';
     }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhum item de combate na Loja.</p>';
     g.querySelectorAll('[data-combate]').forEach(function (bt) {
@@ -41,6 +41,29 @@
     });
     if (typeof queueSync === 'function') queueSync();
   }
+  /* ---------- DROP: itens conquistados resolvendo questões ----------
+     Ao concluir um bloco de 10 (dia/noite/tarde ou treinamento rápido) ou
+     um simulado digital, cada item com drop configurado é sorteado pela
+     própria chance. Conquistado, vai para a mochila — sem custo e sem
+     entrada na janela de estorno (não é compra).                        */
+  function dropSortear(origem) {
+    if (typeof ITENS_COMBATE === 'undefined' || typeof MOCHILA === 'undefined') return [];
+    var rng = window.__dropRng || Math.random;
+    var ganhos = ITENS_COMBATE.filter(function (it) {
+      var ch = +it.drop || 0;
+      return (it.disp === 'drop' || it.disp === 'ambos') && ch > 0 && rng() * 100 < ch;
+    });
+    ganhos.forEach(function (it) { MOCHILA.push(it.id); });
+    if (ganhos.length) {
+      if (typeof renderMochila === 'function') renderMochila();
+      if (typeof renderLojaCombate === 'function') renderLojaCombate();
+      toast('DROP! Você conquistou ' + ganhos.map(function (i) { return '“' + i.nome + '”'; }).join(' e ') + ' ' + origem + ' — já está na mochila.');
+    }
+    return ganhos;
+  }
+  window.__dropRng = null;              /* a suíte pluga um RNG determinístico aqui */
+  window.__dropSortear = dropSortear;   /* para a suíte de testes */
+
   function mochilaComprar(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
     var it = itemDe(id); if (!it) return;

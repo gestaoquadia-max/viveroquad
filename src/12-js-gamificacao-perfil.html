@@ -517,6 +517,7 @@
     carreira.scorePatente += scoreG; carreira.scoreCarreira += scoreG; carreira.scoreTemporada += scoreG;
     if (typeof renderCarreira === 'function') renderCarreira();
     addScore(coinsG, 'Simulado digital · +' + coinsG + ' QdC');
+    var dropS = (typeof dropSortear === 'function') ? dropSortear('ao concluir o simulado digital') : [];
     var body = $('simDigBody');
     $('simDigProgress').textContent = 'Resultado';
     $('simDigSub').textContent = porTempo ? 'O tempo acabou — veja como foi.' : '';
@@ -525,7 +526,8 @@
       '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
       '<h3 class="mil" style="font-size:20px">Simulado concluído</h3>' +
       '<p class="sub" style="margin-top:8px">Você acertou <strong>' + hits + ' de ' + total + '</strong> (' + (total ? Math.round(hits / total * 100) : 0) + '%)' + (porTempo ? ' antes do tempo esgotar' : '') + '.</p>' +
-      '<p class="sub" style="margin-top:6px"><strong>+' + scoreG + ' score</strong> · <strong>+' + coinsG + ' Quad Coins</strong></p></div>';
+      '<p class="sub" style="margin-top:6px"><strong>+' + scoreG + ' score</strong> · <strong>+' + coinsG + ' Quad Coins</strong>' +
+      (dropS.length ? '<br>🎁 <strong>DROP!</strong> ' + dropS.map(function (i) { return i.nome; }).join(' e ') + ' caiu para a sua mochila.' : '') + '</p></div>';
     $('btnSimDigNext').textContent = 'Concluir';
     $('btnSimDigNext').disabled = false;
     simDig.idx = 'done';

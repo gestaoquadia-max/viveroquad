@@ -345,15 +345,23 @@
     EVENTOS.forEach(function (ev) {
       var st = evState[ev.id];
       if (!st || !st.inscrito) return;
-      if (typeof evAcabou === 'function' && evAcabou(ev)) return;   /* passou a data: sai do calendário, fica no histórico */
+      /* o evento não some ao passar: vira CONCLUÍDO (entrada liberada na
+         portaria) ou FALTOSO (o dia passou sem registro de entrada)      */
+      var lib = ((typeof ACESSO_ST !== 'undefined' && ACESSO_ST[ev.id]) || []).some(function (p) { return p.euSou && p.liberado; });
+      var acabou = typeof evAcabou === 'function' && evAcabou(ev);
       var partes = ev.quando.split(' · ');   /* ['QUA','22/07','19H'] */
       var dsem = partes[0] || '', dm = partes[1] || '', hora = partes[2] || '';
       var dia = (dm.split('/')[0]) || dm || '·';
-      var det = (hora ? hora + ' · ' : '') + (ev.online ? 'evento online · link na página do evento' : 'inscrição confirmada');
-      rows.push(calRow(dia, dsem, ev.nome, det, 'INSCRITO', 'live'));
+      var det = lib ? 'presença registrada na portaria'
+        : acabou ? 'evento realizado — a entrada não foi registrada'
+        : (hora ? hora + ' · ' : '') + (ev.online ? 'evento online · link na página do evento' : 'inscrição confirmada');
+      rows.push(calRow(dia, dsem, ev.nome, det,
+        lib ? 'CONCLUÍDO' : acabou ? 'FALTOSO' : 'INSCRITO',
+        lib ? 'live' : acabou ? 'warn' : 'live'));
     });
     el.innerHTML = rows.join('') || '<p class="sub" style="padding:8px 0">Nada agendado ainda.</p>';
   }
+  window.__calRefresh = renderCalendario;   /* para a suíte de testes */
   renderCalendario();
   renderEvStrip();
   queueSync();   /* leva a esteira para as cópias da rolagem infinita vertical */

@@ -1,5 +1,28 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 02/08/2026 — Status do evento no calendário, boina sem estorno e o DROP de itens
+
+- **CONCLUÍDO e FALTOSO no calendário** (item 1): o evento inscrito não
+  some mais quando a data passa. Se a recepção **liberou a entrada** na
+  portaria, a etiqueta vira **CONCLUÍDO** ("presença registrada na
+  portaria"); se o dia passou sem registro, vira **FALTOSO** ("a entrada
+  não foi registrada"). E **evento realizado sai da janela de estorno**
+  — já aconteceu, não há o que devolver (a liberação já fazia isso pela
+  dec. 178; agora a passagem da data também tira).
+- **Boina do tutorial sem estorno** (item 2): compra feita durante o
+  tutorial nasce marcada e não entra em "Estornos · até 7 dias" — a
+  boina é parte do rito de entrada, não uma compra comum.
+- **DROP de itens** (item 3): no "Criar skin do personagem", o item de
+  combate agora tem **disponibilidade** (só vender na Loja · vender e
+  cair no drop · só cair no drop) e **chance no drop (%)**. Ao concluir
+  um **bloco de 10 questões** (dia/noite/tarde ou treinamento rápido) ou
+  um **simulado digital**, cada item configurado é sorteado pela própria
+  chance; o conquistado vai para a **mochila** — sem custo e sem entrada
+  no estorno — com anúncio no cartão de resultado e aviso. Item só de
+  drop não aparece na vitrine; o "vende e dropa" avisa a chance no card.
+  Sementes de demonstração: Cantil (à venda e no drop, 10%) e o novo
+  **Patch da sorte** (só no drop, 12%).
+
 ## 02/08/2026 — Extração da documentação funcional (docs/handoff/)
 
 Pacote de handoff para o futuro engenheiro de software, extraído com o

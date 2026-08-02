@@ -821,8 +821,11 @@
         '<small>' + p.desc + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
         '<button class="adm-x" data-rm-skin="' + p.nome + '" aria-label="Remover">✕</button></div>';
     }).join('') + cb.map(function (i) {
+      var modo = i.disp === 'drop' ? 'só no drop · ' + (+i.drop || 0) + '% de chance'
+        : i.disp === 'ambos' ? fmt(i.preco) + ' QdC · na Loja e no drop (' + (+i.drop || 0) + '%)'
+        : fmt(i.preco) + ' QdC · à venda na Loja';
       return '<div class="adm-bar"><span class="nm">' + i.nome + ' <span class="tag gold">COMBATE</span>' +
-        '<small>' + i.desc + ' · ' + fmt(i.preco) + ' QdC · vai para a mochila</small></span>' +
+        '<small>' + i.desc + ' · ' + modo + ' · vai para a mochila</small></span>' +
         '<button class="adm-x" data-rm-comb="' + i.id + '" aria-label="Remover">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma skin ou item de combate criado ainda.</p>';
     el.querySelectorAll('[data-rm-skin]').forEach(function (b) {
@@ -870,6 +873,7 @@
       var comb = skTipo.value === 'combate';
       skPrecoLabel();
       $('admSkMoeda').style.display = comb ? 'none' : '';
+      if ($('admSkDropRow')) $('admSkDropRow').style.display = comb ? '' : 'none';
       $('admSkNome').placeholder = comb ? 'Nome do item (ex.: Rádio comunicador)' : 'Nome da skin (ex.: Boina de instrutor)';
       $('admSkDesc').placeholder = comb ? 'Descrição curta (ex.: comunicação em campo)' : 'Descrição curta (ex.: edição limitada)';
       $('btnAdmSkin').textContent = comb ? 'Publicar item de combate' : 'Publicar skin';
@@ -879,18 +883,24 @@
       var ehCombate = $('admSkTipo') && $('admSkTipo').value === 'combate';
       var moeda = ehCombate ? 'qdc' : $('admSkMoeda').value;   /* mochila é sempre em Quad Coins */
       var preco = parseInt($('admSkPreco').value, 10);
+      var disp = (ehCombate && $('admSkDisp')) ? $('admSkDisp').value : 'venda';
+      var drop = (ehCombate && $('admSkDrop')) ? parseInt($('admSkDrop').value, 10) || 0 : 0;
       if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao item.'); return; }
-      if (!preco || preco < 1) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+      /* item só de drop não é vendido — preço deixa de ser obrigatório */
+      if (!(ehCombate && disp === 'drop') && (!preco || preco < 1)) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+      if (ehCombate && disp !== 'venda' && (drop < 1 || drop > 100)) { toast('Item no drop precisa de uma chance entre 1% e 100%.'); return; }
       if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) ||
           (typeof ITENS_COMBATE !== 'undefined' && ITENS_COMBATE.some(function (p) { return p.nome === nome; })) ||
           document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
         toast('Já existe um item com esse nome na Loja.'); return;
       }
       if (ehCombate) {
-        ITENS_COMBATE.push({ id: 'cb' + Date.now(), nome: nome, desc: desc || 'utilitário de campo', preco: preco, ico: admSkIco, criado: true });
+        ITENS_COMBATE.push({ id: 'cb' + Date.now(), nome: nome, desc: desc || 'utilitário de campo', preco: preco || 0, ico: admSkIco, criado: true, disp: disp, drop: drop });
         renderLojaCombate(); renderSkinsAdm();
-        $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = '';
-        toast('Item de combate “' + nome + '” publicado — vai para a mochila de quem comprar.');
+        $('admSkNome').value = ''; $('admSkDesc').value = ''; $('admSkPreco').value = ''; if ($('admSkDrop')) $('admSkDrop').value = '';
+        toast(disp === 'drop' ? 'Item “' + nome + '” publicado só no drop — ' + drop + '% de chance ao resolver questões.'
+          : disp === 'ambos' ? 'Item “' + nome + '” publicado na Loja e no drop (' + drop + '%).'
+          : 'Item de combate “' + nome + '” publicado — vai para a mochila de quem comprar.');
         return;
       }
       LOJA_EXTRAS.push({ nome: nome, desc: desc || 'skin do personagem', cat: 'personagem', preco: preco, moeda: moeda, icone: admSkIco, skin: true });

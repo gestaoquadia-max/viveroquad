@@ -378,6 +378,7 @@
           compraConsumida('item', ev.nome);   /* isolada comprada é logada pelo nome */
         }
         renderAcessos();
+        if (p.euSou && typeof renderCalendario === 'function') renderCalendario();   /* INSCRITO vira CONCLUÍDO */
         toast('Entrada liberada — ' + p.nome + ' · ' + ev.nome + (p.euSou ? '. A compra saiu da janela de estorno.' : '.'));
       });
     });

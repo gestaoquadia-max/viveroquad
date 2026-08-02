@@ -414,8 +414,10 @@
     return true;
   }
   function lojaCompraLog(item, valor, moeda, tipo, ref, extra) {
+    /* compra feita DURANTE o tutorial (a boina) fica fora da regra dos 7 dias */
     COMPRAS.unshift({ aluno: nomeCurto(), item: item, valor: valor, moeda: moeda || 'qdc', quando: 'agora', ts: Date.now(),
-      tipo: tipo || 'item', ref: ref != null ? ref : item, extra: extra || null });
+      tipo: tipo || 'item', ref: ref != null ? ref : item, extra: extra || null,
+      semEstorno: (typeof tutOn !== 'undefined' && !!tutOn) });
     renderCompras();
     if (typeof renderEstornos === 'function') renderEstornos();
     if (typeof renderRelCompras === 'function') renderRelCompras();

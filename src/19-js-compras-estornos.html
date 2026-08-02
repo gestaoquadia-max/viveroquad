@@ -98,8 +98,17 @@
   function estornoDias(cp) { return 7 - Math.floor((Date.now() - (cp.ts || 0)) / DIA_MS); }
   function renderEstornos() {
     var el = $('lojaEstornos'); if (!el) return;
-    /* consumida (entregue na recepção ou entrada liberada) sai daqui */
-    var minhas = COMPRAS.filter(function (cp) { return cp.aluno === nomeCurto() && !cp.estornado && !cp.consumido; });
+    /* consumida (entregue na recepção ou entrada liberada) sai daqui;
+       compra feita no tutorial (a boina) não entra na regra dos 7 dias;
+       e evento que JÁ ACONTECEU também sai — não há o que estornar      */
+    var minhas = COMPRAS.filter(function (cp) {
+      if (cp.aluno !== nomeCurto() || cp.estornado || cp.consumido || cp.semEstorno) return false;
+      if (cp.tipo === 'evento' && typeof evAcabou === 'function') {
+        var ev = null; EVENTOS.forEach(function (x) { if (x.id === cp.ref) ev = x; });
+        if (ev && evAcabou(ev)) return false;
+      }
+      return true;
+    });
     el.innerHTML = minhas.map(function (cp) {
       var dias = estornoDias(cp), i = COMPRAS.indexOf(cp);
       var prazo = dias > 0
@@ -123,6 +132,7 @@
       });
     });
   }
+  window.__estRefresh = renderEstornos;   /* para a suíte de testes */
   /* estornar NÃO é só devolver a moeda: o que foi comprado volta para a Loja
      e sai da posse do aluno — cada tipo de compra desfaz do seu jeito.      */
   function desfazerCompra(cp, mo) {

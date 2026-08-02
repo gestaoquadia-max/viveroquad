@@ -612,11 +612,13 @@
       renderDia();
       renderAtrasadas();
     }
+    var drop = (typeof dropSortear === 'function') ? dropSortear(deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
       '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
       '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
       'O Domínio de <strong>' + trDeck.a + '</strong> foi atualizado.' +
+      (drop.length ? '<br>🎁 <strong>DROP!</strong> ' + drop.map(function (i) { return i.nome; }).join(' e ') + ' caiu para a sua mochila.' : '') +
       (deDia ? '<br>As 10 rápidas entraram no banco do Treinamento Rápido.' : '') + '</p>' +
       '<button class="btn" id="btnTrProx" style="width:100%">' + (deDia ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
     $('trBody').innerHTML = h;
