@@ -63,7 +63,7 @@ Pré-requisitos: navegador + Python 3 (ou PowerShell no Windows). **Sem npm, sem
 
 > **Nota (divergência registrada):** o gate do admin **valida somente a chave** — qualquer e-mail com `@` entra; o `npp@…` é apenas placeholder. Divergência conhecida da auditoria (docs 10/13), reconfirmada nos dossiês do handoff.
 
-O 1º acesso do aluno dispara o tutorial obrigatório de 29 passos (botão "‹ Pular" disponível; a flag `vq_tut_skip` no localStorage também pula). O botão "Reiniciar demonstração" (painel lateral) **não limpa `vq_intro_done`** — bug conhecido, mantido de propósito (dec. 188).
+O 1º acesso do aluno dispara o tutorial obrigatório de 29 passos (botão "‹ Pular" disponível; a flag `vq_tut_skip` no localStorage também pula). O botão "Resetar demonstração (dispositivo)" (painel lateral) **não limpa `vq_intro_done`** — bug conhecido, mantido de propósito (dec. 188).
 
 ## 3. Como verificar
 
@@ -184,7 +184,7 @@ Para achar uma função específica: `grep -rn "nomeDaFuncao" src/` — os dossi
 
 ## 10. Limitações técnicas (aceitas na V0)
 
-- **Monólito num IIFE único**: ~8.200 linhas de JS acopladas, sem `use strict`, sem módulos, sem framework; as 3 personas compartilham o mesmo estado (é isso que produz o "tempo real" da demo).
+- **Monólito num IIFE único**: ~7.900 linhas de JS acopladas (partes 07–20 atuais de `src/`), sem `use strict`, sem módulos, sem framework; as 3 personas compartilham o mesmo estado (é isso que produz o "tempo real" da demo).
 - **~200 variáveis globais** de nível superior dentro do IIFE (`TURMAS_LOJA`, `MATRICULAS`, `QUIZZES`, `COMPRAS`…); armadilha de nomenclatura: **`var score` guarda Quad Coins**, não o score de carreira.
 - **Render por `innerHTML` com strings** (≈187 pontos contra 17 `createElement`) — sem componentes, sem virtual DOM.
 - **Nada persiste**: recarregar (F5) zera moedas, compras, matrículas, carreira; só 2 chaves de localStorage sobrevivem (`vq_tut_skip`, `vq_intro_done`).

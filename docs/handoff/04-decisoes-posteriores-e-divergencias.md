@@ -31,7 +31,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Decisão atual:** o Viver o Quad é **a plataforma principal do Quad Concursos**; **11 capacidades viram módulos internos**: cadastro, autenticação, matrículas, produção de materiais, banco de questões, simulados, inteligência pedagógica, loja, administração, relatórios e cronogramas. Seguem externos: site/checkout, pagamentos, plataforma de cursos (legado em avaliação), notificações e telemetria (a decidir). A dec. 184 fixa: módulo sem especificação suficiente = **"Módulo Planejado"** (objetivo, responsabilidade, dependências; **sem implementação parcial**). As dec. 6 e 22 ficam formalmente superadas.
 - **Fonte da decisão:** dec. 182 e 184, 01/08/2026 (Consolidação v1.0; documento oficial `docs/arquitetura/00-arquitetura-oficial.md`).
 - **Impacto funcional:** nenhum — mudança exclusivamente arquitetural; nada foi implementado.
-- **Impacto na futura implementação:** enorme — muda a propriedade de tudo o que o protótipo simula. Nenhum contrato de integração existe ainda (Q19 reescopada: separar fronteiras internas × integrações externas nas 24 marcas `[INTEGRAÇÃO REAL]`).
+- **Impacto na futura implementação:** enorme — muda a propriedade de tudo o que o protótipo simula. Nenhum contrato de integração existe ainda (Q19 reescopada: separar fronteiras internas × integrações externas nas 23 marcas `[INTEGRAÇÃO REAL]` — eram 24 na auditoria de 30/07; 23 após a dec. 188).
 - **Precisa ajustar o protótipo?** **Não** (a demonstração permanece); os módulos aguardam especificação.
 
 ### A3 · Dec. 185 — Economia indefinida: todos os valores viram dado demonstrativo
@@ -53,7 +53,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 
 ### A5 · Dec. 187 + 188 + 190 + 191 — Refatoração autorizada (impacto só técnico)
 
-- **Comportamento anterior:** monolito `src.html` (11.920 linhas); seeds embutidos no fonte; 56 suítes Playwright fora do repositório; código morto acumulado (duplicata de `hojeISO`, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`).
+- **Comportamento anterior:** monolito `src.html` (11.920 linhas — estado histórico pré-dec. 187/188; o fonte atual são as 20 partes de `src/`, ~11.600 linhas); seeds embutidos no fonte; 56 suítes Playwright fora do repositório; código morto acumulado (duplicata de `hojeISO`, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`).
 - **Decisão atual:** **187** — fonte dividido em `src/` (20 partes; saída byte-idêntica; regra de trabalho: editar as partes); **188** — código morto removido com regressão completa verde (`LINKS_ONLINE` preservado como ponto de integração planejado; o bug do reset que não limpa `vq_intro_done` foi **mantido aberto por exigir decisão** — ver B22); **190** — as 56 suítes entram versionadas em `tests/` e `verify.py` (build + regressão) vira o portão de aceite oficial; **191** — 19 conjuntos de dados demonstrativos extraídos para `data/` como fragmentos verbatim (tokens `__SEED_*__`).
 - **Fonte da decisão:** dec. 187, 188, 190, 191 — todas de 01/08/2026.
 - **Impacto funcional:** **nenhum** (byte-idêntico comprovado; regressão verde). **Impacto na implementação:** organização do repositório e critério de aceite; F2–F6 da refatoração seguem suspensas.
@@ -179,6 +179,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Decisão atual:** **revogação**: combate não é compra única e não some da vitrine; compra repetida **empilha** na mochila com etiqueta "N na mochila"; a regra de estoque (dec. 170) fica só nos produtos físicos.
 - **Fonte da decisão:** dec. 172, 28/07/2026.
 - **Impacto funcional:** implementado (sonda D: 2 facas → "2 na mochila"). Expõe o defeito do estorno em B8.
+- **Impacto na futura implementação:** o inventário do jogador precisa suportar quantidade por item (empilhamento e recompra livre); o estorno deve desfazer apenas a unidade da compra estornada (correção do defeito B8).
 - **Precisa ajustar o protótipo?** **Não** (a decisão); **sim** para o estorno correlato (B8).
 
 ### A20 · Dec. 104/107 — "EM CHOQUE" avisa sem impedir (substitui a 101)
@@ -187,6 +188,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Decisão atual:** o app **informa** o conflito (etiqueta "EM CHOQUE" na vitrine + aviso "Atenção ao horário… o Quad não faz reposição de aula nem devolve o valor por ausência") e a decisão fica com o aluno; **única exceção que segue barrada: matrícula em turma com horário sobreposto**.
 - **Fonte da decisão:** dec. 104 e 107, 26/07/2026.
 - **Impacto funcional:** implementado (sondas D/E, inclusive confirmação em dois toques na inscrição gratuita com choque).
+- **Impacto na futura implementação:** a detecção de conflito de horário deve **avisar sem bloquear** em toda compra de atividade, mantendo a matrícula em turma sobreposta como única exceção barrada — regra a preservar na validação do servidor.
 - **Precisa ajustar o protótipo?** **Não.**
 
 ### A21 · Cadeia da turma ativa — dec. 62 → 146–148, 152–154, 156–160, 162–163, 177
@@ -204,6 +206,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Decisão atual:** aviso tem alvo `'todas'` ou o **ID** de uma turma; o aluno vê os avisos da turma **ativa**.
 - **Fonte da decisão:** dec. 149, 28/07/2026.
 - **Impacto funcional:** implementado (sonda B1: aviso some ao trocar de turma). Pergunta pendente registrada: aviso deveria alcançar **todas** as matrículas do aluno, não só a ativa? (produto).
+- **Impacto na futura implementação:** o modelo de avisos deve referenciar a turma por **ID estável** (nunca por nome); a entrega ao aluno depende da resposta pendente (turma ativa × todas as matrículas).
 - **Precisa ajustar o protótipo?** **Não** (aguarda a resposta da pergunta para eventual mudança).
 
 ### A23 · Dec. 164 — Material anexado baixa de verdade
@@ -220,6 +223,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Comportamento anterior:** página "verificando" separada após o login (duplicava o carregamento).
 - **Decisão atual:** verificação embutida na vinheta ("Verificando a matrícula de \<e-mail\>…"); entrada ~1,4 s mais rápida. O passo `#gateVerify` sobreviveu **vestigial** no HTML (B23).
 - **Fonte da decisão:** dec. 57, 24/07/2026.
+- **Impacto funcional:** login em uma tela só — a vinheta acumula a verificação; nenhum fluxo exibe a página "verificando" separada.
+- **Impacto na futura implementação:** a verificação real de matrícula no login deve acontecer dentro da vinheta (uma tela, sem etapa intermediária); remover o vestígio `#gateVerify` na implementação.
 - **Precisa ajustar o protótipo?** **Não** funcionalmente; limpeza do vestígio é higiene técnica.
 
 ### A25 · Dec. 111/112 — Quad Store e leitor de QR saem do menu "+"
@@ -227,6 +232,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Comportamento anterior:** dec. 20/66 — loja e "Validar pelo QR" acessíveis pelo botão "+".
 - **Decisão atual:** a Quad Store fica só na barra de navegação (+ card de Coins e bloco do Início); o leitor de QR migra para o bloco do gift card **dentro da Quad Store**, ao lado de "Resgatar".
 - **Fonte da decisão:** dec. 111 e 112, 26/07/2026.
+- **Impacto funcional:** o menu "+" deixa de dar acesso à loja e ao leitor; o resgate por QR passa a viver junto do resgate por código, no mesmo bloco.
+- **Impacto na futura implementação:** a arquitetura de navegação deve tratar o leitor de QR como parte do fluxo de gift card da Quad Store, não como atalho global do app.
 - **Precisa ajustar o protótipo?** **Não.**
 
 ### A26 · Dec. 93/103 — Aulão e Mentoria deixam de ser itens fixos
@@ -234,6 +241,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Comportamento anterior:** "Aulão especial" e "Mentoria Quad" eram itens/botões fixos da Loja, fora das regras de evento.
 - **Decisão atual:** **aulão é EVENTO** (data, professor, carrossel, expiração — dec. 93); **mentoria é item de catálogo com data** (entra em eventos/calendário de quem compra; com início e fim — dec. 103/120); "Simulado físico" → "Caderno de simulados impresso".
 - **Fonte da decisão:** dec. 93 e 103, 25/07/2026 (+ dec. 120, 26/07).
+- **Impacto funcional:** aulões seguem todas as regras de evento (vigência, carrossel, inscrição); a mentoria comprada entra na agenda do aluno com início e fim.
+- **Impacto na futura implementação:** o catálogo não deve ter itens fixos hard-coded — aulões são modelados como eventos e a mentoria como item de catálogo com data que gera compromisso de agenda.
 - **Precisa ajustar o protótipo?** **Não.**
 
 ### A27 · Dec. 138/139 — Tipo de turma com nome real; turno derivado do horário
@@ -241,6 +250,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Comportamento anterior:** tipos "RONDESP/PATAMO/BOPE" tratados como nomes de tipo; turno marcado à mão (o gestor marcou "noite" e digitou 8h–11h — salvou errado).
 - **Decisão atual:** tipos com nome de verdade (nivelamento / regular / de questões / isoladas); **RONDESP, PATAMO e BOPE são apelidos** digitados no campo próprio; **o turno sai do horário** (antes das 12h = manhã; até 18h = tarde; depois = noite), exibido no eco do formulário.
 - **Fonte da decisão:** dec. 138 e 139, 28/07/2026.
+- **Impacto funcional:** o formulário de turma cria com tipo real + apelido separados e ecoa o turno derivado — o erro original ("noite" digitada com horário 8h–11h) fica impossível.
+- **Impacto na futura implementação:** no modelo de turma, tipo e apelido são campos distintos e o turno é **derivado do horário** (nunca digitado) — regra de consistência a manter no servidor.
 - **Precisa ajustar o protótipo?** **Não.**
 
 ---
@@ -251,7 +262,7 @@ Formato de cada ficha: **O que diz X · O que o código faz · Evidência · Imp
 
 ### B1 · Gate do administrador valida só a chave
 
-- **O que dizem a decisão e a UI:** dec. 20 — acesso do admin por chave "emitida e revogada pela direção, **por pessoa**"; o portão pede e-mail funcional; o briefing interno cita `npp@quadconcursos.com.br`.
+- **O que dizem a decisão e a UI:** dec. 20 — área do admin (N.P.P.) com **acesso por chave da direção**; o comentário do fonte (src/16 l.10, marca `[INTEGRAÇÃO REAL]`) detalha o alvo: chave "emitida e revogada pela direção, **por pessoa**". O portão pede e-mail funcional; o briefing interno cita `npp@quadconcursos.com.br`.
 - **O que o código faz:** valida **apenas** `@` no e-mail + chave `NPP-2026` (case-insensitive); o e-mail digitado não é validado nem guardado.
 - **Evidência:** src/16 l.6–15; sondas A (`qualquer@gmail.com` + `npp-2026` entrou) e F3 nº1; doc 10 item 4.3.
 - **Impacto:** qualquer pessoa com a chave entra como admin; nenhum vínculo pessoa×acesso.
@@ -340,7 +351,7 @@ Formato de cada ficha: **O que diz X · O que o código faz · Evidência · Imp
 ### B12 · Curva de patentes achatada
 
 - **O que sugere o desenho de progressão:** metas crescentes por patente ao longo das 14 patentes/4 fases.
-- **O que o dado faz:** as **6 patentes finais exigem os mesmos 12.500 pts** — curva achatada, provável placeholder.
+- **O que o dado faz:** **5 patentes (Aspirante → Tenente-Coronel, 9ª–13ª) exigem os mesmos 12.500 pts** e a **Coronel (14ª, máxima) tem `pontos: null`** — sem meta, por ser a patente final; curva achatada, provável placeholder.
 - **Evidência:** `GAMI` (src/07 l.11–37); dossiê C.
 - **Impacto:** nenhum na demo; os valores são dado demonstrativo (dec. 185).
 - **Precisa de decisão de quem:** **produto** (balanceamento — já coberto pela dec. 185; registrar para o estudo econômico).
@@ -411,7 +422,7 @@ Formato de cada ficha: **O que diz X · O que o código faz · Evidência · Imp
 
 ### B21 · Gift card em Quad Coins × dec. 48; códigos-demo fora do formato
 
-- **O que diz a decisão:** dec. 48 apresenta o gift card como canal do **Diamante** ("comprado em dinheiro — recarga no site ou gift card"); dec. 84 fixa o formato `QG<lote>-<código>`.
+- **O que diz a decisão:** dec. 48 apresenta o gift card como canal do **Diamante** ("comprado em dinheiro — recarga no site ou gift card"); o formato `QG<lote>-<código>` é definido **pelo código** (src/16 l.326, geração dos lotes) — a dec. 84 não o define, apenas alinha os textos da loja ao "formato real dos lotes".
 - **O que o código faz:** lotes de gift card (e crédito manual, e estorno) funcionam **também em QdC** — QdC "comprável" via cartão, tensionando o princípio "Score não é moeda" (mesma família da dec. 11/A9); os códigos-demo `QUAD-100`/`QUAD-500` não seguem o formato oficial (mantidos só como demonstração).
 - **Evidência:** src/07 l.117–133 (`moeda === 'dmn' ? addDiamante : addScore`); sondas C1/C2; dossiê C (M9).
 - **Impacto:** canal de venda de moeda conquistável sem cobertura de decisão econômica.
@@ -494,7 +505,7 @@ Tipos: **CxD** = código × decisão/documento · **TxM** = texto × mecânica �
 | B9 | "PRAZO ENCERRADO" listado para sempre | TxM | Sim (arquivamento) — menor | produto |
 | B10 | Evento sem sala nunca lota | CxD | Sim (fora da sede tem lotação?) | produto |
 | B11 | Estado 'aguardando-fiscal' morto | TEC | Não (remover) | engenheiro |
-| B12 | Curva de patentes achatada (6×12.500) | DD | Sim (balanceamento, dec. 185) | produto |
+| B12 | Curva de patentes achatada (5×12.500; Coronel sem meta) | DD | Sim (balanceamento, dec. 185) | produto |
 | B13 | `notaMin` por fase × 80% fixo | CxD | Sim (Q10) | produto → engenheiro |
 | B14 | `var score` = Quad Coins | TEC | Sim (aprovar refactor, Q6) | engenheiro |
 | B15 | "Pode retomar depois" × re-sorteio do digital | TxM | Sim (retomada é requisito?) | produto |

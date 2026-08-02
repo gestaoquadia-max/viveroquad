@@ -103,4 +103,4 @@ Em resumo: o protótipo mostra **o que** o produto é e **como ele se comporta**
 
 ---
 
-*Próximo documento: [02](./02-jornada-do-aluno.md) — a jornada do aluno em detalhe. O mapa completo do pacote está no [README](./README.md).*
+*Próximo documento: [02 — Fluxo completo do aluno](./02-fluxo-completo-do-aluno.md) — a jornada do aluno em 19 etapas, como o protótipo a demonstra. O mapa completo do pacote está no [README](./README.md).*

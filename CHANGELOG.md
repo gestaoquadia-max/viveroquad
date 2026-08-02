@@ -1,5 +1,27 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 02/08/2026 — Extração da documentação funcional (docs/handoff/)
+
+Pacote de handoff para o futuro engenheiro de software, extraído com o
+protótipo como fonte de verdade funcional (diretriz oficial do gestor).
+**Nenhum arquivo funcional foi alterado** — o pacote é só documentação.
+
+- **8 documentos em `docs/handoff/`**: visão geral do produto; fluxo
+  completo do aluno em 19 etapas; **especificação funcional dos 17
+  módulos** (gabarito de 17 campos por módulo, 1.286 linhas); decisões
+  posteriores e divergências (27 + 28 fichas); dados, simulações e
+  implementação real; guia técnico do protótipo (com mapa módulo →
+  código → dados → suítes); **58 perguntas realmente pendentes**; índice.
+- **Método**: 6 investigadores leram código, dados e decisões e
+  **executaram ~30 sondas Playwright** no protótipo (250+ verificações)
+  antes de registrar; redação por documento; verificação cruzada final
+  (completude contra a diretriz + ~80 afirmações conferidas no código)
+  com 21 correções aplicadas.
+- Classificação padronizada em 8 rótulos (FUNCIONAMENTO FUNCIONAL DO
+  PROTÓTIPO, SIMULAÇÃO LOCAL, REGRA DE PRODUTO CONFIRMADA, DADO
+  DEMONSTRATIVO, DECISÃO POSTERIOR, FUNCIONALIDADE PLANEJADA,
+  DIVERGÊNCIA, PERGUNTA PENDENTE).
+
 ## 01/08/2026 — Refatoração autorizada: rede de segurança (F0) e dados demonstrativos (F1)
 
 Execução das fases autorizadas pela Diretriz Oficial de ajuste da estratégia

@@ -15,18 +15,18 @@ Em caso de conflito entre documentos, vale a hierarquia oficial: `docs/arquitetu
 | Nº | Documento | Em 1 linha |
 |---|---|---|
 | 01 | [Visão geral do produto](./01-visao-geral-do-produto.md) | O que é o Viver o Quad, o problema que resolve, público, papéis das três personas e a diferença honesta entre protótipo e aplicação real |
-| 02 | Jornada do aluno | Entrada/conta/matrículas, tutorial do QUAD e identidade, tela inicial e cronograma, missões e treinamento, questões e quizzes (M1–M6) |
-| 03 | Gamificação e economia | Score/carreira/patentes/insígnias/rankings, Quad Coins e Diamantes, Quad Store, compras/matrículas/estornos e gift cards (M7–M10) |
-| 04 | Operação da sede e áreas internas | Eventos, simulados, materiais, área do professor, área administrativa N.P.P. e inteligência pedagógica (M11–M16) |
-| 05 | Divergências | Catálogo consolidado das divergências texto×código e doc×doc encontradas, com evidência e impacto |
-| 06 | Perguntas pendentes | As perguntas abertas ao gestor/produto, consolidadas por módulo, que a especificação real precisa responder |
-| 07 | Protótipo × aplicação real | A natureza técnica do protótipo (build, estado em memória, hooks, testes), o que precisará de implementação real e as pendências de segurança/LGPD |
+| 02 | [Fluxo completo do aluno](./02-fluxo-completo-do-aluno.md) | A jornada do aluno como o protótipo a demonstra, narrada em 19 etapas — da chegada ao Quad até o pós-venda —, com regras confirmadas e simulações de cada etapa |
+| 03 | [Especificação funcional](./03-especificacao-funcional.md) | Os 17 módulos do protótipo descritos num gabarito uniforme de 17 campos, com o vocabulário oficial de classificação e rastreio a código, decisões e testes |
+| 04 | [Decisões posteriores e divergências](./04-decisoes-posteriores-e-divergencias.md) | O que modifica o que existia antes: 27 fichas de decisões posteriores (seção A) e 28 fichas de divergências confirmadas (seção B), com fonte, impacto e "precisa ajustar?" |
+| 05 | [Dados, simulações e implementação real](./05-dados-simulacoes-e-implementacao-real.md) | Camada por camada: o que é regra no código, dado demonstrativo, estado volátil e simulação — e o que a aplicação real deve reproduzir, persistir, validar e integrar |
+| 06 | [Guia técnico do protótipo](./06-guia-tecnico-do-prototipo.md) | Como rodar, construir (`build.py`/`verify.py`), inspecionar e testar o protótipo: as 20 partes de `src/`, os seeds de `data/`, as 56 suítes e os hooks de teste |
+| 07 | [Perguntas realmente pendentes](./07-perguntas-realmente-pendentes.md) | As 58 perguntas que nada no protótipo, na documentação ou nas decisões responde — deduplicadas, com responsável sugerido e o que cada uma bloqueia |
 
 ## Ordem de leitura sugerida
 
 **01 → 02 → 03 → 04 → 07 → 05 → 06**
 
-Primeiro o produto (01) e as três frentes funcionais (02–04); depois a natureza técnica do protótipo e o que falta construir (07); por fim, os dois catálogos de referência — divergências (05) e perguntas pendentes (06) — que devem acompanhar toda decisão de especificação.
+Primeiro o produto (01), depois a jornada do aluno (02) e a especificação módulo a módulo (03); em seguida o que mudou por decisão posterior e as divergências confirmadas (04) e o que ainda falta decidir (07); por fim, a natureza dos dados e simulações com o que a implementação real precisa cobrir (05) e o guia prático para rodar e inspecionar o protótipo (06).
 
 ## Aviso: a especificação executável acompanha os textos
 

@@ -6,7 +6,7 @@
 
 > Este documento separa, camada por camada, **o que o protótipo tem de dado e de mecânica**: o que é regra que vive no código, o que é dado de demonstração, o que é estado volátil, o que é simulação declarada, o que é só fachada visual — e, do outro lado, o que a aplicação real deve **reproduzir**, **persistir**, **validar no servidor** e **integrar com terceiros**. Nada aqui modela banco de dados nem inventa regra econômica (proibições expressas da arquitetura oficial, seções 5 e 8).
 
-Rótulos usados (vocabulário do projeto): **FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO** · **SIMULAÇÃO LOCAL** · **REGRA DE PRODUTO CONFIRMADA** · **DADO DEMONSTRATIVO** · **APENAS VISUAL** · **FUNCIONALIDADE PLANEJADA** · **DECISÃO POSTERIOR** · **DIVERGÊNCIA**.
+Rótulos usados (vocabulário do projeto): **FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO** · **SIMULAÇÃO LOCAL** · **REGRA DE PRODUTO CONFIRMADA** · **DADO DEMONSTRATIVO** · **DECISÃO POSTERIOR** · **FUNCIONALIDADE PLANEJADA** · **DIVERGÊNCIA** · **PERGUNTA PENDENTE**.
 
 ---
 
@@ -17,10 +17,10 @@ Quando os seeds foram extraídos para `data/` (dec. 191, build byte-idêntico), 
 | Estrutura | Onde vive | O que é | Por que ficou no código |
 |---|---|---|---|
 | `GAMI` | `src/07` l.11–37 | Configuração central da carreira: 14 patentes (AL SD 900 pts → CEL), 4 fases com `notaMin` 0,70–0,85, `provaQuestoes: 20`, `tentativaHoras: 24` | É a **parametrização da gamificação**, não catálogo; o comentário do fonte diz "o admin ajustará no sistema real". Pendência declarada: `PROVA_APROV = 0.80` fixa (src/12 l.332) e as `notaMin` por fase **nunca são lidas** (src/07 l.7–9) — DIVERGÊNCIA registrada |
-| `SALA_CAP` (+ `SALAS`/`ESTUDIO`) | src (monolito l.8920–8928) | Lotações físicas da sede: Sala 1=155, 2=85, 3=125, 4=185 + Estúdio | É **infraestrutura física**, usada como regra em lotação de eventos (dec. 179), validação de vagas de turma/simulado e choque de agenda. No real vira cadastro administrável (Ficha 16 da auditoria: DECISÃO TÉCNICA PENDENTE) |
+| `SALA_CAP` (+ `SALAS`/`ESTUDIO`) | `src/14` l.248 | Lotações físicas da sede: Sala 1=155, 2=85, 3=125, 4=185 + Estúdio | É **infraestrutura física**, usada como regra em lotação de eventos (dec. 179), validação de vagas de turma/simulado e choque de agenda. No real vira cadastro administrável (Ficha 16 da auditoria: DECISÃO TÉCNICA PENDENTE) |
 | Cadeia de skins (`SKIN_CADEIA`/`SKIN_FARDAS` + preços) | `src/15` | Progressão gandola → capa de colete → fuzil (60/120/200/500 QdC…) e fardas finais de escolha única (CIPE 500 / PATAMO 750 / BOPE 1300) | É a **regra de progressão do personagem** ("um elo por vez", "quem possui, veste" — dec. 25), não vitrine; os **preços** são DADO DEMONSTRATIVO (dec. 185) |
-| Roteiro `TUT` (+ `GESTOS`, `TUT_PALAVROES`, `TUT_REW`) | `src/10` l.181–274 | Os 29 passos da Instrução do QUAD, gestos do mascote, filtro de palavrões do nome de guerra, recompensa 30 score/25 QdC | É o **roteiro da experiência aprovada** do onboarding (dec. 7/17/105) — conteúdo de produto, coberto pela suíte `tests/vtut.mjs` como critério de aceite. Os valores 30/25/20 são calibração de demo (dec. 185) |
-| `GIFT_LOTES` | `src/16` | Nasce **vazio** — lotes são criados em runtime pelo admin | É **estado**, não seed: não há o que extrair para `data/` |
+| Roteiro `TUT` (+ `GESTOS`, `TUT_PALAVROES`; `TUT_REW` declarado em `src/11` l.653) | `src/10` l.181–274 | Os 29 passos da Instrução do QUAD, gestos do mascote, filtro de palavrões do nome de guerra, recompensa 30 score/25 QdC | É o **roteiro da experiência aprovada** do onboarding (dec. 7/17/105) — conteúdo de produto, coberto pela suíte `tests/vtut.mjs` como critério de aceite. Os valores 30/25/20 são calibração de demo (dec. 185) |
+| `GIFT_LOTES` | `src/07` l.109 (declaração; operado pelo Painel de controle em `src/16`) | Nasce **vazio** — lotes são criados em runtime pelo admin | É **estado**, não seed: não há o que extrair para `data/` |
 
 Também vivem no código, pela mesma lógica: `MODALIDADES` (nivelamento/regular/questões — RONDESP/PATAMO/BOPE são apelidos, dec. 138), `INSIG_MAP` (14 patentes → 10 artes, dec. 15/16), `TR_REW`/`DIA_EXPIRA_DIAS` (regras dos blocos: +1 score/acerto, +5 QdC/bloco, expiração em 7 dias) e `PROVA_APROV`. **Regra geral do produto:** mecânicas são REGRA DE PRODUTO CONFIRMADA; todos os **números econômicos são placeholders** — a dec. 185 mantém as regras econômicas INDEFINIDAS e a arquitetura oficial (seção 5) **proíbe inventá-las**.
 
@@ -75,12 +75,12 @@ Cada arquivo é um fragmento JavaScript **verbatim** reinjetado no build pelo to
 
 ## 4. `localStorage` — as duas chaves que importam
 
-Grep exaustivo da auditoria (06, §3): existem 8 chaves `vq_*`, mas **4 são código morto** (`vq_pending` nunca escrita; `vq_last_sync`, `vq_tut_step`, `vq_tut_done` nunca lidas; `vq_tut_rew` jamais usada) e `vq_device_authorized` é resquício do fluxo de dispositivo removido (dec. 188). Só **duas têm efeito perceptível**:
+O grep exaustivo da auditoria (06, §3, estado de 30/07) **encontrava** 8 chaves `vq_*` — 4 delas código morto (`vq_pending` nunca escrita; `vq_last_sync`, `vq_tut_step`, `vq_tut_done` nunca lidas; `vq_tut_rew` jamais usada) e `vq_device_authorized` como resquício do fluxo de dispositivo removido. A dec. 188 (01/08) removeu esse código morto com regressão completa verde; **hoje o fonte só usa duas chaves**, ambas com efeito perceptível:
 
 | Chave | O que controla | Detalhes |
 |---|---|---|
 | `vq_tut_skip` | Se a Instrução do QUAD abre no login. `'1'` (gravada ao concluir OU pular) = entra direto | Única flag de tutorial realmente lida (`acessarPortal`); é também o atalho das suítes/sondas para pular o tutorial |
-| `vq_intro_done` | Se a missão "Introdução no Quad" está feita — a linha some do bloco "Hoje" (dec. 157/177) e a recompensa (+30/+25) não repete | Flag conceitualmente **da conta** guardada **por dispositivo** (trocar de aparelho a perderia — no real, DEPENDE DO BACK-END). **Bug documentado e mantido de propósito:** "Resetar demonstração" limpa 7 chaves e esquece esta (src/13 l.801; dec. 188; a arquitetura oficial proíbe corrigir sem decisão) |
+| `vq_intro_done` | Se a missão "Introdução no Quad" está feita — a linha some do bloco "Hoje" (dec. 157/177) e a recompensa (+30/+25) não repete | Flag conceitualmente **da conta** guardada **por dispositivo** (trocar de aparelho a perderia — no real, DEPENDE DO BACK-END). **Bug documentado e mantido de propósito:** o handler de "Resetar demonstração" executa apenas `lsDel('vq_tut_skip')` e **não limpa** esta chave (src/13 l.801–808, com o aviso no próprio comentário do fonte; dec. 188 mantém o bug aberto por exigir decisão) |
 
 **Nenhum dado pessoal ou de negócio vai ao `localStorage`** — positivo para a LGPD do protótipo, fatal para continuidade: nada de progresso sobrevive.
 
@@ -88,7 +88,7 @@ Grep exaustivo da auditoria (06, §3): existem 8 chaves `vq_*`, mas **4 são có
 
 ## 5. Simulações — a lista honesta
 
-Tudo abaixo é SIMULAÇÃO LOCAL declarada (muitas com a etiqueta `[INTEGRAÇÃO REAL]` no próprio fonte — 24 ocorrências confirmadas por grep, auditoria 09):
+Tudo abaixo é SIMULAÇÃO LOCAL declarada (muitas com a etiqueta `[INTEGRAÇÃO REAL]` no próprio fonte — 23 ocorrências confirmadas por grep; eram 24 na auditoria de 30/07, 23 após a remoção de código morto da dec. 188):
 
 | Simulação | Como funciona de verdade | Evidência |
 |---|---|---|
@@ -217,7 +217,7 @@ Conforme a **arquitetura oficial** (00, seção 3): a Consolidação v1.0 intern
 | **Notificações push/e-mail** | **Canal** de entrega (não domínio da plataforma); "o app nunca empurra na V0" | Badges internos apenas; push é faixa V1 do roadmap |
 | **Telemetria como serviço de dados** | Coleta de eventos comportamentais (insumo do futuro IRA) — **"a decidir"**; o Módulo de Relatórios [PLANEJADO] consome leituras, não é dono da coleta | Mock/inexistente — o item **mais distante do código** (Ficha 10; nada é coletado) |
 
-Costuras secundárias que a especificação decidirá se são serviço externo ou parte de módulo interno: **parser de PDF** (edital, quiz, simulado — hoje só o nome do arquivo), **planilha Google Sheets da coordenação** (fonte transitória do cronograma), **storage/CDN de materiais e mídia**, **geração/leitura real de QR**, **controle de acesso físico** (portaria/geofencing — geofencing é V1 sem nenhum código). Os 24 pontos `[INTEGRAÇÃO REAL]` no fonte e o `LINKS_ONLINE` preservado são o mapa dessas costuras (arquitetura 00 §3).
+Costuras secundárias que a especificação decidirá se são serviço externo ou parte de módulo interno: **parser de PDF** (edital, quiz, simulado — hoje só o nome do arquivo), **planilha Google Sheets da coordenação** (fonte transitória do cronograma), **storage/CDN de materiais e mídia**, **geração/leitura real de QR**, **controle de acesso físico** (portaria/geofencing — geofencing é V1 sem nenhum código). Os 23 pontos `[INTEGRAÇÃO REAL]` no fonte (24 na auditoria de 30/07; 23 após a dec. 188) e o `LINKS_ONLINE` preservado são o mapa dessas costuras (arquitetura 00 §3).
 
 ---
 

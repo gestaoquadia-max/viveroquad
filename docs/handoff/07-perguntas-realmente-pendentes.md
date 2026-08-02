@@ -80,7 +80,7 @@ Contexto: a rev. 2.3 manda a V0 rodar sem economia ativa; o protótipo demonstra
 Impacto: define o corte de escopo da primeira construção e protege a métrica-mãe (retorno espontâneo) de contaminação.
 Responsável: Danilo Moura + Vitor França/N.G.E./Jurídico. *(Fontes: Q7, Q18.)*
 
-**P14. Quem conduz — e quando sai — o estudo de balanceamento que fixará os valores hoje demonstrativos (recompensas, preços, metas de patente incl. a curva achatada de 12.500 nas 6 últimas, janela de estorno de 7 dias)?**
+**P14. Quem conduz — e quando sai — o estudo de balanceamento que fixará os valores hoje demonstrativos (recompensas, preços, metas de patente incl. a curva achatada de 12.500 nas patentes 9ª–13ª — a Coronel, 14ª e máxima, tem `pontos: null`, sem meta —, janela de estorno de 7 dias)?**
 Contexto: a dec. 185 declara tudo indefinido; todos os números do protótipo são placeholders calibrados para a demonstração.
 Impacto: a construção precisa ao menos de parametrização configurável — e o lançamento, dos números finais.
 Responsável: Danilo Moura + gestor da economia. *(Fontes: dossiês B/C/D + dec. 185.)*
@@ -319,7 +319,7 @@ Contexto: o protótipo usa o relógio local para tudo (inclusive prazos com valo
 Impacto: requisito transversal de back-end — integridade de todas as regras temporais.
 Responsável: engenheiro. *(Fonte: dossiê B/M4, generalizada.)*
 
-**P57. Quem produz e prioriza o catálogo técnico das 24 marcas `[INTEGRAÇÃO REAL]`, separando fronteiras de módulos internos × contratos de integração externa (site/checkout, pagamentos, plataforma de cursos, notificações, telemetria)?**
+**P57. Quem produz e prioriza o catálogo técnico das 23 marcas `[INTEGRAÇÃO REAL]` (24 na auditoria de 30/07; 23 após a dec. 188), separando fronteiras de módulos internos × contratos de integração externa (site/checkout, pagamentos, plataforma de cursos, notificações, telemetria)?**
 Contexto: a Consolidação definiu a propriedade dos módulos, mas nenhum contrato de API/payload/dono existe (Q19 [ABERTA], reescopada em 01/08).
 Impacto: é o primeiro artefato técnico da construção — bloqueia o planejamento das integrações.
 Responsável: engenheiro (Danilo Moura prioriza). *(Fonte: Q19.)*
@@ -402,7 +402,7 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 2. **"A lista de conferência em PDF deve sair com os nomes reais dos inscritos?"** (dossiê E/M11) — Sim, por construção: a dec. 169 define a lista como conferência dos inscritos; os nomes sintéticos são limitação da simulação local, não regra de produto.
 3. **"Unificar as ATIVIDADES fixas com os eventos vivos nas Liberações?"** (dossiê F/M16) — Já decidido: dec. 80/180 mandam Liberações/Relatórios lerem dados vivos sincronizados; as `ATIVIDADES` fixas são semente de demonstração que não existirá no sistema real.
 4. **"Os 3 cards fixos de 'Curso online' passam a nascer do cadastro?"** (dossiê D/M8) — Sim: dec. 95/118 fazem de "Cadastrar produto ou serviço" a porta única de entrada do digital; os cards fixos são semente da demo.
-5. **Q1 — "O mascote é QUAD em tudo?"** (auditoria) — Respondida pela dec. 17: o mascote é QUAD; os resíduos "Danilo" (card interno, assets) são correção pendente, não dúvida de produto.
+5. **Q1 — "O mascote é QUAD em tudo?"** (auditoria) — Respondida pela dec. 17: o mascote é QUAD; os resíduos "Danilo" (card interno, assets) são correção pendente, não dúvida de produto. *Discordância registrada: a auditoria/10 mantém Q1 [ABERTA]; este pacote a considera respondida pela dec. 17, restando a tarefa de renomeação de assets (nota abaixo, Q2).*
 6. **"Versionar as suítes Playwright"** (parte da Q13) — Executado: dec. 190 versionou as 56 suítes em `tests/` com `verify.py` como portão de aceite oficial.
 7. **"Drop aleatório/itens raros entram na V2?"** (dossiê F/M17) — Coberto pela dec. 184: sem especificação = "Módulo Planejado" (junto de Quests/forja) — nada a construir até o gestor especificar.
 8. **"Qual provedor de push e quais eventos disparam?"** (dossiê F/M17) — Coberto pelas dec. 182/184: notificações seguem sistema externo com integração "a definir" — entra no catálogo de integrações (P57), não como pergunta própria.

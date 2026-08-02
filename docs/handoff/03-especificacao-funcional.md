@@ -156,7 +156,7 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - Introdução no Quad: 3/3 obrigatório; recompensa 30 score + 25 QdC; é da conta e vale para todas as turmas (dec. 157/177). Mecânica: REGRA DE PRODUTO CONFIRMADA; os valores 30/25/20 (boina) são calibração de demo — ver "Dados demonstrativos".
 - Dados pessoais chegam prontos do banco geral; o tutorial confirma, não pede (dec. 22 — formalmente superada pela 182, mas o comportamento demonstrado permanece). REGRA DE PRODUTO CONFIRMADA (na demo).
 
-**Dados utilizados:** `TUT` (29 passos, src/10), `GESTOS`, `TUT_PALAVROES`, `AV_LABELS` (12), sprites `__AVATARS__`/`__DANILO_SPRITE__` (tokens do build), `DB_ALUNO`, `TQ` (3 questões), `TUT_REW`, chaves `vq_tut_skip` e `vq_intro_done` no `localStorage`.
+**Dados utilizados:** `TUT` (29 passos, src/10), `GESTOS`, `TUT_PALAVROES`, `AV_LABELS` (12), sprites `__AVATARS__`/`__DANILO_SPRITE__` (tokens do build), `DB_ALUNO`, `TQ` (3 questões), `TUT_REW` (declarado em src/11), chaves `vq_tut_skip` e `vq_intro_done` no `localStorage`.
 
 **Dados demonstrativos:**
 - As 3 questões da Introdução (LIMPE / 1+1 / hierarquia e disciplina) — DADO DEMONSTRATIVO; a mecânica (3 questões rápidas, feedback imediato, loop até 100%) é REGRA DE PRODUTO CONFIRMADA.
@@ -385,7 +385,7 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - Revisão espaçada D0 · D+1 · D+7 · D+30, 2 aulas/dia, liberação diária (22h15) — mecânica declarada em comentário e rótulos; os marcos temporais funcionam por seeds, não por agendador. REGRA DE PRODUTO CONFIRMADA na intenção; SIMULAÇÃO LOCAL na execução.
 - Rodízio segue o edital da turma ativa; ajuste de Domínio por concurso (dec. 159). REGRA DE PRODUTO CONFIRMADA.
 - Cartas respondidas do PDF 01 migram para o banco do Treinamento Rápido. FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO.
-- Noite completa paga +1 score de carreira por bloco + 1 Quad Coin, resgate único por turma/noite (dec. 26). Mecânica: REGRA DE PRODUTO CONFIRMADA; valores: DADO DEMONSTRATIVO de balanceamento (dec. 185 mantém as regras econômicas indefinidas).
+- Noite completa paga +1 score de carreira por bloco + 1 Quad Coin, resgate único por noite (dec. 26); o caráter **por turma** do resgate não vem da dec. 26, e sim da implementação (`NOITE_RESG` chaveado pela turma ativa — cadeia das missões por turma, dec. 156 em diante). Mecânica: REGRA DE PRODUTO CONFIRMADA; valores: DADO DEMONSTRATIVO de balanceamento (dec. 185 mantém as regras econômicas indefinidas).
 - Recompensas do treinamento: +1 score por acerto · +5 QdC por bloco de 10 (`TR_REW`, l.11). Mecânica (participação → QdC; acerto → score/Domínio): REGRA DE PRODUTO CONFIRMADA; valores: DADO DEMONSTRATIVO.
 
 **Dados utilizados:** `DIA_BLOCOS`/`BLOCOS_TURMA` (rot, det, m/a ou fonte 'aula'+ini, criadoEm, feito, idadeDias), `DIA_EXPIRA_DIAS`, `TR_BANK` (cartas `fc(m, a, certo, texto, observação, nota, resp)`), `AULA_DEMO` (matéria, assunto, professor, 40 cartas C/E), `TR_GERAIS`, `TR_REW`, `EDITAL_ATUAL`/`CONCURSO_ATUAL_ID`, `trAj`, `TR_ST` (fila/posição por turma), `NOITE_RESG`, `carreira` (scores), hooks de teste `__blocos`, `__noite`, `__introFeita`.
@@ -525,7 +525,7 @@ Motores de resposta e suas regras de feedback/prêmio (cada um distinto, todos v
 **Dados utilizados:** `GAMI` (patentes/fases/prova), `carreira`, `score` (QdC), `diamantes`, `TR_BANK` + `nota` dos flashcards (pool da prova), `TR_REW`, `TUT_REW`, `SIMULADOS` (campos `rec`, `score`), `SIM_INSC`, `NOITE_RESG` (por turma), `trAj` (ajuste do Domínio por concurso), `INSIG_MAP` + sprite de insígnias, `RK_NOMES`/`RK_OFF` (rankings), `EDITAL_*`/`ED_BASE` (Domínio), `turmaInscritos` (tamanho da sala).
 
 **Dados demonstrativos** (dec. 185: valores sujeitos a balanceamento):
-- Saldos iniciais 620/310 score de carreira, 1.240 QdC, 150 Dmn; metas das patentes (900, 3.300, … 12.500 repetido nas 6 últimas); `notaMin` das fases (0,70–0,85) nunca lidas; +275 do "dia de estudo"; todos os valores de recompensa (1/5/10/15/20/25/30/275, `rec` padrão 2, score 100–120 dos simulados). DADO DEMONSTRATIVO.
+- Saldos iniciais 620/310 score de carreira, 1.240 QdC, 150 Dmn; metas das patentes (900, 3.300, … 12.500 repetido nas 5 patentes 9ª–13ª; a Coronel, 14ª e máxima, tem `pontos: null` — sem meta); `notaMin` das fases (0,70–0,85) nunca lidas; +275 do "dia de estudo"; todos os valores de recompensa (1/5/10/15/20/25/30/275, `rec` padrão 2, score 100–120 dos simulados). DADO DEMONSTRATIVO.
 - Ranking geral inteiro (1.286 usuários, 87º, top com 24.870 pts, nomes `RK_NOMES`), colegas da sala e quem é "privado" (1 a cada 4), posição na sala (fórmula 29%), "presença 9/10" (texto fixo), histórico inicial da carreira (10/07/2026). DADO DEMONSTRATIVO.
 - Barras do Domínio (hash determinístico) e as duas provas: pool completado com questões não-difíceis quando faltam difíceis ("para sempre fechar as 20 **na demo**" — src/12 l.348). DADO DEMONSTRATIVO.
 
@@ -547,7 +547,7 @@ Motores de resposta e suas regras de feedback/prêmio (cada um distinto, todos v
 3. DIVERGÊNCIA — `GAMI.fases[].notaMin` (70–85%) existe mas ninguém lê; a prova usa 80% fixo para todas as fases — o código diz uma coisa (config por fase) e faz outra (pendência declarada em src/07 l.7–9).
 4. DIVERGÊNCIA — estado 'aguardando-fiscal' listado no comentário mas inalcançável desde a dec. 23 (prova sem fiscal).
 5. DIVERGÊNCIA — Quadrômetro mistura números vivos com "presença 9/10" fixo na mesma frase.
-6. DIVERGÊNCIA — as 6 patentes finais exigem os mesmos 12.500 pts (curva achatada — provável placeholder).
+6. DIVERGÊNCIA — 5 patentes (Aspirante → Tenente-Coronel, 9ª–13ª) exigem os mesmos 12.500 pts e a Coronel (14ª, máxima) tem `pontos: null`, sem meta (curva achatada — provável placeholder).
 7. DIVERGÊNCIA — os prêmios "+1 score por questão" e "+20 QdC · quiz da aula" existem no código (src/08 l.423/428), mas pertencem ao motor órfão `QUESTIONS` (ver Módulo 6); o quiz da aula real não premia (dec. 64, sonda `b5-quiz-aula.mjs`). Toast com rótulo enganoso em código inalcançável.
 
 **Perguntas pendentes:** PERGUNTA PENDENTE: qual o ciclo real da temporada (semanal?) e há recompensa/reset? O que é o "Prestígio" após Coronel? As `notaMin` por fase substituirão os 80% fixos? Quais serão os valores finais de recompensa e das metas de patente (dec. 185)? A posição no ranking geral virá de qual recorte (plataforma inteira, por concurso)? A presença (9/10) virá de qual registro — liberações da recepção? O botão demo de patente e o "dia de estudo" serão removidos na V1 (o código já pede)?
@@ -691,7 +691,7 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 
 **Ações disponíveis:** Admin: criar lote (qtd × valor × moeda); ver QR codes do lote (6/todos); acompanhar consumo; creditar QdC/Dmn manualmente com motivo. Aluno: resgatar por código; abrir leitor QR e validar (demo); ver saldos no topo/Loja/Quadrômetro.
 
-**Regras confirmadas:** REGRA DE PRODUTO CONFIRMADA: gift card nasce em lote no Painel de controle; **liberação única com invalidação imediata**; validação pelo código digitado na Quad Store ou pelo leitor com câmera (dec. 66/112); crédito cai na moeda do lote; contadores de consumo por lote; crédito manual livre da administração com motivo e histórico (dec. 52); formato de código `QG<lote>-<código>` (dec. 84); Dmn é comprado em dinheiro — recarga do site ou gift card — e nunca conquistado (dec. 48; ver Módulo 7).
+**Regras confirmadas:** REGRA DE PRODUTO CONFIRMADA: gift card nasce em lote no Painel de controle; **liberação única com invalidação imediata**; validação pelo código digitado na Quad Store ou pelo leitor com câmera (dec. 66/112); crédito cai na moeda do lote; contadores de consumo por lote; crédito manual livre da administração com motivo e histórico (dec. 52); formato de código `QG<lote>-<código>` definido pelo código gerador dos lotes (src/16 l.326; a dec. 84 não define o formato — apenas alinhou os textos da loja ao "formato real dos lotes"); Dmn é comprado em dinheiro — recarga do site ou gift card — e nunca conquistado (dec. 48; ver Módulo 7).
 
 **Dados utilizados:** `GIFT_LOTES` (lotes com `codes[{c, usado}]`, valor, moeda), `giftSeq`, `GIFT_CARDS`/`giftUsados` (demo), `score`/`diamantes` (carteira), `CREDITOS` (histórico do admin), `CONTAS`, `moedaTxt`, `qrSvg`/`edHash` (QR ilustrativo).
 
@@ -709,7 +709,7 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 
 **Decisões posteriores:** DECISÃO POSTERIOR: dec. 185 — valores/economia indefinidos (preço real de um gift card em R$, limites de emissão, política de expiração: nada definido); dec. 182 — integração com pagamentos "a definir".
 
-**Divergências:** DIVERGÊNCIA: a dec. 48 apresenta o gift card como canal do **Diamante** ("comprada em dinheiro — recarga no site ou gift card"), mas o código e o painel permitem lote de gift card em **Quad Coins** (e o crédito manual idem) — QdC "comprável" via cartão colide com o princípio "Score não é moeda" da rev. 2.3 (mesma tensão da dec. 11; ver Módulo 7); os códigos-demo QUAD-100/500 não seguem o formato oficial `QG<lote>-<código>` (dec. 84 os manteve só como demonstração).
+**Divergências:** DIVERGÊNCIA: a dec. 48 apresenta o gift card como canal do **Diamante** ("comprada em dinheiro — recarga no site ou gift card"), mas o código e o painel permitem lote de gift card em **Quad Coins** (e o crédito manual idem) — QdC "comprável" via cartão colide com o princípio "Score não é moeda" da rev. 2.3 (mesma tensão da dec. 11; ver Módulo 7); os códigos-demo QUAD-100/500 não seguem o formato `QG<lote>-<código>` dos lotes gerados pelo código (src/16; a dec. 84 alinhou os textos ao formato e manteve os códigos-demo só como demonstração).
 
 **Perguntas pendentes:** PERGUNTA PENDENTE: gift card em QdC é intencional no produto final ou o cartão real será só de Dmn? Gift cards terão validade/expiração e valor de face em R$? O resgate será limitado por conta (ex.: 1 por CPF)? O leitor de QR entrará no app (câmera) ou haverá resgate também no site? Estorno de compra paga com crédito de gift card devolve para onde (ver Módulo 10)? Quem pode emitir lotes (qualquer admin N.P.P. ou só a direção)?
 
