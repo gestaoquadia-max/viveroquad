@@ -10,116 +10,10 @@
   var TR_GERAIS = ['Língua Portuguesa', 'Língua Inglesa', 'Informática', 'Matemática', 'História', 'Geografia'];
   var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
   function fc(m, a, c, t, o) { return { m: m, a: a, c: c, t: t, o: o, nota: -1, resp: null }; }
-  var TR_BANK = [
-    fc('Língua Portuguesa','Interpretação de textos',true,'A ideia central de um texto pode aparecer de forma implícita.','Nem sempre a tese está escrita com todas as letras.'),
-    fc('Língua Portuguesa','Interpretação de textos',false,'Inferir é copiar uma informação explícita do texto.','Inferir é concluir a partir de pistas — o explícito se localiza.'),
-    fc('Língua Portuguesa','Interpretação de textos',true,'O título costuma antecipar o tema e orientar a leitura.','Use o título como bússola antes de ler.'),
-    fc('Língua Portuguesa','Interpretação de textos',false,'Textos não verbais não transmitem informação.','Imagens, gráficos e símbolos também comunicam.'),
-    fc('Língua Portuguesa','Interpretação de textos',true,'Charges combinam linguagem verbal e não verbal.','Humor gráfico é texto misto por natureza.'),
-    fc('Língua Portuguesa','Interpretação de textos',false,'Em textos mistos, a imagem nunca altera o sentido do escrito.','A imagem pode reforçar, ironizar ou contradizer o texto.'),
-    fc('Língua Portuguesa','Interpretação de textos',true,'A ironia pode inverter o sentido literal de uma frase.','O contexto denuncia a inversão.'),
-    fc('Língua Portuguesa','Interpretação de textos',true,'O contexto ajuda a definir o sentido de palavras ambíguas.','“Manga”, “banco”, “vela”: o entorno decide.'),
-    fc('Língua Portuguesa','Interpretação de textos',false,'O texto publicitário é neutro, sem intenção de convencer.','Publicidade existe para persuadir.'),
-    fc('Língua Portuguesa','Interpretação de textos',false,'Compreender um texto dispensa identificar o público-alvo.','Saber para quem se fala muda a leitura.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'Cognatos são palavras parecidas com o português e ajudam na leitura.','“Important”, “diferent”… aliados do leitor.'),
-    fc('Língua Inglesa','Interpretação de textos',false,'“Push” significa puxar.','Falso cognato: push = empurrar; pull = puxar.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'Skimming é a leitura rápida para captar a ideia geral.','Passar o olho com propósito.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'Scanning busca uma informação específica no texto.','Caçar um dado: nome, número, data.'),
-    fc('Língua Inglesa','Interpretação de textos',false,'“Actually” significa atualmente.','Falso cognato: actually = na verdade.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'Palavras repetidas ao longo do texto costumam indicar o tema.','Repetição é pista de assunto.'),
-    fc('Língua Inglesa','Interpretação de textos',false,'“Parents” significa parentes.','Falso cognato: parents = pais.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'Títulos e imagens ajudam a prever o conteúdo em inglês.','Predição é estratégia de leitura.'),
-    fc('Língua Inglesa','Interpretação de textos',false,'Interpretar exige traduzir palavra por palavra.','O sentido global vale mais que a tradução literal.'),
-    fc('Língua Inglesa','Interpretação de textos',true,'O sufixo “-ly” costuma indicar advérbio.','Quickly, carefully, really…'),
-    fc('Informática','Editores de texto',true,'Ctrl+C copia e Ctrl+V cola, no Word e no Writer.','Atalhos universais de edição.'),
-    fc('Informática','Editores de texto',false,'Ctrl+Z refaz a última ação.','Ctrl+Z desfaz; refazer é Ctrl+Y (ou Ctrl+R no Writer).'),
-    fc('Informática','Editores de texto',true,'O corretor ortográfico sublinha palavras não reconhecidas.','O sublinhado é alerta, não sentença.'),
-    fc('Informática','Editores de texto',false,'Salvar em PDF impede qualquer pessoa de ler o arquivo.','PDF é formato de leitura, não de sigilo.'),
-    fc('Informática','Editores de texto',true,'Cabeçalho e rodapé se repetem nas páginas do documento.','Por isso carregam título e numeração.'),
-    fc('Informática','Editores de texto',true,'No Word em português, Ctrl+B salva o documento.','Pegadinha clássica: negrito é Ctrl+N.'),
-    fc('Informática','Editores de texto',false,'A extensão .docx é típica de planilhas.','.docx é texto; planilha é .xlsx.'),
-    fc('Informática','Editores de texto',true,'Localizar e substituir troca uma palavra em todo o texto de uma vez.','Ctrl+U no Word pt-BR.'),
-    fc('Informática','Editores de texto',false,'Quebra de página e quebra de linha são o mesmo recurso.','Uma muda de página; a outra, de linha.'),
-    fc('Informática','Editores de texto',true,'O Writer, do LibreOffice, é um editor de textos gratuito.','Software livre, muito cobrado em prova.'),
-    fc('Matemática','Conjuntos numéricos',true,'Todo número natural é também inteiro.','ℕ está contido em ℤ.'),
-    fc('Matemática','Conjuntos numéricos',false,'Todo número inteiro é natural.','−3 é inteiro e não é natural.'),
-    fc('Matemática','Conjuntos numéricos',true,'−3 é um número inteiro.','ℤ inclui os negativos.'),
-    fc('Matemática','Conjuntos numéricos',false,'1/2 é um número irracional.','Fração de inteiros é racional.'),
-    fc('Matemática','Conjuntos numéricos',true,'√2 é um número irracional.','Não há fração exata para √2.'),
-    fc('Matemática','Conjuntos numéricos',true,'Todo racional pode ser escrito como fração de inteiros, com denominador não nulo.','Definição de ℚ.'),
-    fc('Matemática','Conjuntos numéricos',false,'O zero não pertence ao conjunto dos racionais.','0 = 0/1 — racional.'),
-    fc('Matemática','Conjuntos numéricos',true,'Dízimas periódicas são números racionais.','Toda dízima periódica vira fração.'),
-    fc('Matemática','Conjuntos numéricos',false,'π é um número racional.','π é o irracional mais famoso.'),
-    fc('Matemática','Conjuntos numéricos',true,'O conjunto dos reais reúne racionais e irracionais.','ℝ = ℚ ∪ irracionais.'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'A dignidade da pessoa humana é fundamento da República.','Art. 1º, III, da CF.'),
-    fc('Direito Constitucional','Princípios fundamentais',false,'A soberania é objetivo fundamental da República.','Soberania é fundamento (art. 1º); objetivos estão no art. 3º.'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'Construir uma sociedade livre, justa e solidária é objetivo fundamental.','Art. 3º, I.'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'Todo o poder emana do povo, que o exerce por representantes eleitos ou diretamente.','Parágrafo único do art. 1º.'),
-    fc('Direito Constitucional','Princípios fundamentais',false,'Os Poderes da União são dependentes e hierarquizados entre si.','São independentes e harmônicos (art. 2º).'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'O pluralismo político é fundamento da República.','Art. 1º, V.'),
-    fc('Direito Constitucional','Princípios fundamentais',false,'O presidencialismo está listado no art. 1º como fundamento.','Forma de governo não integra a lista de fundamentos.'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'A cidadania é fundamento da República.','Art. 1º, II.'),
-    fc('Direito Constitucional','Princípios fundamentais',false,'Promover o bem de todos, sem preconceitos, é fundamento da República.','É objetivo fundamental (art. 3º, IV).'),
-    fc('Direito Constitucional','Princípios fundamentais',true,'A independência nacional rege as relações internacionais do Brasil.','Art. 4º, I.'),
-    fc('Direito Penal','Aplicação da lei penal',true,'A lei penal não retroage, salvo para beneficiar o réu.','Irretroatividade in pejus, retroatividade in bonam partem.'),
-    fc('Direito Penal','Aplicação da lei penal',false,'A lei mais grave retroage para alcançar fatos antigos.','Nunca — só a mais benéfica retroage.'),
-    fc('Direito Penal','Aplicação da lei penal',true,'Considera-se praticado o crime no momento da ação ou omissão.','Teoria da atividade (art. 4º do CP).'),
-    fc('Direito Penal','Aplicação da lei penal',false,'O Brasil adota a teoria do resultado para o tempo do crime.','Adota a teoria da atividade.'),
-    fc('Direito Penal','Aplicação da lei penal',true,'Para o lugar do crime valem a conduta e o resultado.','Teoria da ubiquidade (art. 6º).'),
-    fc('Direito Penal','Aplicação da lei penal',true,'Aplica-se a lei brasileira ao crime cometido no território nacional.','Princípio da territorialidade.'),
-    fc('Direito Penal','Aplicação da lei penal',false,'Navio de guerra estrangeiro em águas brasileiras segue a lei brasileira.','É extensão do território de origem.'),
-    fc('Direito Penal','Aplicação da lei penal',true,'A abolitio criminis extingue a punibilidade de fatos anteriores.','Lei que descriminaliza retroage sempre.'),
-    fc('Direito Penal','Aplicação da lei penal',false,'A lei temporária perde força sobre os fatos da sua vigência após o prazo.','Ultratividade: continua alcançando aqueles fatos.'),
-    fc('Direito Penal','Aplicação da lei penal',true,'Não há crime sem lei anterior que o defina.','Legalidade estrita (art. 1º do CP).')
-  ];
+  __SEED_TR_BANK__
 
   /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
-  var AULA_DEMO = {
-    m: 'Direito Administrativo', a: 'Poderes administrativos',
-    titulo: 'Poderes administrativos', prof: 'Danilo Moura',
-    cards: [
-      ['C','O poder de polícia condiciona direitos individuais em favor do interesse público.','Essência do conceito.'],
-      ['E','O poder de polícia é exercido exclusivamente pelo Poder Judiciário.','É típico da Administração Pública.'],
-      ['C','O poder hierárquico autoriza dar ordens, fiscalizar e rever atos de subordinados.','Tríade clássica da hierarquia.'],
-      ['E','O poder disciplinar alcança qualquer cidadão, mesmo sem vínculo com a Administração.','Só quem tem vínculo funcional ou contratual.'],
-      ['C','O poder regulamentar permite editar decretos para a fiel execução das leis.','Art. 84, IV, da CF.'],
-      ['E','O decreto regulamentar pode criar obrigações novas sem base legal.','Regulamento não inova a ordem jurídica.'],
-      ['C','A discricionariedade envolve conveniência e oportunidade dentro dos limites da lei.','Mérito administrativo com moldura legal.'],
-      ['E','O ato discricionário dispensa qualquer limite legal.','Discricionário ≠ arbitrário.'],
-      ['C','O excesso de poder é uma espécie de abuso de poder.','Abuso = excesso de poder + desvio de finalidade.'],
-      ['E','Excesso de poder e desvio de finalidade são a mesma coisa.','Um extrapola a competência; o outro trai o fim.'],
-      ['C','Licenças e alvarás são manifestações preventivas do poder de polícia.','Polícia administrativa preventiva.'],
-      ['E','A multa de trânsito não é manifestação do poder de polícia.','É o exemplo clássico da face repressiva.'],
-      ['C','A autoexecutoriedade permite executar certas medidas sem ordem judicial.','Atributo do poder de polícia.'],
-      ['E','Toda medida de polícia exige autorização judicial prévia.','A autoexecutoriedade dispensa, em regra.'],
-      ['C','A coercibilidade torna a medida de polícia obrigatória para o particular.','Imposição independe de concordância.'],
-      ['E','O particular pode recusar a fiscalização sem qualquer consequência.','A recusa pode gerar sanção.'],
-      ['C','O poder disciplinar exige processo com ampla defesa para punir.','Contraditório e ampla defesa sempre.'],
-      ['E','A punição disciplinar dispensa motivação.','Ato punitivo sem motivação é nulo.'],
-      ['C','A hierarquia permite avocar e delegar competências nos termos da lei.','Instrumentos do poder hierárquico.'],
-      ['E','Competências exclusivas podem ser livremente delegadas.','Exclusiva não se delega.'],
-      ['C','O Judiciário pode anular ato praticado com abuso de poder.','Controle de legalidade.'],
-      ['E','O ato com desvio de finalidade é válido se der bom resultado.','Fim ilegítimo contamina o ato.'],
-      ['C','Interditar estabelecimento irregular é exemplo de polícia repressiva.','Atuação após a infração.'],
-      ['E','A licença é ato discricionário.','Licença é vinculada; autorização é discricionária.'],
-      ['C','A autorização é, em regra, discricionária e precária.','Pode ser revogada.'],
-      ['E','A autorização gera direito adquirido definitivo ao particular.','Precariedade afasta o direito adquirido.'],
-      ['C','O poder regulamentar do chefe do Executivo se expressa tipicamente por decretos.','Decreto é o veículo típico.'],
-      ['E','Portaria de ministro tem força superior à lei.','Ato infralegal não supera a lei.'],
-      ['C','Parte do poder de polícia pode ser delegada a entidades de direito público.','Consenso na jurisprudência.'],
-      ['E','Empresas privadas podem aplicar sanções de polícia livremente.','Sanção exige regime de direito público.'],
-      ['C','A proporcionalidade limita a intensidade das medidas de polícia.','Meio adequado, necessário e proporcional.'],
-      ['E','A interdição de atividade dispensa juízo de proporcionalidade.','Medida drástica exige proporcionalidade reforçada.'],
-      ['C','A omissão do dever de agir também pode configurar abuso de poder.','Abuso por omissão existe.'],
-      ['E','Abuso de poder só ocorre por ação, nunca por omissão.','Omissão indevida também é abuso.'],
-      ['C','A revisão hierárquica permite anular atos ilegais de subordinados.','Autotutela + hierarquia.'],
-      ['E','O superior só pode rever ato de subordinado se for provocado.','Pode rever de ofício.'],
-      ['C','As sanções disciplinares devem respeitar o contraditório.','Devido processo também na via administrativa.'],
-      ['E','A “verdade sabida” autoriza punir sem defesa nos dias de hoje.','Superada pela CF/88.'],
-      ['C','O poder de polícia alcança atividades, bens e direitos dos particulares.','Campo amplo de incidência.'],
-      ['E','O poder de polícia não alcança bens, somente pessoas.','Bens também se sujeitam (ex.: interdição).']
-    ]
-  };
+  __SEED_AULA_DEMO__
   /* PDF 01 → bloco Hoje: 2 aulas por dia × marcos D0 · D+1 · D+7 · D+30.
      Tudo libera às 22h15 do dia — o aluno só vê "as rápidas de hoje". */
   var DIA_BLOCOS = [
@@ -187,11 +81,7 @@
        histórico
      · digital → quiz cronometrado; realizado, vai ao histórico
      Tudo é computado no histórico para fins pedagógicos.                    */
-  var SIMULADOS = [
-    { id: 's63', rot: 'Simulado 63 · SD PMBA', det: 'domingo · 8h', tag: 'PRESENCIAL', pago: true,  valor: 120, precoDmn: 120, precoQdc: 150, rec: 0, score: 120, vagas: 60, vagasDmn: 50, vagasQdc: 10, vagasGratis: 0,  insc: false, comprado: false, realizado: false },
-    { id: 'sq',  rot: 'Simuladão Quad',        det: 'sábado · 8h',  tag: 'PRESENCIAL', pago: true,  valor: 20,  precoDmn: 15, precoQdc: 20, rec: 0, score: 100, vagas: 80, vagasDmn: 20, vagasQdc: 60, vagasGratis: 0, insc: false, comprado: false, realizado: false },
-    { id: 'sd1', rot: 'Simulado digital · CFO 1ª fase', tag: 'DIGITAL', pago: false, valor: 0, pdf: 'cfo-1fase.pdf', minutos: 30, nq: 10, dia: '', feito: false, comprado: false }
-  ];
+  __SEED_SIMULADOS__
   /* inscritos presenciais que aguardam liberação (feed da recepção) */
   var SIM_INSC = [
     { simRot: 'Simulado 63 · SD PMBA', nome: 'AL SGT QUAD SANTIAGO', pago: true,  valor: 120, score: 120, geraQdC: false, liberado: true,  pontuado: true,  euSou: false },

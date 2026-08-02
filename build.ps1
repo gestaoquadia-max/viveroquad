@@ -40,6 +40,11 @@ $rep = [ordered]@{
   "__DIAMANTE__" = "data:image/webp;base64," + $dmn
   "__FOTOS_VARIANTES__" = $fotosVar
 }
+# dados demonstrativos (data/*.js): fragmentos JS verbatim injetados nos tokens __SEED_*__
+Get-ChildItem (Join-Path $dir "data") -Filter "*.js" | Sort-Object Name | ForEach-Object {
+  $tok = "__SEED_" + ($_.BaseName.ToUpper() -replace '-','_') + "__"
+  $rep[$tok] = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+}
 $out = $src
 foreach ($k in $rep.Keys) {
   if (-not $out.Contains($k)) { throw "token ausente no fonte: $k" }

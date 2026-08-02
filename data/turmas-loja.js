@@ -1,0 +1,7 @@
+var TURMAS_LOJA = [
+    { id: 'rondesp-n', nome: 'Turma RONDESP', tipo: 'RONDESP', tipoDesc: 'Turma de nivelamento', sala: 'Sala 1', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 1800, precoQdc: 2000, vagasDmn: 145, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'patamo-n',  nome: 'Turma PATAMO',  tipo: 'PATAMO',  tipoDesc: 'Turma regular', sala: 'Sala 2', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2200, precoQdc: 2400, vagasDmn: 75, vagasQdc: 10, inicio: '2026-06-01', fim: '2026-12-15' },
+    { id: 'bope-n',    nome: 'Turma BOPE',    tipo: 'BOPE',    tipoDesc: 'Turma de questões', sala: 'Sala 3', turno: 'noite', hor: '19h–20h30 e 20h30–22h', concurso: 'cfo', precoDmn: 2600, precoQdc: 2800, vagasDmn: 115, vagasQdc: 10, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'rondesp-m', nome: 'Turma RONDESP Manhã', tipo: 'RONDESP', tipoDesc: 'Turma de nivelamento', sala: 'Sala 1', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 600, precoQdc: 700, vagasDmn: 54, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' },
+    { id: 'bope-m',    nome: 'Turma BOPE Manhã',    tipo: 'BOPE',    tipoDesc: 'Turma de questões',    sala: 'Sala 2', turno: 'manhã', hor: '8h–9h30 e 9h30–11h', concurso: 'sdba', precoDmn: 800, precoQdc: 900, vagasDmn: 44, vagasQdc: 6, inicio: '2026-08-03', fim: '2027-02-01' }
+  ];

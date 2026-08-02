@@ -1,0 +1,46 @@
+# tests/ — a rede de segurança do protótipo
+
+56 suítes de regressão (Playwright headless) que verificam o comportamento
+do protótipo de ponta a ponta — aluno, professor e administrador. Foram
+construídas junto com o produto, rodada a rodada, e são o **critério de
+aceite oficial** de qualquer mudança: *nenhuma alteração no fonte é boa se
+a regressão não fechar verde*.
+
+## Como rodar
+
+```sh
+python3 ../build.py     # gera o index.html que as suítes abrem
+./run.sh                # todas as suítes  (ou: ./run.sh vtut vloja ...)
+```
+
+Na raiz do repositório, `python3 verify.py` faz os dois passos de uma vez.
+
+Requisitos: Node 20+, Playwright e um Chromium. Os caminhos padrão são os
+do ambiente de desenvolvimento original e podem ser trocados por variável
+de ambiente (`VQ_NODE`, `VQ_PW`, `VQ_CHROME` — ver `run.sh`).
+
+## O que cada família cobre
+
+| Prefixo | Cobre |
+|---|---|
+| vtut, vfase* | tutorial do QUAD, fases do pacote do aluno (a–h) |
+| vf[a-e], vfix*, vg[1-3] | rodadas de ajuste do gestor (regras pontuais) |
+| v[h-u]1 | uma suíte formal por rodada de evolução (vu1 = lotação/portaria/públicos) |
+| vadmin, vinterno, vcontrole, vestrutura | as abas do administrador N.P.P. |
+| vloja*, vdmn, vbonus, vmochila, vevento | Quad Store, moedas, mochila, eventos |
+| vsim, vprova, vaula | simulados, prova de promoção, aula de hoje (com relógio simulado) |
+| vrank, vperfil, vgami, vturma, vtr | rankings, perfil, gamificação, turmas, treinamento |
+| demais | login, navegação, calendário, materiais, acessos |
+
+## Regras de manutenção
+
+1. **Suíte quebrou após uma mudança?** Primeiro pergunte se ela mede o
+   comportamento vigente. Se a regra mudou por decisão registrada, a
+   suíte acompanha (e a decisão é citada no commit). Se não mudou, o
+   código regrediu — conserte o código, nunca afrouxe a suíte.
+2. **Datas**: suítes que criam turmas/eventos usam datas futuras; ao
+   vencerem no calendário real, reancore-as (precedente: dec. 189).
+   As suítes de "aula de hoje" (vaula*) usam relógio simulado e não vencem.
+3. As suítes conversam com o protótipo pelos ~31 ganchos `window.__*`
+   do fonte — eles são contrato estável; não remova sem atualizar aqui.
+4. Screenshots e artefatos de execução caem em `_out/` (fora do git).

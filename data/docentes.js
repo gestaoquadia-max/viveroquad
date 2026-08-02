@@ -1,0 +1,8 @@
+var DOCENTES = [
+    { nome: 'Danilo Moura',        materias: ['Direito Administrativo', 'Direito Constitucional'], turnos: ['manhã', 'noite'], grad: 'Especialista em Direito Público', fone: '(71) 9 8877-2301', desligado: false, bloqueado: false },
+    { nome: 'Cap. Silva',          materias: ['Direito Penal', 'Direito Penal Militar'],           turnos: ['noite'],          grad: 'Bacharel em Direito',              fone: '(71) 9 8811-1020', desligado: false, bloqueado: false },
+    { nome: 'Prof. Ferraz',        materias: ['Matemática', 'Informática'],                        turnos: ['manhã', 'tarde'], grad: 'Mestre em Matemática',             fone: '(71) 9 8822-3040', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ritha Galvão', materias: ['Língua Portuguesa', 'Redação oficial'],             turnos: ['manhã', 'tarde', 'noite'], grad: 'Doutora em Letras',       fone: '(71) 9 8833-5060', desligado: false, bloqueado: false },
+    { nome: 'Prof. Nascimento',    materias: ['História', 'Geografia', 'Direitos Humanos'],         turnos: ['tarde', 'noite'], grad: '',                                 fone: '(71) 9 8844-7080', desligado: false, bloqueado: false },
+    { nome: 'Prof.ª Ana Beatriz',  materias: ['Língua Inglesa', 'Direito Processual Penal'],        turnos: ['noite'],          grad: 'Especialista em Idiomas',          fone: '(71) 9 8855-9010', desligado: false, bloqueado: false }
+  ];

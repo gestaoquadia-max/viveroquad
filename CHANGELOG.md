@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 01/08/2026 — Refatoração autorizada: rede de segurança (F0) e dados demonstrativos (F1)
+
+Execução das fases autorizadas pela Diretriz Oficial de ajuste da estratégia
+de refatoração (F0, F1 e correções de build/documentação; F2–F6 suspensas).
+**Comportamento intacto**: F1 comprovada por saída de build byte-idêntica;
+F0 fecha com a regressão completa verde.
+
+- **F0 · Rede de segurança versionada**: as **56 suítes de regressão
+  Playwright** — até aqui só no ambiente de desenvolvimento — entram no
+  repositório em `tests/`, com cabeçalhos portáteis (variáveis `VQ_NODE`,
+  `VQ_PW`, `VQ_CHROME`; URL do `index.html` derivada da posição do arquivo),
+  runner `tests/run.sh` (aprovação por código de saída **e** texto) e
+  `verify.py` na raiz (build + regressão em um comando). Documentação e
+  regras de manutenção em `tests/README.md`.
+- **F1 · Dados demonstrativos em `data/`**: 19 conjuntos-semente (eventos,
+  turmas, docentes, concursos e editais, cronograma, simulados, isoladas,
+  catálogos da loja, bancos de questões) saíram das partes JS e viraram
+  **fragmentos verbatim** injetados no build pelos tokens `__SEED_*__` —
+  a saída continua **byte a byte idêntica**. Relações entre os conjuntos
+  documentadas em `data/README.md`; o que é regra (GAMI, SALA_CAP, TUT,
+  cadeia de skins) permaneceu no código, de propósito.
+- **Build e docs**: `build.py`/`build.ps1` ganharam a injeção de dados;
+  README (estrutura e passo "Verificar"), guia de build e `src/README.md`
+  atualizados; decisões 189–191 registradas (inclui a reancoragem das
+  datas-semente feita mais cedo no dia).
+
 ## 01/08/2026 — Consolidação Arquitetural v1.0: fonte em `src/`, build portátil, limpeza de código morto e documentação alinhada
 
 Quatro commits no dia, todos decorrentes da Consolidação Arquitetural v1.0

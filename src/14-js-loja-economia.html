@@ -186,9 +186,7 @@
     'dig:mentoria':  { via: 'dig',  cat: 'mentoria', rot: 'Mentoria', data: true, periodo: true }
   };
   function prodDestino(v) { return PROD_DESTINOS[v] || PROD_DESTINOS['pres:outros']; }
-  var LOJA_EXTRAS = [
-    { nome: 'Mentoria Quad', desc: 'acompanhamento individual com o time', cat: 'mentoria', preco: 900, moeda: 'dmn', icone: 'mentoria', dataISO: '2026-08-12' }
-  ];
+  __SEED_LOJA_EXTRAS__
   function renderLojaExtras() {
     ['turmas', 'digitais', 'mentoria', 'personagem'].forEach(function (cat) {
       var host = document.getElementById('lojaExtras-' + cat);
@@ -209,27 +207,11 @@
   /* ---------- itens presenciais: estoque, quantidade e entrega ----------
      cat: excursao · modulos · taf · outros — cada uma vira uma sub-área
      da Loja; moeda: qdc | dmn                                             */
-  var ITENS_PRESENCIAIS = [
-    { id: 'excursao',   nome: 'Excursão · concurso PM-BA', desc: 'viagem organizada pelo Quad', preco: 600, moeda: 'dmn', icone: 'presencial', estoque: 40, cat: 'excursao', estado: 'disp' },
-    { id: 'vademecum',  nome: 'Vade Mecum',       desc: 'legislação da carreira', preco: 200, moeda: 'qdc', icone: 'vademecum', estoque: 8,  cat: 'modulos', estado: 'disp' },
-    { id: 'modulo',     nome: 'Módulo impresso',  desc: 'apostila da matéria',    preco: 150, moeda: 'qdc', icone: 'modulo',    estoque: 15, cat: 'modulos', estado: 'disp' },
-    { id: 'simufis',    nome: 'Caderno de simulados impresso', desc: 'apostila com provas anteriores', preco: 120, moeda: 'qdc', icone: 'simulado', estoque: 30, cat: 'modulos', estado: 'disp' },
-    { id: 'taf',        nome: 'Treinamento TAF',  desc: 'preparação para a prova física', preco: 450, moeda: 'dmn', icone: 'medalha', estoque: 30, cat: 'taf', estado: 'disp' },
-    { id: 'garrafinha', nome: 'Garrafinha Quad',  desc: 'squeeze da tropa',       preco: 90,  moeda: 'qdc', icone: 'garrafinha', estoque: 12, cat: 'outros', estado: 'disp' },
-    { id: 'chaveiro',   nome: 'Chaveiro Quad',    desc: 'brinde da marca',        preco: 40,  moeda: 'qdc', icone: 'chaveiro',  estoque: 25, cat: 'outros', estado: 'disp' },
-    { id: 'camiseta',   nome: 'Camiseta Quad',    desc: 'camisa temática',        preco: 180, moeda: 'qdc', icone: 'camiseta',  estoque: 20, cat: 'outros', estado: 'disp' }
-  ];
+  __SEED_ITENS_PRESENCIAIS__
   /* ---------- ISOLADAS: matérias avulsas com dias fixos e período ----------
      Nascem no bloco "Criação de turmas e isoladas". Compradas, viram evento
      recorrente: entram no carrossel do Início e no calendário do aluno.   */
-  var ISOLADAS = [
-    { id: 'iso-adm', materia: 'Direito Administrativo', nome: 'Isolada Dir. Administrativo', prof: 'Danilo Moura', sala: 'Sala 4',
-      dias: ['terça-feira'], hi: '20:00', hf: '22:00', ini: '2026-08-04', fim: '2026-10-20', preco: 350, moeda: 'dmn', vagas: 30 },
-    { id: 'iso-port', materia: 'Língua Portuguesa', nome: 'Isolada de Português', prof: 'Prof.ª Ritha Galvão', sala: 'Sala 1',
-      dias: ['sábado'], hi: '14:00', hf: '17:00', ini: '2026-08-08', fim: '2026-10-24', preco: 350, moeda: 'dmn', vagas: 25 },
-    { id: 'iso-livre', materia: 'qualquer matéria', nome: 'Aula isolada', prof: '',
-      dias: [], hi: '', hf: '', ini: '', fim: '', preco: 40, moeda: 'qdc', vagas: 60 }
-  ];
+  __SEED_ISOLADAS__
   var DIA_ABREV = { 'segunda-feira': 'SEG', 'terça-feira': 'TER', 'quarta-feira': 'QUA', 'quinta-feira': 'QUI', 'sexta-feira': 'SEX', 'sábado': 'SÁB', 'domingo': 'DOM' };
   function isoDiasTxt(iso) { return (iso.dias || []).map(function (d) { return DIA_ABREV[d] || d; }).join(' e '); }
   /* =============== AGENDA DO ALUNO · choque de horário ===============

@@ -38,6 +38,7 @@ base64 (ou pelo texto, no caso das fontes):
 | `__QUAD_COIN__` | `quad-coin.webp` |
 | `__DIAMANTE__` | `diamante.webp` |
 | `__FOTOS_VARIANTES__` | `fotos/` — objeto JS por variante (boina, gandola, colete, fuzil, cipe, patamo, bope) |
+| `__SEED_*__` (19 tokens) | `data/*.js` — dados demonstrativos como fragmentos JS verbatim (ver [`data/README.md`](../data/README.md)) |
 
 ## Build
 
@@ -57,9 +58,15 @@ Os dois scripts fazem o mesmo:
 
 1. Concatenam as 20 partes de `src/` na ordem do prefixo, **sem acrescentar
    nem remover um byte**;
-2. Substituem os 10 tokens pelas mídias;
-3. Gravam `artifact.html` (conteúdo publicado) e `index.html` (com o
+2. Substituem os 10 tokens de mídia e injetam os 19 fragmentos de dados
+   demonstrativos de `data/` (tokens `__SEED_*__`);
+3. Validam que nenhum token faltou **nem sobrou**;
+4. Gravam `artifact.html` (conteúdo publicado) e `index.html` (com o
    esqueleto `<html>` — abre com clique duplo).
+
+Depois do build, `python3 verify.py` roda a **regressão completa** (56 suítes
+Playwright em [`tests/`](../tests/README.md)) — o portão de aceite de qualquer
+mudança no fonte.
 
 ### Validações (o build falha de propósito se…)
 

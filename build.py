@@ -34,6 +34,9 @@ def fotos_variante(prefixo):
             itens.append('%s: %r' % (m.group(1), 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode()))
     return '{ ' + ', '.join(itens) + ' }'
 rep['__FOTOS_VARIANTES__'] = '{ ' + ', '.join('%s: %s' % (v, fotos_variante(v)) for v in VARIANTES) + ' }'
+# dados demonstrativos (data/*.js): fragmentos JS verbatim injetados nos tokens __SEED_*__
+for f in sorted((root / 'data').glob('*.js')):
+    rep['__SEED_' + f.stem.upper().replace('-', '_') + '__'] = f.read_text(encoding='utf-8')
 out = src
 for k, v in rep.items():
     assert k in out, 'token ausente: ' + k

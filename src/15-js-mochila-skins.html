@@ -12,14 +12,7 @@
     cantil:   '<svg viewBox="0 0 24 24"><path d="M10 2h4v3h-4Z"/><rect x="7" y="5" width="10" height="16" rx="4"/><path d="M9 11h6"/></svg>',
     corda:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="5"/><circle cx="12" cy="7" r="1.6"/><path d="M9 11.5 7 21m8-9.5L17 21"/></svg>'
   };
-  var ITENS_COMBATE = [
-    { id: 'faca',     nome: 'Faca tática',        desc: 'utilitário de campo', preco: 40 },
-    { id: 'lanterna', nome: 'Lanterna tática',    desc: 'operações noturnas',  preco: 35 },
-    { id: 'bussola',  nome: 'Bússola de campanha',desc: 'orientação em campo', preco: 30 },
-    { id: 'broche',   nome: 'Broche de mérito',   desc: 'condecoração',        preco: 25 },
-    { id: 'cantil',   nome: 'Cantil',             desc: 'hidratação em marcha',preco: 20 },
-    { id: 'corda',    nome: 'Corda de rapel',     desc: 'transposição',        preco: 45 }
-  ];
+  __SEED_ITENS_COMBATE__
   var MOCHILA = [];   /* ids dos itens guardados */
   function itemDe(id) { return ITENS_COMBATE.filter(function (x) { return x.id === id; })[0]; }
   /* o sinal do item: os de fábrica têm desenho próprio; os criados no

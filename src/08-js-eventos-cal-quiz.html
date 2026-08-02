@@ -5,43 +5,7 @@
   /* Cada evento tem: modalidade (online|presencial, um TÓPICO — não o nome),
      pago (true → vendido na Loja; false → gratuito, dá recompensa ao participar),
      preco, e regras de score/coins.                                          */
-  var EVENTOS = [
-    { id: 'nac', nome: 'NAC · Atualidades', tipo: 'ENCONTRO · AO VIVO', modalidade: 'online', pago: false, preco: 0, quando: 'QUA · 16/09 · 19H–21H', profs: ['Danilo Moura'],
-      cor: 'teal', meta: 'Atualidades da semana com Danilo Moura',
-      desc: 'Encontro semanal do Núcleo de Atualidades e Conhecimentos: os fatos da semana que podem cair na sua prova, analisados ao vivo.',
-      score: [['Presença no encontro', '+30 score'], ['Acerto no quiz de atualidades', '+2 score por questão']],
-      coins: [['Check-in ao vivo', '+10']] },
-    { id: 'aulao-rondesp', nome: 'Aulão de véspera RONDESP', tipo: 'AULÃO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'QUI · 17/09 · 19H–22H', profs: ['Cap. Silva', 'Prof.ª Ritha Galvão'],
-      cor: '', meta: 'Revisão final antes da prova', tag: 'COINS', garimpo: true,
-      desc: 'Aulão de véspera com os professores do Quad: pontos quentes do edital RONDESP, macetes de prova e rodada de questões comentadas.',
-      score: [['Presença confirmada', '+40 score'], ['Acerto na rodada de questões', '+1 score por questão']],
-      coins: [['Check-in no evento', '+10'], ['Garimpo escondido no aulão', '+15']] },
-    { id: 'gincana', nome: 'Gincana Quad Coins', tipo: 'EVENTO · ONLINE', modalidade: 'online', pago: false, preco: 0, quando: 'SEX · 18/09 · 20H–21H',
-      cor: 'gold', meta: 'Caça aos Coins escondidos', tag: 'COINS', garimpo: true,
-      desc: 'Uma hora de desafios-relâmpago no app: quem explora e resolve primeiro, garimpa mais. Os Coins da gincana expiram com ela.',
-      score: [['Desafio concluído', '+5 score por desafio']],
-      coins: [['Desafio vencido', '+5 por desafio'], ['Garimpo escondido na gincana', '+15'], ['Top 3 da noite', '+30']] },
-    { id: 'aulao-especial', nome: 'Aulão especial', tipo: 'EVENTO PAGO · PRESENCIAL', modalidade: 'presencial', online: false,
-      pago: true, preco: 80, moeda: 'qdc', quando: 'SÁB · 26/09 · 9H–12H', dataISO: '2026-09-26', sala: 'Sala 2', hi: '09:00', hf: '12:00', profs: ['Prof.ª Ritha Galvão'],
-      cor: 'navy2', meta: '80 QdC · evento presencial',
-      desc: 'Aulão de véspera de prova: revisão dirigida dos pontos mais cobrados, com rodada de questões comentadas ao vivo.',
-      score: [['Presença confirmada', '+40 score']], coins: [['Check-in no evento', '+10']] },
-    { id: 'simuladao', nome: 'Simuladão Quad', tipo: 'SIMULADO · PRESENCIAL', modalidade: 'presencial', pago: false, preco: 0, quando: 'SÁB · 19/09 · 8H–13H', profs: ['Prof. Nascimento'],
-      cor: 'purple', meta: '140 questões · formato da banca',
-      desc: 'Simulado completo no formato e no tempo da banca, com ranking geral e correção comentada no fim do dia.',
-      score: [['Simulado concluído', '+120 score'], ['Aproveitamento acima de 70%', '+80 score bônus']],
-      coins: [['Participação', '+25'], ['Top 10 do ranking', '+50']] },
-    { id: 'semana-insana', nome: 'Semana Insana', tipo: 'MARATONA · PRESENCIAL', modalidade: 'presencial', pago: true, preco: 400, moeda: 'dmn', quando: 'SEG · 21/09 · 18H', ate: '2026-09-25',
-      cor: 'gold', meta: 'SEG a SEX · 400 Dmn',
-      desc: 'Cinco noites seguidas de revisão intensiva na sede — a maratona mais dura do Quad. O ingresso vale a semana inteira; o item segue na Quad Store até o último dia.',
-      score: [['Presença em cada noite', '+30 score'], ['Semana completa', '+100 score bônus']],
-      coins: [['Semana completa', '+40']] },
-    { id: 'mentoria-cfo', nome: 'Mentoria CFO · redação', tipo: 'MENTORIA · ONLINE', modalidade: 'online', pago: true, preco: 120, quando: 'DOM · 20/09 · 9H–11H', link: 'https://meet.quadconcursos.com.br/cfo-redacao',
-      cor: 'navy2', meta: 'Acesso pago · 120 QdC',
-      desc: 'Mentoria online de redação para o CFO: correção ao vivo, banca comentada e plano de treino individual. Acesso liberado pela Loja.',
-      score: [['Participação na mentoria', '+40 score']],
-      coins: [['Entrega da redação treino', '+15']] }
-  ];
+  __SEED_EVENTOS__
   var evState = {};   /* por evento: { garimpado, inscrito } */
   /* professores do evento: alimentam o card do aluno, o painel do admin e,
      mais adiante, a agenda do próprio professor. */
@@ -395,32 +359,7 @@
   queueSync();   /* leva a esteira para as cópias da rolagem infinita vertical */
 
   /* ---------- quiz engine ---------- */
-  var QUESTIONS = [
-    {
-      txt: 'Sobre o poder de polícia, é correto afirmar que:',
-      alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.',
-             'Decorre da supremacia do interesse público e condiciona direitos individuais.',
-             'Confunde-se com o poder disciplinar aplicado a servidores.',
-             'Só pode ser exercido pelo Poder Judiciário.'],
-      right: 1
-    },
-    {
-      txt: 'O ato administrativo discricionário se caracteriza por:',
-      alts: ['Ausência total de limites legais.',
-             'Vinculação integral de todos os seus elementos.',
-             'Margem de escolha em motivo e objeto, dentro da lei.',
-             'Impossibilidade de controle judicial.'],
-      right: 2
-    },
-    {
-      txt: 'O poder hierárquico permite à Administração:',
-      alts: ['Aplicar sanções a particulares sem vínculo.',
-             'Escalonar funções, dar ordens e rever atos de subordinados.',
-             'Editar normas com força de lei.',
-             'Delegar competência exclusiva livremente.'],
-      right: 1
-    }
-  ];
+  __SEED_QUESTIONS__
   var quiz = { idx: 0, sel: null, answers: [], source: null };
 
   function renderQuestion() {
@@ -517,36 +456,7 @@
      Na V0 a semana vigente vem embutida (snapshot da semana 30); na V1 o app
      sincroniza direto da planilha — o que for atualizado lá aparece aqui.
      Estrutura avalia: dia da semana → turno → turma do aluno → 2 tempos.   */
-  var CRONO = {
-    semana: 30,
-    turno: 'NOITE',
-    slots: ['19h – 20h30', '20h30 – 22h'],
-    dias: ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira'],
-    datas: ['20/07', '21/07', '22/07', '23/07', '24/07'],
-    turmas: {
-      'rondesp-n': { sala: 'SALA 1', tipo: 'teoria', aulas: [
-        [{ e: 10, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 9, m: 'REDAÇÃO', p: 'Rodrigo' }],
-        [{ e: 10, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 11, m: 'DIR. PENAL', p: 'Marcello Esquivel' }],
-        [{ e: 2, m: 'NAC', p: 'Danilo Moura' }, { e: 2, m: 'ATUALIDADES', p: 'Moab Kigran' }],
-        [{ e: 10, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 8, m: 'IGUALDADE', p: 'Bruno Araújo' }],
-        [{ e: 13, m: 'PORTUGUÊS', p: 'Alisson Lopes' }, { e: 4, m: 'PENAL MILITAR', p: 'Minho' }]
-      ] },
-      'patamo-n': { sala: 'SALA 4', tipo: 'teoria + questões', aulas: [
-        [{ e: 7, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 4, m: 'MATEMÁTICA', p: 'Dan Reis' }],
-        [{ e: 3, m: 'DIR. PENAL', p: 'Marcello Esquivel' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
-        [{ e: 3, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }],
-        [{ e: 7, m: 'GEOGRAFIA', p: 'Noelice' }, { e: 3, m: 'REDAÇÃO', p: 'Rodrigo' }],
-        [{ e: 5, m: 'PENAL MILITAR', p: 'Minho' }, { e: 7, m: 'DIR. ADMIN.', p: 'Danilo Moura' }]
-      ] },
-      'bope-n': { sala: 'SALA 3', tipo: 'questões', aulas: [
-        [{ e: 2, m: 'MATEMÁTICA', p: 'Dan Reis' }, { e: 1, m: 'HISTÓRIA', p: 'Moab Kigran' }],
-        [{ e: 1, m: 'REDAÇÃO', p: 'Rodrigo' }, { e: 2, m: 'IGUALDADE', p: 'Bruno Araújo' }],
-        [{ e: 2, m: 'HISTÓRIA', p: 'Moab Kigran' }, { e: 2, m: 'DIR. HUMANOS', p: 'Bruno Araújo' }],
-        [{ e: 3, m: 'DIR. CONST.', p: 'John Bernam' }, { e: 2, m: 'GEOGRAFIA', p: 'Noelice' }],
-        [{ e: 2, m: 'DIR. ADMIN.', p: 'Danilo Moura' }, { e: 2, m: 'REDAÇÃO', p: 'Rodrigo' }]
-      ] }
-    }
-  };
+  __SEED_CRONO__
   /* A grade do cronograma segue as TURMAS REAIS (as mesmas da Quad Store):
      turma nova nasce com a grade em branco para a coordenação preencher, e
      turma que não existe mais some daqui — nada de turma-fantasma.        */

@@ -18,11 +18,13 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 3. **A ordem é imutável.** O JavaScript depende da ordem de execução
    entre as partes (a cascata de inicialização fica na parte 20).
    Renomear ou reordenar partes = quebra silenciosa.
-4. **Tokens de build** (`__FONTS__`, `__DANILO_VIDEO__`,
+4. **Tokens de build**: os de mídia (`__FONTS__`, `__DANILO_VIDEO__`,
    `__DANILO_SPRITE__`, `__QUAD_LOGO__`, `__QUAD_SIMBOLO__`,
    `__AVATARS__`, `__INSIGNIAS__`, `__QUAD_COIN__`, `__DIAMANTE__`,
-   `__FOTOS_VARIANTES__`) ocupam cada um uma única linha — não os quebre
-   nem os renomeie; o build falha (de propósito) se algum sumir.
+   `__FOTOS_VARIANTES__`) e os de dados demonstrativos (`__SEED_*__`,
+   preenchidos pelos fragmentos de `../data/*.js` — ver `data/README.md`)
+   ocupam cada um uma única linha — não os quebre nem os renomeie; o
+   build falha (de propósito) se algum sumir ou sobrar.
 5. Arquivos em LF, UTF-8 sem BOM; a parte 20 termina com newline final.
 
 ## O que há em cada parte

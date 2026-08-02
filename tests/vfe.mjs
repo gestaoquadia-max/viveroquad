@@ -1,0 +1,57 @@
+const pw = (await import(process.env.VQ_PW ?? '/opt/node22/lib/node_modules/playwright/index.js')).default;
+const { chromium } = pw;
+const OUT=new URL('./_out', import.meta.url).pathname;
+const b = await chromium.launch({ executablePath:process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
+const c = await b.newContext({viewport:{width:430,height:940}, deviceScaleFactor:2});
+const p = await c.newPage();
+  await p.addInitScript(() => { window.__admTudo = true; });   /* blocos do admin abertos para o teste */ const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+let pass=0, fail=0; const ok=(v,t)=>{ if(v){pass++;console.log('  ok  '+t);} else {fail++;console.log('  XX  '+t);} };
+const txt = id => p.evaluate(x=>{const e=document.getElementById(x);return e?e.textContent.replace(/\s+/g,' ').trim():'(inexistente)';},id);
+const num = async (rot) => p.evaluate(r=>{ const b=[...document.querySelectorAll('#profRelResumo .adm-bar')].find(x=>x.textContent.includes(r)); return b?parseInt(b.querySelector('.pct').textContent.replace(/\D/g,''),10):null; }, rot);
+await p.goto(new URL('../index.html', import.meta.url).href,{waitUntil:'load'}); await p.waitForTimeout(400);
+await p.evaluate(()=>{localStorage.setItem('vq_tut_done','1');localStorage.setItem('vq_tut_skip','1');});
+await p.fill('#loginEmail','aluno@quad.com'); await p.fill('#loginSenha','quad1234'); await p.click('#btnAcessar'); await p.waitForTimeout(5600);
+const persona = q => p.evaluate(x=>document.querySelector('.persona-btn[data-persona="'+x+'"]').click(), q);
+const navProf = v => p.evaluate(x=>document.querySelector('#navProfessor .nav-btn[data-view="'+x+'"]').click(), v);
+
+console.log('\n== 7) RELATÓRIO DO PROFESSOR ==');
+await persona('professor'); await p.waitForTimeout(500);
+const abas = await p.evaluate(()=>[...document.querySelectorAll('#navProfessor .nav-btn')].map(b=>b.textContent.replace(/\d+$/,'').trim()));
+console.log('   abas:', JSON.stringify(abas));
+ok(abas.some(a=>/Informações/.test(a)) && !abas.some(a=>/Recepção/.test(a)),'7.1 a aba "Recepção" virou "Informações"');
+await p.fill('#profEmail','moura@quadconcursos.com.br'); await p.fill('#profSenha','quad1234');
+await p.click('#btnProfEntrar'); await p.waitForTimeout(600);
+await navProf('v-prof-chat'); await p.waitForTimeout(600);
+const per = await p.evaluate(()=>[...document.querySelectorAll('#profRelTabs .rel-tab')].map(b=>b.textContent));
+ok(per.join(',')==='Mês,Trimestre,Semestre,Ano','7.2 quatro períodos: '+per.join(' · '));
+const resumo = await txt('profRelResumo');
+console.log('   resumo (mês):', resumo.slice(0,120));
+ok(/Aulas ministradas/.test(resumo) && /Horas em sala/.test(resumo) && /Eventos com você/.test(resumo),'7.3 aulas, horas em sala e eventos');
+const aMes = await num('Aulas ministradas'), hMes = await num('Horas em sala');
+ok(aMes>0,'7.4 o mês traz número de aulas ('+aMes+')');
+ok(hMes>0,'7.5 e as horas em sala ('+hMes+'h)');
+const turmas = await txt('profRelTurmas');
+console.log('   por turma:', turmas.slice(0,130));
+ok(/Turma/.test(turmas) && /\/semana/.test(turmas),'7.6 aulas por turma, com a frequência semanal');
+ok(/NAC/.test(await txt('profRelEventos')),'7.7 os eventos dele aparecem');
+ok(/AGENDADO|REALIZADO/.test(await txt('profRelEventos')),'7.8 com o estado do evento');
+// períodos crescem
+await p.evaluate(()=>[...document.querySelectorAll('#profRelTabs .rel-tab')].find(b=>b.dataset.per==='tri').click()); await p.waitForTimeout(400);
+const aTri = await num('Aulas ministradas');
+ok(aTri>aMes,'7.9 trimestre > mês ('+aTri+' > '+aMes+')');
+await p.evaluate(()=>[...document.querySelectorAll('#profRelTabs .rel-tab')].find(b=>b.dataset.per==='sem').click()); await p.waitForTimeout(400);
+const aSem = await num('Aulas ministradas');
+ok(aSem>aTri,'7.10 semestre > trimestre ('+aSem+')');
+await p.evaluate(()=>[...document.querySelectorAll('#profRelTabs .rel-tab')].find(b=>b.dataset.per==='ano').click()); await p.waitForTimeout(400);
+const aAno = await num('Aulas ministradas');
+ok(aAno>aSem,'7.11 ano > semestre ('+aAno+')');
+ok(/no ano/.test(await txt('profRelResumo')),'7.12 o rótulo acompanha o período');
+// a comunicação com a recepção continua na mesma tela
+ok(/Comunicação com a recepção/.test(await txt('v-prof-chat')),'7.13 a comunicação com a recepção segue nesta aba');
+await p.locator('#v-prof-chat').screenshot({path:OUT+'/pf-info.png'}).catch(()=>{});
+
+console.log('\n  ERROS JS:', errs.length?errs.join(' | '):'nenhum');
+if (errs.length) fail++;
+console.log('\n  '+pass+' ok / '+fail+' falhas');
+await b.close();
+process.exit(fail?1:0);

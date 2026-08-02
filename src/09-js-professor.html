@@ -368,31 +368,8 @@
   });
 
   /* ---------- quiz da aula: bancos (na demo; o PDF real é extraído) ---------- */
-  var QA_MULT = [
-    { txt: 'Sobre o poder de polícia, é correto afirmar que:', alts: ['É indelegável em qualquer hipótese, inclusive atos materiais.', 'Decorre da supremacia do interesse público e condiciona direitos individuais.', 'Confunde-se com o poder disciplinar aplicado a servidores.', 'Só pode ser exercido pelo Poder Judiciário.'], right: 1 },
-    { txt: 'O ato administrativo discricionário caracteriza-se por:', alts: ['Ausência total de limites legais.', 'Margem de escolha em conveniência e oportunidade, dentro da lei.', 'Dispensa de motivação em qualquer caso.', 'Ser sempre revogável pelo Judiciário.'], right: 1 },
-    { txt: 'A hierarquia na Administração Pública autoriza:', alts: ['Delegação de atos políticos.', 'Avocação e revisão de atos dos subordinados.', 'Suprimir a competência legal de outro órgão.', 'Aplicar pena privativa de liberdade.'], right: 1 },
-    { txt: 'São atributos do ato administrativo:', alts: ['Presunção de legitimidade, imperatividade e autoexecutoriedade.', 'Coisa julgada, imperatividade e anterioridade.', 'Legalidade, moralidade e publicidade.', 'Tipicidade penal e culpabilidade.'], right: 0 },
-    { txt: 'O abuso de poder ocorre quando o agente:', alts: ['Atua dentro da competência com finalidade pública.', 'Excede a competência ou desvia a finalidade do ato.', 'Motiva o ato conforme a lei.', 'Delega atribuições com previsão legal.'], right: 1 },
-    { txt: 'A revogação do ato administrativo:', alts: ['Atinge ato ilegal, com efeitos retroativos.', 'Atinge ato válido e inconveniente, com efeitos para frente.', 'Só pode ser feita pelo Judiciário.', 'Independe de competência do agente.'], right: 1 },
-    { txt: 'São requisitos do ato administrativo:', alts: ['Competência, finalidade, forma, motivo e objeto.', 'Competência, culpa, dolo e resultado.', 'Publicidade, oralidade e celeridade.', 'Ampla defesa, contraditório e duplo grau.'], right: 0 },
-    { txt: 'A anulação do ato administrativo ilegal:', alts: ['Depende sempre de ação judicial.', 'Pode ser feita pela própria Administração, de ofício.', 'Gera direito adquirido ao beneficiado.', 'Só cabe se houver prejuízo ao erário.'], right: 1 },
-    { txt: 'Sobre a improbidade administrativa, é correto afirmar:', alts: ['Alcança apenas agentes públicos efetivos.', 'Exige dolo nas condutas, salvo exceções legais.', 'É modalidade de crime militar.', 'Dispensa a demonstração de conduta.'], right: 1 },
-    { txt: 'O princípio da eficiência na Administração Pública:', alts: ['Autoriza descumprir a legalidade em nome do resultado.', 'Exige boa gestão de meios e resultados, dentro da lei.', 'Aplica-se apenas à esfera federal.', 'Foi revogado pela Constituição de 1988.'], right: 1 }
-  ];
-  var QA_CE = [
-    { txt: 'O poder de polícia condiciona o exercício de direitos individuais em favor do interesse público.', right: 0 },
-    { txt: 'O poder disciplinar aplica-se a qualquer particular, mesmo sem vínculo com a Administração.', right: 1 },
-    { txt: 'A autoexecutoriedade permite executar o ato sem prévia autorização judicial, nos casos previstos.', right: 0 },
-    { txt: 'Ato vinculado admite juízo de conveniência e oportunidade do administrador.', right: 1 },
-    { txt: 'O desvio de finalidade é espécie de abuso de poder.', right: 0 },
-    { txt: 'A revogação atinge ato válido e produz efeitos apenas para o futuro.', right: 0 },
-    { txt: 'A anulação de ato ilegal depende sempre de decisão judicial.', right: 1 },
-    { txt: 'A publicidade é requisito de eficácia dos atos administrativos em regra.', right: 0 },
-    { txt: 'O agente público responde por improbidade independentemente de dolo em qualquer hipótese.', right: 1 },
-    { txt: 'A competência é elemento vinculado do ato administrativo.', right: 0 },
-    { txt: 'A Administração pode rever os próprios atos, de ofício, quando eivados de ilegalidade.', right: 0 }
-  ];
+  __SEED_QA_MULT__
+  __SEED_QA_CE__
   /* CADA TURMA tem o SEU quiz: turmaId -> quiz. Dois professores (ou o mesmo
      professor em salas seguidas) trabalham ao mesmo tempo sem se atropelar.  */
   var QUIZZES = {};   /* { turmaId, tipo, minutos, pdf, qs, status, alunoFez, respostasAluno, pollN } */
