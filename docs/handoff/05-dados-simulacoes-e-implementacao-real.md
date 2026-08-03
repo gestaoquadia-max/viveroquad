@@ -48,7 +48,7 @@ Cada arquivo é um fragmento JavaScript **verbatim** reinjetado no build pelo to
 | `loja-extras.js` (`LOJA_EXTRAS`) | Itens avulsos da Quad Store (ex.: Mentoria Quad com data que entra na agenda) | Catálogo real de produtos/serviços cadastrados pelo admin |
 | `itens-presenciais.js` (`ITENS_PRESENCIAIS`) | 8 produtos físicos com estoque decrescente (dec. 170) e retirada na recepção | Estoque real conciliado (recepção/ERP) com baixa transacional |
 | `isoladas.js` (`ISOLADAS`) | 3 matérias isoladas (dias, horário, sala, vagas) que viram evento recorrente ao comprar | Catálogo real de isoladas do Módulo Matrículas/Loja |
-| `itens-combate.js` (`ITENS_COMBATE`) | 6 itens de mochila (sempre QdC, recompra livre — dec. 172) | Catálogo real do inventário do jogador (base das Quests/forja planejadas) |
+| `itens-combate.js` (`ITENS_COMBATE`) | 7 itens de mochila (sempre QdC, recompra livre — dec. 172); desde a dec. 194 cada item traz `disp` (`venda` — padrão quando o campo não existe — `drop` ou `ambos`) e `drop` (chance %): o Cantil é `ambos` (10%) e o "Patch da sorte" é `drop` puro (preço 0, 12%), fora da vitrine | Catálogo real do inventário do jogador (base do DROP e das Quests/forja planejadas) |
 
 *(19 arquivos: 15 conjuntos + as 4 árvores de edital.)* Manutenção conhecida dos seeds: **datas fixas vencem no calendário real** — eventos foram reancorados uma vez (dec. 189) e o `crono.js` não foi; a recomendação registrada é datas relativas enquanto o protótipo viver.
 
@@ -110,7 +110,7 @@ Tudo abaixo é SIMULAÇÃO LOCAL declarada (muitas com a etiqueta `[INTEGRAÇÃO
 | **Inscritos e presenças sintéticos** | Listas de portaria semeadas por hash (`inscNome`); a lista "PDF" de conferência sai 100% sintética mesmo com inscrito real; "PDF" = `window.print()` | src/17 l.451–480; dossiê E |
 | **Botões de teatro assumido** | "+275 dia de estudo (simulação)", "Liberar nova tentativa (simulação)", `demoSobePatente` "[DEMO PROVISÓRIO — REMOVER]" | src/12 l.322/551–569 |
 | **Troca de senha do aluno** | Só toast "Senha alterada com sucesso" — nada é gravado nem conferido (a do professor, ao contrário, vale na sessão) | src/12 l.577–581 |
-| **Hooks de teste embarcados** | ~31 ganchos `window.__*` (contrato das suítes) + credenciais demo embarcam no artefato publicado — aceitável na V0, removível em build de produção (DECISÃO TÉCNICA PENDENTE) | auditoria 09, "Como ler", item 3 |
+| **Hooks de teste embarcados** | 35 ganchos `window.__*` (contrato das suítes; os 4 mais novos — `__dropRng`, `__dropSortear`, `__calRefresh`, `__estRefresh` — vieram das dec. 192/194) + credenciais demo embarcam no artefato publicado — aceitável na V0, removível em build de produção (DECISÃO TÉCNICA PENDENTE) | auditoria 09, "Como ler", item 3 |
 
 ---
 
@@ -133,7 +133,7 @@ Diferente das simulações (que têm mecânica local real), estas são **fachada
 
 ## 7. Comportamentos validados que a aplicação real deve REPRODUZIR
 
-Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (56 suítes verdes; dec. 190 as fixa como critério de aceite). A aplicação real muda o "como" (servidor, persistência), nunca o "o quê":
+Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (57 suítes verdes; dec. 190 as fixa como critério de aceite). A aplicação real muda o "como" (servidor, persistência), nunca o "o quê":
 
 **Entrada e conta**
 1. Sem matrícula ativa, o app trava — resta a Quad Store (dec. 62; RN-02/03).
@@ -149,6 +149,7 @@ Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (56
 **Estudo e gamificação**
 8. Bloco = 10 rápidas certo/errado com feedback imediato + autoavaliação Errei/Difícil/Bom/Fácil; expiração em 7 dias → Atrasadas recuperáveis; recompensa da noite com resgate único por turma; rodízio do treino segue a árvore do edital da turma ativa; ajuste de Domínio **por concurso** (dec. 26/106/159).
 9. Regra econômica de mecânica (não de valores): **QdC paga participação, score/Domínio pagam acerto**; exceção assumida: simulado digital premia QdC por acerto (dec. 117b/123/125). Diamante nunca é conquistado em missão (dec. 48).
+9-A. **DROP de itens de combate** (dec. 194): concluir um bloco de 10 (dia/noite/tarde), o treinamento rápido ou um simulado digital **sorteia** cada item configurado pela sua própria chance; o conquistado entra na mochila **sem custo, sem registro de compra e sem estorno**, com celebração dedicada. **Nunca dispara no tutorial.** O admin define, por item, a disponibilidade (só venda / só drop / venda + drop) e a chance de 1% a 100%; item só de drop **não aparece na vitrine** e é publicado sem preço.
 10. Prova de promoção: score atingir a meta apenas **libera**; 20 questões que o próprio aluno marcou Errei/Difícil (sem revelar o critério); 80% promove na hora com excedente transferido; reprovação bloqueia 24h (dec. 23).
 11. Quiz da aula: por turma, 1–30 questões/1–180 min, sem gabarito para o aluno e **sem premiação**; relatório do professor começa em branco ("nada de % inventado") (dec. 64/77/83/86).
 12. Rankings com **privacidade de mão dupla** e top 10 sempre visível (dec. 132/143).
@@ -157,11 +158,13 @@ Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (56
 13. Toda compra pede confirmação; efeitos por tipo (matrícula, isolada→evento, evento, simulado, skin, combate→mochila, físico→pedido); estoque físico decresce e o item some ao zerar; item de combate recompra e empilha; cadeia de skins um elo por vez, farda de escolha única, "quem possui, veste" (dec. 25/170/172; RN-22).
 14. "EM CHOQUE" **avisa sem impedir** (exceto matrícula); LOTADO herda a lotação da sala e bloqueia; atalho "NA LOJA" leva ao item exato piscando (dec. 104/107/173/179).
 15. Estorno **direto** em até 7 dias, dois toques, devolução na **moeda original**, desfazendo a posse por tipo (inclusive vaga na moeda usada e troca automática da turma ativa); **consumo mata o estorno** (entrega, entrada liberada, presença) (dec. 67/100/162/178; RN-26/28).
+15-A. **Três exceções à janela de 7 dias**: a compra feita **durante o tutorial** nasce marcada `semEstorno` e nunca entra na regra (dec. 193); o **evento já realizado** sai da janela pela data, tenha havido presença ou não — 4º caminho de saída, ao lado dos 3 gatilhos de consumo (dec. 192); e o item ganho no **DROP** não é compra, logo não existe estorno para ele (dec. 194).
 16. Gift card em lote com **liberação única** e invalidação imediata; crédito manual do admin com motivo e histórico (dec. 52/66/84).
 
 **Operação**
 17. Portaria sincronizada com as atividades reais; liberar entrada confirma presença, pontua e consome (dec. 128/129/180).
 18. Eventos são **do Quad** (sem turma-alvo, dec. 161); avisos têm turma-alvo por id (dec. 149); mensagens por público com prefixo e status ENVIADA→LIDA (dec. 181); materiais por turma com download real e etiqueta de origem (dec. 144/164).
+18-A. **Status do evento no calendário do aluno** (dec. 192): o evento **presencial** em que ele se inscreveu **não some ao passar** — vira **CONCLUÍDO** quando a entrada foi liberada na portaria ou **FALTOSO** quando o dia passou sem registro de entrada; o **online**, que não passa pela portaria, continua saindo do calendário ao vencer (sem registro não há julgamento justo).
 19. Governança do admin em tempo real: criar/editar turma, preços e vagas sem recriar, rename de docente propagado com e-mail acompanhando, validações de lotação/choque de sala (dec. 81/121/139/155/174/175/179).
 
 **Ressalva permanente:** todos os **valores** (preços, saldos, recompensas, metas de patente, janela de 7 dias) são DADO DEMONSTRATIVO — dec. 185.

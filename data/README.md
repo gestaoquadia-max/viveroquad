@@ -28,7 +28,7 @@ lugar onde o token vive; datas em `AAAA-MM-DD`.
 | `loja-extras.js` | `LOJA_EXTRAS` | 14 | Itens avulsos da Quad Store (ex.: Mentoria Quad, com data) |
 | `itens-presenciais.js` | `ITENS_PRESENCIAIS` | 14 | Produtos físicos da recepção (estoque decrescente, dec. 170) |
 | `isoladas.js` | `ISOLADAS` | 14 | Matérias isoladas (dias da semana, horário, sala, vagas) |
-| `itens-combate.js` | `ITENS_COMBATE` | 15 | Itens de mochila (compra repetida, dec. 172) |
+| `itens-combate.js` | `ITENS_COMBATE` | 15 | **7 itens** de mochila (compra repetida, dec. 172). Dois campos de DROP (dec. 194): `disp` = como o aluno obtém (`'venda'` é o padrão e pode ser omitido · `'drop'` = só por sorteio, fora da vitrine · `'ambos'` = vende e também cai) e `drop` = chance do sorteio em % (1–100). Hoje: Cantil com `disp:'ambos'`/`drop:10` e **"Patch da sorte"** (`disp:'drop'`, `preco:0`, `drop:12`), o item raro que só existe no drop — os outros 5 não têm os campos e valem como `venda` |
 
 O que ficou **no código de propósito** (é regra/configuração, não dado de
 demonstração): `GAMI` (carreira), `SALA_CAP` (lotações), `SKIN_CADEIA`/preços

@@ -1,7 +1,7 @@
 # 04 — Decisões posteriores e divergências
 
 **Handoff "Viver o Quad" · 02/08/2026.** Protótipo = fonte de verdade (`/home/user/viveroquad`, `index.html` gerado das 20 partes de `src/` + seeds de `data/`).
-**Fontes:** dossiês A–F da investigação de handoff (02/08/2026, com sondas Playwright verdes), `docs/auditoria/10-divergencias-e-decisoes-pendentes.md` (status atualizado em 01/08) e `docs/02-registro-de-decisoes.md` (dec. 1–191; 182–191 = Consolidação Arquitetural v1.0 e refatoração autorizada).
+**Fontes:** dossiês A–F da investigação de handoff (02/08/2026, com sondas Playwright verdes), `docs/auditoria/10-divergencias-e-decisoes-pendentes.md` (status atualizado em 01/08) e `docs/02-registro-de-decisoes.md` (dec. 1–194; 182–191 = Consolidação Arquitetural v1.0 e refatoração autorizada; 192–194 = rodada de 02/08 incorporada na revisão de 03/08 — fichas A28, A29 e A30).
 
 **Escopo:** este documento registra **apenas o que modifica o que existia antes** — no código ou na documentação. Funcionamento normal do protótipo está nos docs 01–03 do handoff e nos dossiês. Duas seções:
 
@@ -53,8 +53,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 
 ### A5 · Dec. 187 + 188 + 190 + 191 — Refatoração autorizada (impacto só técnico)
 
-- **Comportamento anterior:** monolito `src.html` (11.920 linhas — estado histórico pré-dec. 187/188; o fonte atual são as 20 partes de `src/`, ~11.600 linhas); seeds embutidos no fonte; 56 suítes Playwright fora do repositório; código morto acumulado (duplicata de `hojeISO`, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`).
-- **Decisão atual:** **187** — fonte dividido em `src/` (20 partes; saída byte-idêntica; regra de trabalho: editar as partes); **188** — código morto removido com regressão completa verde (`LINKS_ONLINE` preservado como ponto de integração planejado; o bug do reset que não limpa `vq_intro_done` foi **mantido aberto por exigir decisão** — ver B22); **190** — as 56 suítes entram versionadas em `tests/` e `verify.py` (build + regressão) vira o portão de aceite oficial; **191** — 19 conjuntos de dados demonstrativos extraídos para `data/` como fragmentos verbatim (tokens `__SEED_*__`).
+- **Comportamento anterior:** monolito `src.html` (11.920 linhas — estado histórico pré-dec. 187/188; o fonte atual são as 20 partes de `src/`, ~11.750 linhas); seeds embutidos no fonte; as suítes Playwright fora do repositório (56 à época da dec. 190; 57 hoje); código morto acumulado (duplicata de `hojeISO`, fluxo revogado de autorização de dispositivo, chaves `vq_*` nunca lidas, `openQuiz`/`fmtSync`/`tutDadosOk`).
+- **Decisão atual:** **187** — fonte dividido em `src/` (20 partes; saída byte-idêntica; regra de trabalho: editar as partes); **188** — código morto removido com regressão completa verde (`LINKS_ONLINE` preservado como ponto de integração planejado; o bug do reset que não limpa `vq_intro_done` foi **mantido aberto por exigir decisão** — ver B22); **190** — as suítes entram versionadas em `tests/` (56 à época; **57 hoje**, com a `vv1.mjs` da dec. 194) e `verify.py` (build + regressão) vira o portão de aceite oficial; **191** — 19 conjuntos de dados demonstrativos extraídos para `data/` como fragmentos verbatim (tokens `__SEED_*__`).
 - **Fonte da decisão:** dec. 187, 188, 190, 191 — todas de 01/08/2026.
 - **Impacto funcional:** **nenhum** (byte-idêntico comprovado; regressão verde). **Impacto na implementação:** organização do repositório e critério de aceite; F2–F6 da refatoração seguem suspensas.
 - **Precisa ajustar o protótipo?** **Não** (exceto o bug do reset, que aguarda decisão — B22).
@@ -117,8 +117,8 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Comportamento anterior:** dec. 67 (24/07) — estorno em até 7 dias, sem exceção: era possível participar do aulão/retirar o produto e estornar depois.
 - **Decisão atual:** **complementa a 67**: liberar a entrada na portaria, liberar o inscrito do simulado ou confirmar a entrega física marca a compra como **consumida** e a tira da janela de estorno na hora ("participar do aulão e estornar depois lesaria a empresa"). Os três gatilhos foram comprovados por sonda (dossiê D).
 - **Fonte da decisão:** dec. 178, 28/07/2026 (com a dec. 180 — portaria sincronizada).
-- **Impacto funcional:** implementado; a linha sai de "Estornos · até 7 dias" no ato do consumo.
-- **Impacto na futura implementação:** a transação compra↔consumo↔estorno precisa ser atômica no back-end; check-in físico real na portaria.
+- **Impacto funcional:** implementado; a linha sai de "Estornos · até 7 dias" no ato do consumo. **Desde a dec. 192 (02/08) existe um QUARTO caminho de saída da janela**, que não é consumo: o **evento já realizado** sai pela data (`renderEstornos` descarta a compra de tipo `evento` quando `evAcabou` é verdadeiro), tenha havido presença ou não — ver ficha A28. E a dec. 193 acrescentou uma linha que **nunca entra** na janela: a compra feita no tutorial (`semEstorno`) — ver A29.
+- **Impacto na futura implementação:** a transação compra↔consumo↔estorno precisa ser atômica no back-end; check-in físico real na portaria. O back-end precisa distinguir **três motivos de saída da janela**: consumo registrado (3 gatilhos), data do evento vencida (sem consumo) e compra nascida fora da regra (`semEstorno`).
 - **Precisa ajustar o protótipo?** **Não.**
 
 ### A13 · Dec. 179 — Lotação fixa por sala; vagas limitadas pela capacidade
@@ -177,6 +177,7 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 
 - **Comportamento anterior:** dec. 99 (25/07) — item de combate comprado **saía da vitrine** e existia só na mochila.
 - **Decisão atual:** **revogação**: combate não é compra única e não some da vitrine; compra repetida **empilha** na mochila com etiqueta "N na mochila"; a regra de estoque (dec. 170) fica só nos produtos físicos.
+- **Ressalva posterior (dec. 194, 02/08):** "não some da vitrine" vale para os itens **vendáveis**. O item marcado como **só de drop** (`disp: 'drop'`) **nunca aparece na vitrine** — a Loja filtra `disp !== 'drop'` —, porque ele não se compra: só se conquista por sorteio. O item `ambos` continua à venda e avisa na descrição "· também cai no DROP (N%)". Ver ficha A30.
 - **Fonte da decisão:** dec. 172, 28/07/2026.
 - **Impacto funcional:** implementado (sonda D: 2 facas → "2 na mochila"). Expõe o defeito do estorno em B8.
 - **Impacto na futura implementação:** o inventário do jogador precisa suportar quantidade por item (empilhamento e recompra livre); o estorno deve desfazer apenas a unidade da compra estornada (correção do defeito B8).
@@ -252,6 +253,33 @@ Formato de cada ficha: **Comportamento anterior · Decisão atual · Fonte (nº 
 - **Fonte da decisão:** dec. 138 e 139, 28/07/2026.
 - **Impacto funcional:** o formulário de turma cria com tipo real + apelido separados e ecoa o turno derivado — o erro original ("noite" digitada com horário 8h–11h) fica impossível.
 - **Impacto na futura implementação:** no modelo de turma, tipo e apelido são campos distintos e o turno é **derivado do horário** (nunca digitado) — regra de consistência a manter no servidor.
+- **Precisa ajustar o protótipo?** **Não.**
+
+### A28 · Dec. 192 — Evento inscrito vira CONCLUÍDO ou FALTOSO no calendário (e sai do estorno)
+
+- **Comportamento anterior:** o evento vencido sumia de tudo — carrossel, Loja **e calendário** (`evAcabou`). O aluno perdia o registro da atividade: não havia como saber, olhando o app, se ele tinha participado ou faltado. E a compra do evento continuava estornável até o 7º dia mesmo depois de o evento acontecer, desde que ninguém tivesse liberado a entrada na portaria.
+- **Decisão atual:** no calendário, o **evento presencial inscrito não some ao vencer**: vira **CONCLUÍDO** quando a entrada foi liberada na portaria ("presença registrada na portaria") ou **FALTOSO** quando o dia passou sem registro de entrada ("evento realizado — a entrada não foi registrada"); antes do dia, segue INSCRITO. O **evento online continua saindo** ao vencer — ele não passa pela portaria e, sem registro de entrada, não haveria como julgá-lo com justiça. A mesma decisão põe o **evento realizado fora da janela de estorno**: é o **4º caminho de saída**, ao lado dos 3 gatilhos de consumo da dec. 178 (ver A12).
+- **Fonte da decisão:** dec. 192, 02/08/2026 (pedido do gestor).
+- **Impacto funcional:** implementado. `renderCalendario` (src/08 l.341–366) decide o status pelo par "entrada liberada × dia passou" e `renderEstornos` (src/19 l.99–111) descarta a compra de evento já realizado. Liberar a entrada na portaria repinta o calendário na hora (src/17 l.381). Hook de teste novo: `window.__calRefresh`. Suíte: `vv1.mjs`.
+- **Impacto na futura implementação:** o histórico do aluno precisa guardar **presença por evento** (registro da portaria) como dado persistente, não como estado de sessão — é ele que separa CONCLUÍDO de FALTOSO. A janela de estorno passa a depender também da **data do evento**, não só do consumo: o servidor precisa avaliar as duas condições. Decidir se FALTOSO tem alguma consequência (score, alerta pedagógico) — hoje é só rótulo.
+- **Precisa ajustar o protótipo?** **Não.**
+
+### A29 · Dec. 193 — A compra do tutorial (a boina) fica fora da regra dos 7 dias
+
+- **Comportamento anterior:** a boina comprada durante a Instrução do QUAD entrava em "Estornos · até 7 dias" como qualquer outra compra — o aluno podia estornar o item que o próprio tutorial mandou comprar, desmontando o estado final da instrução (boina vestida, saldo 5 QdC).
+- **Decisão atual:** compra feita **durante o tutorial** nasce marcada e **não entra na janela de estorno** ("ela faz parte do tutorial e não entra na regra"). `COMPRAS` ganhou o campo **`semEstorno`**, gravado como `semEstorno: !!tutOn` em `lojaCompraLog`; `renderEstornos` descarta as linhas marcadas.
+- **Fonte da decisão:** dec. 193, 02/08/2026 (pedido do gestor).
+- **Impacto funcional:** implementado (src/18 l.420 grava o campo; src/19 l.105 filtra). A boina segue no relatório de compras — some apenas do bloco de estornos. Hook de teste novo: `window.__estRefresh`. Suíte: `vv1.mjs`.
+- **Impacto na futura implementação:** o modelo de compra precisa de um marcador de **origem/elegibilidade a estorno** (não basta o tipo do item): compras de onboarding, brindes e itens concedidos pelo sistema nascem fora da política de reembolso. Definir se outras compras guiadas futuras herdam a mesma marca.
+- **Precisa ajustar o protótipo?** **Não.**
+
+### A30 · Dec. 194 — Sistema de DROP: item de combate conquistado resolvendo questões
+
+- **Comportamento anterior:** todo item de combate era **exclusivamente de venda** — só entrava na mochila por compra em Quad Coins, e todos apareciam na vitrine. Drop aleatório e itens raros **não existiam em lugar nenhum** do protótipo: a menção mais próxima era a forja de Quests, ainda EM BREVE (o documento 03, Módulo 17, registrava isso como funcionalidade inexistente e havia pergunta pendente sobre "drop entra na V2?").
+- **Decisão atual:** cada item de combate passa a ter **disponibilidade** (`disp`: só venda / só drop / venda + drop) e **chance** (`drop`, em %). Ao concluir um **bloco de 10** (dia/noite/tarde), o **treinamento rápido** ou um **simulado digital**, cada item configurado é sorteado pela própria chance; o conquistado vai à mochila **sem custo, sem log em `COMPRAS` e sem estorno**. A conquista abre uma **celebração em overlay** (`#dropLayer`: card dourado com raios, item em destaque e o botão "Guardar na mochila"). A vitrine de combate **filtra `disp !== 'drop'`** e o item `ambos` avisa "· também cai no DROP (N%)". **O drop não dispara durante o tutorial.** O criador de itens do admin ganhou `#admSkDisp` e `#admSkDrop`, com validação de **1% a 100%**; item só-drop publica **sem preço**.
+- **Fonte da decisão:** dec. 194, 02/08/2026 (pedido do gestor — "itens conquistados durante a resolução de questões").
+- **Impacto funcional:** implementado. `dropSortear`/`dropCelebrar` em src/15 (l.44–88); gatilhos em src/11 (l.615, fim de bloco/treino) e src/12 (l.520, fim do simulado digital); overlay em src/06 (l.320); criador em src/05 (l.541–547) e src/14 (l.875–902). O catálogo passou de 6 para **7 itens** (`data/itens-combate.js`): o **Cantil** virou `ambos` (10%) e nasceu o **"Patch da sorte"** (`disp: 'drop'`, preço 0, 12%), que não aparece na Loja. Hooks de teste novos: `window.__dropSortear` e `window.__dropRng` (RNG determinístico). Suíte: `vv1.mjs`.
+- **Impacto na futura implementação:** o sorteio precisa acontecer **no servidor** (é concessão de item por chance — no cliente, é fraudável pelo console, como todo o resto hoje); o inventário do jogador passa a ter itens **sem transação de compra associada**, o que exige uma origem registrada por unidade (compra × drop) para auditoria e para a política de estorno; as chances entram no estudo econômico (dec. 185 mantém a economia indefinida) e precisam ser configuráveis por item sem redeploy; falta definir a relação do drop com as **Quests/forja**, que seguem planejadas.
 - **Precisa ajustar o protótipo?** **Não.**
 
 ---
@@ -525,4 +553,4 @@ Tipos: **CxD** = código × decisão/documento · **TxM** = texto × mecânica �
 
 ---
 
-*Documento redigido em 02/08/2026 a partir dos dossiês A–F (sondas verdes), do doc 10 da auditoria (status 01/08) e do registro de decisões 1–191. Nenhuma divergência aqui é opinião: todas têm evidência de código, sonda ou registro citada na ficha.*
+*Documento redigido em 02/08/2026 a partir dos dossiês A–F (sondas verdes), do doc 10 da auditoria (status 01/08) e do registro de decisões 1–191; revisado em 03/08/2026 para incorporar as dec. 192–194 (fichas A28, A29 e A30). Nenhuma divergência aqui é opinião: todas têm evidência de código, sonda ou registro citada na ficha.*

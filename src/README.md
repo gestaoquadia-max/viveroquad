@@ -45,7 +45,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais |
 | 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo |
 | 14-js-loja-economia | Loja: moedas, compras, catálogos, salas/lotações, overlay de compra, skins |
-| 15-js-mochila-skins | Mochila de combate e cadeia de skins do personagem |
+| 15-js-mochila-skins | Mochila de combate, **sistema de DROP** (sorteio ao concluir bloco/treinamento/simulado digital e celebração `#dropLayer`, dec. 194) e cadeia de skins do personagem |
 | 16-js-admin-controle | Gate N.P.P., contas/créditos, mensagens por público, gift cards, cronograma, materiais |
 | 17-js-admin-liberacoes | Eventos do admin, pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
 | 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |

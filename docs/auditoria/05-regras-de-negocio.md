@@ -427,6 +427,7 @@ Textos decorativos da interface (cards descritivos, placeholders "EM BREVE") **n
 ### RN-26 — Estorno em até 7 dias, com confirmação em dois toques
 - **Área**: Economia/Pós-venda.
 - **Regra**: Toda compra pode ser estornada em até 7 dias corridos, com contagem regressiva visível, confirmação em dois toques e devolução imediata da moeda usada.
+- ***Nota 03/08 — "toda compra" foi superado pelas dec. 192/193 (02/08):*** a compra feita **durante o tutorial** (a boina) nasce marcada `semEstorno` e **nunca entra** na janela; e o **evento já realizado** sai da janela pela data (4º caminho de saída, ao lado dos 3 gatilhos de consumo da RN-27), tenha havido presença ou não. O item ganho no **DROP** (dec. 194) também fica fora, por não ser compra.
 - **Fonte documental**: decisão 67; CHANGELOG 24/07 Fase D.
 - **Evidência no código**: `estornoDias()` l. 11562; `renderEstornos()` l. 11563–11589 (estados FALTAM X DIAS / ÚLTIMO DIA / PRAZO ENCERRADO; dois toques l. 11580–11585); `estornar()` l. 11684–11695 (devolve via `addDiamante`/`addScore`, registra em `ESTORNOS`).
 - **Comportamento atual**: compra de 8 dias atrás aparece com "PRAZO ENCERRADO" e botão desativado.
@@ -491,6 +492,7 @@ Textos decorativos da interface (cards descritivos, placeholders "EM BREVE") **n
 ### RN-31 — Expiração vale em todas as vitrines e no calendário; 7 dias nas missões
 - **Área**: Agenda/Missões.
 - **Regra**: O que vence some do carrossel, da vitrine e do calendário (ficando só no histórico); bloco de missão sem resposta expira em 7 dias e cai em "Atrasadas"; abrir a tela revalida.
+- ***Nota 03/08 — a parte "some do calendário" foi superada pela dec. 192 (02/08):*** o **evento presencial em que o aluno se inscreveu não some mais do calendário** ao vencer — vira **CONCLUÍDO** (entrada liberada na portaria) ou **FALTOSO** (o dia passou sem registro). Só o **evento online** continua saindo, por não passar pela portaria. Carrossel e vitrine seguem como descrito, e a expiração de 7 dias das missões não mudou.
 - **Fonte documental**: decisões 102 e 106; CHANGELOG 25/07 e 26/07.
 - **Evidência no código**: `evAcabou()` l. 4393–4397; `eventosInicio()` filtra vencidos l. 4320–4322; `DIA_EXPIRA_DIAS = 7` l. 6248; `renderAtrasadas()` l. 6312–6325; `missoesDaNoite()` l. 6559–6564.
 - **Comportamento atual**: seeds com `idadeDias: 8..10` aparecem em Atrasadas (l. 6250–6254).

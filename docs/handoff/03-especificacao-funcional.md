@@ -7,8 +7,14 @@ o vocabulário oficial de classificação (FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO
 SIMULAÇÃO LOCAL · REGRA DE PRODUTO CONFIRMADA · DADO DEMONSTRATIVO · DECISÃO
 POSTERIOR · FUNCIONALIDADE PLANEJADA · DIVERGÊNCIA · PERGUNTA PENDENTE).
 As evidências citam as partes de `src/`, os conjuntos de `data/`, as decisões
-do registro (1–191) e as sondas/suítes executadas na extração. Divergências e
+do registro (1–194) e as sondas/suítes executadas na extração. Divergências e
 perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
+
+> **Revisão de 03/08/2026** — a extração original foi feita contra as decisões
+> 1–191; as decisões **192** (status CONCLUÍDO/FALTOSO do evento no calendário),
+> **193** (a boina do tutorial fica fora da regra de estorno) e **194**
+> (sistema de DROP de itens de combate) foram incorporadas nesta revisão.
+> Os módulos afetados são o 2, 5, 8, 10, 11, 12, 16 e 17.
 
 ## Índice
 1. Entrada, cadastro e autenticação · 2. Tutorial, identidade e personagem ·
@@ -135,7 +141,8 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - **Nome de guerra** (`tutGuerraOk`, src/10 l.148–165): precisa vir do nome completo — um dos nomes ou uma combinação deles em ordem (subsequência), nunca o nome inteiro, nunca apelido; só letras (acentos aceitos); mínimo 2 caracteres; filtro de palavrões (`TUT_PALAVROES`, 7 termos). Verificado por sonda: "Xuxa" e "Danilo de Almeida Moura" reprovam; "Danilo" e "Almeida Moura" (via regra) aprovam; "Moura Almeida" (ordem invertida) reprova. O QUAD confirma ("Você quis dizer MOURA?") e a validação vale também fora do tutorial, no Salvar do Perfil. Campo com `maxlength=12` (src/03 l.460). O avanço só ocorre quando o aluno para de digitar (debounce 900 ms). REGRA DE PRODUTO CONFIRMADA (mecânica) — ver Divergências para o limite de 12.
 - **Salvar perfil** (passo 12): se faltar avatar/nome/telefone/nome de guerra, o QUAD intercepta o clique e aponta o que falta (`tutErro`, src/10 l.458–470).
 - **Introdução no Quad** (missão demonstrativa, src/11 l.647–733): 3 questões de múltipla escolha com feedback imediato (uma resposta por questão; erro mostra a correta). **Só 3/3 paga** — errou qualquer uma, o QUAD relança em loop ("Você ainda não conseguiu pontos suficientes… vou lançar as perguntas novamente!"; a `vtut.mjs` prova que 2/3 também reprova). Recompensa `TUT_REW = { score: 30, coins: 25 }`: +30 nos três acumuladores de score de carreira e +25 Quad Coins.
-- **Boina exclusiva**: 20 QdC na Loja; no tutorial o QUAD conduz a compra sem modal de confirmação; item mais caro clicado → bronca "não pode comprar este item — é mais caro do que o que você possui!"; comprada, a boina sai da vitrine e veste a foto do personagem na hora ("quem possui, veste", dec. 25).
+- **Boina exclusiva**: 20 QdC na Loja; no tutorial o QUAD conduz a compra sem modal de confirmação; item mais caro clicado → bronca "não pode comprar este item — é mais caro do que o que você possui!"; comprada, a boina sai da vitrine e veste a foto do personagem na hora ("quem possui, veste", dec. 25). **A compra feita durante o tutorial nasce marcada `semEstorno: true`** (`lojaCompraLog`, src/18 l.420 — grava `semEstorno: !!tutOn`) e por isso **não entra em "Estornos · até 7 dias"** (dec. 193: "ela faz parte do tutorial e não entra na regra"; ver Módulo 10). REGRA DE PRODUTO CONFIRMADA.
+- **O DROP não dispara durante o tutorial** (dec. 194): `dropSortear` sai antes do sorteio quando `tutOn` é verdadeiro ("no tutorial o rito é guiado — sem sorteio", src/15 l.51) — a Introdução no Quad nunca premia item de combate por sorteio. Fora do tutorial, o mesmo bloco de 10 passa a sortear (ver Módulo 5). REGRA DE PRODUTO CONFIRMADA.
 - **Pular** (`tutPular`, src/11 l.762–787): botão "‹ Pular" oposto ao "Avançar" (dec. 105). Reproduz o estado final constante de quem concluiu: +30 score de carreira, boina garantida/equipada/fora da vitrine, Quad Coins = 25 − preço da boina = **5**, Introdução marcada como feita, `vq_tut_skip=1`. Toast explicativo. Sonda confirmou todos os valores. Detalhe observado em sonda: pular não define nome de guerra — o aluno fica "AL SD QUAD ______" até preencher no Perfil.
 - **Concluir** (`tutFim`): grava `vq_tut_skip=1`, toast "Instrução inicial concluída — plataforma liberada!", QUAD acena.
 - **Refazer**: só pela central de tutoriais do QUAD (FAB → "↻ Refazer a instrução inicial") — zera tudo de novo; o botão de refazer saiu do Perfil (`vtut.mjs` l.223–232).
@@ -194,6 +201,8 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - **Dec. 182 (01/08)** supera formalmente a dec. 22 (dados do banco geral) e a dec. 6: cadastro/dados passam a ser módulos internos; o comportamento demonstrado (pré-preenchimento + confirmação no tutorial) permanece como demonstração vigente. DECISÃO POSTERIOR.
 - **Dec. 188 (01/08)**: limpeza de código morto removeu `tutDadosOk` e chaves `vq_*` não lidas; manteve aberto por exigir decisão o bug do reset que não limpa `vq_intro_done`. DECISÃO POSTERIOR (bug reconhecido, não corrigido de propósito).
 - Dec. 177 (28/07) é a última palavra sobre a linha da Introdução (some quando feita) — substitui o comportamento anterior de linha fixa "FEITA · DA CONTA". DECISÃO POSTERIOR.
+- **Dec. 193 (02/08)**: a boina comprada no tutorial fica **fora da janela de 7 dias** — `COMPRAS` ganhou o campo `semEstorno` e `renderEstornos` filtra essas linhas. Antes, a boina aparecia em "Estornos · até 7 dias" como qualquer compra. DECISÃO POSTERIOR.
+- **Dec. 194 (02/08)**: o sistema de DROP existe, mas **não roda no tutorial** — o passo da boina segue sendo a única forma de o aluno ganhar item na instrução. DECISÃO POSTERIOR.
 
 **Divergências:**
 - DIVERGÊNCIA (achado de sonda): **`maxlength=12` do campo × regra de combinação** — a regra aceita combinações em ordem ("Almeida Moura"), mas o campo corta em 12 caracteres, tornando combinações longas impossíveis de digitar (o valor truncado "Almeida Mour" reprova). "Danilo Moura" (12) cabe por coincidência. Sondas `invA-guerra.mjs/2/3`: via `dispatchEvent` programático o mesmo valor avança — é o limite do input, não a regra, que barra.
@@ -270,7 +279,7 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - Matrículas, vagas, saldos e datas em memória — recarregar a página restaura a semente. SIMULAÇÃO LOCAL.
 - `hojeISO()` usa o relógio local para vigência da matrícula. SIMULAÇÃO LOCAL.
 - Pagamento em Diamantes = saldo fictício vindo de "recarga do checkout" simulada. SIMULAÇÃO LOCAL / `[INTEGRAÇÃO REAL]`.
-- Hooks de teste (`__mat`, `__turmaAtiva`, `__matRefresh`) fazem parte do contrato das suítes (tests/README: ~31 ganchos estáveis).
+- Hooks de teste (`__mat`, `__turmaAtiva`, `__matRefresh`) fazem parte do contrato das suítes (tests/README: 35 ganchos estáveis).
 
 **O que precisará de implementação real:**
 - Módulo de matrículas (dec. 182 o lista como módulo interno): vigência, renovação, encerramento e reflexo em vagas no servidor.
@@ -373,6 +382,7 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - **Blocos são POR TURMA** (dec. 156; `BLOCOS_TURMA`, l.49–71): cada matrícula tem sua fila; turma nova nasce "no dia zero", sem atrasadas, com as rápidas no horário dela (`novosBlocosDia` usa `horSlots(t.hor)` — provado na sonda `b1-aula-hoje.mjs`: "aula de hoje · 8h" na turma da manhã). O rodízio do Treinamento Rápido também é por turma (`TR_ST`/`trTrocaTurma`, l.474–481) e o herói fala o turno da turma ("Bloco da manhã/tarde/noite", dec. 158). A etiqueta `#diaTurma` diz de qual turma são as questões. As questões em si são banco único da demo (comentário l.44–48; RN-59; ver Módulo 6).
 - **Execução de um bloco** (`trAbrirBloco`/`trCarta`/`trResponde`, l.540–589): carta certo/errado → feedback imediato ("✓ Você acertou!" / "✗ Errou — gabarito: …") + comentário da carta → autoavaliação obrigatória **Errei / Difícil / Bom / Fácil** (nota 0–3). Fim do bloco (`trFimBloco`, l.590–628): **+1 score de carreira por acerto** (`TR_REW.scorePorAcerto`) e **+5 Quad Coins por bloco** (`TR_REW.coinsPorBloco`), ajuste do Domínio, bloco marcado feito; se a fonte era 'aula', as 10 cartas entram no TR_BANK e as filas do rodízio se refazem (provado na sonda `b2-missoes-dia.mjs`: banco 60→70).
 - **Treinamento Rápido** (overlay `#trLayer`): abas **Gerais** (`TR_GERAIS`: Português, Inglês, Informática, Matemática, História, Geografia) e **Específicas (Direito)**. `trMontarFila` percorre a árvore do edital da turma ativa (`EDITAL_ATUAL`) e monta o rodízio "10 por assunto, alternando as matérias", só com assuntos que têm carta no banco (dec. 159). Segunda volta prioriza cartas difíceis (`trPeso`: Errei=3 > Difícil=2 > Bom=1 > Fácil=0, l.498–503); zerar a fila → "baralho redistribuído pela dificuldade" (`trRedistribuir`, l.629–637). Ajuste do Domínio: `trAj[CONCURSO|matéria|assunto] += round((acertos − 10/2) × 1,2)` (l.599–600) — **por concurso**, para acerto na PC-BA não vazar para barra homônima do CFO (dec. 159).
+- **DROP ao concluir o bloco (dec. 194)**: no fim de todo bloco de 10 — do dia/noite/tarde ou do Treinamento Rápido — `trFimBloco` chama `dropSortear('ao concluir o bloco do dia' | 'no treinamento rápido')` (src/11 l.615). Cada item de combate com disponibilidade `drop`/`ambos` e chance > 0 é sorteado pela **própria chance**; o conquistado vai direto para a `MOCHILA` **sem custo, sem linha em `COMPRAS` e sem entrada na janela de estorno** (não é compra), e a celebração dourada `#dropLayer` anuncia o item. **Não dispara no tutorial** (`tutOn`). Hooks de teste: `window.__dropSortear` (dispara o sorteio) e `window.__dropRng` (a suíte pluga um RNG determinístico — `vv1.mjs`). Detalhamento do catálogo, das chances e do criador do admin no Módulo 8. FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO.
 - **Recompensa da noite** (`heroSync`/`resgatarBeneficios`, l.352–409; dec. 26): o cartão herói do Início conta feitas/total das missões vigentes da noite (`missoesDaNoite` — nunca atrasadas nem simulados; a Introdução fica fora da conta), acende um segmento por missão; "Continuar missão" abre a próxima pendente; com tudo feito o botão vira dourado "**Retire aqui seus benefícios**" → paga +1 de score de carreira por bloco da noite (total, ex.: +8) + 1 Quad Coin, com a moeda voando até o contador; depois "Benefícios retirados" (desativado; resgate registrado por turma em `NOITE_RESG`, não acumula). Provado ponta a ponta na sonda `b4-noite-recompensa.mjs`.
 
 **Fluxo principal:** Início → herói "Bloco da noite 0/8" → "Continuar missão" → overlay de flashcards do Bloco 1 → 10 cartas (responder → feedback → autoavaliar) → resumo "+N score · +5 Quad Coins · Domínio atualizado" → volta a Missões, bloco sumiu → repete até 8/8 → Início → botão dourado → benefícios (+8 score de carreira, +1 QdC). Paralelo: Missões → "Abrir treinamento" → rodízio por assunto sem prazo. Atrasadas → "Recuperar" reabre o bloco vencido.
@@ -387,8 +397,9 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 - Cartas respondidas do PDF 01 migram para o banco do Treinamento Rápido. FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO.
 - Noite completa paga +1 score de carreira por bloco + 1 Quad Coin, resgate único por noite (dec. 26); o caráter **por turma** do resgate não vem da dec. 26, e sim da implementação (`NOITE_RESG` chaveado pela turma ativa — cadeia das missões por turma, dec. 156 em diante). Mecânica: REGRA DE PRODUTO CONFIRMADA; valores: DADO DEMONSTRATIVO de balanceamento (dec. 185 mantém as regras econômicas indefinidas).
 - Recompensas do treinamento: +1 score por acerto · +5 QdC por bloco de 10 (`TR_REW`, l.11). Mecânica (participação → QdC; acerto → score/Domínio): REGRA DE PRODUTO CONFIRMADA; valores: DADO DEMONSTRATIVO.
+- **Concluir um bloco sorteia itens de combate (dec. 194)**: o sorteio é por item e independe de acerto (é prêmio de participação, não de desempenho); item conquistado entra na mochila sem custo e sem estorno; o tutorial fica de fora. Mecânica: REGRA DE PRODUTO CONFIRMADA; as chances (%) são DADO DEMONSTRATIVO (dec. 185 mantém a economia indefinida).
 
-**Dados utilizados:** `DIA_BLOCOS`/`BLOCOS_TURMA` (rot, det, m/a ou fonte 'aula'+ini, criadoEm, feito, idadeDias), `DIA_EXPIRA_DIAS`, `TR_BANK` (cartas `fc(m, a, certo, texto, observação, nota, resp)`), `AULA_DEMO` (matéria, assunto, professor, 40 cartas C/E), `TR_GERAIS`, `TR_REW`, `EDITAL_ATUAL`/`CONCURSO_ATUAL_ID`, `trAj`, `TR_ST` (fila/posição por turma), `NOITE_RESG`, `carreira` (scores), hooks de teste `__blocos`, `__noite`, `__introFeita`.
+**Dados utilizados:** `DIA_BLOCOS`/`BLOCOS_TURMA` (rot, det, m/a ou fonte 'aula'+ini, criadoEm, feito, idadeDias), `DIA_EXPIRA_DIAS`, `TR_BANK` (cartas `fc(m, a, certo, texto, observação, nota, resp)`), `AULA_DEMO` (matéria, assunto, professor, 40 cartas C/E), `TR_GERAIS`, `TR_REW`, `EDITAL_ATUAL`/`CONCURSO_ATUAL_ID`, `trAj`, `TR_ST` (fila/posição por turma), `NOITE_RESG`, `carreira` (scores), `ITENS_COMBATE`/`MOCHILA` (drop — ver Módulo 8), hooks de teste `__blocos`, `__noite`, `__introFeita`, `__dropSortear`, `__dropRng`.
 
 **Dados demonstrativos:** As 60 cartas do `data/tr-bank.js` e as 40 do `data/aula-demo.js` ("Poderes administrativos" com Danilo Moura); os 8 blocos e as 3 atrasadas-semente (8/9/10 dias); os valores +1/+5/+1/+1 e o tamanho de bloco 10 (`TR_REW.blocoTam`); o fator 1,2 do ajuste de Domínio; horário 22h15; "PDF 01/PDF 02 do operador" como narrativa do abastecimento. DADO DEMONSTRATIVO.
 
@@ -400,9 +411,9 @@ perguntas estão consolidadas nos documentos 04 e 07 deste pacote.
 
 **O que precisará de implementação real:** Pipeline operacional aula → extração dos 2 PDFs → geração dos blocos por turma com agendamento real (D0 22h15, D+1, D+7, D+30); persistência do progresso por conta/turma; anti-fraude básica (respostas do lado do servidor); motor de repetição espaçada real sobre a autoavaliação (hoje só ordena a 2ª volta e redistribui); economia auditável de score/QdC; sincronização offline (o banner "respostas aguardando envio" é demo).
 
-**Funcionalidades futuras relacionadas:** FUNCIONALIDADE PLANEJADA: quests de itens da mochila ("reúna itens para forjar equipamentos", Loja — ver Módulo 8); corte semanal de missões (existe só como texto), se confirmado; metodologia calibrada do Domínio (V1).
+**Funcionalidades futuras relacionadas:** FUNCIONALIDADE PLANEJADA: quests de itens da mochila ("reúna itens para forjar equipamentos", Loja — ver Módulo 8); corte semanal de missões (existe só como texto), se confirmado; metodologia calibrada do Domínio (V1). O **drop** deixou de ser futuro: é mecânica implementada (dec. 194 — ver acima e Módulo 17).
 
-**Decisões posteriores:** Dec. 165 tirou os simulados de Missões (foram para o Calendário); dec. 177 removeu a linha da Introdução feita; dec. 185 congelou as regras econômicas (valores acima são placeholders); dec. 191 extraiu os seeds para `data/`. DECISÃO POSTERIOR.
+**Decisões posteriores:** Dec. 165 tirou os simulados de Missões (foram para o Calendário); dec. 177 removeu a linha da Introdução feita; dec. 185 congelou as regras econômicas (valores acima são placeholders); dec. 191 extraiu os seeds para `data/`; **dec. 194 (02/08) acrescentou o sorteio de itens de combate ao fim de todo bloco de 10 e do treinamento rápido** (não dispara no tutorial). DECISÃO POSTERIOR.
 
 **Divergências:**
 - DIVERGÊNCIA (texto × código): "Corte das missões da semana" (sáb 23h59) e o toast "Missão pausada — expira 23h59" não têm mecânica — a única expiração implementada é a de 7 dias por bloco.
@@ -569,7 +580,7 @@ Motores de resposta e suas regras de feedback/prêmio (cada um distinto, todos v
 FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO — a Loja é renderizada em dois macro-blocos + dois blocos de pós-venda (rótulos exatos do HTML, src/03 l.264–366):
 
 1. **"Atividades e itens · presenciais"**, com as seções: *Turmas · modalidades do Quad* (`lojaTurmasCore` — `TURMAS_LOJA`); *Isoladas* (`lojaIsoladas` — `ISOLADAS`); *Simulados presenciais · na sede* (`lojaSim-pres` — `SIMULADOS` tag PRESENCIAL); *Eventos · aulões, corujões, semana insana…* (`lojaEventos-pres` — `EVENTOS` pagos presenciais); *Excursões para concursos*, *Módulos · vade mecum, apostilas e cadernos*, *Treinamento para o TAF*, *Outros · retirada na recepção* (`ITENS_PRESENCIAIS` por `cat`).
-2. **"Itens digitais"**, com: *Cursos online* (3 cards fixos em Dmn + `LOJA_EXTRAS`), *Simulados digitais · no app*, *Mentoria*, *Eventos online · YouTube e lives exclusivas*, *Itens do personagem* (Boina exclusiva + cadeia de skins + skins criadas pelo admin) e *Itens de combate · vão para a mochila* (`combatGrid`).
+2. **"Itens digitais"**, com: *Cursos online* (3 cards fixos em Dmn + `LOJA_EXTRAS`), *Simulados digitais · no app*, *Mentoria*, *Eventos online · YouTube e lives exclusivas*, *Itens do personagem* (Boina exclusiva + cadeia de skins + skins criadas pelo admin) e *Itens de combate · vão para a mochila* (`combatGrid` — **a vitrine filtra `disp !== 'drop'`**: item que só cai no DROP não aparece à venda; item `ambos` mostra na descrição "· também cai no DROP (N%)" — dec. 194; src/15 l.30–36).
 3. **"Estornos · até 7 dias"** (`lojaEstornos`) — ver Módulo 10 (Compras, matrículas e estornos).
 4. **"Relatório de compras"** (`rcResumo`/`rcTabs`) — ver Módulo 10.
 
@@ -586,7 +597,7 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 - **Evento pago** → `evState[id].comprado/inscrito = true`; entra no carrossel como INSCRITO, no calendário e na portaria do admin na hora (`renderAcessos`); evento pontual comprado sai da vitrine; evento de vários dias permanece marcado INSCRITO até o último dia; online mostra o link.
 - **Simulado presencial** → `sm.insc/comprado`; inscrição cai na recepção (`SIM_INSC`) aguardando "Liberar entrada"; comprado sai da vitrine. **Simulado digital pago** → liberado para responder no app (ver Módulo 6).
 - **Skin** → troca a foto do personagem na hora (`skinVestir`/`aplicarAvatar` — sonda: `src` da foto muda); elo comprado some e o próximo da cadeia aparece.
-- **Item de combate** → vai para a `MOCHILA` (empilha).
+- **Item de combate** → vai para a `MOCHILA` (empilha). **Segunda via de entrada na mochila (dec. 194)**: além da compra, o item pode chegar pelo **DROP** — sorteado ao concluir um bloco de 10 (dia/noite/tarde), o treinamento rápido ou um simulado digital. Item conquistado por drop **não custa moeda, não gera linha em `COMPRAS` e não entra na janela de estorno** (ver Módulos 5, 10 e 12).
 - **Item físico** → estoque baixa pela quantidade, gera pedido de retirada na recepção (`PEDIDOS`, status "aguardando"); pedido em aberto vira etiqueta "seu pedido"/"N seus" sem travar novas compras.
 - **Produto com data (mentoria, excursão, TAF, curso com período)** → entra nos eventos/calendário de quem comprou (`agendaDoProduto`/`PROD_AGENDA`).
 
@@ -596,11 +607,20 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 
 **LOTADO (dec. 179)** — evento presencial herda a lotação da sala (`evLot` = `ev.lot || salaCap(ev.sala)`; Sala 1=155, 2=85, 3=125, 4=185). Cheio, vira LOTADO na vitrine E no carrossel e o clique não abre compra. Turma/isolada/simulado esgotados: turma "ESGOTADA" quando as duas moedas zeram; simulado sem vagas restantes sai da vitrine.
 
-**Mochila de combate** — storage no Perfil (`#btnMochila` → `#storageLayer`): grade de slots, contagem "N itens guardados" e "N unidades · M tipos". Item de combate não some da vitrine e não é de compra única (dec. 172): recompra avisa "você já tem N" e a etiqueta do card mostra "N na mochila". Sonda: 2 facas → "2 na mochila", "2 unidades · 1 tipo".
+**Mochila de combate** — storage no Perfil (`#btnMochila` → `#storageLayer`): grade de slots, contagem "N itens guardados" e "N unidades · M tipos". Item de combate não some da vitrine e não é de compra única (dec. 172): recompra avisa "você já tem N" e a etiqueta do card mostra "N na mochila". Sonda: 2 facas → "2 na mochila", "2 unidades · 1 tipo". **Ressalva da dec. 194 à dec. 172**: "nunca sai da vitrine" vale para os itens vendáveis — item com `disp: 'drop'` **nunca entra na vitrine**, porque só se obtém por sorteio.
+
+**DROP · itens conquistados resolvendo questões (dec. 194)** — FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO (`dropSortear`/`dropCelebrar`, src/15 l.44–88; suíte `vv1.mjs`):
+- Cada item de combate tem **disponibilidade** (`disp`: `'venda'` — padrão implícito quando o campo não existe — `'drop'` ou `'ambos'`) e **chance** (`drop`, em %).
+- Gatilhos: fim de bloco de 10 (dia/noite/tarde) e do treinamento rápido (src/11 l.615) e fim de **simulado digital** (src/12 l.520 — ver Módulo 12). **Nunca no tutorial** (`tutOn`).
+- Sorteio **por item**: `rng() * 100 < chance`, com `window.__dropRng` substituível pela suíte; podem cair vários itens no mesmo bloco.
+- Conquistado, o item entra na `MOCHILA` **sem custo, sem log em `COMPRAS` e sem estorno**, e a Loja/mochila re-renderizam.
+- **Celebração**: overlay `#dropLayer` (src/06 l.320) — card dourado com raios, item em destaque (`#dropItens`), texto "A sorte encontra quem está em combate…" (`#dropMsg`) e botão **"Guardar na mochila"** (`#btnDropOk`) que fecha a celebração.
+
+**Criador de itens de combate — disponibilidade e chance (dec. 194)** — no "Criar skin do personagem" do Painel interno, quando o destino é *item de combate*, aparece a linha `#admSkDropRow` com o seletor `#admSkDisp` (só venda / só drop / venda + drop) e o campo `#admSkDrop` (chance no drop, %). Validações reais (src/14 l.886–902): item **só de drop publica sem preço** (a exigência de preço ≥ 1 é dispensada); qualquer item com drop exige **chance entre 1% e 100%** ("Item no drop precisa de uma chance entre 1% e 100%."). O item nasce em `ITENS_COMBATE` com `disp` e `drop` e o toast confirma o modo publicado. Ver Módulo 16.
 
 **Estoque físico (dec. 170)** — decresce por compra (25→23 comprando 2), o seletor de quantidade trava no máximo do estoque, e na última unidade o item some da Loja (sonda: vade mecum, 8 unidades compradas → card removido, toast "Era a última unidade — o item saiu da Loja"). Digitais não têm limite. Entrega confirmada devolve o item à condição normal da vitrine (a etiqueta de pedido sai).
 
-**Governança do admin (contexto; detalhamento no módulo do administrador, na segunda metade)**: preços e vagas por moeda editáveis sem recriar turma/isolada/simulado (`renderPrecoTurmas`, `btnAdmPrecoTurma`, `btnAdmPrecos` — "já vale na Quad Store"); cadastro de produto com destino fixo por categoria (`PROD_DESTINOS`), estoque obrigatório para presencial, data para excursão/TAF/mentoria (mentoria com início+fim); criador de skins/itens de combate; crédito manual de moedas (comprovado na sonda: +2.000 QdC caem na carteira na hora).
+**Governança do admin (contexto; detalhamento no módulo do administrador, na segunda metade)**: preços e vagas por moeda editáveis sem recriar turma/isolada/simulado (`renderPrecoTurmas`, `btnAdmPrecoTurma`, `btnAdmPrecos` — "já vale na Quad Store"); cadastro de produto com destino fixo por categoria (`PROD_DESTINOS`), estoque obrigatório para presencial, data para excursão/TAF/mentoria (mentoria com início+fim); criador de skins/itens de combate (com **disponibilidade e chance de drop** desde a dec. 194 — ver acima); crédito manual de moedas (comprovado na sonda: +2.000 QdC caem na carteira na hora).
 
 **Fluxo principal:**
 1. Aluno abre a Loja (ou chega pelo atalho "NA LOJA").
@@ -617,7 +637,9 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 - REGRA DE PRODUTO CONFIRMADA — vagas e preços POR MOEDA em turma e simulado presencial (dec. 155); a compra decrementa só a moeda usada.
 - REGRA DE PRODUTO CONFIRMADA — confirmação em toda compra (RN-22); exceção: durante o tutorial o QUAD conduz sem modal (ver Módulo 2).
 - REGRA DE PRODUTO CONFIRMADA — estoque físico decrescente, esgotou→some; pedido aberto não trava compra (dec. 170).
-- REGRA DE PRODUTO CONFIRMADA — item de combate recomprável, nunca sai da vitrine, empilha na mochila com "N na mochila", sempre QdC (dec. 172).
+- REGRA DE PRODUTO CONFIRMADA — item de combate recomprável, nunca sai da vitrine, empilha na mochila com "N na mochila", sempre QdC (dec. 172) — **com a ressalva da dec. 194**: a regra vale para os itens vendáveis (`disp` `venda`/`ambos`); item **só de drop nunca aparece na vitrine** (a vitrine filtra `disp !== 'drop'`), porque não se compra.
+- REGRA DE PRODUTO CONFIRMADA — **DROP (dec. 194)**: item de combate pode ser conquistado por sorteio ao concluir bloco de 10, treinamento rápido ou simulado digital, pela chance configurada; vai à mochila sem custo, sem log de compra e sem estorno; nunca dispara no tutorial; a conquista é anunciada na celebração `#dropLayer`. Mecânica: confirmada; as chances (%) são DADO DEMONSTRATIVO (dec. 185).
+- REGRA DE PRODUTO CONFIRMADA — o admin define **como o aluno obtém** cada item de combate (só venda / só drop / venda + drop) e a **chance de 1% a 100%**; item só-drop publica sem preço (dec. 194).
 - REGRA DE PRODUTO CONFIRMADA — cadeia de skins um elo por vez (gandola→capa de colete→fuzil) e fardas finais de ESCOLHA ÚNICA (CIPE/PATAMO/BOPE); compra troca a foto do personagem; quem possui, veste (sem equipar manual).
 - REGRA DE PRODUTO CONFIRMADA — EM CHOQUE avisa sem impedir; LOTADO bloqueia (evento com sala); atalho NA LOJA leva ao item (dec. 173); lotação por sala fixa 155/85/125/185 (dec. 179).
 - REGRA DE PRODUTO CONFIRMADA — economia é DA PESSOA, não da turma (dec. 148): saldos, mochila e skins não mudam ao trocar de turma ativa (ver Módulo 3).
@@ -626,7 +648,7 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 **Dados utilizados:** `TURMAS_LOJA`, `ISOLADAS`, `SIMULADOS`, `EVENTOS`+`evState`, `ITENS_PRESENCIAIS`, `LOJA_EXTRAS`, `ITENS_COMBATE`, `MOCHILA`, `SKIN_CADEIA`/`SKIN_FARDAS`/`skinEtapa`/`fardaEscolhida`, `lojaOwned`, `score` (QdC), `diamantes`, `GIFT_CARDS`/`GIFT_LOTES`, `PEDIDOS`, `PROD_AGENDA`, `SALA_CAP`. Tudo em memória (IIFE), sem persistência além de `localStorage` do tutorial.
 
 **Dados demonstrativos:**
-- DADO DEMONSTRATIVO — saldos iniciais 1.240 QdC / 150 Dmn; 5 turmas seed (ex.: RONDESP Manhã 600 Dmn/700 QdC, vagas 54/6); 3 isoladas (350 Dmn/30 vagas; "Aula isolada" 40 QdC); 8 itens físicos com estoques 8–40; 6 itens de combate 20–45 QdC; 3 cursos online fixos em Dmn; eventos seed (Aulão especial 80 QdC · Sala 2; Semana Insana 400 Dmn, multi-dia; Mentoria CFO 120 QdC); simulados seed (Simulado 63: 120 Dmn/150 QdC, 50/10 vagas; Simuladão: 15 Dmn/20 QdC, 20/60); gift codes demo QUAD-100/QUAD-500; "Boina exclusiva" 20 QdC (item do tutorial).
+- DADO DEMONSTRATIVO — saldos iniciais 1.240 QdC / 150 Dmn; 5 turmas seed (ex.: RONDESP Manhã 600 Dmn/700 QdC, vagas 54/6); 3 isoladas (350 Dmn/30 vagas; "Aula isolada" 40 QdC); 8 itens físicos com estoques 8–40; **7 itens de combate** (`data/itens-combate.js`): 6 vendáveis de 20 a 45 QdC — Faca tática 40, Lanterna tática 35, Bússola de campanha 30, Broche de mérito 25, **Cantil 20 com `disp: 'ambos'` e `drop: 10`** (vende na Loja e também cai no drop a 10%) e Corda de rapel 45 — mais o **"Patch da sorte"** (`disp: 'drop'`, `preco: 0`, `drop: 12`), item só de drop que **não aparece na vitrine** (dec. 194); 3 cursos online fixos em Dmn; eventos seed (Aulão especial 80 QdC · Sala 2; Semana Insana 400 Dmn, multi-dia; Mentoria CFO 120 QdC); simulados seed (Simulado 63: 120 Dmn/150 QdC, 50/10 vagas; Simuladão: 15 Dmn/20 QdC, 20/60); gift codes demo QUAD-100/QUAD-500; "Boina exclusiva" 20 QdC (item do tutorial).
 - DADO DEMONSTRATIVO — todos os valores/preços são de demonstração: dec. 185 — regras econômicas permanecem INDEFINIDAS; a mecânica é a regra, os números não.
 
 **Resultados esperados:** Compra confirmada = débito na moeda escolhida + efeito imediato do tipo + registro em `COMPRAS` + vitrine atualizada; nunca há débito sem saldo, compra acima do estoque, nem vaga negativa.
@@ -648,12 +670,14 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 **O que precisará de implementação real:** Back-end de catálogo/estoque (ERP), carteira por conta com transações atômicas (QdC e Dmn), checkout do site para recarga de Dmn, gateway de pagamento, geração/leitura reais de QR de gift card, inventário do jogador (mochila/skins) persistente, CDN das artes de skin, sincronização em tempo real da vitrine (vagas/estoque multiusuário com concorrência), portaria/recepção com dispositivo real.
 
 **Funcionalidades futuras relacionadas:**
-- FUNCIONALIDADE PLANEJADA — Quests da administração ("Quests — missões especiais… Próxima implementação", botão existente) e forja de itens da mochila ("reúna itens em quests para forjar equipamentos novos", texto na Loja).
+- FUNCIONALIDADE PLANEJADA — Quests da administração ("Quests — missões especiais… Próxima implementação", botão existente) e forja de itens da mochila ("reúna itens em quests para forjar equipamentos novos", texto na Loja). O **drop** saiu desta lista: virou mecânica implementada pela dec. 194 (ver acima e Módulo 17).
 - FUNCIONALIDADE PLANEJADA — aplicação de skin no boneco 3D é "da V1" (comentário do criador de skins); artes definitivas das fardas via PDF do gestor.
 - FUNCIONALIDADE PLANEJADA — Intendência (gastar score) segue bloqueada até a V1 (obs. da dec. 11).
 
 **Decisões posteriores:**
 - DECISÃO POSTERIOR — dec. 185 (01/08): valores, preços e balanceamento econômico não estudados; nenhuma regra nova criada na Consolidação.
+- DECISÃO POSTERIOR — **dec. 194 (02/08)**: itens de combate ganharam disponibilidade (`disp`) e chance (`drop`); a vitrine passou a filtrar os só-drop e o criador do admin passou a pedir os dois campos. Antes, todo item de combate era exclusivamente de venda e aparecia na vitrine.
+- DECISÃO POSTERIOR — **dec. 193 (02/08)**: a compra da boina no tutorial nasce `semEstorno` e não entra na janela de 7 dias (ver Módulos 2 e 10).
 - DECISÃO POSTERIOR — rev. 2.4 do documento-base (RN-18): absorver o modelo "QdC direto por atividade + Diamante" ou manter o Anexo A (Marcos de Conquista/ledger) como alvo.
 - DECISÃO POSTERIOR — renomear a variável `score` (QdC) para eliminar a colisão com o score de carreira (ver Módulo 7).
 
@@ -728,9 +752,9 @@ Há ainda, na própria Loja, o resgate de **gift card** (`#giftCode` + `#btnGift
 
 **Funcionamento atual:**
 FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
-- **Log de compras** (`COMPRAS`): toda compra entra com `{aluno, item, valor, moeda, ts, tipo, ref, extra}`; tipos: `matricula`, `pres` (físico), `simulado`, `evento`, `skin`, `combate`, `item` (avulso/isolada da vitrine). O admin vê as 5 últimas + "Ver completo".
+- **Log de compras** (`COMPRAS`): toda compra entra com `{aluno, item, valor, moeda, ts, tipo, ref, extra, semEstorno}` — o campo **`semEstorno`** (dec. 193) nasce `true` quando a compra é feita **durante o tutorial** (`semEstorno: !!tutOn` em `lojaCompraLog`, src/18 l.420) e mantém a linha permanentemente fora de "Estornos · até 7 dias"; tipos: `matricula`, `pres` (físico), `simulado`, `evento`, `skin`, `combate`, `item` (avulso/isolada da vitrine). O admin vê as 5 últimas + "Ver completo".
 - **Matrícula**: comprada a turma (ver Módulo 8), `MATRICULAS` ganha a entrada e o acesso é liberado — a 1ª matrícula destrava o app; da 2ª em diante vale a regra de turma ativa com pop-up de escolha (RN-08/RN-09 — comprovado por sonda).
-- **Estornos · até 7 dias** (`renderEstornos`): lista as compras do aluno não estornadas e **não consumidas**, cada uma com etiqueta de prazo — "FALTAM 7 DIAS" (dia da compra), "FALTAM N DIAS", "ÚLTIMO DIA" (dias ≤2 em estilo de alerta) ou "PRAZO ENCERRADO" (botão desativado; a linha permanece visível). Comprovado por sonda: compra de 2 dias = FALTAM 5 DIAS; seeds de 8 e 55 dias = PRAZO ENCERRADO desativado.
+- **Estornos · até 7 dias** (`renderEstornos`, src/19 l.99–111; hook de teste `window.__estRefresh`): lista as compras do aluno **não estornadas**, **não consumidas**, **sem a marca `semEstorno`** (compra do tutorial — dec. 193) e, quando o tipo é `evento`, **cujo evento ainda não aconteceu** (`evAcabou` — dec. 192), cada uma com etiqueta de prazo — "FALTAM 7 DIAS" (dia da compra), "FALTAM N DIAS", "ÚLTIMO DIA" (dias ≤2 em estilo de alerta) ou "PRAZO ENCERRADO" (botão desativado; a linha permanece visível). Comprovado por sonda: compra de 2 dias = FALTAM 5 DIAS; seeds de 8 e 55 dias = PRAZO ENCERRADO desativado.
 - **Estorno é DIRETO, sem aprovação administrativa** (fiel ao protótipo): o aluno confirma em **dois toques** ("Estornar" → "Confirmar estorno?", que expira em 4s) e o estorno executa na hora. O admin é apenas **avisado**: a linha entra em `ESTORNOS` → painel "Estornos e desistências" (com contagem por item) e a compra ganha a tag ESTORNADO no log. Comprovado por sonda.
 - **Devolução na moeda ORIGINAL**: `estornar()` credita `cp.valor` via `addDiamante` se a compra foi em Dmn, `addScore` se em QdC ("Estorno confirmado — +N … de volta"). Comprovado por sonda (+700 QdC da matrícula).
 - **Desfazer POR TIPO** (`desfazerCompra` — todos comprovados por sonda, exceto onde indicado):
@@ -745,6 +769,8 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
   1. **Portaria** ("Autorizações de acesso", dec. 180): grupos = eventos presenciais vigentes reais; o aluno entra na lista ao comprar (aparece como "você") e "Liberar entrada" → ENTRADA LIBERADA + toast "A compra saiu da janela de estorno" → some dos estornos.
   2. **Simulado presencial**: "Liberar entrada" do inscrito pontua o score de carreira, marca REALIZADO, manda ao histórico de simulados e consome a compra (ver Módulo 12).
   3. **Entrega física**: "Confirmar entrega" na recepção marca ENTREGUE, consome, e o relatório do aluno passa a "entregue na recepção".
+- **Quarto caminho de saída da janela (dec. 192)** — além dos três gatilhos de consumo acima, **o evento que já aconteceu sai da janela de estorno**: `renderEstornos` descarta a compra de tipo `evento` quando `evAcabou(ev)` é verdadeiro ("evento que JÁ ACONTECEU também sai — não há o que estornar", comentário do fonte, src/19 l.99–110). Diferente dos três gatilhos, este **não marca `consumido`**: é o próprio calendário que decide, pela data. Efeito prático: o aluno que comprou e não compareceu deixa de poder estornar quando o evento passa (ver Módulo 11 — o evento presencial vira CONCLUÍDO ou FALTOSO em vez de sumir).
+- **Compra do tutorial fora da regra (dec. 193)** — a boina comprada durante a instrução nasce `semEstorno: true` e nunca aparece em "Estornos · até 7 dias" ("ela faz parte do tutorial e não entra na regra"; ver Módulo 2).
 - **Relatório de compras** (`renderRelCompras`): períodos Semanal/Mensal/Trimestral/Semestral (7/30/90/180 dias); KPIs "compras · Quad Coins · Diamantes · a receber"; três listas com situação por tipo (`rcSituacao`): **em andamento** com % de evolução (turma pelo período `inicio→fim` — comprovado: matrícula PATAMO de 55 dias aparece no trimestral com %; mentoria/curso com período idem), **a receber** ("aguardando retirada na recepção", "inscrito · aguardando liberação na sede", "inscrito · <quando>", "simulado digital · pronto para responder") e **entregue/concluído** ("entregue na recepção", "entrada liberada na sede", "simulado realizado", "evento realizado", "no seu personagem", "na sua mochila de combate", "acesso liberado na hora", "turma concluída em <data>"). **Compra estornada sai do relatório** (`!cp.estornado`); consumida permanece (vira concluída).
 
 **Fluxo principal:** compra confirmada (ver Módulo 8) → `lojaCompraLog` → aparece em "Estornos · até 7 dias" (FALTAM 7 DIAS) e no "Relatório de compras" → OU o aluno consome (entrega/entrada liberada/simulado liberado ⇒ sai da janela, vira "concluído" no relatório) OU estorna em dois toques dentro do prazo (moeda original de volta + posse desfeita + aviso ao admin) OU o prazo vence (PRAZO ENCERRADO, botão morto).
@@ -758,13 +784,15 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - REGRA DE PRODUTO CONFIRMADA — devolução na moeda original da compra (RN-26; sonda: QdC→QdC).
 - REGRA DE PRODUTO CONFIRMADA — estorno desfaz a aquisição por tipo, inclusive devolução da vaga à moeda usada e cancelamento da matrícula (RN-28).
 - REGRA DE PRODUTO CONFIRMADA — estorno da turma em uso → o app passa à matrícula restante como turma ativa (RN-10; dec. 146/163 correlatas).
-- REGRA DE PRODUTO CONFIRMADA — consumo mata o estorno pelos três gatilhos (dec. 178: "participar do aulão e estornar depois lesaria a empresa").
+- REGRA DE PRODUTO CONFIRMADA — consumo mata o estorno pelos três gatilhos (dec. 178: "participar do aulão e estornar depois lesaria a empresa") **+ um quarto caminho de saída: o evento realizado (dec. 192), que sai da janela pela data, sem marcar `consumido`**.
+- REGRA DE PRODUTO CONFIRMADA — **compra feita no tutorial não entra na regra dos 7 dias** (dec. 193; campo `semEstorno` em `COMPRAS`).
+- REGRA DE PRODUTO CONFIRMADA — **item conquistado por DROP não entra na janela de estorno** (dec. 194): não é compra, não custa moeda e não gera linha em `COMPRAS` (ver Módulos 5 e 8).
 - REGRA DE PRODUTO CONFIRMADA — portaria sincronizada com as atividades reais; liberar entrada consome (dec. 180).
 - REGRA DE PRODUTO CONFIRMADA — matrícula em turma com horário sobreposto é BARRADA ("matrícula em turma não pode se sobrepor" — única compra bloqueada por choque; o resto só avisa, RN-30; ver Módulo 8).
 - REGRA DE PRODUTO CONFIRMADA — relatório de compras por período com três estados e % de evolução; estornos saem do relatório (RN-29).
 - REGRA DE PRODUTO CONFIRMADA — estorno é direto (sem fila de aprovação); o admin recebe o registro. Não existe fluxo de aprovação no protótipo.
 
-**Dados utilizados:** `COMPRAS` (ts/estornado/consumido/tipo/ref/extra.qtd), `ESTORNOS`, `PEDIDOS`, `SIM_INSC`, `SIM_HIST`, `MATRICULAS`, `evState`, `MOCHILA`, `ITENS_PRESENCIAIS.estoque`, `TURMAS_LOJA.vagas*`, `PROD_AGENDA`, `DIA_MS`.
+**Dados utilizados:** `COMPRAS` (ts/estornado/consumido/**semEstorno**/tipo/ref/extra.qtd), `ESTORNOS`, `PEDIDOS`, `SIM_INSC`, `SIM_HIST`, `MATRICULAS`, `evState`, `MOCHILA`, `ITENS_PRESENCIAIS.estoque`, `TURMAS_LOJA.vagas*`, `PROD_AGENDA`, `DIA_MS`.
 
 **Dados demonstrativos:**
 - DADO DEMONSTRATIVO — seeds de `COMPRAS`: "Módulo impresso" há 2 dias (150 QdC), "Garrafinha Quad" há 8 dias (90 QdC), "Turma PATAMO · matrícula" há 55 dias (2.400 QdC — "a matrícula que veio do site também é compra"), + 2 compras de alunos-semente; `PEDIDOS` seed com entregas de terceiros; janelas calculadas sobre `Date.now()`.
@@ -790,6 +818,9 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 
 **Decisões posteriores:**
 - DECISÃO POSTERIOR — dec. 185: janela de 7 dias, valores e política de estorno não foram revisados na Consolidação (estrutura preservada, economia indefinida).
+- DECISÃO POSTERIOR — **dec. 192 (02/08)**: evento realizado **sai da janela de estorno** (4º caminho de saída, ao lado dos 3 gatilhos de consumo da dec. 178). Antes, um evento comprado e não frequentado continuava estornável até o 7º dia.
+- DECISÃO POSTERIOR — **dec. 193 (02/08)**: `COMPRAS` ganhou o campo `semEstorno`; a compra feita no tutorial (a boina) nasce marcada e fica fora dos 7 dias.
+- DECISÃO POSTERIOR — **dec. 194 (02/08)**: o DROP cria posse de item de combate sem passar por `COMPRAS` — logo, sem estorno possível (a mochila ganha item que o pós-venda não registra).
 - DECISÃO POSTERIOR — definição do fluxo financeiro real do estorno em Dmn (dinheiro de verdade) — hoje é só crédito local.
 
 **Divergências:**
@@ -800,7 +831,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 **Perguntas pendentes:**
 - PERGUNTA PENDENTE — estorno de item de combate: deve devolver e remover apenas 1 unidade (e o valor daquela compra), ou o comportamento atual (remove todas, devolve uma) é aceito? (ver Divergências)
 - PERGUNTA PENDENTE — na versão real, estorno de compra em Dmn devolve Dmn na carteira ou dinheiro no meio de pagamento original? Precisa de aprovação humana em algum valor/limite (hoje é 100% self-service)?
-- PERGUNTA PENDENTE — os 7 dias são corridos a partir do `ts` da compra (comportamento atual); vale também para compra de evento/simulado cuja data é ANTES do fim da janela (hoje o consumo resolve, mas um evento não frequentado permanece estornável até o 7º dia — confirmar se é o desejado)?
+- ~~PERGUNTA PENDENTE — os 7 dias são corridos a partir do `ts` da compra; vale também para compra de evento cuja data é ANTES do fim da janela (um evento não frequentado permanece estornável até o 7º dia — confirmar se é o desejado)?~~ **RESPONDIDA pela dec. 192 (02/08)**: não permanece — o evento realizado sai da janela de estorno pela data, tenha o aluno comparecido ou não. Segue pendente apenas o recorte de **simulado** com data anterior ao fim da janela, que continua saindo só pelo consumo (liberação da entrada).
 - PERGUNTA PENDENTE — estorno de matrícula deve ter regra própria (pró-rata após início das aulas)? Hoje qualquer matrícula ≤7 dias estorna 100%, mesmo com a turma já em andamento.
 
 ---
@@ -821,8 +852,9 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - Carrossel infinito no Início com todos os eventos vigentes (`eventosInicio`, src/08 l.66-68); etiquetas por estado: INSCRITO / LOTADO / EM CHOQUE / NA LOJA / +BÔNUS / tag própria (l.50-55).
 - Página do evento (`openEvento`, src/08 l.237-308): descrição, regras de score, regras de Quad Coins, botão de inscrição/compra, link do online (só para inscrito), botão de garimpo (+15 QdC, uma vez).
 - Evento pago vai à Loja (vitrine separada presencial × online — `renderEventosLoja`, l.84-116) e o clique na tag "NA LOJA" do carrossel leva **ao item exato**, que pisca (dec. 173; `lojaLevarAte`, l.223-234 — ver Módulo 8).
-- Evento vencido some do carrossel, da Loja e do calendário (`evAcabou`, l.139-143); evento multi-dia (`ate`) permanece marcado INSCRITO até o último dia.
-- Calendário do aluno em 3 camadas: aulas da turma ativa + marcos do Quad + eventos inscritos da conta (`renderCalendario`, l.310-356).
+- Evento vencido some do carrossel e da Loja (`evAcabou`, l.139-143); evento multi-dia (`ate`) permanece marcado INSCRITO até o último dia.
+- **No calendário, o evento presencial inscrito NÃO some ao vencer (dec. 192)**: vira **CONCLUÍDO** quando a entrada foi liberada na portaria (`ACESSO_ST[ev.id]` com `euSou && liberado` — detalhe "presença registrada na portaria", etiqueta em estilo `live`) ou **FALTOSO** quando o dia passou sem registro de entrada (detalhe "evento realizado — a entrada não foi registrada", etiqueta em estilo `warn`); antes do dia, segue **INSCRITO**. O **evento online continua saindo** do calendário ao vencer — "online não passa na portaria: sem registro de entrada não há CONCLUÍDO/FALTOSO justo" (comentário do fonte, src/08 l.348–355).
+- Calendário do aluno em 3 camadas: aulas da turma ativa + marcos do Quad + eventos inscritos da conta (`renderCalendario`, src/08 l.341–366; hook de teste `window.__calRefresh`, que repinta a lista sob demanda — usado pela suíte `vv1.mjs`). Liberar a entrada na portaria repinta o calendário na hora (`src/17 l.381` — "INSCRITO vira CONCLUÍDO").
 
 **Fluxo principal (verificado nas sondas S1/S2):**
 1. Admin em Interno → "Eventos da semana": nome, resumo, modalidade (presencial|online), tipo (gratuito|pago, com moeda QdC **ou** Dmn e preço), link (só online), chips de professores do Banco, data + início + término, e **reserva de espaço**: presencial escolhe uma das 4 salas; online **seleciona o Estúdio** (seletor ativo e vazio — dec. 136, que revogou a 131; src/17 l.126-140, sonda S2).
@@ -833,7 +865,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 
 **Ações disponíveis:**
 - Admin: criar; **editar** (mesmo formulário, preserva inscritos/`evState`, "trocou de sala? a lotação acompanha" — src/17 l.214-232 e l.220); **cancelar** pelo ✕ (`cancelarEvento`, l.52-67: sai do carrossel, da Loja, dos calendários, libera sala/Estúdio e **remove o grupo da portaria** `delete ACESSO_ST[id]`); adicionar regras de score/coins a evento existente (l.68-78); liberar entrada na portaria; consultar inscritos por atividade + **"Gerar lista de conferência (PDF)"** (`ativListaPdf`, l.451-480 — janela nova + `window.print()`); mandar mensagem ao público "inscritos no evento" (dec. 181 — ver Módulo 16).
-- Aluno: inscrever-se (gratuito; com choque de agenda exige **dois toques** — "Inscrever mesmo assim", src/08 l.283-290), comprar (pago), garimpar, abrir link online, estornar em 7 dias (o estorno desfaz a inscrição e o tira da portaria — dec. 100/178; ver Módulo 10).
+- Aluno: inscrever-se (gratuito; com choque de agenda exige **dois toques** — "Inscrever mesmo assim", src/08 l.283-290), comprar (pago), garimpar, abrir link online, estornar em 7 dias **enquanto o evento não acontece** (o estorno desfaz a inscrição e o tira da portaria — dec. 100/178; **passado o evento, a compra sai da janela e o botão não existe mais — dec. 192**; ver Módulo 10).
 
 **Regras confirmadas:**
 - REGRA DE PRODUTO CONFIRMADA — **eventos são DO QUAD, não de uma turma** — todo evento vigente aparece para qualquer aluno (dec. 161, revoga a 150; comentário no código src/08 l.64-65). Ver "Decisões posteriores".
@@ -845,8 +877,10 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - REGRA DE PRODUTO CONFIRMADA — **portaria sincronizada** (dec. 180): grupos = eventos presenciais vigentes; online não passa na portaria; o aluno entra/sai da lista conforme compra/inscrição (`acessoListaDe`, src/17 l.329-341); **liberar a entrada consome a compra** e a tira da janela de estorno (dec. 178; verificado na família — S3 no simulado; ver Módulo 10).
 - REGRA DE PRODUTO CONFIRMADA — "EM CHOQUE" avisa sem impedir (dec. 104/107); compra assumida é do aluno, sem reposição.
 - REGRA DE PRODUTO CONFIRMADA — cancelar evento limpa tudo na hora (dec. 37 + 180).
+- REGRA DE PRODUTO CONFIRMADA — **o evento presencial inscrito não desaparece do calendário ao vencer** (dec. 192): vira CONCLUÍDO (entrada liberada na portaria) ou FALTOSO (o dia passou sem registro); o **online**, que não passa na portaria, continua saindo do calendário ao vencer.
+- REGRA DE PRODUTO CONFIRMADA — **evento realizado não é mais estornável** (dec. 192): a compra sai da janela de 7 dias pela data do evento, mesmo sem consumo registrado (é o 4º caminho de saída — ver Módulo 10).
 
-**Dados utilizados:** `EVENTOS` (data/eventos.js — id, nome, tipo, modalidade, online, pago, preco, moeda, quando, dataISO, ate, sala, hi, hf, lot, ocup, profs, score[], coins[], garimpo, link); `evState` (por evento: comprado/inscrito/garimpado); `ACESSO_ST` (listas de portaria); `SALA_CAP`; `DOCENTES` (chips). Hooks de teste: `__eventos`, `__evEstado`, `__evLotar`, `__evProf`, `__evSalaRefresh`.
+**Dados utilizados:** `EVENTOS` (data/eventos.js — id, nome, tipo, modalidade, online, pago, preco, moeda, quando, dataISO, ate, sala, hi, hf, lot, ocup, profs, score[], coins[], garimpo, link); `evState` (por evento: comprado/inscrito/garimpado); `ACESSO_ST` (listas de portaria); `SALA_CAP`; `DOCENTES` (chips). Hooks de teste: `__eventos`, `__evEstado`, `__evLotar`, `__evProf`, `__evSalaRefresh`, `__calRefresh` (repinta o calendário — dec. 192).
 
 **Dados demonstrativos:**
 - DADO DEMONSTRATIVO — 7 eventos-semente (NAC, Aulão RONDESP, Gincana, Aulão especial pago 80 QdC Sala 2, Simuladão, Semana Insana 400 Dmn, Mentoria CFO 120 QdC) com **datas reancoradas em +8 semanas (dec. 189: 16-21/09 e 26/09/2026)** — manutenção de demo, nenhuma regra alterada; recomendação registrada de datas relativas.
@@ -872,6 +906,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - DECISÃO POSTERIOR — dec. 179: lotação passou a ser herdada da sala (antes o evento não tinha lotação física).
 - DECISÃO POSTERIOR — dec. 178/180: consumo mata o estorno; portaria sincronizada com os eventos reais (removido o fictício "Aniversário do Quad").
 - DECISÃO POSTERIOR — dec. 189 (01/08): reancoragem das datas-semente (+8 semanas) — dado demonstrativo, sem regra nova.
+- DECISÃO POSTERIOR — **dec. 192 (02/08)**: status do evento no calendário. Antes, todo evento inscrito sumia do calendário ao vencer (o aluno perdia o registro da atividade); agora o presencial permanece como CONCLUÍDO ou FALTOSO e só o online sai. A mesma decisão tirou o evento realizado da janela de estorno (ver Módulo 10).
 
 **Divergências:**
 - DIVERGÊNCIA — regras de score/coins do evento são publicadas como se fossem executáveis, mas nenhum mecanismo credita presença de evento (diferente do simulado presencial, que pontua na liberação — ver Módulo 12). Texto × mecânica.
@@ -912,7 +947,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 
 **Fluxo principal (verificado nas sondas S3/S4):**
 - *Presencial:* admin lança (S3: "5 vagas: 3 em Diamantes (50 Dmn) e 2 em Quad Coins (60 QdC), à venda na Loja") → aluno clica → pop-up "em qual moeda" com vagas por moeda → confirmação → débito (1240→1180 QdC) → INSCRITO no Calendário + entra em `SIM_INSC` na recepção → admin "Liberar entrada" → **+score real** ("Entrada liberada — presença confirmada (+100 score)") → simulado vai ao `SIM_HIST` do aluno como REALIZADO → **compra consumida sai da janela de estorno** (dec. 178 — ver Módulo 10).
-- *Digital gratuito:* admin anexa PDF + minutos + questões + prêmio (S4: "+3 QdC por acerto") → aparece direto nos Simulados do aluno → "Responder o simulado" abre overlay com cronômetro → questões Certo/Errado → resultado: **+10 score por acerto + N QdC por acerto** (S4: 2 acertos = +20 score · +6 QdC) → vai ao histórico como REALIZADO e sai da lista. Digital pago só abre depois de comprado (`simAtivo`, src/11 l.112-116).
+- *Digital gratuito:* admin anexa PDF + minutos + questões + prêmio (S4: "+3 QdC por acerto") → aparece direto nos Simulados do aluno → "Responder o simulado" abre overlay com cronômetro → questões Certo/Errado → resultado: **+10 score por acerto + N QdC por acerto** (S4: 2 acertos = +20 score · +6 QdC) **+ sorteio de DROP** (dec. 194: `dropSortear('ao concluir o simulado digital')`, src/12 l.520 — cada item com chance configurada pode cair na mochila, com a celebração `#dropLayer`; sem custo e sem estorno; ver Módulos 5 e 8) → vai ao histórico como REALIZADO e sai da lista. Digital pago só abre depois de comprado (`simAtivo`, src/11 l.112-116).
 
 **Ações disponíveis:**
 - Admin: lançar, remover pelo ✕ (limpa Loja, editor de preços e mapa de salas), editar preços/vagas no editor, liberar inscrito, mensagem ao público "inscritos no simulado" (dec. 181 — ver Módulo 16), lista de inscritos + PDF (bloco "Inscritos por atividade").
@@ -924,10 +959,11 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - REGRA DE PRODUTO CONFIRMADA — **digital sem limite de vagas e sem trava de choque** (dec. 123; comentário src/18 l.3-5); vende nas duas moedas ou é gratuito **premiando +10 score e +N QdC por acerto** (N definido no lançamento, padrão 2 — dec. 125; src/12 l.511-515).
 - REGRA DE PRODUTO CONFIRMADA — liberação consome a compra (dec. 178; `compraConsumida('simulado', id)` — src/17 l.542) e move ao histórico.
 - REGRA DE PRODUTO CONFIRMADA — bloco de Simulados no Calendário, não em Missões (dec. 165).
+- REGRA DE PRODUTO CONFIRMADA — **concluir um simulado digital dispara o DROP** (dec. 194), como o fim de um bloco de 10 ou do treinamento rápido: item conquistado vai à mochila sem custo e sem estorno; o presencial não dispara drop (não há resolução de questões no app).
 - REGRA DE PRODUTO CONFIRMADA — preço nasce e vive no editor de preços, sincronizado com a Loja (dec. 171).
 - REGRA DE PRODUTO CONFIRMADA — clique em "NA LOJA"/bloco leva ao item exato (dec. 173; ver Módulo 8).
 
-**Dados utilizados:** `SIMULADOS` (data/simulados.js — id, rot, det, tag PRESENCIAL|DIGITAL, pago, valor, precoDmn/precoQdc, rec, score, vagas/vagasDmn/vagasQdc/vagasGratis + `*Rest`, dataISO/hi/hf/sala, pdf/minutos/nq/dia, insc/comprado/realizado/feito); `SIM_INSC` (fila da recepção); `SIM_HIST` (histórico); `carreira.score*` (score de carreira); banco de questões demo `TR_BANK` + `AULA_DEMO` (digital). Hooks: `__simDig`, `__simSalaRefresh`.
+**Dados utilizados:** `SIMULADOS` (data/simulados.js — id, rot, det, tag PRESENCIAL|DIGITAL, pago, valor, precoDmn/precoQdc, rec, score, vagas/vagasDmn/vagasQdc/vagasGratis + `*Rest`, dataISO/hi/hf/sala, pdf/minutos/nq/dia, insc/comprado/realizado/feito); `SIM_INSC` (fila da recepção); `SIM_HIST` (histórico); `carreira.score*` (score de carreira); banco de questões demo `TR_BANK` + `AULA_DEMO` (digital); `ITENS_COMBATE`/`MOCHILA` no drop do digital (dec. 194). Hooks: `__simDig`, `__simSalaRefresh`, `__dropSortear`/`__dropRng` (drop determinístico nas suítes).
 
 **Dados demonstrativos:**
 - DADO DEMONSTRATIVO — 3 sementes: "Simulado 63 · SD PMBA" (presencial, 120 Dmn/150 QdC, 50+10 vagas, score 120), "Simuladão Quad" (presencial 15/20, 20+60 vagas, score 100) e "Simulado digital · CFO 1ª fase" (grátis, 30 min, 10 questões); 3 inscritos-semente em `SIM_INSC`; os presenciais-semente **não têm dataISO/sala** ("simulado antigo, sem controle de sala passa direto" — src/11 l.136) e por isso não ocupam o mapa de salas nem travam choque; `det` semente "domingo · 8h"/"sábado · 8h" é texto.
@@ -951,6 +987,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - DECISÃO POSTERIOR — dec. 171 move o preço do simulado para o editor de preços sincronizado (antes só ele não estava).
 - DECISÃO POSTERIOR — dec. 178 (consumo mata estorno) aplicada à liberação do inscrito.
 - DECISÃO POSTERIOR — dec. 128/129 (26/07): presença passou a gerar score de carreira mesmo sem QdC (antes só pontuava quando premiava).
+- DECISÃO POSTERIOR — **dec. 194 (02/08)**: o fim do simulado digital passou a sortear itens de combate (drop); antes, o digital só premiava score e QdC por acerto.
 
 **Divergências:**
 - DIVERGÊNCIA — toast "Simulado interrompido — você pode retomar depois" (src/12 l.544-547) × comportamento real: não há retomada; reabrir recomeça com novas questões e cronômetro cheio. Texto × mecânica.
@@ -1181,7 +1218,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
   - Contas: bloquear derruba a sessão do aluno em ~400 ms com pop-up de conta bloqueada (dec. 52); desbloquear reativa.
   - **Comunicação por público (dec. 181):** 7 públicos (aluno, professor, turma, isolada, simulado, evento, todos — F3 nº8); alcance calculado (inscritos reais quando existem; "Todos" = 1.286 fixo — DADO DEMONSTRATIVO); mensagem de público chega no chat do aluno **prefixada "[Turma PATAMO] …"** (F3 nº11); para professor vira recado na sala dele; status ENVIADA→LIDA sincronizado na leitura (F3 nº12/15).
   - Gift cards em lote (1–500 × valor × moeda) com QR ilustrativo e resgate único; estornos/desistências com ranking (ver Módulo 10).
-- **Interno/Hoje (`v-adm-hoje`) — "Atualizações do dia":** avisos por turma-alvo por id (dec. 149), **cronograma por turma** (seletores: turma por id, dia, tempo com horário real, matéria da árvore, professor filtrado pela matéria; grava grade + corpo docente como fonte única e re-renderiza aluno e professor na hora — dec. 91/163), **materiais da aula** (ver Módulo 13; turma→matéria→assunto→tipo→arquivo/link; arquivo baixa de verdade via objectURL — dec. 144/164; só quem está na turma vê), eventos da semana (ver Módulo 11; chips de professores, reserva de sala/Estúdio, gratuito×pago, lotação herdada da sala — dec. 179), lançamento de simulados (ver Módulo 12; presencial sempre vendido com vagas por moeda ≤ sala; digital sem limite, por PDF "[INTEGRAÇÃO REAL]" — dec. 117b/122/123), skins e itens de combate (combate sempre QdC — ver Módulo 8), Quests = botão **EM BREVE** (`src/05-html-admin.html:550-554`).
+- **Interno/Hoje (`v-adm-hoje`) — "Atualizações do dia":** avisos por turma-alvo por id (dec. 149), **cronograma por turma** (seletores: turma por id, dia, tempo com horário real, matéria da árvore, professor filtrado pela matéria; grava grade + corpo docente como fonte única e re-renderiza aluno e professor na hora — dec. 91/163), **materiais da aula** (ver Módulo 13; turma→matéria→assunto→tipo→arquivo/link; arquivo baixa de verdade via objectURL — dec. 144/164; só quem está na turma vê), eventos da semana (ver Módulo 11; chips de professores, reserva de sala/Estúdio, gratuito×pago, lotação herdada da sala — dec. 179), lançamento de simulados (ver Módulo 12; presencial sempre vendido com vagas por moeda ≤ sala; digital sem limite, por PDF "[INTEGRAÇÃO REAL]" — dec. 117b/122/123), skins e itens de combate (combate sempre QdC — ver Módulo 8; desde a dec. 194 o criador ganhou dois campos próprios do item de combate: **`#admSkDisp`** — "Como o aluno obtém o item": só venda / só drop / venda + drop — e **`#admSkDrop`** — chance no drop em %, validada entre **1 e 100**; item **só de drop publica sem preço**, e a linha `#admSkDropRow` só aparece quando o destino é item de combate — `src/05:541-547`, `src/14:875-902`), Quests = botão **EM BREVE** (`src/05-html-admin.html:550-554`).
 - **Relatórios (`v-adm-alunos`)** — sonda F4 (18/18): 4 painéis com gráficos de colunas/rosca em **CSS/HTML puro, sem biblioteca** (dec. 55; F4 nº18). Individuais (conta da demo + 3 seeds; compras reais da sessão; pedagógico vivo; Reclamações EM BREVE); **pedagógico por turma** (um bloco por turma aberta na árvore dela — dec. 167; ver Módulo 14); Turmas (dificuldades por sub-assunto/assunto/matéria; "Alunos que precisam de apoio" com Acionar→mensagem pronta; Presença e Feedbacks EM BREVE); Gerais ("Perfil médio da base" com 412 alunos = **tabela fixa no HTML** — DADO DEMONSTRATIVO — F4 nº12; dificuldade da base viva; NPS EM BREVE); Loja (mais vendidos fixos `REL_LOJA_TOP`; donut = base fixa 18.600→21.360 QdC/9.400 Dmn **+ compras vivas**; "Compradores · últimas compras" = `COMPRAS` real; inscritos por atividade com **lista de conferência em PDF via `window.print()`** — dec. 169, sem lib).
 - **Liberações (`v-adm-liber`):** produtos físicos (entrega consome a compra e mata o estorno — dec. 178; ver Módulo 10), autorizações de acesso sincronizadas com os eventos presenciais vigentes (dec. 180; ver Módulo 11), simulados presenciais com liberação que pontua score de carreira (dec. 128/129; ver Módulo 12), inscritos por atividade + PDF, categorias com hierarquia visual (dec. 168), gift em lote no Controle.
 - **Loja (`v-adm-loja`):** cadastro de produto/serviço nas seções reais (dec. 95), editor de preços de qualquer item da vitrine, "Preços e vagas · turmas, isoladas e simulados" (edita sem recriar, matrículas preservadas — dec. 81/117c/121/124; ver Módulo 8).
@@ -1192,7 +1229,8 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 **Ações disponíveis:** criar/editar/remover em todos os cadastros; bloquear contas e docentes; creditar moedas; enviar mensagens/avisos/materiais; liberar entradas/entregas; gerar PDF de conferência; editar preços e vagas (detalhamento por bloco em "Funcionamento atual").
 
 **Regras confirmadas:**
-- REGRA DE PRODUTO CONFIRMADA — lotação fixa por sala (155/85/125/185 — dec. 179); sala não aceita duas atividades no mesmo dia/horário (dec. 129/130); turno sai do horário (dec. 139); vagas por moeda (dec. 155); remoção de turma recusada com matrícula ativa ("estorne antes"); consumo mata o estorno (dec. 178); comunicação por público com prefixo (dec. 181); admin abre limpa (dec. 127).
+- REGRA DE PRODUTO CONFIRMADA — lotação fixa por sala (155/85/125/185 — dec. 179); sala não aceita duas atividades no mesmo dia/horário (dec. 129/130); turno sai do horário (dec. 139); vagas por moeda (dec. 155); remoção de turma recusada com matrícula ativa ("estorne antes"); consumo mata o estorno (dec. 178) e o evento realizado também sai da janela (dec. 192); comunicação por público com prefixo (dec. 181); admin abre limpa (dec. 127).
+- REGRA DE PRODUTO CONFIRMADA — **o admin decide como cada item de combate é obtido e com que chance** (dec. 194): seletor de disponibilidade (`#admSkDisp`) + chance de 1% a 100% (`#admSkDrop`); item só-drop dispensa preço e não vai à vitrine; a lista de itens do painel mostra o modo ("só no drop · N% de chance" / "N QdC · na Loja e no drop (N%)" — src/14 l.824-825).
 
 **Dados utilizados:** `DOCENTES`, `TURMAS_LOJA`, `ISOLADAS`, `CONCURSOS`+árvores, `CRONO`, `EVENTOS`, `SIMULADOS`, `CONTAS`, `COMPRAS`, `PEDIDOS`, `ACESSO_ST`, `LOJA_EXTRAS`, `ITENS_COMBATE`, `ITENS_PRESENCIAIS`, `RECADOS`/`RECADOS_PROF`, `AVISOS`, `MATERIAIS`, `CREDITOS`, `ESTORNOS` (todos em memória, sementes em `data/`).
 
@@ -1212,7 +1250,7 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - FUNCIONALIDADE PLANEJADA — Quests (EM BREVE); chat ao vivo de duas vias ("próxima implementação"); Reclamações/Presença/Feedbacks/NPS nos Relatórios (EM BREVE); banco de questões operável e reconciliação de edital (telas hoje demonstrativas); aba de configurações (não existe — a criar se o produto exigir). Ver Módulo 17.
 
 **Decisões posteriores:**
-- DECISÃO POSTERIOR — dec. 20 (área criada), 51 (5 áreas), 52 (governança de contas), 76, 78/79/80/81, 91, 113/114/115/116, 117/117b/117c, 122–129, 127, 129–131/134/135/136 (salas/Estúdio), 138–141, 144/145, 149, 155, 163, 167, 168, 169, 170/171/172/173, 174/175, 178, 179, 180, 181, 186 (riscos de segurança registrados como pendências — nenhuma solução implementada).
+- DECISÃO POSTERIOR — dec. 20 (área criada), 51 (5 áreas), 52 (governança de contas), 76, 78/79/80/81, 91, 113/114/115/116, 117/117b/117c, 122–129, 127, 129–131/134/135/136 (salas/Estúdio), 138–141, 144/145, 149, 155, 163, 167, 168, 169, 170/171/172/173, 174/175, 178, 179, 180, 181, 186 (riscos de segurança registrados como pendências — nenhuma solução implementada), **194 (criador de itens de combate com disponibilidade e chance de drop)**.
 
 **Divergências:**
 - DIVERGÊNCIA — gate valida SÓ a chave, e-mail livre (reconfirmada ao vivo, F3 nº1).
@@ -1243,7 +1281,8 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 - **Georreferenciamento / presença por geofencing (GPS):** não há tela; aparece só como texto do roadmap — faixa V1 "Geofencing, domínio, push · Quadcoin faseado" (`src/06:503`) e nota "prévias de V1 (Quadcoin, geofencing)… aparecem bloqueadas" (`src/06:524`); `docs/01-visao-e-escopo.md:25` (V1). Nenhum código de localização existe.
 - **Notificações reais (push):** só na mesma faixa V1 do roadmap (`src/06:503`; `docs/01:25`); no protótipo os "recados" são badges internos. A arquitetura mantém "notificações" como sistema externo a integrar (dec. 182).
 - **Pré-TAF:** botão bloqueado no "+" `data-lock="Pré-TAF em planejamento — ainda não disponível nesta versão"` + "EM BREVE" (`src/06:207-211`).
-- **Quests / forja de itens (drop de equipamentos):** botão "Criar Quests" EM BREVE no admin (`src/05:550-554`, toast "Próxima implementação"); na mochila do aluno: "🎯 Quests em breve: reúna itens da sua mochila para forjar novos equipamentos" (`src/06:316`). **Drop aleatório e itens raros como mecânica não aparecem em lugar nenhum** — a menção mais próxima é essa forja de Quests. (Varredura por "drop|aleat|raro": sem ocorrências funcionais.) Ver Módulos 8 e 10 (mochila/estorno de combate).
+- **Quests / forja de itens:** botão "Criar Quests" EM BREVE no admin (`src/05:550-554`, toast "Próxima implementação"); na mochila do aluno: "🎯 Quests em breve: reúna itens da sua mochila para forjar novos equipamentos" (`src/06:316`). **Só as Quests e a forja seguem planejadas.**
+  - **O DROP saiu desta lista (dec. 194, 02/08): deixou de ser "não existe em lugar nenhum" e passou a ser mecânica implementada.** A varredura anterior por "drop|aleat|raro" foi feita antes da decisão e não vale mais. Hoje o sorteio roda ao concluir bloco de 10 (dia/noite/tarde), treinamento rápido ou simulado digital (`dropSortear`, `src/15:49-83`; gatilhos em `src/11:615` e `src/12:520`), com item raro só-drop no catálogo (o "Patch da sorte", `data/itens-combate.js`), celebração `#dropLayer` (`src/06:320`) e configuração pelo admin (`#admSkDisp`/`#admSkDrop`). Não dispara no tutorial. Suíte `vv1.mjs`. Ver Módulos 5, 8, 10, 12 e 16.
 - **Expansão para alunos online / atividades online:** o texto do professor amarra a resposta à recepção a "as atividades online, na V1" (`src/04:99` — ver Módulo 15); `LINKS_ONLINE` foi preservado como ponto de integração planejado (dec. 188); cursos online/mentoria já são itens de catálogo (ver Módulo 8), mas "plataforma de cursos" segue sistema externo (dec. 182).
 - **Biometria / reconhecimento facial:** só em texto de release note sobre o antigo fluxo de autorização de dispositivo ("reconhecimento facial/desbloqueio nos próximos acessos", `src/06:523`); o fluxo de autorização de dispositivo foi **removido** na Consolidação (dec. 188). Nenhuma mecânica.
 - **Quadcoin/Intendência faseados (economia real):** faixa V1 (`src/06:503`); regras econômicas permanecem INDEFINIDAS por decisão (dec. 185 — ver Módulos 8 e 10).
@@ -1275,12 +1314,13 @@ FUNCIONAMENTO FUNCIONAL DO PROTÓTIPO:
 
 **Decisões posteriores:**
 - DECISÃO POSTERIOR — dec. 52 (chat ao vivo EM BREVE), 54 (skin no boneco V1), 182/183/184/185/186/188 (Consolidação v1.0: módulos internos, cadastro revogado da dec. 21 mas fluxo novo não implementado, módulos planejados, economia indefinida, riscos de segurança pendentes, `LINKS_ONLINE` preservado).
+- DECISÃO POSTERIOR — **dec. 194 (02/08): o drop de itens saiu de "funcionalidade futura" e virou mecânica implementada** — este módulo perdeu um item da varredura. Quests e forja continuam EM BREVE.
 
 **Divergências:**
 - DIVERGÊNCIA — o texto de release note ainda descreve o fluxo de autorização de dispositivo/reconhecimento facial que a dec. 188 removeu do código (texto histórico no overlay de notas).
 
 **Perguntas pendentes:**
 - PERGUNTA PENDENTE — presença por GPS/geofencing: será presença de aula, de evento, ou gatilho de missão? Nenhum requisito existe.
-- PERGUNTA PENDENTE — drop aleatório/itens raros: entram na V2 junto com Quests ou não fazem parte do produto?
+- ~~PERGUNTA PENDENTE — drop aleatório/itens raros: entram na V2 junto com Quests ou não fazem parte do produto?~~ **RESPONDIDA pela dec. 194 (02/08)**: fazem parte do produto e já estão na V0 — o drop foi implementado ao concluir blocos/treinamento/simulado digital, com item raro só-drop no catálogo. O que resta pendente é o **balanceamento das chances** (dec. 185 mantém a economia indefinida) e a relação do drop com as Quests/forja, ainda EM BREVE.
 - PERGUNTA PENDENTE — push: qual provedor e quais eventos disparam?
 - PERGUNTA PENDENTE — biometria segue no escopo após a remoção do fluxo de dispositivo?

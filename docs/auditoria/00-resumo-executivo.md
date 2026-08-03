@@ -42,7 +42,7 @@ O "Viver o Quad" V0 é **um único arquivo HTML navegável** que demonstra, de p
 - **Não mede a métrica-mãe.** A telemetria (origem da sessão, linha de base comportamental), declarada pré-requisito da V0 no relatório rev. 2.3, existe **apenas como uma linha de texto estática** no painel lateral. APENAS VISUAL.
 - **Não persiste progresso.** Nada de negócio sobrevive ao F5 (ver §1). O que o relatório chama de ledger, matrícula, estoque e presença é mutação de variável local.
 - **Não respeita o faseamento do documento-base.** O protótipo demonstra na V0 itens que a rev. 2.3 fasea em V1/V2: economia completa, Diamante (dinheiro real — sequer previsto no documento), painel de Domínio completo, patente dinâmica com prova de promoção. É demonstração, não antecipação de entrega — mas o documento-base nunca foi revisado (a "rev. 2.4" é pendência formal desde a decisão 11). DIVERGÊNCIA DOCUMENTAL + DECISÃO DE PRODUTO PENDENTE.
-- **Não carrega os testes.** As suítes Playwright citadas em todo o CHANGELOG **não estão no repositório** — sobraram apenas os 31 hooks `window.__*` no código. O repositório sozinho não permite reproduzir a verificação de regressão.
+- **Não carrega os testes.** As suítes Playwright citadas em todo o CHANGELOG **não estão no repositório** — sobraram apenas os 31 hooks `window.__*` no código. O repositório sozinho não permite reproduzir a verificação de regressão. *Atualização 01/08 (dec. 190) — SUPERADO:* as suítes foram versionadas em `tests/` (56 à época; **57 e 35 hooks desde a rodada de 02/08**), com runner portátil e `verify.py` (build + regressão) como portão de aceite oficial. **O repositório hoje reproduz a regressão sozinho.**
 
 ## 3. Grau de complexidade encontrado
 

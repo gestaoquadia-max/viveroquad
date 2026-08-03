@@ -562,7 +562,7 @@
 3. **Gratuito**: inscrição direta (com confirmação em 2 toques se houver choque de agenda). **Pago**: o botão leva ao item na Loja (F13-d); a compra marca INSCRITO.
 4. Inscrito: o evento entra no calendário do aluno; **evento online libera o link** após inscrição (na demo, toast — link real DEPENDE DE SISTEMA EXTERNO); evento com "garimpo" oferece "Garimpar Quad Coins escondidos" (+15 QdC, uma vez).
 5. **Na portaria** (evento presencial): o aluno consta na lista de "Autorizações de acesso" — a lista é sincronizada com a inscrição/compra real (entra ao comprar, sai ao estornar). A recepção toca **"Liberar entrada"** → presença registrada e **compra consumida** (estorno morto — F14).
-6. Evento vencido some do carrossel, da Loja e do calendário (`evAcabou`, l.4393–4397), ficando só no histórico de compras.
+6. Evento vencido some do carrossel, da Loja e do calendário (`evAcabou`, l.4393–4397), ficando só no histórico de compras. ***Nota 03/08 — superada pela dec. 192 (02/08):*** o evento **presencial** em que o aluno se inscreveu **não some mais do calendário** — vira **CONCLUÍDO** (entrada liberada na portaria) ou **FALTOSO** (o dia passou sem registro de entrada); só o **online** continua saindo. A mesma decisão tira o **evento realizado da janela de estorno** (4º caminho de saída, além dos 3 gatilhos de consumo da dec. 178). Carrossel e Loja seguem como descrito acima.
 
 **Comportamento atual (simulado):** CONFIRMADO NO CÓDIGO + SIMULADO LOCALMENTE — lotação presencial herda as cadeiras da sala (`evLot`/`evLotado`, com `SALA_CAP`); demais inscritos da portaria são semeados por hash (2–5 por evento).
 

@@ -92,7 +92,7 @@ O repositório é um protótipo de **arquivo único**: um `src.html` editável +
 
 ### 1.3 O que NÃO existe no repositório
 
-- **Nenhum teste versionado** (0 arquivos `*.spec.*`, sem `package.json`, sem `playwright.config.*`). As suítes Playwright de desenvolvimento viviam fora do repo; a única memória delas são os 31 hooks `window.__*` no src.html (CONFIRMADO NO CÓDIGO — ver §6.4).
+- **Nenhum teste versionado** (0 arquivos `*.spec.*`, sem `package.json`, sem `playwright.config.*`). As suítes Playwright de desenvolvimento viviam fora do repo; a única memória delas são os 31 hooks `window.__*` no src.html (CONFIRMADO NO CÓDIGO — ver §6.4). *Atualização 01/08 (dec. 190) — SUPERADO:* as suítes foram versionadas em `tests/` (`run.sh` + `verify.py`); a contagem vigente é de **57 suítes e 35 hooks** (rodada de 02/08, dec. 192–194).
 - **Nenhuma dependência de rede**: zero `<script src>`, `<link>` externo, `fetch`, `XMLHttpRequest` ou `WebSocket` no src.html (greps com 0 resultados). O `index.html` gerado roda 100% offline (CONFIRMADO NO CÓDIGO).
 - **Nenhum servidor, API ou banco de dados** — todo o comportamento é SIMULADO LOCALMENTE no navegador.
 

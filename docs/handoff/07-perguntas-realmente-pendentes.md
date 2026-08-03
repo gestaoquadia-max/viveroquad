@@ -1,7 +1,9 @@
 # 07 — Perguntas realmente pendentes
 
 **Data:** 02/08/2026
-**Fontes:** seções "Perguntas pendentes" dos 6 dossiês de investigação (A–F, `scratchpad/handoff-inv/`); `docs/auditoria/10-divergencias-e-decisoes-pendentes.md` (somente as perguntas marcadas **[ABERTA]**); conferência contra `docs/02-registro-de-decisoes.md` (dec. 1–191, incl. Consolidação v1.0) e contra o comportamento do protótipo.
+**Fontes:** seções "Perguntas pendentes" dos 6 dossiês de investigação (A–F, `scratchpad/handoff-inv/`); `docs/auditoria/10-divergencias-e-decisoes-pendentes.md` (somente as perguntas marcadas **[ABERTA]**); conferência contra `docs/02-registro-de-decisoes.md` (dec. 1–194, incl. Consolidação v1.0) e contra o comportamento do protótipo.
+
+> **Revisão de 03/08/2026** — a triagem original foi feita contra as decisões 1–191. Com as decisões **192** (status do evento no calendário e saída da janela de estorno), **193** (compra do tutorial fora do estorno) e **194** (sistema de DROP), **a conferência de "já respondida" foi refeita para todas as perguntas**: P20 perdeu metade do enunciado e o item 7 do rodapé mudou de justificativa. Nenhuma outra pergunta foi afetada.
 
 **Critério de inclusão (filtro rigoroso):** entram apenas dúvidas que (1) **não** estão respondidas pelo protótipo, pela documentação nem pelo registro de decisões e (2) **afetam diretamente a futura construção** (bloqueiam especificação, modelo de dados, regra de negócio ou corte de escopo). Perguntas repetidas entre dossiês foram **deduplicadas** (fontes citadas em cada uma). Perguntas cuja resposta já existe foram **descartadas e listadas no rodapé** com a resposta em uma linha. Responsável sugerido: **Danilo Moura** = decisão de produto; **engenheiro** = decisão técnica.
 
@@ -110,10 +112,10 @@ Contexto: hoje o estorno é 100% self-service e devolve crédito local na hora; 
 Impacto: bloqueia o fluxo financeiro do estorno (gateway, conciliação, alçadas).
 Responsável: Danilo Moura + financeiro. *(Fonte: dossiê D/M10.)*
 
-**P20. O estorno terá regras específicas por situação — pró-rata de matrícula com turma já iniciada e evento/simulado cuja data já passou dentro da janela de 7 dias?**
-Contexto: hoje qualquer compra ≤7 dias estorna 100% (só o consumo bloqueia); um evento não frequentado permanece estornável até o 7º dia, e matrícula em andamento devolve tudo.
+**P20. O estorno de matrícula terá regra própria de pró-rata quando a turma já começou?**
+Contexto: hoje qualquer matrícula ≤7 dias estorna 100%, mesmo com a turma em andamento. **A metade "evento" desta pergunta foi RESPONDIDA pela dec. 192 (02/08)**: o evento realizado sai da janela de estorno pela data — 4º caminho de saída, ao lado dos 3 gatilhos de consumo da dec. 178 —, tenha o aluno comparecido ou não. Resta **o pró-rata da matrícula** (e, como recorte menor, o simulado cuja data passou sem liberação de entrada, que hoje só sai pelo consumo).
 Impacto: bloqueia as regras de negócio do módulo de estornos.
-Responsável: Danilo Moura. *(Fonte: dossiê D/M10.)*
+Responsável: Danilo Moura. *(Fonte: dossiê D/M10; recorte reduzido pela dec. 192.)*
 
 **P21. No estorno de item de combate, o correto é devolver e remover 1 unidade — ou o comportamento atual (remove TODAS as unidades e devolve o valor de uma) é aceito?**
 Contexto: defeito provável comprovado por sonda (2 facas compradas + 1 estorno = 0 facas e só 40 QdC de volta); nenhuma decisão cobre o caso.
@@ -324,8 +326,8 @@ Contexto: a Consolidação definiu a propriedade dos módulos, mas nenhum contra
 Impacto: é o primeiro artefato técnico da construção — bloqueia o planejamento das integrações.
 Responsável: engenheiro (Danilo Moura prioriza). *(Fonte: Q19.)*
 
-**P58. Antes de qualquer piloto: os botões de demonstração ([DEMO PROVISÓRIO] de patente, "dia de estudo +275", "liberar nova tentativa") saem — e qual é a política dos ~31 hooks `window.__*` no build de produção?**
-Contexto: o próprio código pede a remoção desde 20/07; os hooks são contrato das 56 suítes (dec. 190), mas ficam expostos no build publicado (Q13 [ABERTA] — a parte "versionar suítes" já foi resolvida pela dec. 190).
+**P58. Antes de qualquer piloto: os botões de demonstração ([DEMO PROVISÓRIO] de patente, "dia de estudo +275", "liberar nova tentativa") saem — e qual é a política dos 35 hooks `window.__*` no build de produção?**
+Contexto: o próprio código pede a remoção desde 20/07; os hooks são contrato das 57 suítes (dec. 190), mas ficam expostos no build publicado (Q13 [ABERTA] — a parte "versionar suítes" já foi resolvida pela dec. 190).
 Impacto: higiene obrigatória pré-piloto (integridade/antifraude do estado do aluno).
 Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 
@@ -354,7 +356,7 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 | P17 | Economia | Danilo Moura | Escopo do módulo de gift cards |
 | P18 | Economia | Danilo Moura | Emissão real/antifraude/contabilidade do gift |
 | P19 | Economia | Danilo Moura + financeiro | Fluxo financeiro do estorno em Dmn |
-| P20 | Economia | Danilo Moura | Regras de negócio do módulo de estornos |
+| P20 | Economia | Danilo Moura | Pró-rata da matrícula no estorno (a metade "evento" foi respondida pela dec. 192) |
 | P21 | Economia | Danilo Moura / engenheiro | Estorno × mochila (correção do defeito) |
 | P22 | Economia | Danilo Moura | Matriz produto × moeda do catálogo |
 | P23 | Economia | Danilo Moura | Motor de vagas por moeda |
@@ -403,8 +405,8 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 3. **"Unificar as ATIVIDADES fixas com os eventos vivos nas Liberações?"** (dossiê F/M16) — Já decidido: dec. 80/180 mandam Liberações/Relatórios lerem dados vivos sincronizados; as `ATIVIDADES` fixas são semente de demonstração que não existirá no sistema real.
 4. **"Os 3 cards fixos de 'Curso online' passam a nascer do cadastro?"** (dossiê D/M8) — Sim: dec. 95/118 fazem de "Cadastrar produto ou serviço" a porta única de entrada do digital; os cards fixos são semente da demo.
 5. **Q1 — "O mascote é QUAD em tudo?"** (auditoria) — Respondida pela dec. 17: o mascote é QUAD; os resíduos "Danilo" (card interno, assets) são correção pendente, não dúvida de produto. *Discordância registrada: a auditoria/10 mantém Q1 [ABERTA]; este pacote a considera respondida pela dec. 17, restando a tarefa de renomeação de assets (nota abaixo, Q2).*
-6. **"Versionar as suítes Playwright"** (parte da Q13) — Executado: dec. 190 versionou as 56 suítes em `tests/` com `verify.py` como portão de aceite oficial.
-7. **"Drop aleatório/itens raros entram na V2?"** (dossiê F/M17) — Coberto pela dec. 184: sem especificação = "Módulo Planejado" (junto de Quests/forja) — nada a construir até o gestor especificar.
+6. **"Versionar as suítes Playwright"** (parte da Q13) — Executado: dec. 190 versionou as suítes em `tests/` (56 na época; **57 desde a dec. 194, com a nova `vv1.mjs`**) com `verify.py` como portão de aceite oficial.
+7. **"Drop aleatório/itens raros entram na V2?"** (dossiê F/M17) — **RESPONDIDA pela dec. 194 (02/08)**: não é V2 nem "Módulo Planejado" — o drop foi **implementado na V0**. Cada item de combate tem disponibilidade (só venda / só drop / venda + drop) e chance de 1% a 100%; o sorteio roda ao concluir bloco de 10, treinamento rápido ou simulado digital, nunca no tutorial; o item cai na mochila sem custo e sem estorno, com celebração dedicada. Restam pendentes apenas o **balanceamento das chances** (parte do estudo econômico, P14/dec. 185) e a relação do drop com as Quests/forja, ainda EM BREVE.
 8. **"Qual provedor de push e quais eventos disparam?"** (dossiê F/M17) — Coberto pelas dec. 182/184: notificações seguem sistema externo com integração "a definir" — entra no catálogo de integrações (P57), não como pergunta própria.
 9. **"Biometria segue no escopo?"** (dossiê F/M17) — Coberto pelas dec. 188/184: o fluxo de autorização de dispositivo foi removido e biometria só existe em texto histórico — fora do escopo até nova decisão do gestor.
 
@@ -412,4 +414,4 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 
 ---
 
-*Documento gerado em 02/08/2026 a partir do handoff de investigação. Nenhuma pergunta dos dossiês foi apagada: cada uma está aqui (P1–P58, com deduplicação indicada), no rodapé de descartadas com a resposta, ou na nota de itens fora do filtro.*
+*Documento gerado em 02/08/2026 a partir do handoff de investigação; revisado em 03/08/2026 contra as dec. 192–194. Nenhuma pergunta dos dossiês foi apagada: cada uma está aqui (P1–P58, com deduplicação indicada), no rodapé de descartadas com a resposta, ou na nota de itens fora do filtro.*
