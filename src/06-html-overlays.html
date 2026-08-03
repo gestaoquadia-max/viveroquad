@@ -253,11 +253,20 @@
               <input id="admEmail" type="email" placeholder="voce@quadconcursos.com.br" autocomplete="off">
             </div>
             <div class="login-field" style="width:100%">
+              <label for="admPerfil">Perfil de acesso</label>
+              <select class="fld" id="admPerfil" style="width:100%">
+                <option value="direcao">Direção</option>
+                <option value="coordenacao">Coordenação pedagógica</option>
+                <option value="recepcao">Recepção</option>
+                <option value="financeiro">Financeiro</option>
+              </select>
+            </div>
+            <div class="login-field" style="width:100%">
               <label for="admChave">Chave de liberação</label>
               <input id="admChave" placeholder="NPP-____" autocomplete="off">
             </div>
             <button class="btn" id="btnAdmEntrar" style="width:100%">Liberar acesso</button>
-            <p class="login-note">demo: chave NPP-2026 · no sistema real o cadastro de administrador é aprovado pela direção</p>
+            <p class="login-note">demo: chave NPP-2026 · cada perfil enxerga o que a sua responsabilidade exige (DA-08); no sistema real a chave é emitida por pessoa e toda ação registra o autor</p>
           </div>
         </div>
 

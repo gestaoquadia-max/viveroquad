@@ -147,6 +147,8 @@
   function renderMinhasTurmas() {
     var el = $('minhasTurmasList'); if (!el) return;
     var ats = (typeof matriculasAtivas === 'function') ? matriculasAtivas() : [];
+    /* DA-06: turma encerrada NÃO some — passa a arquivada, com histórico */
+    var arq = (typeof matriculasArquivadas === 'function') ? matriculasArquivadas() : [];
     var ativa = (typeof turmaAtiva === 'function' && turmaAtiva()) ? turmaAtivaId : null;
     el.innerHTML = ats.map(function (m) {
       var t = (typeof turmaDe === 'function') ? turmaDe(m.turmaId) : null;
@@ -158,7 +160,17 @@
         '<div class="grow"><div class="t">' + nome + '</div><div class="d">' + det + '<br>' + per + '</div></div>' +
         (eh ? '<span class="tag ok">EM USO</span>'
             : '<button class="tu-troca" data-usar="' + m.turmaId + '">Usar esta</button>') + '</div>';
+    }).join('') + arq.map(function (m) {
+      var t = (typeof turmaDe === 'function') ? turmaDe(m.turmaId) : null;
+      var nome = t ? t.nome : ('Turma ' + m.tipo);
+      var det = [(t && (t.focoNome || nomeConcurso(t.concurso))) || '', m.turno].filter(Boolean).join(' · ');
+      var fim = m.fim ? dataBRcompleta(m.fim) : '—';
+      return '<div class="mission-row" style="opacity:.72"><div class="m-dot">◌</div>' +
+        '<div class="grow"><div class="t">' + nome + '</div>' +
+        '<div class="d">' + det + '<br>curso encerrado em ' + fim + ' · histórico preservado</div></div>' +
+        '<span class="tag">ARQUIVADA</span></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma matrícula ativa — abra a Quad Store para entrar numa turma.</p>';
+    if (arq.length) el.innerHTML += '<p class="sub" style="margin-top:8px">Turmas encerradas ficam <strong>arquivadas</strong>: o histórico de desempenho, compras e materiais continua disponível para consulta (DA-06).</p>';
     el.querySelectorAll('[data-usar]').forEach(function (b) {
       b.addEventListener('click', function () { definirTurmaAtiva(b.dataset.usar); });
     });

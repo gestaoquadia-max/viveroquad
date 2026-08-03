@@ -1,5 +1,42 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 03/08/2026 — Decisões Administrativas DA-01 a DA-10 e sua implementação
+
+O gestor respondeu as perguntas que a auditoria apontou como bloqueadoras da
+modelagem do banco e do back-end. As decisões estão em
+`docs/arquitetura/02-decisoes-administrativas.md` (DA-01 a DA-10) e o que
+tinha efeito demonstrável foi implementado no protótipo.
+
+- **Extrato da carteira (DA-03 · ledger)**: bloco novo na Quad Store onde
+  cada movimento de Quad Coins e Diamantes aparece como **lançamento** —
+  tipo da operação, origem/destino, data e hora, **autor** e o **saldo
+  resultante**. Nenhuma moeda entra ou sai sem registro: saldo de abertura,
+  gift card (autor: recepção), compras (autor: o aluno), crédito manual
+  (autor: o perfil administrativo) e estornos. Filtros por moeda.
+- **Identidade por ID (DA-01/DA-04)**: aluno e lançamentos passam a ter
+  **ID interno imutável** (`AL-00001`, `MV-00007`); o nome deixa de ser
+  chave. Nome de guerra pode repetir — quem desempata é o ID.
+- **Turma arquivada (DA-06)**: a turma encerrada **não some mais** do
+  perfil — aparece como **ARQUIVADA**, com a data de encerramento e o aviso
+  de que o histórico fica preservado. A demonstração já nasce com uma turma
+  concluída para mostrar o comportamento.
+- **Perfis administrativos (DA-08)**: o portão do N.P.P. passa a pedir o
+  **perfil de acesso** — Direção, Coordenação pedagógica, Recepção ou
+  Financeiro. Cada perfil enxerga apenas as abas da sua responsabilidade
+  (Recepção vê Interno e Liberações; Direção vê tudo), o painel mostra quem
+  está operando e o crédito manual entra no ledger **assinado pelo perfil**.
+- **Persistência da evolução (DA-10)**: moedas, mochila, carreira/patente,
+  avatar, nome de guerra, turma ativa, guarda-roupa, ajuste do Domínio e o
+  extrato **sobrevivem ao recarregar**. O que é catálogo da instituição
+  (turmas, itens, eventos) continua vindo dos dados demonstrativos. O botão
+  "Resetar demonstração" passou a limpar tudo — o que **corrige o defeito
+  conhecido** de a Introdução no Quad sobreviver ao reset.
+- **DA-02 (identidade das questões)** e **DA-05 (simulados do sistema)** são
+  decisões estruturais para a aplicação real, sem efeito visível no
+  protótipo — ficam registradas para a construção.
+- Suíte nova `vw1` (23 checagens) cobrindo ledger, IDs, arquivamento,
+  perfis e persistência.
+
 ## 02/08/2026 — Status do evento no calendário, boina sem estorno e o DROP de itens
 
 - **CONCLUÍDO e FALTOSO no calendário** (item 1): o evento inscrito não

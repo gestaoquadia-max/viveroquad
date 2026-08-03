@@ -208,7 +208,7 @@
             <p class="sub">Score de carreira <strong id="qCarreira">620</strong> · temporada <strong id="qTemporada">310</strong> · Quad Coins <strong id="scorePerfil">1.240</strong> · posição <strong id="qPos">#12</strong> da turma · presença 9/10.</p>
           </div>
           <div class="p-card">
-            <div class="k-label">Minhas turmas · matrículas ativas</div>
+            <div class="k-label">Minhas turmas · ativas e arquivadas</div>
             <div id="minhasTurmasList"></div>
             <p class="sub" style="margin-top:8px">Toda matrícula paga aparece aqui com horário e período. A turma marcada <strong>EM USO</strong> é a que comanda o Início, os avisos, o Domínio, o quiz e o ranking da sala — toque em <strong>“Usar esta”</strong> na outra para trocar, sem sair da conta.</p>
             <div class="priv-box" id="privBox">
@@ -351,6 +351,18 @@
             <div class="loja-sec" style="margin-top:14px">Itens de combate · vão para a mochila</div>
             <div class="loja-grid"><span id="combatGrid" style="display:contents"></span></div>
             <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
+          </div>
+
+          <!-- ================= EXTRATO DA CARTEIRA (ledger · DA-03) ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>Extrato da carteira</div>
+            <div class="rc-tabs" id="extTabs">
+              <button class="rc-tab on" data-ext="tudo">Tudo</button>
+              <button class="rc-tab" data-ext="qdc">Quad Coins</button>
+              <button class="rc-tab" data-ext="dmn">Diamantes</button>
+            </div>
+            <div id="extList"></div>
+            <p class="sub" style="margin-top:8px">Cada linha é um <strong>lançamento</strong>: nenhuma moeda entra ou sai sem a operação que a originou, com data, autor e o <strong>saldo resultante</strong>. É o mesmo princípio que vale para a plataforma real (DA-03).</p>
           </div>
 
           <!-- ================= ESTORNOS · ATÉ 7 DIAS ================= -->

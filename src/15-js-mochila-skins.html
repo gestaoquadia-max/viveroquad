@@ -55,6 +55,7 @@
       return (it.disp === 'drop' || it.disp === 'ambos') && ch > 0 && rng() * 100 < ch;
     });
     ganhos.forEach(function (it) { MOCHILA.push(it.id); });
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
     if (ganhos.length) {
       if (typeof renderMochila === 'function') renderMochila();
       if (typeof renderLojaCombate === 'function') renderLojaCombate();
@@ -93,7 +94,9 @@
     confirmarCompra({ nome: it.nome, desc: it.desc + ' · vai para a mochila' + (jaTem ? ' (você já tem ' + jaTem + ')' : ''),
       preco: it.preco, moeda: 'qdc', ico: itemIcoHtml(it) }, function () {
       if (score < it.preco) { toast('Quad Coins insuficientes para este item.'); return; }
-      addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
+      ledgerOp({ tipo: 'compra · ' + it.nome, destino: 'Quad Store', autor: nomeCurto() }, function () {
+        addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
+      });
       MOCHILA.push(id);
       if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
       renderLojaCombate();

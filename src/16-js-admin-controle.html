@@ -4,14 +4,45 @@
      · avisos gerais · cronograma · eventos · liberações · alunos · Loja
      ================================================================== */
   var admLiberado = false;
+  /* ---------- DA-08: perfis administrativos ----------
+     A área não é de UM administrador: cada perfil responde por uma parte da
+     operação. No protótipo o perfil escolhido no portão define o que fica
+     visível e assina as ações no ledger (DA-03). A modelagem fina das
+     permissões é da fase de especificação — aqui demonstramos o princípio. */
+  var ADM_PERFIS = {
+    direcao:     { nome: 'Direção', abas: ['v-adm-controle', 'v-adm-hoje', 'v-adm-alunos', 'v-adm-liber', 'v-adm-loja'] },
+    coordenacao: { nome: 'Coordenação pedagógica', abas: ['v-adm-controle', 'v-adm-hoje', 'v-adm-alunos'] },
+    recepcao:    { nome: 'Recepção', abas: ['v-adm-liber', 'v-adm-hoje'] },
+    financeiro:  { nome: 'Financeiro', abas: ['v-adm-alunos', 'v-adm-loja', 'v-adm-liber'] }
+  };
+  var admPerfil = 'direcao';
+  function admPerfilNome() { return (ADM_PERFIS[admPerfil] || ADM_PERFIS.direcao).nome; }
+  function admPodeVer(view) { return (ADM_PERFIS[admPerfil] || ADM_PERFIS.direcao).abas.indexOf(view) >= 0; }
+  function admAplicarPerfil() {
+    var nav = $('navAdmin'); if (!nav) return;
+    var visiveis = [];
+    nav.querySelectorAll('.nav-btn[data-view]').forEach(function (bt) {
+      var pode = admPodeVer(bt.dataset.view);
+      bt.style.display = pode ? '' : 'none';
+      if (pode) visiveis.push(bt);
+    });
+    var chip = $('admPerfilChip');
+    if (chip) chip.textContent = admPerfilNome();
+    /* se a aba aberta não pertence ao perfil, vai para a primeira permitida */
+    var atual = document.querySelector('#navAdmin .nav-btn.active');
+    if ((!atual || atual.style.display === 'none') && visiveis[0]) visiveis[0].click();
+  }
+  window.__admPerfil = function (p) { if (p) { admPerfil = p; admAplicarPerfil(); } return admPerfil; };   /* para a suíte */
   $('btnAdmEntrar').addEventListener('click', function () {
     var em = $('admEmail').value.trim(), ch = $('admChave').value.trim().toUpperCase();
     if (!em || em.indexOf('@') < 0) { toast('Informe seu e-mail funcional.'); return; }
     // [INTEGRAÇÃO REAL] a chave é emitida e revogada pela direção, por pessoa
     if (ch !== 'NPP-2026') { toast('Chave inválida — solicite a liberação à direção.'); return; }
     admLiberado = true;
+    if ($('admPerfil')) admPerfil = $('admPerfil').value || 'direcao';
+    admAplicarPerfil();
     $('admGate').classList.remove('on');
-    toast('Acesso do administrador liberado — bom serviço!');
+    toast('Acesso liberado · perfil ' + admPerfilNome() + ' — bom serviço!');
   });
 
   /* ==================================================================
@@ -83,8 +114,12 @@
     if (!c) return;
     if (!valor || valor < 1) { toast('Informe o valor do crédito.'); return; }
     if (!c.seed) {   /* conta desta demo: cai na carteira na hora */
-      if (moeda === 'dmn') addDiamante(valor, '+' + fmt(valor) + ' Diamantes creditados pela administração');
-      else addScore(valor, '+' + fmt(valor) + ' Quad Coins creditados pela administração');
+      /* DA-03/DA-08: crédito manual registra o motivo e QUEM creditou */
+      ledgerOp({ tipo: 'crédito manual' + (motivo ? ' · ' + motivo : ''), origem: 'administração',
+                 autor: (typeof admPerfilNome === 'function') ? admPerfilNome() : 'administração' }, function () {
+        if (moeda === 'dmn') addDiamante(valor, '+' + fmt(valor) + ' Diamantes creditados pela administração');
+        else addScore(valor, '+' + fmt(valor) + ' Quad Coins creditados pela administração');
+      });
     } else {
       toast('+' + fmt(valor) + ' ' + moedaTxt(moeda) + ' creditados para ' + contaNome(c) + '.');
     }

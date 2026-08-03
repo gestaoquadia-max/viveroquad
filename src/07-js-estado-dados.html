@@ -78,8 +78,45 @@
     if (typeof queueSync === 'function') queueSync(); // estado mudou → replica nos clones do loop
   }
 
+  /* ---------- DA-01: identidade por ID interno imutável ----------
+     O ID é gerado na criação do registro e nunca muda; o nome é atributo,
+     nunca chave de relacionamento. DA-04: nomes de guerra podem repetir —
+     quem desempata é o ID.                                              */
+  function novoId(prefixo) { idSeq += 1; return prefixo + '-' + String(idSeq).padStart(5, '0'); }
+  var idSeq = 0;
+  var MEU_ID = 'AL-00001';   /* aluno da demonstração */
+
+  /* ---------- DA-03: ledger — o saldo é consequência, não campo ----------
+     Nenhuma alteração de saldo ocorre sem o lançamento que a originou.
+     Cada movimento guarda origem, destino, tipo, data/hora, autor, valor e
+     o saldo resultante. Vale para Quad Coins, Diamantes e Score.        */
+  var LEDGER = [];
+  var ledgerCtx = null;   /* {tipo, origem, destino, autor} da operação em curso */
+  function ledgerLancar(moeda, valor, saldo) {
+    var c = ledgerCtx || {};
+    LEDGER.unshift({
+      id: novoId('MV'), moeda: moeda, valor: valor, saldo: saldo,
+      tipo: c.tipo || (valor >= 0 ? 'crédito' : 'débito'),
+      origem: c.origem || (valor >= 0 ? 'sistema' : nomeCurto()),
+      destino: c.destino || (valor >= 0 ? nomeCurto() : 'Quad Store'),
+      autor: c.autor || 'sistema', quando: new Date(), ts: Date.now()
+    });
+    if (typeof renderExtrato === 'function') renderExtrato();
+  }
+  /* toda operação declara o seu contexto: ledgerOp({...}, function(){...}) */
+  function ledgerOp(ctx, fn) {
+    var antes = ledgerCtx; ledgerCtx = ctx;
+    try { return fn(); } finally { ledgerCtx = antes; }
+  }
+  window.__ledger = function () { return LEDGER; };   /* para a suíte de testes */
+  window.__ids = function () { return { aluno: (typeof DB_ALUNO !== 'undefined') ? DB_ALUNO.id : MEU_ID, seq: idSeq }; };
+  window.__carteira = function () { return { score: score, diamantes: diamantes, mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA.length : 0 }; };
+
+  var evolAtivo = false;   /* liga depois do boot (DA-10) */
   function addScore(n, msg) {
     score += n;
+    if (n !== 0) ledgerLancar('qdc', n, score);
+    if (evolAtivo && typeof evolMarcar === 'function') evolMarcar();
     $('scoreVal').textContent = fmt(score);
     $('scorePerfil').textContent = fmt(score);
     var ls = $('lojaSaldo'); if (ls) ls.textContent = fmt(score);
@@ -97,6 +134,8 @@
   var diamantes = 150;   // recarga vinda do checkout do site (demo)
   function addDiamante(n, msg) {
     diamantes += n;
+    if (n !== 0) ledgerLancar('dmn', n, diamantes);
+    if (evolAtivo && typeof evolMarcar === 'function') evolMarcar();
     var el = $('dmnVal'); if (el) el.textContent = fmt(diamantes);
     var ls = $('lojaSaldoDmn'); if (ls) ls.textContent = fmt(diamantes);
     if (msg) toast(msg);
@@ -120,15 +159,19 @@
     if (hit) {
       if (hit.g.usado) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
       hit.g.usado = true;   /* invalida o QR na mesma hora */
-      if (hit.lote.moeda === 'dmn') addDiamante(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Diamantes!');
-      else addScore(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Quad Coins!');
+      ledgerOp({ tipo: 'gift card · ' + c, origem: 'gift card presencial', autor: 'recepção' }, function () {
+        if (hit.lote.moeda === 'dmn') addDiamante(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Diamantes!');
+        else addScore(hit.lote.valor, 'Gift card validado — +' + fmt(hit.lote.valor) + ' Quad Coins!');
+      });
       if (typeof renderGiftLotes === 'function') renderGiftLotes();
       return true;
     }
     if (!GIFT_CARDS[c]) { toast('Gift card inválido — confira o código.'); return false; }
     if (giftUsados[c]) { toast('Este gift card já foi resgatado (liberação única).'); return false; }
     giftUsados[c] = true;
-    addDiamante(GIFT_CARDS[c], 'Gift card resgatado — +' + GIFT_CARDS[c] + ' Diamantes!');
+    ledgerOp({ tipo: 'gift card · ' + c, origem: 'gift card presencial', autor: 'recepção' }, function () {
+      addDiamante(GIFT_CARDS[c], 'Gift card resgatado — +' + GIFT_CARDS[c] + ' Diamantes!');
+    });
     return true;
   }
 
@@ -161,9 +204,15 @@
   sincProfessores();
   __SEED_TURMAS_LOJA__
   /* o aluno da demo veio do site já matriculado na PATAMO Noite (CFO) */
-  var MATRICULAS = [{ turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' }];
+  var MATRICULAS = [
+    { turmaId: 'patamo-n', rot: 'PATAMO NOITE', tipo: 'PATAMO', turno: 'noite', concurso: 'cfo', fim: '2026-12-15' },
+    /* turma já concluída: fica ARQUIVADA no perfil, com histórico (DA-06) */
+    { turmaId: 'rondesp-m', rot: 'RONDESP MANHÃ', tipo: 'RONDESP', turno: 'manhã', concurso: 'sdba', fim: '2026-06-30', arquivada: true }
+  ];
   function turmaDe(id) { return TURMAS_LOJA.filter(function (t) { return t.id === id; })[0]; }
   function matriculasAtivas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return !m.fim || m.fim >= h; }); }
+  /* DA-06: a matrícula encerrada não é apagada — fica arquivada e consultável */
+  function matriculasArquivadas() { var h = hojeISO(); return MATRICULAS.filter(function (m) { return m.fim && m.fim < h; }); }
   /* ---------- turma ATIVA: por qual matrícula o app fala ----------
      O aluno pode ter mais de uma turma. Uma delas comanda a tela —
      Aula de hoje, avisos, ranking da sala, Domínio e quiz — e ele troca
@@ -256,7 +305,7 @@
 
   /* dados que chegam do banco de dados geral (o aluno se cadastrou no site).
      [INTEGRAÇÃO REAL] preenchidos a partir da matrícula ativa do aluno. */
-  var DB_ALUNO = { nome: 'Danilo de Almeida Moura', fone: '(71) 9 8877-2301' };
+  var DB_ALUNO = { id: MEU_ID, nome: 'Danilo de Almeida Moura', fone: '(71) 9 8877-2301' };
 
   /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
   var LOOP_VIEWS = ['v-inicio']; // rolagem infinita apenas no Início

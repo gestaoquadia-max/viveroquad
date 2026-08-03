@@ -133,6 +133,47 @@
     });
   }
   window.__estRefresh = renderEstornos;   /* para a suíte de testes */
+
+  /* ---------- extrato da carteira (DA-03: ledger) ---------- */
+  var extFiltro = 'tudo';
+  function extQuando(d) {
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' · ' + p(d.getHours()) + 'h' + p(d.getMinutes());
+  }
+  function renderExtrato() {
+    var el = $('extList'); if (!el) return;
+    var linhas = LEDGER.filter(function (m) { return extFiltro === 'tudo' || m.moeda === extFiltro; });
+    el.innerHTML = linhas.slice(0, 40).map(function (m) {
+      var pos = m.valor > 0;
+      var mo = m.moeda === 'dmn' ? 'Dmn' : 'QdC';
+      return '<div class="mission-row"><div class="grow">' +
+        '<div class="t">' + m.tipo + (pos ? ' · de ' + m.origem : ' · para ' + m.destino) + '</div>' +
+        '<div class="d">' + extQuando(m.quando) + ' · autor: ' + m.autor + ' · saldo depois: <strong>' + fmt(m.saldo) + ' ' + mo + '</strong></div></div>' +
+        '<span class="tag' + (pos ? ' ok' : '') + '">' + (pos ? '+' : '') + fmt(m.valor) + ' ' + mo + '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma movimentação registrada ainda.</p>';
+  }
+  (function () {
+    var tabs = $('extTabs'); if (!tabs) return;
+    tabs.querySelectorAll('[data-ext]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        extFiltro = bt.dataset.ext;
+        tabs.querySelectorAll('.rc-tab').forEach(function (x) { x.classList.remove('on'); });
+        bt.classList.add('on');
+        renderExtrato();
+      });
+    });
+  })();
+  /* saldo de abertura: o que o aluno já tinha ao entrar na demonstração */
+  (function () {
+    if (typeof LEDGER === 'undefined' || LEDGER.length) return;
+    ledgerOp({ tipo: 'saldo de abertura', origem: 'Quad Concursos', autor: 'sistema' }, function () {
+      LEDGER.push({ id: 'MV-00000', moeda: 'qdc', valor: score, saldo: score, tipo: 'saldo de abertura',
+        origem: 'Quad Concursos', destino: nomeCurto(), autor: 'sistema', quando: new Date(), ts: Date.now() });
+      LEDGER.push({ id: 'MV-00001', moeda: 'dmn', valor: diamantes, saldo: diamantes, tipo: 'saldo de abertura',
+        origem: 'recarga do site', destino: nomeCurto(), autor: 'sistema', quando: new Date(), ts: Date.now() });
+    });
+    renderExtrato();
+  })();
   /* estornar NÃO é só devolver a moeda: o que foi comprado volta para a Loja
      e sai da posse do aluno — cada tipo de compra desfaz do seu jeito.      */
   function desfazerCompra(cp, mo) {
@@ -231,8 +272,10 @@
     var cp = COMPRAS[i]; if (!cp || cp.estornado || estornoDias(cp) <= 0) return;
     cp.estornado = true;
     var mo = cp.moeda || 'qdc';
-    if (mo === 'dmn') addDiamante(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Diamantes de volta.');
-    else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
+    ledgerOp({ tipo: 'estorno · ' + cp.item, origem: 'Quad Store', autor: nomeCurto() }, function () {
+      if (mo === 'dmn') addDiamante(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Diamantes de volta.');
+      else addScore(cp.valor, 'Estorno confirmado — +' + fmt(cp.valor) + ' Quad Coins de volta.');
+    });
     desfazerCompra(cp, mo);
     ESTORNOS.push({ aluno: cp.aluno, item: cp.item, valor: cp.valor, moeda: mo, quando: 'agora' });
     renderEstornos(); renderCompras(); renderRelCompras();

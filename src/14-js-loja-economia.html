@@ -3,7 +3,12 @@
   /* ---------- moedas da Loja: Quad Coin (esforço) e Diamante (dinheiro) ---------- */
   function moedaTxt(m) { return m === 'dmn' ? 'Dmn' : 'QdC'; }
   function saldoDe(m) { return m === 'dmn' ? diamantes : score; }
-  function debitar(m, valor, msg) { if (m === 'dmn') addDiamante(-valor, msg); else addScore(-valor, msg); }
+  function debitar(m, valor, msg, oque) {
+    /* DA-03: o débito nasce com a operação que o originou */
+    ledgerOp({ tipo: 'compra' + (oque ? ' · ' + oque : ''), destino: 'Quad Store', autor: nomeCurto() }, function () {
+      if (m === 'dmn') addDiamante(-valor, msg); else addScore(-valor, msg);
+    });
+  }
   function semSaldoMsg(m) {
     return m === 'dmn' ? 'Diamantes insuficientes — recarregue no site do Quad ou resgate um gift card.'
                        : 'Quad Coins insuficientes — complete missões para ganhar mais.';
@@ -26,7 +31,7 @@
         it.querySelector('.li-preco').textContent = 'ADQUIRIDO';
         lojaOwned[nome] = true;
         if (typeof refreshChips === 'function') refreshChips();
-        debitar(moeda, preco, nome + ' adquirido · −' + preco + ' ' + moedaTxt(moeda));
+        debitar(moeda, preco, nome + ' adquirido · −' + preco + ' ' + moedaTxt(moeda), nome);
         lojaCompraLog(nome, preco, moeda, 'item', nome);             /* governança da Loja */
         /* estoque (vagas): decrementa; esgotou → o item desaparece do sistema */
         if (it.dataset.estoque) {
@@ -105,7 +110,7 @@
     if (chq) { toast('Você já tem “' + chq + '” nesse horário — matrícula em turma não pode se sobrepor.'); return; }
     var preco = moeda === 'dmn' ? t.precoDmn : t.precoQdc;
     if (saldoDe(moeda) < preco) { toast(semSaldoMsg(moeda)); return; }
-    debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda));
+    debitar(moeda, preco, t.nome + ' · matrícula −' + fmt(preco) + ' ' + moedaTxt(moeda), t.nome + ' · matrícula');
     if (moeda === 'dmn') t.vagasDmn--; else t.vagasQdc--;
     var primeira = matriculasAtivas().length === 0;
     MATRICULAS.push({ turmaId: t.id, rot: t.tipo.toUpperCase() + ' ' + t.turno.toUpperCase(), tipo: t.tipo, turno: t.turno, concurso: t.concurso, fim: t.fim });
@@ -588,7 +593,7 @@
     var total = compraQtd * p.preco;
     if (compraQtd > p.estoque) { toast('Estoque insuficiente.'); return; }
     if (saldoDe(mo) < total) { toast(semSaldoMsg(mo)); return; }
-    debitar(mo, total, compraQtd + '× ' + p.nome + ' · −' + fmt(total) + ' ' + moedaTxt(mo));
+    debitar(mo, total, compraQtd + '× ' + p.nome + ' · −' + fmt(total) + ' ' + moedaTxt(mo), compraQtd + '× ' + p.nome);
     p.estoque -= compraQtd;
     lojaCompraLog(p.nome + (compraQtd > 1 ? ' (×' + compraQtd + ')' : ''), total, mo, 'pres', p.id, { qtd: compraQtd });
     pedidoPresencial(p, compraQtd);

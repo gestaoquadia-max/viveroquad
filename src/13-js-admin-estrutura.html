@@ -801,7 +801,9 @@
   /* ---------- reset da demonstração (limpa as flags vq_* do navegador; atenção: hoje NÃO limpa vq_intro_done) ---------- */
   var btnReset = $('btnResetDemo');
   if (btnReset) btnReset.addEventListener('click', function () {
-    lsDel('vq_tut_skip');
+    /* limpa as flags do dispositivo E a evolução guardada (DA-10) —
+       inclui a Introdução no Quad, que antes sobrevivia ao reset      */
+    lsDel('vq_tut_skip'); lsDel('vq_intro_done'); lsDel('vq_evolucao');
     online = true;
     updatePending();
     sairConta();

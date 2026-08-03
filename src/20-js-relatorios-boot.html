@@ -198,9 +198,76 @@
   }
   setTimeout(daniloWave, 1200); // acena ao chegar; depois fica quieto
 
+  /* ==================================================================
+     DA-10 · PERSISTÊNCIA DA EVOLUÇÃO DO ALUNO
+     Tudo que representa evolução — score, moedas, mochila, identidade,
+     turma ativa, guarda-roupa, ajuste do Domínio e o extrato — sobrevive
+     ao recarregar. No protótipo o meio é o localStorage; na plataforma
+     real será o banco. Catálogo (turmas, itens, eventos) NÃO entra: é
+     dado da instituição, não do aluno.                                 */
+  var VQ_EVOL = 'vq_evolucao';
+  var evolTimer = null;
+  function evolSalvar() {
+    try {
+      lsSet(VQ_EVOL, JSON.stringify({
+        v: 1, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
+        carreira: carreira,
+        mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA : [],
+        avatarIdx: (typeof avatarIdx !== 'undefined') ? avatarIdx : 0,
+        guerra: $('nomeGuerra') ? $('nomeGuerra').value : '',
+        turmaAtivaId: (typeof turmaAtivaId !== 'undefined') ? turmaAtivaId : '',
+        lojaOwned: (typeof lojaOwned !== 'undefined') ? lojaOwned : {},
+        trAj: (typeof trAj !== 'undefined') ? trAj : {},
+        ledger: (typeof LEDGER !== 'undefined') ? LEDGER.slice(0, 60) : []
+      }));
+    } catch (e) {}
+  }
+  function evolMarcar() { clearTimeout(evolTimer); evolTimer = setTimeout(evolSalvar, 400); }
+  function evolCarregar() {
+    var raw = lsGet(VQ_EVOL); if (!raw) return false;
+    var d; try { d = JSON.parse(raw); } catch (e) { return false; }
+    if (!d || d.v !== 1) return false;
+    if (typeof d.score === 'number') score = d.score;
+    if (typeof d.diamantes === 'number') diamantes = d.diamantes;
+    if (d.carreira) for (var k in d.carreira) if (d.carreira.hasOwnProperty(k)) carreira[k] = d.carreira[k];
+    if (d.mochila && typeof MOCHILA !== 'undefined') { MOCHILA.length = 0; d.mochila.forEach(function (x) { MOCHILA.push(x); }); }
+    if (d.lojaOwned && typeof lojaOwned !== 'undefined') for (var o in d.lojaOwned) if (d.lojaOwned.hasOwnProperty(o)) lojaOwned[o] = d.lojaOwned[o];
+    if (d.trAj && typeof trAj !== 'undefined') for (var a in d.trAj) if (d.trAj.hasOwnProperty(a)) trAj[a] = d.trAj[a];
+    if (d.ledger && typeof LEDGER !== 'undefined' && d.ledger.length) {
+      LEDGER.length = 0;
+      d.ledger.forEach(function (m) { m.quando = new Date(m.ts || Date.now()); LEDGER.push(m); });
+    }
+    if (typeof d.avatarIdx === 'number' && typeof avatarIdx !== 'undefined') avatarIdx = d.avatarIdx;
+    if (d.guerra && $('nomeGuerra')) $('nomeGuerra').value = d.guerra;
+    if (d.turmaAtivaId && typeof turmaAtivaId !== 'undefined') turmaAtivaId = d.turmaAtivaId;
+    return true;
+  }
+  window.__evolSalvar = evolSalvar;
+  window.__evolCarregar = evolCarregar;
+  window.__evolMarcar = evolMarcar;   /* para a suíte de testes */
+
   /* ---------- init do estado de acesso/conectividade ---------- */
   renderCarreira();
   applyConnUI();
   updatePending();
+
+  /* restaura a evolução de quem já usou o app neste dispositivo e passa a
+     salvar a cada mudança de saldo/mochila/identidade (DA-10)            */
+  (function () {
+    if (evolCarregar()) {
+      if (typeof aplicarAvatar === 'function') aplicarAvatar();
+      if (typeof renderCarreira === 'function') renderCarreira();
+      if (typeof renderMochila === 'function') renderMochila();
+      if (typeof renderExtrato === 'function') renderExtrato();
+      if (typeof definirTurmaAtiva === 'function') definirTurmaAtiva(turmaAtivaId, true);
+      $('scoreVal').textContent = fmt(score);
+      $('scorePerfil').textContent = fmt(score);
+      var ls = $('lojaSaldo'); if (ls) ls.textContent = fmt(score);
+      var ld = $('lojaSaldoDmn'); if (ld) ld.textContent = fmt(diamantes);
+      var dv = $('dmnVal'); if (dv) dv.textContent = fmt(diamantes);
+    }
+    evolAtivo = true;   /* a partir daqui, toda mudança é gravada */
+    evolSalvar();
+  })();
 })();
 </script>
