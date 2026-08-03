@@ -405,7 +405,8 @@
         opts.appendChild(b);
       });
     }
-    $('tutStepN').textContent = (i + 1) + ' / ' + TUT.length;
+    /* o aluno não vê "7 / 29": o tutorial é uma conversa, não um formulário
+       com barra de progresso (decisão do gestor, 03/08)                    */
     $('tutLayer').classList.toggle('livre', !st.expect);
     $('tutNext').style.display = st.expect ? 'none' : 'block';
     $('tutNext').textContent = st.btn || 'PRÓXIMO ›';

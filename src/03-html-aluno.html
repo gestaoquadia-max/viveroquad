@@ -353,18 +353,6 @@
             <p class="sub" style="margin-top:8px">Armas, broches e utilitários ficam guardados na sua <strong>mochila de combate</strong> — não vestem o personagem. Em breve: reúna itens em <strong>quests</strong> para forjar equipamentos novos.</p>
           </div>
 
-          <!-- ================= EXTRATO DA CARTEIRA (ledger · DA-03) ================= -->
-          <div class="p-card">
-            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>Extrato da carteira</div>
-            <div class="rc-tabs" id="extTabs">
-              <button class="rc-tab on" data-ext="tudo">Tudo</button>
-              <button class="rc-tab" data-ext="qdc">Quad Coins</button>
-              <button class="rc-tab" data-ext="dmn">Diamantes</button>
-            </div>
-            <div id="extList"></div>
-            <p class="sub" style="margin-top:8px">Cada linha é um <strong>lançamento</strong>: nenhuma moeda entra ou sai sem a operação que a originou, com data, autor e o <strong>saldo resultante</strong>. É o mesmo princípio que vale para a plataforma real (DA-03).</p>
-          </div>
-
           <!-- ================= ESTORNOS · ATÉ 7 DIAS ================= -->
           <div class="p-card">
             <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>Estornos · até 7 dias</div>
@@ -372,9 +360,9 @@
             <p class="sub" style="margin-top:8px">Compras feitas há até <strong>7 dias</strong> podem ser estornadas — as moedas voltam para a sua conta na hora e a administração é avisada. A contagem regressiva mostra o prazo de cada item.</p>
           </div>
 
-          <!-- ================= RELATÓRIO DE COMPRAS ================= -->
+          <!-- ============ CARTEIRA: EXTRATO E COMPRAS (ledger · DA-03) ============ -->
           <div class="p-card" id="rcCard">
-            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M15 3v5h5"/><path d="M8 13h8M8 17h5"/></svg></span>Relatório de compras</div>
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>Carteira · extrato e compras</div>
             <div class="rc-tabs" id="rcTabs">
               <button class="rc-tab on" data-rc="7">Semanal</button>
               <button class="rc-tab" data-rc="30">Mensal</button>
@@ -382,14 +370,23 @@
               <button class="rc-tab" data-rc="180">Semestral</button>
             </div>
             <div class="rc-resumo" id="rcResumo"></div>
+            <div class="loja-sec" style="margin-top:14px">Movimentações do período</div>
+            <div class="rc-tabs" id="extTabs">
+              <button class="rc-tab on" data-ext="tudo">Tudo</button>
+              <button class="rc-tab" data-ext="qdc">Quad Coins</button>
+              <button class="rc-tab" data-ext="dmn">Diamantes</button>
+            </div>
+            <div id="extList"></div>
             <div class="loja-sec" style="margin-top:14px">Em andamento · turmas, isoladas e mentorias</div>
             <div id="rcAndamento"></div>
             <div class="loja-sec" style="margin-top:14px">Comprado · aguardando retirada ou realização</div>
             <div id="rcPendente"></div>
             <div class="loja-sec" style="margin-top:14px">Entregue e concluído</div>
             <div id="rcEntregue"></div>
-            <p class="sub" style="margin-top:10px">Tudo o que você comprou no período escolhido, com a <strong>situação de cada item</strong>: o que ainda espera retirada na recepção, o que já foi entregue e as <strong>turmas em andamento</strong> com a evolução do curso. Compras estornadas saem do relatório.</p>
+            <p class="sub" style="margin-top:10px">Um lugar só para o seu dinheiro: cada linha das <strong>movimentações</strong> é um lançamento — nada entra ou sai sem a operação que originou, com data, autor e o <strong>saldo resultante</strong> (DA-03). Abaixo, as compras do período com a <strong>situação de cada uma</strong>: o que espera retirada na recepção, o que já foi entregue e as turmas em andamento. Compras estornadas saem das listas de situação, mas o estorno continua registrado no extrato.</p>
           </div>
+
+
         </div>
 
         <!-- ============ ALUNO · PERFIL DO ALUNO ============ -->

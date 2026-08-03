@@ -67,10 +67,16 @@
       var sit = rcSituacao(cp);
       (sit.est === 'and' ? andamento : sit.est === 'pend' ? pend : ok).push({ cp: cp, sit: sit });
     });
+    /* entradas do período (o extrato conhece o que a lista de compras não vê:
+       recompensas, gift cards, créditos da administração e estornos)      */
+    var entrou = 0;
+    (typeof LEDGER !== 'undefined' ? LEDGER : []).forEach(function (m) {
+      if ((m.ts || 0) >= corte && m.valor > 0 && !/saldo de abertura/.test(m.tipo)) entrou += m.valor;
+    });
     host.innerHTML =
+      '<div class="rc-kpi"><b>' + fmt(entrou) + '</b><span>recebido</span></div>' +
+      '<div class="rc-kpi"><b>' + fmt(qdc + dmn) + '</b><span>gasto</span></div>' +
       '<div class="rc-kpi"><b>' + minhas.length + '</b><span>compras</span></div>' +
-      '<div class="rc-kpi"><b>' + fmt(qdc) + '</b><span>Quad Coins</span></div>' +
-      '<div class="rc-kpi"><b>' + fmt(dmn) + '</b><span>Diamantes</span></div>' +
       '<div class="rc-kpi"><b>' + pend.length + '</b><span>a receber</span></div>';
     $('rcAndamento').innerHTML = andamento.map(function (x) {
       return '<div class="rc-prog"><div class="rc-top"><span class="rc-nm">' + x.cp.item + '<small>' + x.sit.txt + '</small></span>' +
@@ -90,6 +96,7 @@
         tabs.querySelectorAll('.rc-tab').forEach(function (x) { x.classList.remove('on'); });
         bt.classList.add('on');
         renderRelCompras();
+        renderExtrato();   /* bloco único: o período vale para os dois lados */
       });
     });
   })();
@@ -142,7 +149,13 @@
   }
   function renderExtrato() {
     var el = $('extList'); if (!el) return;
-    var linhas = LEDGER.filter(function (m) { return extFiltro === 'tudo' || m.moeda === extFiltro; });
+    /* o extrato acompanha o mesmo período escolhido para as compras — é um
+       bloco só: dinheiro (lançamentos) em cima, situação do pedido embaixo */
+    var corte = Date.now() - rcPeriodo * DIA_MS;
+    var linhas = LEDGER.filter(function (m) {
+      if (extFiltro !== 'tudo' && m.moeda !== extFiltro) return false;
+      return (m.ts || 0) >= corte || /saldo de abertura/.test(m.tipo);
+    });
     el.innerHTML = linhas.slice(0, 40).map(function (m) {
       var pos = m.valor > 0;
       var mo = m.moeda === 'dmn' ? 'Dmn' : 'QdC';
@@ -150,7 +163,7 @@
         '<div class="t">' + m.tipo + (pos ? ' · de ' + m.origem : ' · para ' + m.destino) + '</div>' +
         '<div class="d">' + extQuando(m.quando) + ' · autor: ' + m.autor + ' · saldo depois: <strong>' + fmt(m.saldo) + ' ' + mo + '</strong></div></div>' +
         '<span class="tag' + (pos ? ' ok' : '') + '">' + (pos ? '+' : '') + fmt(m.valor) + ' ' + mo + '</span></div>';
-    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma movimentação registrada ainda.</p>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma movimentação no período escolhido.</p>';
   }
   (function () {
     var tabs = $('extTabs'); if (!tabs) return;
