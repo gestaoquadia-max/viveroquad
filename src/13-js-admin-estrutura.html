@@ -798,7 +798,10 @@
   });
   $('btnNovaQuestao').addEventListener('click', function () { toast('Cadastro: enunciado, alternativas, tag e campo de uso'); });
 
-  /* ---------- reset da demonstração (limpa as flags vq_* do navegador; atenção: hoje NÃO limpa vq_intro_done) ---------- */
+  /* ---------- reset da demonstração ----------
+     Limpa TODAS as chaves vq_* do navegador: o tutorial, a Introdução no
+     Quad e a evolução guardada (dec. 196) — a demo volta ao estado de
+     fábrica.                                                            */
   var btnReset = $('btnResetDemo');
   if (btnReset) btnReset.addEventListener('click', function () {
     /* limpa as flags do dispositivo E a evolução guardada (DA-10) —

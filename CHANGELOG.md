@@ -1,5 +1,23 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 03/08/2026 — Carteira unificada e tutorial sem contador de etapas
+
+- **Um bloco só para o dinheiro** (dec. 197): "Extrato da carteira" e
+  "Relatório de compras" mostravam o mesmo evento por ângulos diferentes —
+  o extrato acompanhava a moeda, o relatório acompanhava o pedido. Viraram
+  **"Carteira · extrato e compras"**, o último card da Quad Store: o
+  **período escolhido vale para os dois lados**, os indicadores passam a ser
+  **recebido · gasto · compras · a receber** (o "recebido" só o extrato sabe
+  calcular — inclui recompensas, gift cards, créditos e estornos), as
+  **movimentações** do ledger ficam em cima e a **situação de cada compra**
+  (em andamento · aguardando retirada · entregue) embaixo. Supera a dec. 119.
+- **O tutorial deixou de contar etapas**: o "7 / 29" saiu do balão do QUAD.
+  O aluno vive uma conversa com o mascote, não um formulário com barra de
+  progresso. (A marcação `.tut-etapa` continua no CSS porque a central de
+  tutoriais a usa para outro fim.)
+- Comentário do reset da demonstração corrigido no fonte: ele dizia que
+  `vq_intro_done` não era limpo, três linhas acima do código que limpa.
+
 ## 03/08/2026 — Decisões Administrativas DA-01 a DA-10 e sua implementação
 
 O gestor respondeu as perguntas que a auditoria apontou como bloqueadoras da
