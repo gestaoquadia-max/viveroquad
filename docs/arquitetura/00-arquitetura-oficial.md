@@ -231,6 +231,10 @@ ver [src/README.md](../../src/README.md)).
 - **Inventar regras econômicas** (seção 5) ou decisões de produto não tomadas.
 - **Descrever módulos planejados como implementados** em qualquer documento.
 - **Alterar o comportamento do protótipo** (inclusive o portão de cadastro no
-  site e o bug documentado do reset, que não limpa `vq_intro_done`).
+  site), salvo determinação expressa do gestor. *Atualização 03/08: as dec.
+  196 e 197 são determinações desse tipo — implementaram seis Decisões
+  Administrativas no protótipo (DA-01/03/04/06/08/10), **corrigiram o bug do
+  reset** (que não limpava `vq_intro_done` e hoje limpa as três chaves) e
+  unificaram a carteira do aluno.*
 - **Contradizer este documento** em documentos de hierarquia inferior sem nova
   consolidação formal do gestor.

@@ -36,7 +36,7 @@ viveroquad/
 │   └── README.md                   ← tabela das partes e regras de edição
 ├── data/                           ← dados demonstrativos (19 fragmentos __SEED_*__)
 │   └── README.md                   ← o que é cada conjunto e as relações entre eles
-├── tests/                          ← 57 suítes de regressão Playwright (rede de segurança)
+├── tests/                          ← 58 suítes de regressão Playwright (rede de segurança)
 │   ├── run.sh                      ← roda as suítes (./run.sh [suíte…])
 │   └── README.md                   ← requisitos e regras de manutenção
 ├── verify.py                       ← portão de verificação: build + regressão completa
@@ -73,7 +73,7 @@ Os arquivos do mascote chamam-se `danilo.*` por razão histórica — o guia do 
    20 partes, injeta os dados demonstrativos de `data/`, valida os tokens,
    embute as mídias como data URI e gera `index.html` (~9,4 MB) e
    `artifact.html` (versão para publicação).
-3. **Verificar**: `python3 verify.py` roda o build e as **57 suítes de
+3. **Verificar**: `python3 verify.py` roda o build e as **58 suítes de
    regressão** de `tests/` — nenhuma mudança é boa sem a regressão verde.
 4. **Publicar**: o Artefato no claude.ai deve ser republicado a **cada** alteração
    — regra inegociável do projeto. Detalhes no
@@ -98,6 +98,16 @@ Tudo abaixo é **demonstração — simulação 100% local no navegador**, sem s
   garimpo de Coins em eventos
 - **Loja**: compras com Quad Coins e Diamantes, gift cards, mochila e skins —
   as **regras econômicas seguem indefinidas** (registradas, não estudadas)
+- **Carteira do aluno**: o último bloco da Loja é o card **"Carteira · extrato e
+  compras"** — um só período (semanal/mensal/trimestral/semestral) comandando
+  os KPIs **recebido · gasto · compras · a receber**, o **extrato de
+  movimentações** (cada entrada e saída de moeda é um lançamento com tipo,
+  origem/destino, autor, data e **saldo resultante**) e a situação de cada
+  compra: em andamento, aguardando retirada e entregue. Estorno em até 7 dias
+  fica no bloco vizinho e continua registrado no extrato
+- **4 perfis administrativos**: o portão do N.P.P. pede o perfil — **Direção,
+  Coordenação pedagógica, Recepção e Financeiro** —, que define quais abas o
+  operador enxerga e **assina** o crédito manual de moedas no extrato do aluno
 - **Botão "+"**: Quadrômetro (a jornada do aluno em números), Calendário e
   Materiais das aulas; prévias bloqueadas (Chat ao vivo, Guarnições GvG/PvP,
   Pré-TAF)

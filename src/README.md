@@ -37,20 +37,20 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 04-html-professor | As 5 views do professor |
 | 05-html-admin | As 8 views do administrador N.P.P. |
 | 06-html-overlays | Overlays (prova, quizzes, compra, chat, portões, tutorial), artes vetoriais, 3 navbars |
-| 07-js-estado-dados | Abertura do `<script>`/IIFE, estado global, moedas, docentes, turmas, matrículas, concursos |
+| 07-js-estado-dados | Abertura do `<script>`/IIFE, estado global, moedas, docentes, turmas, matrículas, concursos; **ledger da carteira** (`LEDGER`, `ledgerLancar`, `ledgerOp` — DA-03), **IDs internos** (`MEU_ID`, `novoId()` — DA-01) e **`matriculasArquivadas()`** (DA-06), dec. 196 |
 | 08-js-eventos-cal-quiz | Eventos + página do evento, calendário do aluno, motor de quiz, aula de hoje |
 | 09-js-professor | Gate/login do professor, painel, relatórios, quiz ao vivo com polling |
 | 10-js-acesso-tutorial | Conectividade, acesso ao portal, tutorial do QUAD |
 | 11-js-missoes-treinamento | Treinamento rápido, blocos do dia por turma, simulados do aluno, avatares |
-| 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais |
-| 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo |
+| 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais, bloco **"Minhas turmas · ativas e arquivadas"** com a etiqueta ARQUIVADA (DA-06, dec. 196) |
+| 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo (**limpa as 3 chaves `vq_*`**: `vq_tut_skip`, `vq_intro_done` e `vq_evolucao` — dec. 196) |
 | 14-js-loja-economia | Loja: moedas, compras, catálogos, salas/lotações, overlay de compra, skins |
 | 15-js-mochila-skins | Mochila de combate, **sistema de DROP** (sorteio ao concluir bloco/treinamento/simulado digital e celebração `#dropLayer`, dec. 194) e cadeia de skins do personagem |
-| 16-js-admin-controle | Gate N.P.P., contas/créditos, mensagens por público, gift cards, cronograma, materiais |
+| 16-js-admin-controle | Gate N.P.P. com **`ADM_PERFIS`** — 4 perfis administrativos (`admPodeVer` filtra as abas, `admPerfilNome` assina as ações — DA-08, dec. 196) —, contas/créditos, mensagens por público, gift cards, cronograma, materiais |
 | 17-js-admin-liberacoes | Eventos do admin, pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
 | 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |
-| 19-js-compras-estornos | Relatório de compras e estornos de 7 dias (lado do aluno) |
-| 20-js-relatorios-boot | Relatórios com gráficos, cascata de inicialização, fechamento do IIFE |
+| 19-js-compras-estornos | **Carteira do aluno** (card único "Carteira · extrato e compras", dec. 197: `renderRelCompras` com os KPIs recebido/gasto/compras/a receber + `renderExtrato` do ledger, saldo de abertura `MV-00000`/`MV-00001`) e os **estornos** de 7 dias, que também lançam no extrato |
+| 20-js-relatorios-boot | Relatórios com gráficos, **persistência da evolução do aluno** (`evolSalvar`/`evolCarregar`/`evolMarcar`, chave `vq_evolucao`, debounce de 400 ms — DA-10, dec. 196), cascata de inicialização, fechamento do IIFE |
 
 > Referências antigas a "src.html l.N" (documentos da auditoria de
 > 30/07/2026) valem para o monolito original — a concatenação das partes

@@ -191,6 +191,8 @@ O localStorage do protótipo guarda só 8 flags `vq_*`, das quais **4 são total
 
 **Atualização (01/08/2026):** o descarte foi executado na Consolidação v1.0 — as chaves `vq_device_authorized`, `vq_last_sync`, `vq_pending`, `vq_tut_step`, `vq_tut_done` e `vq_tut_rew` foram removidas do fonte junto com o fluxo revogado de autorização de dispositivo, com regressão completa (56 suítes). **Restam vivas apenas `vq_tut_skip` e `vq_intro_done`.** O bug do reset (não limpa `vq_intro_done`) não foi corrigido — mudaria comportamento — e segue documentado. O veredito RECONSTRUIR para o offline real permanece.
 
+**Atualização (03/08/2026, dec. 196):** entrou a chave **`vq_evolucao`** (persistência da evolução do aluno — DA-10), elevando as chaves vivas a **3**, e o **bug do reset foi corrigido** (o handler limpa as três). Isso **não altera o veredito**: continuar baseando continuidade de conta em flag de dispositivo segue sendo o antipadrão a **RECONSTRUIR** — a persistência real é por conta, no servidor (DA-07).
+
 ---
 
 ## 4. Lista consolidada — DESCARTAR APÓS VALIDAÇÃO

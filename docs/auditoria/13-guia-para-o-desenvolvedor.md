@@ -32,7 +32,7 @@ Este guia é o ponto de partida para o desenvolvedor que nunca viu o "Viver o Qu
 
 O protótipo inteiro é **um único documento HTML** — desde 01/08/2026 versionado como **20 partes contíguas em `src/`** (`01-…` a `20-…`; a concatenação na ordem reproduz o monolito `src.html` da auditoria, ~11.900 linhas: ~1.570 de CSS, ~2.100 de HTML e o restante de JavaScript num único IIFE, sem módulos, sem framework, sem dependência de rede). O build (`build.py` ou `build.ps1`) concatena as partes sem acrescentar nem remover um byte, substitui 10 tokens (`__FONTS__`, `__DANILO_VIDEO__`, `__FOTOS_VARIANTES__` etc.) por data-URIs base64 das mídias e gera `index.html`/`artifact.html` (~9,4 MB cada), que rodam 100% offline em qualquer navegador. Dentro do documento convivem **três experiências** (aluno, professor, admin N.P.P.), trocadas por botões de persona, todas operando sobre o **mesmo estado em memória**: arrays e objetos JS (`TURMAS_LOJA`, `MATRICULAS`, `EVENTOS`, `SIMULADOS`, `DOCENTES`, `COMPRAS`, `QUIZZES`…). É isso que produz o efeito "tudo conectado em tempo real": o admin cria uma turma e ela aparece na Loja do aluno na hora — porque é a mesma variável, no mesmo navegador.
 
-O corolário é que **quase nada persiste e nada é autenticado**. Recarregar a página (F5) zera moedas, compras, matrículas, mensagens e carreira; a única persistência é o `localStorage` com **2 chaves vivas**: `vq_tut_skip` e `vq_intro_done` (as 6 chaves mortas que a auditoria listou no doc 06 foram **removidas do fonte** na limpeza de 01/08). O login do aluno aceita qualquer e-mail+senha, os gates de professor e admin são overlays em JS, gabaritos e "segredos" demo estão no cliente, e 31 hooks `window.__*` (para as suítes Playwright de desenvolvimento, **que não estão versionadas neste repositório** — a regressão de 56 suítes de 01/08 rodou fora do repo; *atualização 01/08, dec. 190: as suítes passaram a viver em `tests/` — hoje 57 suítes e 35 hooks*) permitem manipular qualquer estado pelo console. Isso é intencional e adequado para uma demonstração navegável (V0 "Prova de Vida"); nada disso é arquitetura para o produto. As mecânicas, porém, **funcionam de verdade dentro da sessão** (estorno desfaz posse, choque de agenda cruza agendas reais, vagas esgotam por moeda) — o protótipo é uma **especificação executável de regras de negócio**, não um esqueleto de sistema.
+O corolário é que **quase nada persiste e nada é autenticado**. Recarregar a página (F5) zera moedas, compras, matrículas, mensagens e carreira; a única persistência é o `localStorage` com **2 chaves vivas**: `vq_tut_skip` e `vq_intro_done` (as 6 chaves mortas que a auditoria listou no doc 06 foram **removidas do fonte** na limpeza de 01/08). *Atualização 03/08 (dec. 196, DA-10): são **3 chaves** — entrou `vq_evolucao`, que devolve depois do F5 os saldos, o score de carreira, a mochila, as skins, o avatar, o nome de guerra, a turma ativa, o `trAj` e os 60 últimos lançamentos do extrato.* O login do aluno aceita qualquer e-mail+senha, os gates de professor e admin são overlays em JS, gabaritos e "segredos" demo estão no cliente, e 31 hooks `window.__*` (para as suítes Playwright de desenvolvimento, **que não estão versionadas neste repositório** — a regressão de 56 suítes de 01/08 rodou fora do repo; *atualização 01/08, dec. 190: as suítes passaram a viver em `tests/`; **estado em 03/08: 58 suítes e 42 hooks** (dec. 196)*) permitem manipular qualquer estado pelo console. Isso é intencional e adequado para uma demonstração navegável (V0 "Prova de Vida"); nada disso é arquitetura para o produto. As mecânicas, porém, **funcionam de verdade dentro da sessão** (estorno desfaz posse, choque de agenda cruza agendas reais, vagas esgotam por moeda) — o protótipo é uma **especificação executável de regras de negócio**, não um esqueleto de sistema.
 
 ---
 
@@ -60,7 +60,7 @@ Observações importantes:
 - As referências "src.html l.N" desta tabela (e de toda a auditoria) valem para o **monolito auditado em 30/07**; desde 01/08 o fonte vive em 20 partes em `src/` — para localizar um trecho, use grep pelo nome da função/id (correspondência explicada em `src/README.md`).
 - O e-mail `filho@quadconcursos.com.br` citado em materiais de contexto **não existe no código** (grep sem ocorrências) — DIVERGÊNCIA DOCUMENTAL. O e-mail do professor é **dinâmico**: se o admin renomear/desligar docentes na sessão, o e-mail demo muda e a nota do gate acompanha.
 - 1º acesso do aluno dispara o tutorial obrigatório (29 passos no código). Para pular: botão "‹ Pular", ou a flag `vq_tut_skip` no localStorage.
-- O botão "Reiniciar demonstração" (painel lateral, fora do "celular") limpa as flags — mas **esquece `vq_intro_done`** (bug conhecido, doc 06).
+- O botão "Reiniciar demonstração" (painel lateral, fora do "celular") limpa as flags — mas **esquece `vq_intro_done`** (bug conhecido, doc 06). *Atualização 03/08 (dec. 196): **CORRIGIDO** — o handler limpa as três chaves (`vq_tut_skip`, `vq_intro_done` e `vq_evolucao`).*
 
 ---
 
@@ -86,7 +86,7 @@ Limitações que **permanecem** (aceitas para um protótipo):
 
 - **Órfãos versionados:** ✅ **resolvido em 01/08** — `Viver o Quad.rar` (9 MB) e `quad-coin.png` (904 KB) foram **removidos do repositório** no commit da divisão do fonte.
 - **Não versionados por design:** `index.html` e `artifact.html` (no `.gitignore`) — regenere localmente.
-- **Ausentes do repositório:** as **suítes Playwright de desenvolvimento** citadas em todo o CHANGELOG (`vtut`, `vfasea`–`vfaseh`, `vdmn`…). **O repositório continua sem nenhum teste automatizado versionado** — a regressão de 56 suítes que validou a limpeza de 01/08 rodou fora do repo; os 31 hooks `window.__*` no fonte são a única memória delas. *Atualização 01/08 (dec. 190) — SUPERADO:* **a rede de testes já existe no repositório** (`tests/`, com `run.sh` portátil e `verify.py` como portão de aceite oficial). Hoje são **57 suítes** e **35 hooks** (rodada de 02/08, dec. 192–194). Nada a recriar — leia `tests/README.md`.
+- **Ausentes do repositório:** as **suítes Playwright de desenvolvimento** citadas em todo o CHANGELOG (`vtut`, `vfasea`–`vfaseh`, `vdmn`…). **O repositório continua sem nenhum teste automatizado versionado** — a regressão de 56 suítes que validou a limpeza de 01/08 rodou fora do repo; os 31 hooks `window.__*` no fonte são a única memória delas. *Atualização 01/08 (dec. 190) — SUPERADO:* **a rede de testes já existe no repositório** (`tests/`, com `run.sh` portátil e `verify.py` como portão de aceite oficial). Hoje são **58 suítes** e **42 hooks** (rodadas de 02/08 e 03/08, dec. 192–196). Nada a recriar — leia `tests/README.md`.
 - **Docs de entrada:** ✅ **resolvido em 01/08** — README, docs/00, docs/01 e docs/03 foram **reescritos contra a Consolidação**: a URL vigente `945e81a8-9ca3-4d55-9169-c4fc9f6f3703` está registrada em quatro arquivos do repo (README, docs/00, docs/02 e docs/03 — deixou de ser HIPÓTESE, restando só a validação formal do gestor), a árvore reflete `src/` e `docs/arquitetura/`, e os tamanhos citados são os reais (~9,4 MB).
 
 ---
@@ -115,7 +115,7 @@ O monolito `src.html` foi dividido em **20 fatias contíguas** (`src/NN-descrica
 | 16-js-admin-controle | Gate N.P.P., contas/créditos, mensagens por público, gift cards, cronograma, materiais |
 | 17-js-admin-liberacoes | Eventos do admin, pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
 | 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |
-| 19-js-compras-estornos | Relatório de compras e estornos de 7 dias (lado do aluno) |
+| 19-js-compras-estornos | Relatório de compras e estornos de 7 dias (lado do aluno). *Atualização 03/08 (dec. 196/197): virou a **carteira do aluno** — card único "Carteira · extrato e compras", com o extrato do ledger (DA-03) e as listas de situação, mais os estornos de 7 dias* |
 | 20-js-relatorios-boot | Relatórios com gráficos, cascata de inicialização, fechamento do IIFE |
 
 **Cuidados estruturais** (de `src/README.md`): nenhuma parte é válida sozinha (o `<style>` abre na 01 e fecha na 02; o `<script>`/IIFE abre na 07 e fecha na 20); a ordem é imutável; tokens `__*__` ocupam uma linha cada e o build falha se algum sumir ou sobrar.
@@ -126,7 +126,7 @@ O monolito `src.html` foi dividido em **20 fatias contíguas** (`src/NN-descrica
 - ✅ Chaves `vq_*` mortas, fluxo `CODE_OK`/autorização de dispositivo, `openQuiz`, `fmtSync`, `tutDadosOk`: **removidos** na limpeza de 01/08; 8 comentários enganosos atualizados.
 - View `v-pretaf` órfã (inalcançável pela UI) — **permanece**, aguardando decisão de produto.
 - `#connToggle` referenciado no JS não existe no HTML (modo offline inatingível) — **permanece**.
-- O reset da demo **não limpa `vq_intro_done`** — bug conhecido, **não corrigido de propósito** (mudaria comportamento sem decisão); pendente de decisão do produto.
+- O reset da demo **não limpa `vq_intro_done`** — bug conhecido, **não corrigido de propósito** (mudaria comportamento sem decisão); pendente de decisão do produto. *Atualização 03/08 (dec. 196): **corrigido** — o reset limpa as três chaves.*
 - `LINKS_ONLINE` foi **preservado** como ponto de integração planejado (não é código morto).
 
 ---
@@ -149,7 +149,7 @@ Lista explícita — tudo abaixo é SIMULADO LOCALMENTE e/ou APENAS VISUAL no pr
 - **Relatórios do admin** — mistura declarada de dados vivos da sessão com semente por hash e tabelas fixas.
 - **Notificações/push** — inexistentes (badges internos apenas).
 - **Modo offline** — `var online` interna; nem alcançável pela UI atual.
-- **Persistência** — só 2 chaves no localStorage (`vq_tut_skip` e `vq_intro_done` — as demais foram removidas na limpeza de 01/08); todo o resto zera no F5.
+- **Persistência** — só 2 chaves no localStorage (`vq_tut_skip` e `vq_intro_done` — as demais foram removidas na limpeza de 01/08); todo o resto zera no F5. *Atualização 03/08 (dec. 196, DA-10): são **3 chaves** — com `vq_evolucao`, a evolução do aluno (saldos, carreira, mochila, skins, avatar, nome de guerra, turma ativa, `trAj` e os 60 últimos lançamentos) passa a sobreviver ao F5, **por dispositivo**.*
 - **Prova de promoção, crédito manual, estorno, portaria** — mecânicas completas, porém 100% no cliente; qualquer valor é forjável pelo console (hooks `window.__*`).
 
 ---
@@ -248,7 +248,7 @@ Tudo o que é **estado e lógica de negócio no cliente**: autenticação/RBAC, 
 **Perguntas abertas pela Consolidação v1.0 (01/08/2026):**
 
 15. **Regras econômicas** — a Consolidação manteve loja, Quad Coins, Diamantes e gift cards como previstos, mas registrou que as regras econômicas **seguem indefinidas (não estudadas)**: preços, recompensas, conversões, limites, governança. Quando e por quem esse estudo será feito? (Nada deve ser inventado na especificação do módulo Loja antes disso.)
-16. **Bug do reset** — o botão "Reiniciar demonstração" não limpa `vq_intro_done` (bug conhecido desde a auditoria, doc 06). A limpeza de 01/08 **não o corrigiu de propósito**, porque corrigir mudaria comportamento sem decisão. Corrige-se? (Pendente de decisão.)
+16. ~~**Bug do reset**~~ — **RESOLVIDO em 03/08 (dec. 196)**: o botão "Reiniciar demonstração" passou a limpar as três chaves (`vq_tut_skip`, `vq_intro_done` e `vq_evolucao`). *Registro histórico: o botão não limpava `vq_intro_done` (bug conhecido desde a auditoria, doc 06); a limpeza de 01/08 não o corrigiu de propósito, por exigir decisão — a decisão veio com a implementação da DA-10.*
 17. **Cadastro no app** (dec. 21 revogada) — qual é a especificação do fluxo de cadastro dentro da plataforma? Até ela existir, o protótipo mantém o portão "Cadastro no site do Quad" como demonstração.
 18. **Fronteiras a decidir** — plataforma de cursos (legado em avaliação): mantém, integra ou aposenta? Telemetria como serviço de dados: dentro ou fora da plataforma?
 
@@ -266,7 +266,7 @@ Tudo o que é **estado e lógica de negócio no cliente**: autenticação/RBAC, 
 - [x] ~~Remover `Viver o Quad.rar` e `quad-coin.png`~~ — **feito em 01/08**
 - [x] ~~Remover código morto (`openQuiz`, `fmtSync`, `tutDadosOk`, chaves `vq_*` mortas, fluxo `CODE_OK`)~~ — **feito em 01/08** com regressão de 56 suítes; `LINKS_ONLINE` foi **preservado** (ponto de integração planejado). Restam: botão `[DEMO PROVISÓRIO]`, resíduos "Danilo" (dependem de ok do gestor)
 - [ ] Decidi o destino da view órfã `v-pretaf` e do `#connToggle` inexistente
-- [ ] Sei que o reset da demo **não limpa `vq_intro_done`** (bug conhecido, mantido de propósito — correção pendente de decisão)
+- [x] ~~Sei que o reset da demo **não limpa `vq_intro_done`**~~ — *desatualizado: desde 03/08 (dec. 196) o reset limpa as três chaves `vq_tut_skip`, `vq_intro_done` e `vq_evolucao`*
 - [ ] Planejei o rename `var score` → `qdc` (ou documentei a armadilha para a equipe)
 - [ ] Defini política dos hooks `window.__*` (manter em dev, excluir de build de produção)
 - [ ] Criei e versionei suíte de testes nova (o repo não tem nenhuma versionada; Playwright sugerido — os hooks já existem)

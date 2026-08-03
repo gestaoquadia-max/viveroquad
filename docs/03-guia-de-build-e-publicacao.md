@@ -64,7 +64,7 @@ Os dois scripts fazem o mesmo:
 4. Gravam `artifact.html` (conteúdo publicado) e `index.html` (com o
    esqueleto `<html>` — abre com clique duplo).
 
-Depois do build, `python3 verify.py` roda a **regressão completa** (57 suítes
+Depois do build, `python3 verify.py` roda a **regressão completa** (58 suítes
 Playwright em [`tests/`](../tests/README.md)) — o portão de aceite de qualquer
 mudança no fonte.
 

@@ -54,35 +54,42 @@ Cada arquivo é um fragmento JavaScript **verbatim** reinjetado no build pelo to
 
 ---
 
-## 3. Estados locais em memória — o que o F5 apaga
+## 3. Estados locais em memória — o que o F5 apaga (e o que passou a sobreviver)
 
-**100% dos dados de negócio vivem em variáveis JS dentro da IIFE única** (auditoria 06, §1). Um recarregamento (F5) reexecuta a IIFE e devolve tudo ao estado-semente. Perde-se, entre outros (auditoria 06, §5 — CONFIRMADO NO CÓDIGO):
+**Praticamente todos os dados de negócio vivem em variáveis JS dentro da IIFE única** (auditoria 06, §1). Um recarregamento (F5) reexecuta a IIFE e devolve **quase** tudo ao estado-semente.
 
-- **Carteiras e progresso:** Quad Coins voltam a 1.240 (`score`), Diamantes a 150, score de carreira a 620 e patente ao índice 0 (`carreira`); gift cards resgatados "desusam" (`giftUsados`/`GIFT_LOTES` zeram); bônus da noite (`NOITE_RESG`) libera de novo.
-- **Compras e posse:** log de compras (`COMPRAS`), posse (`lojaOwned`), `MOCHILA`, skins/farda (`skinEtapa`/`fardaEscolhida`), pedidos (`PEDIDOS`), estornos (`ESTORNOS`), créditos manuais (`CREDITOS`).
-- **Vida acadêmica:** matrículas compradas na sessão (`MATRICULAS` volta à seed PATAMO Noite), turma ativa (`turmaAtivaId` volta a `patamo-n`), progresso dos blocos (`BLOCOS_TURMA`), rodízio e autoavaliações do treino (`TR_ST`, `TR_BANK[i].nota/resp`), quizzes respondidos (`QUIZZES`), inscrições e histórico de simulados (`SIM_INSC`/`SIM_HIST`), resultado e bloqueio de 24h da prova de promoção (`provaBloqueadaAte`).
-- **Eventos e portaria:** inscrições/compras/garimpos por evento (`evState`), listas de portaria (`ACESSO_ST`), agenda de produtos com data (`PROD_AGENDA`).
-- **Comunicação e administração:** recados do aluno (`RECADOS`), dos professores (`RECADOS_PROF`), histórico do admin (`ADM_MSGS`), avisos (`AVISOS`), materiais publicados (`MATERIAIS` — o arquivo é objectURL em memória), tudo que o admin criou (turmas, eventos, simulados, itens, trocas de grade `CRONO_LOG`).
-- **Preferências e identidade:** avatar escolhido, nome de guerra, `perfilPrivado` do ranking (volta a público — sensível quando houver dado real), senha e foto trocadas do professor.
+> **Mudança de 03/08 (dec. 196 — DA-10):** a evolução do aluno passou a ser gravada no `localStorage` (chave `vq_evolucao`). **Sobrevivem ao F5**: Quad Coins, Diamantes, os três acumuladores de carreira, mochila, skins/itens possuídos (`lojaOwned`), avatar, nome de guerra, turma ativa (`turmaAtivaId`), o ajuste do Domínio (`trAj`) e os **60 últimos lançamentos** do extrato (`LEDGER`). Ver §4.
 
-**O que isso significa para a demo** (auditoria 06, §5):
-1. Cada sessão começa **limpa e previsível** — bom para roteiro guiado.
-2. **Não demonstrar continuidade** ("voltar amanhã", "compra que fica"): um F5 acidental quebra a narrativa.
-3. **Multiusuário é ilusão:** aluno, professor e admin são personas da MESMA aba; dois aparelhos nunca veem a mesma coisa.
-4. O botão "Resetar demonstração" **não zera tudo** (ver seção 4).
+**Continua evaporando no F5** (auditoria 06, §5 — reconferido no código em 03/08):
+
+- **Compras e pós-venda:** log de compras (`COMPRAS`), pedidos de retirada (`PEDIDOS`), estornos (`ESTORNOS`), créditos manuais (`CREDITOS`), agenda de produtos com data (`PROD_AGENDA`).
+- **Vida acadêmica:** matrículas **compradas na sessão** (`MATRICULAS` volta às sementes: PATAMO Noite ativa + RONDESP Manhã arquivada), progresso dos blocos (`BLOCOS_TURMA`), rodízio e autoavaliações do treino (`TR_ST`, `TR_BANK[i].nota/resp` — só o `trAj` resultante sobrevive), quizzes respondidos (`QUIZZES`), inscrições e histórico de simulados (`SIM_INSC`/`SIM_HIST`), resultado e bloqueio de 24h da prova de promoção (`provaBloqueadaAte`).
+- **Eventos e portaria:** inscrições/compras/garimpos por evento (`evState`), listas de portaria (`ACESSO_ST`), bônus da noite (`NOITE_RESG` — libera de novo).
+- **Gift cards:** lotes criados na sessão e resgates (`GIFT_LOTES`/`giftUsados` zeram — os cartões "desusam").
+- **Comunicação e administração:** recados do aluno (`RECADOS`), dos professores (`RECADOS_PROF`), histórico do admin (`ADM_MSGS`), avisos (`AVISOS`), materiais publicados (`MATERIAIS` — o arquivo é objectURL em memória), tudo que o admin criou (turmas, eventos, simulados, itens, trocas de grade `CRONO_LOG`), perfil administrativo escolhido no portão.
+- **Outras preferências:** `perfilPrivado` do ranking (volta a público — sensível quando houver dado real), senha e foto trocadas do professor.
+
+**O que isso significa para a demo** (auditoria 06, §5, atualizado):
+1. Cada sessão começa previsível no que é **cenário** (catálogo, cronograma, eventos, comunicação) — bom para roteiro guiado.
+2. **A continuidade já pode ser demonstrada no que é do aluno**: saldo, mochila, identidade, turma ativa e extrato voltam depois do F5 (DA-10). O que ainda quebra a narrativa é a parte **operacional** (compras, pedidos, inscrições) — ver a lista acima.
+3. **Multiusuário continua sendo ilusão:** aluno, professor e admin são personas da MESMA aba; dois aparelhos nunca veem a mesma coisa. O `localStorage` é **por dispositivo**, não por conta.
+4. O botão "Reiniciar demonstração" **agora zera as três chaves** — o bug antigo foi corrigido (ver seção 4).
 
 ---
 
-## 4. `localStorage` — as duas chaves que importam
+## 4. `localStorage` — as três chaves que importam
 
-O grep exaustivo da auditoria (06, §3, estado de 30/07) **encontrava** 8 chaves `vq_*` — 4 delas código morto (`vq_pending` nunca escrita; `vq_last_sync`, `vq_tut_step`, `vq_tut_done` nunca lidas; `vq_tut_rew` jamais usada) e `vq_device_authorized` como resquício do fluxo de dispositivo removido. A dec. 188 (01/08) removeu esse código morto com regressão completa verde; **hoje o fonte só usa duas chaves**, ambas com efeito perceptível:
+O grep exaustivo da auditoria (06, §3, estado de 30/07) **encontrava** 8 chaves `vq_*` — 4 delas código morto (`vq_pending` nunca escrita; `vq_last_sync`, `vq_tut_step`, `vq_tut_done` nunca lidas; `vq_tut_rew` jamais usada) e `vq_device_authorized` como resquício do fluxo de dispositivo removido. A dec. 188 (01/08) removeu esse código morto com regressão completa verde; a dec. 196 (03/08) acrescentou a chave de persistência da DA-10. **Hoje o fonte usa três chaves**, todas com efeito perceptível:
 
 | Chave | O que controla | Detalhes |
 |---|---|---|
 | `vq_tut_skip` | Se a Instrução do QUAD abre no login. `'1'` (gravada ao concluir OU pular) = entra direto | Única flag de tutorial realmente lida (`acessarPortal`); é também o atalho das suítes/sondas para pular o tutorial |
-| `vq_intro_done` | Se a missão "Introdução no Quad" está feita — a linha some do bloco "Hoje" (dec. 157/177) e a recompensa (+30/+25) não repete | Flag conceitualmente **da conta** guardada **por dispositivo** (trocar de aparelho a perderia — no real, DEPENDE DO BACK-END). **Bug documentado e mantido de propósito:** o handler de "Resetar demonstração" executa apenas `lsDel('vq_tut_skip')` e **não limpa** esta chave (src/13 l.801–808, com o aviso no próprio comentário do fonte; dec. 188 mantém o bug aberto por exigir decisão) |
+| `vq_intro_done` | Se a missão "Introdução no Quad" está feita — a linha some do bloco "Hoje" (dec. 157/177) e a recompensa (+30/+25) não repete | Flag conceitualmente **da conta** guardada **por dispositivo** (trocar de aparelho a perderia — no real, DEPENDE DO BACK-END) |
+| `vq_evolucao` **(nova — dec. 196, DA-10)** | A evolução do aluno neste dispositivo | Payload JSON `{ v: 1, id, score (Quad Coins), diamantes, carreira (os 3 acumuladores), mochila, avatarIdx, guerra (nome de guerra), turmaAtivaId, lojaOwned, trAj, ledger (os 60 últimos lançamentos) }`. Escrita por `evolSalvar()` com **debounce de 400 ms** (`evolMarcar()`), lida por `evolCarregar()` no boot — src/20; hooks `__evolSalvar`/`__evolCarregar`/`__evolMarcar` |
 
-**Nenhum dado pessoal ou de negócio vai ao `localStorage`** — positivo para a LGPD do protótipo, fatal para continuidade: nada de progresso sobrevive.
+**Bug do reset — CORRIGIDO (dec. 196).** O handler de "Reiniciar demonstração" (src/13) executava apenas `lsDel('vq_tut_skip')` e deixava `vq_intro_done` para trás; hoje ele limpa **as três chaves** (`lsDel('vq_tut_skip'); lsDel('vq_intro_done'); lsDel('vq_evolucao');`) antes de sair da conta. Textos anteriores a 03/08 que descrevem isso como "bug conhecido, mantido de propósito" **estão desatualizados**.
+
+**Agora há dado pessoal no `localStorage`.** Com a DA-10, passaram a ser gravados no dispositivo o **nome de guerra**, o **avatar**, os **saldos** e o **extrato de movimentações** do aluno da demonstração. Não é mais verdade que "nenhum dado pessoal vai ao `localStorage`". Ressalva de LGPD **do protótipo**: são dados da conta-demo (Danilo de Almeida Moura, DADO DEMONSTRATIVO) num armazenamento local, sem criptografia e sem vínculo com conta real; no produto, o dono do dado é o servidor (DA-07) e o cache local — se existir — precisa de política de expiração, limpeza no logout e base legal definida. Ver §8 e §9.
 
 ---
 
@@ -110,7 +117,7 @@ Tudo abaixo é SIMULAÇÃO LOCAL declarada (muitas com a etiqueta `[INTEGRAÇÃO
 | **Inscritos e presenças sintéticos** | Listas de portaria semeadas por hash (`inscNome`); a lista "PDF" de conferência sai 100% sintética mesmo com inscrito real; "PDF" = `window.print()` | src/17 l.451–480; dossiê E |
 | **Botões de teatro assumido** | "+275 dia de estudo (simulação)", "Liberar nova tentativa (simulação)", `demoSobePatente` "[DEMO PROVISÓRIO — REMOVER]" | src/12 l.322/551–569 |
 | **Troca de senha do aluno** | Só toast "Senha alterada com sucesso" — nada é gravado nem conferido (a do professor, ao contrário, vale na sessão) | src/12 l.577–581 |
-| **Hooks de teste embarcados** | 35 ganchos `window.__*` (contrato das suítes; os 4 mais novos — `__dropRng`, `__dropSortear`, `__calRefresh`, `__estRefresh` — vieram das dec. 192/194) + credenciais demo embarcam no artefato publicado — aceitável na V0, removível em build de produção (DECISÃO TÉCNICA PENDENTE) | auditoria 09, "Como ler", item 3 |
+| **Hooks de teste embarcados** | **42 ganchos** `window.__*` (contrato das suítes). Os 4 das dec. 192/194 — `__dropRng`, `__dropSortear`, `__calRefresh`, `__estRefresh` — e os **7 da dec. 196**: `__ledger` (lê o LEDGER), `__ids` (id do aluno + sequência), `__carteira` (saldos), `__admPerfil` (lê/troca o perfil administrativo), `__evolSalvar`, `__evolCarregar` e `__evolMarcar` (persistência DA-10). Junto das credenciais demo, embarcam no artefato publicado — aceitável na V0, removível em build de produção (DECISÃO TÉCNICA PENDENTE) | contagem por grep em `src/*.html`; auditoria 09, "Como ler", item 3 |
 
 ---
 
@@ -133,7 +140,7 @@ Diferente das simulações (que têm mecânica local real), estas são **fachada
 
 ## 7. Comportamentos validados que a aplicação real deve REPRODUZIR
 
-Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (57 suítes verdes; dec. 190 as fixa como critério de aceite). A aplicação real muda o "como" (servidor, persistência), nunca o "o quê":
+Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (**58 suítes** verdes; dec. 190 as fixa como critério de aceite). A aplicação real muda o "como" (servidor, persistência), nunca o "o quê":
 
 **Entrada e conta**
 1. Sem matrícula ativa, o app trava — resta a Quad Store (dec. 62; RN-02/03).
@@ -145,6 +152,7 @@ Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (57
 5. **DA CONTA × DA TURMA** (dec. 148/156): score, patente, moedas, mochila, avatar e nome de guerra são da pessoa; aula, avisos, missões, ranking da sala, Domínio, materiais e calendário seguem a **turma ativa**.
 6. Uma turma por turno; matrícula barrada por sobreposição de horário (única compra bloqueada por choque); 1ª matrícula assume sem perguntar; da 2ª em diante, pop-up de escolha; troca de turma ativa sem deslogar re-renderiza tudo em cadeia (dec. 62/101/146/147/152–154).
 7. Turma vendida em **duas moedas com vagas separadas por moeda** (dec. 155); grade do cronograma chaveada por id de turma — turma nova nasce em branco, extinta sai (dec. 163).
+7-A. **Turma encerrada fica ARQUIVADA, não apagada** (DA-06, dec. 195; demonstrado na dec. 196): a matrícula vencida sai da lista de turmas ativas mas continua no perfil, sob "Minhas turmas · ativas e arquivadas", com a etiqueta **ARQUIVADA** — e o histórico de desempenho, compras e materiais continua consultável. Evidência: `matriculasArquivadas()` (src/07), semente `rondesp-m` com `fim: 2026-06-30`, render em src/12. A aplicação real precisa da mesma separação: **vigência encerrada ≠ dado removido**.
 
 **Estudo e gamificação**
 8. Bloco = 10 rápidas certo/errado com feedback imediato + autoavaliação Errei/Difícil/Bom/Fácil; expiração em 7 dias → Atrasadas recuperáveis; recompensa da noite com resgate único por turma; rodízio do treino segue a árvore do edital da turma ativa; ajuste de Domínio **por concurso** (dec. 26/106/159).
@@ -160,12 +168,16 @@ Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (57
 15. Estorno **direto** em até 7 dias, dois toques, devolução na **moeda original**, desfazendo a posse por tipo (inclusive vaga na moeda usada e troca automática da turma ativa); **consumo mata o estorno** (entrega, entrada liberada, presença) (dec. 67/100/162/178; RN-26/28).
 15-A. **Três exceções à janela de 7 dias**: a compra feita **durante o tutorial** nasce marcada `semEstorno` e nunca entra na regra (dec. 193); o **evento já realizado** sai da janela pela data, tenha havido presença ou não — 4º caminho de saída, ao lado dos 3 gatilhos de consumo (dec. 192); e o item ganho no **DROP** não é compra, logo não existe estorno para ele (dec. 194).
 16. Gift card em lote com **liberação única** e invalidação imediata; crédito manual do admin com motivo e histórico (dec. 52/66/84).
+16-A. **Extrato da carteira com autor e saldo resultante** (DA-03, dec. 195; implementado na dec. 196): **nada entra nem sai da carteira sem lançamento**. Cada movimentação registra `id` (`MV-xxxxx`), moeda, **tipo** da operação, **origem**, **destino**, **autor**, data/hora, valor e o **saldo depois** — inclusive os dois lançamentos de **saldo de abertura** (`MV-00000`/`MV-00001`). Compras, recompensas, gift cards, créditos manuais da administração **e estornos** lançam. O aluno lê tudo no card único "**Carteira · extrato e compras**" (dec. 197), com um seletor de período que vale para o extrato e para as compras e KPIs **recebido · gasto · compras · a receber**. Na aplicação real, o extrato é a **projeção do ledger do servidor**, não um relatório montado no cliente.
+16-B. **Identidade de tudo que se move**: aluno e lançamentos têm **ID interno** (`MEU_ID = 'AL-00001'`, `DB_ALUNO.id`, `novoId()` gerando `MV-xxxxx`) — DA-01. Nenhuma entidade econômica deve ser referenciada por nome no produto real.
 
 **Operação**
 17. Portaria sincronizada com as atividades reais; liberar entrada confirma presença, pontua e consome (dec. 128/129/180).
 18. Eventos são **do Quad** (sem turma-alvo, dec. 161); avisos têm turma-alvo por id (dec. 149); mensagens por público com prefixo e status ENVIADA→LIDA (dec. 181); materiais por turma com download real e etiqueta de origem (dec. 144/164).
 18-A. **Status do evento no calendário do aluno** (dec. 192): o evento **presencial** em que ele se inscreveu **não some ao passar** — vira **CONCLUÍDO** quando a entrada foi liberada na portaria ou **FALTOSO** quando o dia passou sem registro de entrada; o **online**, que não passa pela portaria, continua saindo do calendário ao vencer (sem registro não há julgamento justo).
 19. Governança do admin em tempo real: criar/editar turma, preços e vagas sem recriar, rename de docente propagado com e-mail acompanhando, validações de lotação/choque de sala (dec. 81/121/139/155/174/175/179).
+19-A. **A administração tem perfis, e o perfil filtra e assina** (DA-08, dec. 195; implementado na dec. 196): são **quatro** — Direção, Coordenação pedagógica, Recepção e Financeiro (`ADM_PERFIS`, src/16). O perfil é escolhido no portão (`#admPerfil`), aparece como chip no painel (`#admPerfilChip`) e **decide quais abas existem** para aquele operador (`admPodeVer`); o **crédito manual** de moedas entra no extrato do aluno **assinado pelo perfil** (`autor: admPerfilNome()`). A aplicação real precisa reproduzir o princípio — cada operador vê o que a sua responsabilidade exige e **toda ação registra quem a fez** — sobre um RBAC de verdade, com chave por pessoa.
+20. **A evolução do aluno tem continuidade** (DA-10, dec. 195; demonstrada na dec. 196 via `localStorage`): saldo, carreira, mochila, skins, avatar, nome de guerra, turma ativa, ajuste do Domínio e extrato **voltam quando o aluno reabre o app**. O protótipo demonstra o comportamento no dispositivo; a aplicação real o entrega **pela conta, no servidor** — o `localStorage` é vitrine, não arquitetura (ver §8 e §9).
 
 **Ressalva permanente:** todos os **valores** (preços, saldos, recompensas, metas de patente, janela de 7 dias) são DADO DEMONSTRATIVO — dec. 185.
 
@@ -173,29 +185,34 @@ Esta é a **experiência aprovada** — mecânicas provadas por sonda/suíte (57
 
 ## 8. O que precisará de banco de dados (por domínio — sem modelar)
 
-Registro apenas de **o que precisa persistir e com que relação** (a modelagem é da fase de especificação, arquitetura 00 §8):
+Registro apenas de **o que precisa persistir e com que relação** (a modelagem é da fase de especificação, arquitetura 00 §8).
 
-- **Identidade e conta:** persistir conta do aluno (dados cadastrais, credenciais, estado de bloqueio) com relação às suas sessões/dispositivos; conta do professor e do administrador com papel/permissão; nome de guerra e avatar escolhidos **com relação à conta** (hoje se perdem no F5).
-- **Matrículas e turmas:** persistir turmas (catálogo, sala, turno, período, preços/vagas por moeda) e matrículas **com relação aluno×turma e vigência**; a **preferência de turma ativa** com relação à conta; docentes com ID estável e escalação **com relação turma×matéria**.
-- **Economia:** persistir saldos de QdC e Dmn como **ledger com relação a cada evento de crédito/débito** (compra, recompensa, crédito manual, gift, estorno); compras com relação a aluno, item, moeda, carimbo (janela de estorno) e estado de consumo; gift cards com relação lote→código→resgate→conta; pedidos de retirada com relação compra×recepção.
+> **Decisões que já fecharam parte destas perguntas (dec. 195/196):** **DA-01** — toda entidade tem **ID interno** e nome deixa de ser chave; **DA-03** — a economia é um **ledger de lançamentos**, não um saldo mutável; **DA-06** — o encerramento **arquiva**, não apaga; **DA-09** — há **política de retenção** a definir por domínio; **DA-10** — a **evolução do aluno persiste** e é da conta. O que segue abaixo é o desdobramento delas em necessidade de persistência.
+
+- **Identidade e conta:** persistir conta do aluno (dados cadastrais, credenciais, estado de bloqueio) com relação às suas sessões/dispositivos; conta do professor e do administrador com **papel/perfil** (os 4 de DA-08) e chave por pessoa; nome de guerra e avatar escolhidos **com relação à conta** — hoje o protótipo os guarda no dispositivo (`vq_evolucao`), o que **não** substitui a persistência por conta (DA-07 define o dono do dado).
+- **Matrículas e turmas:** persistir turmas (catálogo, sala, turno, período, preços/vagas por moeda) e matrículas **com relação aluno×turma e vigência**, **preservando as encerradas como arquivadas e consultáveis (DA-06)**; a **preferência de turma ativa** com relação à conta; docentes com **ID estável** (DA-01) e escalação **com relação turma×matéria**.
+- **Economia:** persistir saldos de QdC e Dmn como **ledger com relação a cada evento de crédito/débito** (compra, recompensa, crédito manual, gift, estorno) — modelo já **decidido pela DA-03** e demonstrado no protótipo, com tipo, origem, destino, **autor**, carimbo e **saldo resultante** por lançamento; o saldo é derivado, nunca a fonte. Compras com relação a aluno, item, moeda, carimbo (janela de estorno) e estado de consumo; gift cards com relação lote→código→resgate→conta; pedidos de retirada com relação compra×recepção.
 - **Pedagógico:** persistir cada resposta do aluno **com relação a questão, contexto (bloco/quiz/simulado/prova), turma e tempo**; a autoavaliação de dificuldade (dado sensível — base da prova de promoção); o estado dos blocos por turma (feito/expirado); histórico de simulados e de promoções; o Domínio calculado **com relação a concurso→matéria→assunto**.
 - **Conteúdo:** persistir banco de questões com ID por questão, gabarito, tags pela árvore do edital e campo de uso; árvores de edital **versionadas com relação ao concurso**; cronograma por turma com histórico de trocas; materiais com relação turma×matéria×assunto e arquivo em storage.
 - **Eventos e presença:** persistir eventos, inscrições/compras com relação aluno×evento, ocupação com relação à sala, presenças/liberações **com relação a operador, aluno e carimbo** (auditoria).
 - **Comunicação:** persistir avisos (com alvo), mensagens por público e recados **com relação a emissor, destinatário e recibo de leitura**.
 - **Gamificação:** persistir os três scores, patente, estado da prova (incluindo o bloqueio de 24h — hoje em memória) e histórico **com relação à conta**; parametrização (`GAMI`, salas/lotações) como configuração administrável.
 - **Preferências:** persistir perfil público/privado do ranking com relação à conta (preferência de privacidade — crítica sob LGPD).
+- **Retenção (DA-09):** cada domínio acima precisa de **prazo e destino do dado** — o que se guarda para sempre (ledger, histórico acadêmico), o que se arquiva (matrículas encerradas), o que se anonimiza e o que se apaga. A decisão de **que existe política** já foi tomada; os prazos por domínio são da especificação.
 
-A auditoria 09 (obs. transversal 3) indica por onde começar: **turma ativa, avatar, nome de guerra, perfil privado, progresso da noite e histórico de mensagens** — o estado de usuário que hoje evapora no F5.
+A auditoria 09 (obs. transversal 3) indicava por onde começar: **turma ativa, avatar, nome de guerra, perfil privado, progresso da noite e histórico de mensagens**. Desde a dec. 196 o protótipo **já demonstra** a maior parte disso (turma ativa, avatar, nome de guerra, saldos, mochila e extrato voltam pela chave `vq_evolucao`) — mas **no dispositivo, não na conta**: continuam fora o perfil privado do ranking, o progresso da noite e o histórico de mensagens, e a persistência por conta segue sendo trabalho de back-end.
 
 ---
 
 ## 9. O que precisará de back-end (validações e autorizações que hoje são JS local)
 
-Motivação registrada em decisão: os **riscos de falsificação da auditoria de 30/07** foram assumidos como pendências da plataforma (dec. 186; arquitetura 00 §6 — "bloqueantes para qualquer versão com dado real"): *toda autorização é do lado do cliente; credenciais demo hardcoded (algumas impressas na tela); hooks `window.__*` e gabaritos embarcados no HTML público permitem fraude trivial; senha de professor em texto claro; dados pessoais simulados plausíveis demais*. Hoje **score, moedas, matrícula, vaga, estoque, presença, consumo e gabarito são mutáveis pelo console** (auditoria 09, obs. 2). Daí decorre a lista:
+Motivação registrada em decisão: os **riscos de falsificação da auditoria de 30/07** foram assumidos como pendências da plataforma (dec. 186; arquitetura 00 §6 — "bloqueantes para qualquer versão com dado real"): *toda autorização é do lado do cliente; credenciais demo hardcoded (algumas impressas na tela); hooks `window.__*` e gabaritos embarcados no HTML público permitem fraude trivial; senha de professor em texto claro; dados pessoais simulados plausíveis demais*. Hoje **score, moedas, matrícula, vaga, estoque, presença, consumo e gabarito são mutáveis pelo console** (auditoria 09, obs. 2) — e, desde a dec. 196, o que o console alterar também **persiste** no dispositivo (`vq_evolucao`), o que agrava o ponto em vez de aliviá-lo. Daí decorre a lista:
 
-1. **Autenticação e sessão** (aluno, professor, admin): validação real de credenciais, recuperação de acesso (hoje inexistente), revogação server-side — o bloqueio que derruba a sessão na hora é comportamento aprovado que precisa virar revogação de verdade; chaves de admin emitidas/revogadas **por pessoa**.
+> **Decisões que já orientam esta lista (dec. 195):** **DA-01** (IDs internos), **DA-03** (economia como ledger auditável, com autor por lançamento), **DA-08** (perfis administrativos — o "quem fez" tem nome), **DA-09** (retenção) e **DA-10** (a evolução do aluno é da conta e tem continuidade). Elas **não** resolvem os itens abaixo: definem o alvo que o back-end tem de atingir.
+
+1. **Autenticação e sessão** (aluno, professor, admin): validação real de credenciais, recuperação de acesso (hoje inexistente), revogação server-side — o bloqueio que derruba a sessão na hora é comportamento aprovado que precisa virar revogação de verdade; chaves de admin emitidas/revogadas **por pessoa**, sobre os 4 perfis já decididos na DA-08 (o protótipo demonstra o filtro de abas; **não** há RBAC nem identidade individual).
 2. **Verificação de matrícula no login** contra a base real (hoje: array em memória encenado na vinheta).
-3. **Crédito de pontos e moedas exclusivamente no servidor** — a regra de ouro do próprio fonte: "a interface nunca decide sozinha quantos pontos foram conquistados" (src/07 l.39–40); fila idempotente para nunca premiar duas vezes.
+3. **Crédito de pontos e moedas exclusivamente no servidor** — a regra de ouro do próprio fonte: "a interface nunca decide sozinha quantos pontos foram conquistados" (src/07 l.39–40); fila idempotente para nunca premiar duas vezes. O **formato** já está decidido (DA-03): cada crédito/débito é um lançamento com autor e saldo resultante, e o saldo do aluno é a **projeção** desse ledger.
 4. **Correção no servidor de tudo que pontua** (blocos, simulado digital, prova de promoção): o gabarito **não pode viajar com a questão** (hoje está no objeto, no cliente).
 5. **Transações atômicas** de compra/estorno/consumo: débito + baixa de vaga/estoque **por moeda** + criação de posse numa operação única; concorrência real ("a última vaga acabou de ser tomada") não pode viver no cliente.
 6. **Relógio do servidor** como juiz das janelas: estorno de 7 dias, bloqueio de 24h da prova, vigência de matrícula, selos AGORA/ENCERRADO.
@@ -204,7 +221,8 @@ Motivação registrada em decisão: os **riscos de falsificação da auditoria d
 9. **Máscara de privacidade do ranking aplicada pelo servidor** (no cliente é contornável) e ranking materializado sobre dados reais.
 10. **Presença/portaria auditável**: liberação por operador autenticado, com quem/quando, consumo fechando a janela de estorno em tempo real.
 11. **Controle de acesso a materiais** por matrícula (hoje quem tiver a URL do blob baixa — pendência de segurança registrada).
-12. **Build de produção sem hooks `window.__*` nem credenciais demo** (DECISÃO TÉCNICA PENDENTE registrada).
+12. **Build de produção sem hooks `window.__*` nem credenciais demo** (DECISÃO TÉCNICA PENDENTE registrada) — hoje são **42** hooks.
+13. **Estado do aluno servido pela conta, não pelo dispositivo** (DA-10 + DA-07): a persistência local da dec. 196 é demonstração. No produto, a evolução vem do servidor ao autenticar, o cache local (se houver) precisa de invalidação, limpeza no logout e política de retenção (DA-09) — e **nenhum dado pessoal deve ficar em `localStorage` sem base legal definida** (ver §4).
 
 ---
 
@@ -230,4 +248,5 @@ Costuras secundárias que a especificação decidirá se são serviço externo o
 - **Auditoria:** `docs/auditoria/06` (inventário de estruturas, localStorage, F5), `docs/auditoria/09` (22 fichas de contrato + estado atual), `docs/auditoria/00` §5.3 (riscos de segurança/LGPD).
 - **Arquitetura:** `docs/arquitetura/00-arquitetura-oficial.md` (Consolidação v1.0 — prevalece sobre tudo; seções 3, 5, 6 e 8 citadas).
 - **Dados:** `data/README.md` (19 fragmentos verbatim + o que ficou no código de propósito).
-- **Decisões-chave citadas:** 21/183 (cadastro), 48 (Diamante), 52, 62, 105, 148, 155, 157/177, 159, 161, 163, 164, 170/172/173, 178/179/180/181, 182 (Consolidação), 184 (Módulo Planejado), 185 (economia indefinida), 186 (riscos como pendências), 188 (código morto/bug do reset), 189 (reancoragem), 190/191 (suítes e seeds).
+- **Decisões-chave citadas:** 21/183 (cadastro), 48 (Diamante), 52, 62, 105, 148, 155, 157/177, 159, 161, 163, 164, 170/172/173, 178/179/180/181, 182 (Consolidação), 184 (Módulo Planejado), 185 (economia indefinida), 186 (riscos como pendências), 188 (código morto), 189 (reancoragem), 190/191 (suítes e seeds), **195 (as dez Decisões Administrativas DA-01…DA-10)**, **196 (implementação de DA-01/03/04/06/08/10 — ledger, IDs, turma arquivada, perfis administrativos, persistência e correção do bug do reset)** e **197 (carteira unificada + remoção do contador do tutorial)**.
+- **Data desta revisão:** 03/08/2026 — contagens conferidas no repositório: **58 suítes** em `tests/`, **42 hooks** `window.__*` em `src/`, **3 chaves** `vq_*` vivas.

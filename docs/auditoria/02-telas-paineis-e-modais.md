@@ -395,6 +395,8 @@ Componentes pequenos agrupados (sem ficha individual):
 
 ### 4.11 `v-loja` · Quad Store (inclui Estornos e Relatório de compras)
 
+> ***Atualização 03/08/2026 (dec. 196/197)*** — o "Relatório de compras" e o "Extrato da carteira" viraram **um card só**: "**Carteira · extrato e compras**" (`#rcCard`, último bloco da Loja), com um seletor de período valendo para os dois lados, KPIs **recebido · gasto · compras · a receber**, a seção "Movimentações do período" (`#extTabs` Tudo/QdC/Dmn + `#extList`, alimentada pelo **LEDGER** — DA-03) e as três listas de situação (`#rcAndamento`, `#rcPendente`, `#rcEntregue`). A ficha abaixo descreve o estado de 30/07.
+
 - **Perfil:** aluno.
 - **Identificador:** `#v-loja` — HTML l.1819–1951.
 - **Finalidade:** vitrine única de tudo que se adquire com Quad Coins (QdC) e Diamantes (Dmn): turmas, isoladas, simulados, eventos, produtos físicos, cursos digitais, skins, itens de combate — mais gift card, estornos e relatório de compras.
@@ -410,7 +412,7 @@ Componentes pequenos agrupados (sem ficha individual):
   - **Produtos físicos com estoque** (`ITENS_PRESENCIAIS`, 8 itens l.8868–8877): compra por quantidade gera **pedido de retirada** (`pedidoPresencial` → `PEDIDOS`, l.10757–10773) baixado pelo admin em Liberações.
   - **Gift cards:** `resgatarGift` (l.3791–3807) — lotes do admin (`GIFT_LOTES`, códigos `QG<lote>-<código>`, resgate único) ou demo `QUAD-100`/`QUAD-500`.
   - **Estornos · até 7 dias** (`renderEstornos` l.11563–11589; `estornar` l.11684–11695): devolve a moeda, avisa o admin (`ESTORNOS`) e **desfaz a posse por tipo** (`desfazerCompra`, l.11592–11683); compra **consumida** (entrega confirmada / entrada liberada) sai da janela (`compraConsumida`, l.11447–11457).
-  - **Relatório de compras** (`#rcCard`): abas Semanal/Mensal/Trimestral/Semestral, KPIs e três listas (Em andamento com % do período, Aguardando retirada, Entregue) — `renderRelCompras`/`rcSituacao` (l.11469–11548).
+  - **Relatório de compras** (`#rcCard`): abas Semanal/Mensal/Trimestral/Semestral, KPIs e três listas (Em andamento com % do período, Aguardando retirada, Entregue) — `renderRelCompras`/`rcSituacao` (l.11469–11548). *Hoje o mesmo `#rcCard` é a **Carteira · extrato e compras** e traz também o extrato do ledger (`renderExtrato`) — ver a nota no topo desta seção.*
 - **Dados e origem:** todos os catálogos são arrays JS em memória; a economia é **da conta (pessoa)**, não da turma — nenhuma estrutura vincula saldo a turma (CONFIRMADO NO CÓDIGO). Diamantes chegam por recarga do site (`addDiamante`, l.3772–3778 — `[INTEGRAÇÃO REAL] crédito do site`) ou gift card.
 - **Simulado hoje:** economia completa funcional na sessão (compra, estoque, vaga, estorno, consumo).
 - **Necessário no real:** pagamento, estoque, vagas, estorno financeiro e ledger de moedas no servidor; recarga de Diamantes integrada ao checkout do site.

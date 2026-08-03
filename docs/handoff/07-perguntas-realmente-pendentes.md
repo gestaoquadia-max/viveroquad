@@ -4,6 +4,8 @@
 **Fontes:** seções "Perguntas pendentes" dos 6 dossiês de investigação (A–F, `scratchpad/handoff-inv/`); `docs/auditoria/10-divergencias-e-decisoes-pendentes.md` (somente as perguntas marcadas **[ABERTA]**); conferência contra `docs/02-registro-de-decisoes.md` (dec. 1–194, incl. Consolidação v1.0) e contra o comportamento do protótipo.
 
 > **Revisão de 03/08/2026** — a triagem original foi feita contra as decisões 1–191. Com as decisões **192** (status do evento no calendário e saída da janela de estorno), **193** (compra do tutorial fora do estorno) e **194** (sistema de DROP), **a conferência de "já respondida" foi refeita para todas as perguntas**: P20 perdeu metade do enunciado e o item 7 do rodapé mudou de justificativa. Nenhuma outra pergunta foi afetada.
+>
+> **Segunda revisão de 03/08/2026 — conferida contra as dec. 195, 196 e 197.** A dec. **195** registrou as dez **Decisões Administrativas (DA-01…DA-10)** de Danilo Moura; a dec. **196** implementou seis delas no protótipo; a dec. **197** unificou a carteira e removeu o contador do tutorial. **Nove perguntas passaram a RESPONDIDA** — P1, P2 (DA-07), P4 (DA-04), P12 (DA-03), P27 (DA-06), P36 (DA-05), P43 (DA-02), P51 (DA-08) e P54 (DA-01) —, cada uma com o resíduo que **continua aberto** anotado logo abaixo do enunciado original. **Nenhum texto foi apagado.** Contagens atualizadas neste documento: **58 suítes** e **42 hooks** `window.__*`.
 
 **Critério de inclusão (filtro rigoroso):** entram apenas dúvidas que (1) **não** estão respondidas pelo protótipo, pela documentação nem pelo registro de decisões e (2) **afetam diretamente a futura construção** (bloqueiam especificação, modelo de dados, regra de negócio ou corte de escopo). Perguntas repetidas entre dossiês foram **deduplicadas** (fontes citadas em cada uma). Perguntas cuja resposta já existe foram **descartadas e listadas no rodapé** com a resposta em uma linha. Responsável sugerido: **Danilo Moura** = decisão de produto; **engenheiro** = decisão técnica.
 
@@ -14,11 +16,13 @@
 ## Tema 1 — Conta e acesso
 
 **P1. Quais são os campos e o fluxo do novo módulo interno de cadastro, qual a sua relação com o checkout externo — e quem cria a conta quando a matrícula é presencial/manual?**
+**[RESPONDIDA — DA-07, 03/08]** O dono do cadastro, da autenticação e das contas é o **Viver o Quad**; integrações externas passam a ser complementares, nunca dependência. **Resta especificar**: os campos do cadastro, o mecanismo e a criação da conta na matrícula presencial/manual.
 Contexto: a dec. 183 revogou a dec. 21 (conta nascia no site), mas o fluxo novo não foi especificado (dec. 184 — "Módulo Planejado"); o protótipo mantém de propósito o portão "cadastro no site" como demonstração, e pagamentos seguem externos (dec. 182).
 Impacto: bloqueia o desenho do módulo de cadastro/autenticação e a integração com o checkout — porta de entrada de todo aluno.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M1.)*
 
 **P2. Haverá recuperação de acesso ("esqueci minha senha") e por qual mecanismo (e-mail de redefinição? código?)?**
+**[RESPONDIDA — DA-07, 03/08]** Sim: a autenticação é responsabilidade da plataforma, logo a recuperação de acesso existe e é dela. **Resta especificar** o mecanismo (e-mail? telefone? código?).
 Contexto: o login do protótipo só tem "Entrar" e "Criar conta"; não existe caminho de recuperação em nenhuma forma nem decisão registrada.
 Impacto: bloqueia o escopo do módulo de autenticação (fluxos, e-mail transacional).
 Responsável: Danilo Moura (fluxo) + engenheiro (mecanismo). *(Fonte: dossiê A/M1.)*
@@ -29,6 +33,7 @@ Impacto: define a tela/fluxo do estado bloqueado e o canal de contestação.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M1.)*
 
 **P4. O nome de guerra deve ser único (na turma ou na plataforma) ou pode repetir?**
+**[RESPONDIDA — DA-04, 03/08]** **Pode repetir** — sem constraint de unicidade; havendo coincidência, o **ID do aluno** desempata (e pode ser exibido), apoiado na personalização do personagem.
 Contexto: o protótipo valida apenas a derivação do nome completo; não há checagem de duplicidade entre alunos — e a tradição militar sugere unicidade.
 Impacto: bloqueia a validação server-side e o modelo de dados da identidade militar.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M2.)*
@@ -44,8 +49,9 @@ Impacto: define os gates de completude de identidade no onboarding real.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M2.)*
 
 **P7. Refazer a instrução deve zerar score/Quad Coins da conta de verdade no produto final, ou o reset é só teatro do protótipo?**
+**[CONTINUA ABERTA — e ficou MAIS urgente em 03/08]** A DA-10 tornou a evolução do aluno **permanente**, e a dec. 196 já a persiste no protótipo (`vq_evolucao`): hoje, refazer a instrução zera saldo, carreira, mochila e identidade **e a gravação leva o zero para o disco**. Com persistência real, o mesmo botão destruiria progresso de verdade. Precisa de regra explícita (refazer é só narrativa? preserva saldos? exige confirmação forte?) **antes** de a persistência sair do protótipo.
 Contexto: hoje "refazer" zera as variáveis reais da sessão; num produto com persistência isso destruiria o progresso acumulado do aluno.
-Impacto: bloqueia a regra do "refazer tutorial" e a proteção do progresso persistido.
+Impacto: bloqueia a regra do "refazer tutorial" e a proteção do progresso persistido — agravado pela DA-10 (a evolução passa a ser permanente).
 Responsável: Danilo Moura. *(Fonte: dossiê A/M2.)*
 
 **P8. Qual é a lista oficial de termos vetados e a regra de moderação do nome de guerra?**
@@ -73,6 +79,7 @@ Responsável: Danilo Moura. *(Fonte: Q16.)*
 ## Tema 2 — Economia e balanceamento
 
 **P12. O modelo econômico canônico será o do protótipo (QdC ganho direto por atividade + Diamante) ou o do Anexo A da rev. 2.3 (Marcos de Conquista/ledger) — quem redige a rev. 2.4 e quem é o dono do portão do Diamante?**
+**[RESPONDIDA — DA-03, 03/08]** O modelo é o **ledger**: nenhum saldo muda sem lançamento (origem, destino, tipo, data/hora, autor, valor e saldo resultante) — saldo é consequência, não campo. Já demonstrado no protótipo pela dec. 196. **Resta**: quem é o dono do **portão do Diamante**, quem redige a rev. 2.4 e os **valores** (dec. 185, ver P14).
 Contexto: o protótipo paga QdC direto por atividade e tem uma segunda moeda em dinheiro real que não existe no documento-base; a dec. 185 apenas registra que nada foi estudado (Q5+Q8 [ABERTAS]).
 Impacto: bloqueia a modelagem da carteira/ledger, a integração de pagamentos e o realinhamento do documento-base.
 Responsável: Danilo Moura + Vitor França (economia). *(Fontes: Q5, Q8, dossiês C/D.)*
@@ -152,6 +159,7 @@ Impacto: define o comportamento do seletor de turma ativa na expiração.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M3.)*
 
 **P27. O histórico da turma encerrada (missões, ranking, materiais) fica acessível ao aluno depois do fim?**
+**[RESPONDIDA — DA-06, 03/08]** Sim: turma **nunca é apagada** — ao encerrar passa a **arquivada**, com histórico disponível para o aluno e para a administração. O protótipo já demonstra (etiqueta ARQUIVADA no perfil, dec. 196).
 Contexto: hoje tudo que é "da turma" some junto com a matrícula; nada foi decidido sobre retenção ou consulta posterior.
 Impacto: bloqueia o modelo de arquivamento e eventuais telas de histórico.
 Responsável: Danilo Moura. *(Fonte: dossiê A/M3.)*
@@ -201,6 +209,7 @@ Impacto: modelo de espaços/lotação do módulo de eventos.
 Responsável: Danilo Moura. *(Fontes: dossiês D/M8 + E — deduplicadas.)*
 
 **P36. O simulado real terá vínculo com turma/concurso/árvore do edital (segmentação e relatório por matéria) ou permanece "do Quad", igual para todos?**
+**[RESPONDIDA — DA-05, 03/08]** O simulado é **do sistema** e pode ser **associado** a uma turma, a várias, a um concurso, a um edital ou a campanhas — sempre por associação, nunca por dependência direta.
 Contexto: `SIMULADOS` não tem campo de turma nem de concurso; o digital sorteia do banco único sem filtrar pelo edital da turma ativa.
 Impacto: bloqueia o modelo de dados do módulo de simulados e o relatório pedagógico por matéria.
 Responsável: Danilo Moura. *(Fonte: dossiê E/M12.)*
@@ -240,6 +249,7 @@ Impacto: bloqueia o desenho de permissões e do fluxo editorial do banco de ques
 Responsável: Danilo Moura. *(Fontes: dossiês B/M6 + F/M16 — deduplicadas.)*
 
 **P43. Qual é o modelo real do banco de questões: ID única com deduplicação, classificação descendo ao subassunto, versionamento e trilha de auditoria da "correção ao vivo"?**
+**[RESPONDIDA — DA-02, 03/08]** Cada questão terá **ID único e permanente**, vinculada a disciplina → matéria → assunto → **subassunto**, com **revisão sem perda do histórico de utilização** (ou seja, versionamento). **Resta** a trilha da "correção ao vivo" e o desenho do schema em si.
 Contexto: hoje a ligação questão↔edital é por rótulo textual matéria+assunto (sem ID, sem subassunto — o Domínio exibe subassuntos que nenhuma questão aponta); a "correção ao vivo" é só texto de tela.
 Impacto: bloqueia o schema do banco de questões — dependência de missões, simulados, quiz da aula e Domínio.
 Responsável: engenheiro (modelo) + Danilo Moura (regras). *(Fontes: dossiês B/M6 + F/M16 — deduplicadas.)*
@@ -288,6 +298,7 @@ Responsável: Danilo Moura. *(Fonte: Q11.)*
 ## Tema 7 — Administração
 
 **P51. Quantos papéis administrativos existirão (N.P.P., direção, recepção…) com quais permissões — e o acesso passa a ser conta individual com e-mail validado e chave emitida/revogada por pessoa?**
+**[RESPONDIDA — DA-08, 03/08]** Há **perfis administrativos** com permissões por responsabilidade institucional, e toda ação administrativa tem **autor auditável**; o protótipo já demonstra quatro (Direção, Coordenação pedagógica, Recepção e Financeiro — dec. 196). **Resta**: o **RBAC fino** (matriz de permissões por perfil) e a **chave/identidade por pessoa**.
 Contexto: a demo tem 1 perfil com chave única `NPP-2026` e e-mail livre (qualquer "@" entra); o próprio código anota "a chave é emitida e revogada pela direção, por pessoa", nunca especificado.
 Impacto: bloqueia o RBAC do módulo de administração e a auditoria de ações (quem fez o quê).
 Responsável: Danilo Moura (papéis) + engenheiro (RBAC). *(Fontes: dossiês A/M1 + F/M16 — deduplicadas.)*
@@ -307,6 +318,7 @@ Responsável: Danilo Moura (escopo) + engenheiro. *(Fontes: dossiê F/M16 + audi
 ## Tema 8 — Técnicas
 
 **P54. As entidades (professor, aluno, turma, questão) terão ID estável como chave — e o e-mail funcional do professor deixa de ser derivado do sobrenome (colisão de homônimos)?**
+**[RESPONDIDA — DA-01, 03/08]** Sim: todo registro principal terá **ID interno único, permanente e imutável**, usado em **todos** os relacionamentos — **o nome nunca será chave**. **Resta** definir como o e-mail funcional do professor passa a ser gerado/atribuído.
 Contexto: hoje o nome é a chave do docente (renomear propaga e troca o login) e dois "Silva" gerariam o mesmo e-mail; Q15 segue [ABERTA], a especificar nos módulos internos.
 Impacto: requisito de arquitetura do modelo de dados — bloqueia autenticação e todos os cadastros reais.
 Responsável: engenheiro (Danilo Moura confirma o requisito). *(Fontes: Q15 + dossiês A/M1 + F/M15 — deduplicadas.)*
@@ -326,8 +338,8 @@ Contexto: a Consolidação definiu a propriedade dos módulos, mas nenhum contra
 Impacto: é o primeiro artefato técnico da construção — bloqueia o planejamento das integrações.
 Responsável: engenheiro (Danilo Moura prioriza). *(Fonte: Q19.)*
 
-**P58. Antes de qualquer piloto: os botões de demonstração ([DEMO PROVISÓRIO] de patente, "dia de estudo +275", "liberar nova tentativa") saem — e qual é a política dos 35 hooks `window.__*` no build de produção?**
-Contexto: o próprio código pede a remoção desde 20/07; os hooks são contrato das 57 suítes (dec. 190), mas ficam expostos no build publicado (Q13 [ABERTA] — a parte "versionar suítes" já foi resolvida pela dec. 190).
+**P58. Antes de qualquer piloto: os botões de demonstração ([DEMO PROVISÓRIO] de patente, "dia de estudo +275", "liberar nova tentativa") saem — e qual é a política dos 42 hooks `window.__*` no build de produção?**
+Contexto: o próprio código pede a remoção desde 20/07; os hooks são contrato das **58 suítes** (dec. 190), mas ficam expostos no build publicado (Q13 [ABERTA] — a parte "versionar suítes" já foi resolvida pela dec. 190). **Agravante da dec. 196**: com a persistência da DA-10, o estado forjado pelo console passa a ser **gravado** no dispositivo (`vq_evolucao`).
 Impacto: higiene obrigatória pré-piloto (integridade/antifraude do estado do aluno).
 Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 
@@ -335,20 +347,22 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 
 ## Tabela-resumo
 
+> **Leitura da tabela (03/08)** — as linhas marcadas **[RESPONDIDA]** saíram da fila de decisão do gestor: a decisão já existe (DA-0x, dec. 195) e o que sobra é **especificação**. As demais continuam bloqueando.
+
 | P# | Tema | Responsável | Bloqueia o quê |
 |---|---|---|---|
-| P1 | Conta e acesso | Danilo Moura | Módulo de cadastro + integração com checkout |
-| P2 | Conta e acesso | Danilo Moura + engenheiro | Escopo do módulo de autenticação |
+| P1 | Conta e acesso | Danilo Moura | **[RESPONDIDA — DA-07]** dono do cadastro é o Viver o Quad; resta especificar campos e mecanismo |
+| P2 | Conta e acesso | Danilo Moura + engenheiro | **[RESPONDIDA — DA-07]** recuperação de acesso é da plataforma; resta o mecanismo |
 | P3 | Conta e acesso | Danilo Moura | Fluxo do estado "conta bloqueada" |
-| P4 | Conta e acesso | Danilo Moura | Validação/modelo do nome de guerra |
+| P4 | Conta e acesso | Danilo Moura | **[RESPONDIDA — DA-04]** nome de guerra pode repetir; o ID desempata |
 | P5 | Conta e acesso | Danilo Moura | Especificação final da validação do nome de guerra |
 | P6 | Conta e acesso | Danilo Moura | Gates de completude do onboarding |
-| P7 | Conta e acesso | Danilo Moura | Regra do "refazer tutorial" com progresso persistido |
+| P7 | Conta e acesso | Danilo Moura | Regra do "refazer tutorial" com progresso persistido — **mais urgente após a DA-10** |
 | P8 | Conta e acesso | Danilo Moura | Moderação de produção do nome de guerra |
 | P9 | Conta e acesso | Danilo Moura | Roteiro canônico do onboarding |
 | P10 | Conta e acesso | Danilo Moura | Gatilho de exibição do tutorial |
 | P11 | Conta e acesso | Danilo Moura | Cadastro/perfil do aluno (graduação) |
-| P12 | Economia | Danilo Moura + Vitor França | Modelo econômico/ledger + rev. 2.4 |
+| P12 | Economia | Danilo Moura + Vitor França | **[RESPONDIDA — DA-03]** o modelo é ledger; restam o portão do Diamante, a rev. 2.4 e os valores |
 | P13 | Economia | Danilo Moura + N.G.E./Jurídico | Corte de escopo do piloto |
 | P14 | Economia | Danilo Moura + gestor da economia | Valores finais / parametrização econômica |
 | P15 | Economia | Danilo Moura | Modelo de temporadas e pós-jogo (Prestígio) |
@@ -363,7 +377,7 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 | P24 | Turmas e cronograma | Danilo Moura | Regra de limite de matrículas |
 | P25 | Turmas e cronograma | Danilo Moura | Ciclo de vida/renovação da matrícula |
 | P26 | Turmas e cronograma | Danilo Moura | Comportamento da turma ativa na expiração |
-| P27 | Turmas e cronograma | Danilo Moura | Arquivamento/histórico da turma encerrada |
+| P27 | Turmas e cronograma | Danilo Moura | **[RESPONDIDA — DA-06]** turma encerrada é arquivada, com histórico consultável |
 | P28 | Turmas e cronograma | Danilo Moura + engenheiro | Fonte única do cronograma (Sheets × módulo) |
 | P29 | Turmas e cronograma | Danilo Moura | Visibilidade de avisos (ativa × todas) |
 | P30 | Turmas e cronograma | Danilo Moura | Agendador do pipeline de missões |
@@ -372,14 +386,14 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 | P33 | Eventos e simulados | Danilo Moura | Crédito de presença/participação em eventos |
 | P34 | Eventos e simulados | Danilo Moura | Estorno no cancelamento de evento pago |
 | P35 | Eventos e simulados | Danilo Moura | Modelo de espaços/lotação de eventos |
-| P36 | Eventos e simulados | Danilo Moura | Modelo de dados dos simulados (vínculo turma/edital) |
+| P36 | Eventos e simulados | Danilo Moura | **[RESPONDIDA — DA-05]** simulado é do sistema, associável a turmas/concursos/editais |
 | P37 | Eventos e simulados | Danilo Moura | Ranking e correção comentada de simulado |
 | P38 | Eventos e simulados | Danilo Moura | Entrada da nota do presencial no histórico |
 | P39 | Eventos e simulados | Danilo Moura | Regra de premiação do digital pago |
 | P40 | Eventos e simulados | Danilo Moura | Persistência de estado de prova (retomada) |
 | P41 | Conteúdo e questões | Danilo Moura | Motor unificado de questões (regra de feedback) |
 | P42 | Conteúdo e questões | Danilo Moura | Permissões/fluxo editorial do banco de questões |
-| P43 | Conteúdo e questões | Engenheiro + Danilo Moura | Schema do banco de questões (ID, subassunto, versão) |
+| P43 | Conteúdo e questões | Engenheiro + Danilo Moura | **[RESPONDIDA — DA-02]** ID único, classificação até subassunto e revisão sem perder histórico |
 | P44 | Conteúdo e questões | Danilo Moura | Integração materiais ↔ questões ↔ economia |
 | P45 | Pedagógico | Danilo Moura + engenheiro | Motor real de dificuldade/Domínio |
 | P46 | Pedagógico | Danilo Moura | Intervenção pedagógica (gatilhos e agentes) |
@@ -387,14 +401,14 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 | P48 | Pedagógico | Danilo Moura | Papéis do módulo de produção de materiais |
 | P49 | Pedagógico | Danilo Moura | Ciclo de vida do material publicado |
 | P50 | Pedagógico | Danilo Moura | Corte de escopo do Pré-TAF |
-| P51 | Administração | Danilo Moura + engenheiro | RBAC e auditoria da área administrativa |
+| P51 | Administração | Danilo Moura + engenheiro | **[RESPONDIDA — DA-08]** há perfis com autoria auditável; restam o RBAC fino e a chave por pessoa |
 | P52 | Administração | Danilo Moura | Módulo de presença (fonte do registro) |
 | P53 | Administração | Danilo Moura + engenheiro | Parametrização administrável (salas, GAMI) |
-| P54 | Técnicas | Engenheiro | IDs estáveis / identidade do professor |
+| P54 | Técnicas | Engenheiro | **[RESPONDIDA — DA-01]** ID interno imutável em tudo; o nome deixa de ser chave |
 | P55 | Técnicas | Danilo Moura + engenheiro | Telemetria (pré-requisito do piloto) |
 | P56 | Técnicas | Engenheiro | Fonte de tempo oficial (servidor/fuso) |
 | P57 | Técnicas | Engenheiro | Catálogo de contratos de integração |
-| P58 | Técnicas | Engenheiro | Higiene pré-piloto (demos e hooks) |
+| P58 | Técnicas | Engenheiro | Higiene pré-piloto (demos e os 42 hooks) |
 
 ---
 
@@ -405,13 +419,15 @@ Responsável: engenheiro. *(Fontes: Q13 + dossiê C/M7 — deduplicadas.)*
 3. **"Unificar as ATIVIDADES fixas com os eventos vivos nas Liberações?"** (dossiê F/M16) — Já decidido: dec. 80/180 mandam Liberações/Relatórios lerem dados vivos sincronizados; as `ATIVIDADES` fixas são semente de demonstração que não existirá no sistema real.
 4. **"Os 3 cards fixos de 'Curso online' passam a nascer do cadastro?"** (dossiê D/M8) — Sim: dec. 95/118 fazem de "Cadastrar produto ou serviço" a porta única de entrada do digital; os cards fixos são semente da demo.
 5. **Q1 — "O mascote é QUAD em tudo?"** (auditoria) — Respondida pela dec. 17: o mascote é QUAD; os resíduos "Danilo" (card interno, assets) são correção pendente, não dúvida de produto. *Discordância registrada: a auditoria/10 mantém Q1 [ABERTA]; este pacote a considera respondida pela dec. 17, restando a tarefa de renomeação de assets (nota abaixo, Q2).*
-6. **"Versionar as suítes Playwright"** (parte da Q13) — Executado: dec. 190 versionou as suítes em `tests/` (56 na época; **57 desde a dec. 194, com a nova `vv1.mjs`**) com `verify.py` como portão de aceite oficial.
+6. **"Versionar as suítes Playwright"** (parte da Q13) — Executado: dec. 190 versionou as suítes em `tests/` (56 na época; 57 com a `vv1.mjs` da dec. 194; **58 desde a dec. 196, com a nova `vw1.mjs`**) com `verify.py` como portão de aceite oficial.
 7. **"Drop aleatório/itens raros entram na V2?"** (dossiê F/M17) — **RESPONDIDA pela dec. 194 (02/08)**: não é V2 nem "Módulo Planejado" — o drop foi **implementado na V0**. Cada item de combate tem disponibilidade (só venda / só drop / venda + drop) e chance de 1% a 100%; o sorteio roda ao concluir bloco de 10, treinamento rápido ou simulado digital, nunca no tutorial; o item cai na mochila sem custo e sem estorno, com celebração dedicada. Restam pendentes apenas o **balanceamento das chances** (parte do estudo econômico, P14/dec. 185) e a relação do drop com as Quests/forja, ainda EM BREVE.
 8. **"Qual provedor de push e quais eventos disparam?"** (dossiê F/M17) — Coberto pelas dec. 182/184: notificações seguem sistema externo com integração "a definir" — entra no catálogo de integrações (P57), não como pergunta própria.
 9. **"Biometria segue no escopo?"** (dossiê F/M17) — Coberto pelas dec. 188/184: o fluxo de autorização de dispositivo foi removido e biometria só existe em texto histórico — fora do escopo até nova decisão do gestor.
+
+10. **Retenção de dados e persistência** — não eram perguntas numeradas neste documento (a auditoria apontou a lacuna sem número). **Ambas foram DECIDIDAS em 03/08**: a **DA-09** fixa o princípio de retenção (não se apagam dados acadêmicos, financeiros, de compras e de matrículas; conta que sai é **desativada, não removida** — bases legais, prazos por categoria e eliminação a pedido do titular seguem em aberto, ver dec. 186) e a **DA-10** fixa o princípio de persistência (**toda evolução do aluno é permanente**: progresso, Score, Quad Coins, Diamantes, mochila, itens, conquistas, missões, histórico de compras e de simulados, desempenho e estatísticas). A dec. 196 já demonstra a DA-10 no protótipo, **por dispositivo** (`localStorage`) — o que **não** substitui a persistência por conta no servidor.
 
 **Nota — fora do filtro (não bloqueiam a construção; higiene do protótipo, recomendadas como tarefas e não como perguntas):** renomear assets/ids `danilo*` → `quad*` (Q2); renomear `var score` (moeda) → `qdc` (Q6); sanear a numeração duplicada 126–129 e a ordenação do registro de decisões (Q20).
 
 ---
 
-*Documento gerado em 02/08/2026 a partir do handoff de investigação; revisado em 03/08/2026 contra as dec. 192–194. Nenhuma pergunta dos dossiês foi apagada: cada uma está aqui (P1–P58, com deduplicação indicada), no rodapé de descartadas com a resposta, ou na nota de itens fora do filtro.*
+*Documento gerado em 02/08/2026 a partir do handoff de investigação; revisado em 03/08/2026 contra as dec. 192–194 e novamente, no mesmo dia, contra as **dec. 195–197** (Decisões Administrativas DA-01…DA-10, sua implementação no protótipo e a carteira unificada). Nenhuma pergunta dos dossiês foi apagada: cada uma está aqui (P1–P58, com deduplicação indicada e nove marcadas **[RESPONDIDA — DA-0x]** sem supressão do texto original), no rodapé de descartadas com a resposta, ou na nota de itens fora do filtro.*
