@@ -5,6 +5,7 @@ const b = await chromium.launch({ executablePath:process.env.VQ_CHROME ?? '/opt/
 const p = await (await b.newContext({ viewport:{width:430,height:900}, deviceScaleFactor:2 })).newPage();
 const errs = []; p.on('pageerror', e => errs.push(e.message));
 const fails = []; const ok = (c,m)=>{ console.log((c?'✔':'✗'), m); if(!c) fails.push(m); };
+await p.addInitScript(() => { window.__dropRng = () => 0.999; });   /* sem drop aleatório no teste */
 await p.goto(new URL('../index.html', import.meta.url).href, { waitUntil:'load' });
 await p.evaluate(()=>document.getElementById('loginLayer').classList.add('off'));
 await p.waitForTimeout(600);

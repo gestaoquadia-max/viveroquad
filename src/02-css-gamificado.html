@@ -792,4 +792,45 @@
     .splash-phrase, .splash-phrase .dot, .splash-brand { opacity: 1 !important; transform: none !important; }
     .splash-symbol { -webkit-mask: none !important; mask: none !important; transform: none !important; }
   }
+
+  /* ---------- DROP conquistado: celebração dourada ---------- */
+  .drop-layer { position: absolute; inset: 0; z-index: 66; display: none; align-items: center; justify-content: center;
+    background: rgba(4, 18, 34, 0.82); backdrop-filter: blur(3px); }
+  .drop-layer.on { display: flex; }
+  .drop-card { position: relative; width: 88%; max-width: 330px; text-align: center; padding: 26px 20px 20px;
+    border-radius: 20px; background: linear-gradient(180deg, #0E2A47, #123B63); overflow: hidden;
+    border: 1.5px solid rgba(244, 182, 58, 0.65);
+    box-shadow: 0 0 0 4px rgba(244, 182, 58, 0.12), 0 0 42px rgba(244, 182, 58, 0.35), 0 18px 50px rgba(0, 0, 0, 0.5);
+    animation: dropPop .55s cubic-bezier(.2, 1.4, .4, 1) both; }
+  @keyframes dropPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+  .drop-raios { position: absolute; inset: -60%; pointer-events: none; opacity: .5;
+    background: conic-gradient(from 0deg, transparent 0 14deg, rgba(244, 182, 58, .16) 14deg 22deg,
+      transparent 22deg 40deg, rgba(244, 182, 58, .16) 40deg 48deg, transparent 48deg 66deg,
+      rgba(244, 182, 58, .16) 66deg 74deg, transparent 74deg 92deg, rgba(244, 182, 58, .16) 92deg 100deg,
+      transparent 100deg 118deg, rgba(244, 182, 58, .16) 118deg 126deg, transparent 126deg 144deg,
+      rgba(244, 182, 58, .16) 144deg 152deg, transparent 152deg 180deg, rgba(244, 182, 58, .16) 180deg 188deg,
+      transparent 188deg 206deg, rgba(244, 182, 58, .16) 206deg 214deg, transparent 214deg 232deg,
+      rgba(244, 182, 58, .16) 232deg 240deg, transparent 240deg 258deg, rgba(244, 182, 58, .16) 258deg 266deg,
+      transparent 266deg 284deg, rgba(244, 182, 58, .16) 284deg 292deg, transparent 292deg 310deg,
+      rgba(244, 182, 58, .16) 310deg 318deg, transparent 318deg 336deg, rgba(244, 182, 58, .16) 336deg 344deg, transparent 344deg 360deg);
+    animation: dropSpin 14s linear infinite; }
+  @keyframes dropSpin { to { transform: rotate(360deg); } }
+  .drop-eyebrow { position: relative; font-size: 10.5px; font-weight: 800; letter-spacing: .22em; color: #F4B63A; }
+  .drop-titulo { position: relative; margin: 6px 0 2px; font-size: 24px; font-weight: 900; color: #fff;
+    text-shadow: 0 0 18px rgba(244, 182, 58, .55); }
+  .drop-itens { position: relative; margin: 12px 0 4px; display: flex; flex-direction: column; gap: 10px; }
+  .drop-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px;
+    background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(244, 182, 58, 0.35); }
+  .drop-item .di-ico { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px;
+    background: radial-gradient(circle at 50% 35%, rgba(244, 182, 58, .4), rgba(244, 182, 58, .08));
+    box-shadow: 0 0 16px rgba(244, 182, 58, .45); animation: dropGlow 1.6s ease-in-out infinite; }
+  .drop-item .di-ico svg { width: 28px; height: 28px; fill: #FFDF9E; }
+  @keyframes dropGlow { 0%, 100% { box-shadow: 0 0 10px rgba(244, 182, 58, .35); } 50% { box-shadow: 0 0 24px rgba(244, 182, 58, .75); } }
+  .drop-item .di-nome { text-align: left; }
+  .drop-item .di-nome b { display: block; color: #fff; font-size: 15px; }
+  .drop-item .di-nome small { color: #BFD8F5; font-size: 11.5px; }
+  .drop-msg { position: relative; margin: 8px 2px 0; color: #DCEBFB; font-size: 13px; line-height: 1.5; }
+  .drop-cta { position: relative; margin: 10px 2px 14px; color: #F4B63A; font-size: 12px; font-weight: 700; }
+  .drop-card .btn { position: relative; width: 100%; background: linear-gradient(180deg, #F7C55C, #E8A82A);
+    color: #24303C; font-weight: 800; border: none; box-shadow: 0 6px 18px rgba(244, 182, 58, .4); }
 </style>

@@ -21,6 +21,12 @@
   chance; o conquistado vai para a **mochila** — sem custo e sem entrada
   no estorno — com anúncio no cartão de resultado e aviso. Item só de
   drop não aparece na vitrine; o "vende e dropa" avisa a chance no card.
+  A conquista abre uma **celebração dourada em tela cheia** — raios
+  girando, item pulsando em destaque, "A sorte encontra quem está em
+  combate" e o convite "cada bloco resolvido é uma nova chance de drop.
+  Bora pro próximo!" — no lugar do aviso discreto (pedido do gestor:
+  evidência visual que motive a continuar). No tutorial o sorteio não
+  dispara — o rito de entrada é guiado.
   Sementes de demonstração: Cantil (à venda e no drop, 10%) e o novo
   **Patch da sorte** (só no drop, 12%).
 

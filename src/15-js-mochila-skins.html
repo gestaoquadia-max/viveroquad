@@ -48,6 +48,7 @@
      entrada na janela de estorno (não é compra).                        */
   function dropSortear(origem) {
     if (typeof ITENS_COMBATE === 'undefined' || typeof MOCHILA === 'undefined') return [];
+    if (typeof tutOn !== 'undefined' && tutOn) return [];   /* no tutorial o rito é guiado — sem sorteio */
     var rng = window.__dropRng || Math.random;
     var ganhos = ITENS_COMBATE.filter(function (it) {
       var ch = +it.drop || 0;
@@ -57,11 +58,32 @@
     if (ganhos.length) {
       if (typeof renderMochila === 'function') renderMochila();
       if (typeof renderLojaCombate === 'function') renderLojaCombate();
-      toast('DROP! Você conquistou ' + ganhos.map(function (i) { return '“' + i.nome + '”'; }).join(' e ') + ' ' + origem + ' — já está na mochila.');
+      dropCelebrar(ganhos, origem);
     }
     return ganhos;
   }
-  window.__dropRng = null;              /* a suíte pluga um RNG determinístico aqui */
+  /* a celebração é o anúncio: tela dourada, item em destaque e convite
+     para continuar — o drop existe para premiar quem está resolvendo   */
+  function dropCelebrar(ganhos, origem) {
+    var layer = $('dropLayer');
+    if (!layer) {   /* fallback improvável */
+      toast('DROP! Você conquistou ' + ganhos.map(function (i) { return '“' + i.nome + '”'; }).join(' e ') + ' ' + origem + '.');
+      return;
+    }
+    $('dropItens').innerHTML = ganhos.map(function (it) {
+      return '<div class="drop-item"><span class="di-ico">' + itemIcoHtml(it) + '</span>' +
+        '<span class="di-nome"><b>' + it.nome + '</b><small>' + (it.desc || 'item de campo') + '</small></span></div>';
+    }).join('');
+    $('dropMsg').innerHTML = 'A sorte encontra quem está em combate: ' +
+      (ganhos.length > 1 ? 'estes itens caíram' : 'este item caiu') + ' para você <b>' + origem + '</b> e já ' +
+      (ganhos.length > 1 ? 'estão' : 'está') + ' na sua <b>mochila</b>.';
+    layer.classList.add('on');
+  }
+  (function () {
+    var bt = $('btnDropOk');
+    if (bt) bt.addEventListener('click', function () { $('dropLayer').classList.remove('on'); });
+  })();
+  window.__dropRng = window.__dropRng || null;   /* a suíte pluga um RNG determinístico aqui (preservado se vier antes do boot) */
   window.__dropSortear = dropSortear;   /* para a suíte de testes */
 
   function mochilaComprar(id) {

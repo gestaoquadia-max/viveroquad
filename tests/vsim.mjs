@@ -5,7 +5,7 @@ const b = await chromium.launch({ executablePath:process.env.VQ_CHROME ?? '/opt/
 const errs = [], fails = [];
 const ok = (c, m) => { console.log((c?'✔':'✗'), m); if(!c) fails.push(m); };
 async function ctx(){ const c = await b.newContext({ viewport:{width:430,height:940}, deviceScaleFactor:2 }); const p = await c.newPage();
-  await p.addInitScript(() => { window.__admTudo = true; });   /* blocos do admin abertos para o teste */ p.on('pageerror', e=>errs.push(e.message)); await p.goto(new URL('../index.html', import.meta.url).href,{waitUntil:'load'}); await p.waitForTimeout(400); return p; }
+  await p.addInitScript(() => { window.__admTudo = true; window.__dropRng = () => 0.999; /* sem drop aleatório no teste */ }); p.on('pageerror', e=>errs.push(e.message)); await p.goto(new URL('../index.html', import.meta.url).href,{waitUntil:'load'}); await p.waitForTimeout(400); return p; }
 const loginAluno = async () => { const p = await ctx(); await p.evaluate(()=>{localStorage.setItem('vq_tut_done','1');localStorage.setItem('vq_tut_skip','1');}); await p.fill('#loginEmail','aluno@quad.com'); await p.fill('#loginSenha','quad1234'); await p.click('#btnAcessar'); await p.waitForTimeout(5600); return p; };
 const persona = (p,q) => p.evaluate(pp=>{ document.querySelector('.persona-btn[data-persona="'+pp+'"]').click(); }, q);
 const toast = p => p.evaluate(()=>document.getElementById('toast').textContent);

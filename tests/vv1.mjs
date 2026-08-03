@@ -49,6 +49,13 @@ for (let i = 0; i < 10; i++) {
   await p.evaluate(() => document.querySelector('#trBody [data-nota="3"]')?.click());
   await p.waitForTimeout(120);
 }
+/* a celebração dourada abre por cima do resultado */
+t('a celebração de DROP abre ao concluir o bloco', await p.evaluate(() => document.getElementById('dropLayer').classList.contains('on')));
+const celebra = await p.evaluate(() => document.querySelector('#dropLayer .drop-card').textContent.replace(/\s+/g, ' '));
+t('a celebração traz o título e o item em destaque', /DROP CONQUISTADO!/.test(celebra) && /RECOMPENSA DE CAMPO/.test(celebra) && /Patch da sorte/.test(celebra));
+t('o texto motiva a continuar resolvendo', /sorte encontra quem está em combate/.test(celebra) && /nova chance de drop/.test(celebra));
+await p.evaluate(() => document.getElementById('btnDropOk').click());
+t('"Guardar na mochila" fecha a celebração', await p.evaluate(() => !document.getElementById('dropLayer').classList.contains('on')));
 const fimBloco = await p.evaluate(() => document.getElementById('trBody').textContent.replace(/\s+/g, ' '));
 t('bloco concluído anuncia o DROP no cartão de resultado', /DROP!/.test(fimBloco) && /Patch da sorte/.test(fimBloco));
 await p.evaluate(() => { document.getElementById('btnTrProx')?.click(); document.getElementById('trLayer').style.display = 'none'; });
@@ -92,6 +99,7 @@ t('mas participa do sorteio', await p.evaluate(() => {
   window.__dropRng = () => 0;
   const g = window.__dropSortear('em teste').map(i => i.nome);
   window.__dropRng = null;
+  document.getElementById('dropLayer').classList.remove('on');   /* fecha a celebração do teste */
   return g.indexOf('Medalha do sorteio') >= 0;
 }));
 
