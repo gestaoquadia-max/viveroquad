@@ -74,6 +74,20 @@ t('o extrato sobrevive ao recarregar', depoisF5.lanc === antesF5.lanc);
 t('a tela mostra o saldo restaurado, não o de fábrica',
   (await p.evaluate(() => parseInt(document.getElementById('dmnVal').textContent.replace(/\D/g, ''), 10))) === depoisF5.dmn);
 
+/* ============ DEC. 198 · A DEMONSTRAÇÃO ABRE ZERADA ============ */
+/* mesma aba (F5) lembra — já verificado acima; ABA NOVA volta à fábrica */
+const p2 = await c.newPage();
+await p2.addInitScript(() => { try { localStorage.setItem('vq_tut_skip', '1'); } catch (e) {} });
+await p2.goto(new URL('../index.html', import.meta.url).href, { waitUntil: 'load' });
+await p2.evaluate(() => { document.getElementById('loginLayer').classList.add('off'); });
+await p2.waitForTimeout(1000);
+const fabrica = await p2.evaluate(() => window.__carteira());
+t('aba nova abre com a carteira de fábrica (não herda a visita anterior)',
+  fabrica.diamantes === 150 && fabrica.mochila === 0 && fabrica.diamantes !== depoisF5.dmn);
+t('a evolução da visita anterior foi descartada do armazenamento',
+  await p2.evaluate(() => { try { return !localStorage.getItem('vq_evolucao') || JSON.parse(localStorage.getItem('vq_evolucao')).diamantes === 150; } catch (e) { return false; } }));
+await p2.close();
+
 /* ============ DA-08 · PERFIS ADMINISTRATIVOS ============ */
 await persona('admin'); await p.waitForTimeout(400);
 t('o portão do admin pede o perfil de acesso', await p.evaluate(() => !!document.getElementById('admPerfil')));

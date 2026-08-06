@@ -807,6 +807,7 @@
     /* limpa as flags do dispositivo E a evolução guardada (DA-10) —
        inclui a Introdução no Quad, que antes sobrevivia ao reset      */
     lsDel('vq_tut_skip'); lsDel('vq_intro_done'); lsDel('vq_evolucao');
+    try { window.sessionStorage.removeItem('vq_sessao'); } catch (e) {}
     online = true;
     updatePending();
     sairConta();

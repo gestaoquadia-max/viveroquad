@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 03/08/2026 — A demonstração volta a abrir zerada
+
+- **Persistência com escopo de sessão** (dec. 198): a DA-10 fez a evolução
+  do aluno sobreviver ao recarregar — e, sem querer, também entre
+  demonstrações: quem abria o app encontrava a conta da visita anterior.
+  Agora o protótipo **abre sempre no estado de fábrica**; dentro da mesma
+  aba, o F5 continua preservando moedas, mochila, patente, identidade e
+  extrato (a DA-10 segue demonstrada). Fechar a aba e voltar depois começa
+  limpo — o marcador de sessão é descartado pelo navegador.
+- O botão do painel lateral virou **"Reiniciar demonstração do zero"** e
+  encerra a sessão junto. O texto ao lado dele estava velho: descrevia
+  login por **código de e-mail** e **autorização de dispositivo** — fluxo
+  revogado (dec. 21/183) e código removido na dec. 188. Reescrito com as
+  credenciais que valem hoje.
+
 ## 03/08/2026 — Carteira unificada e tutorial sem contador de etapas
 
 - **Um bloco só para o dinheiro** (dec. 197): "Extrato da carteira" e

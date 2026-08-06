@@ -207,6 +207,18 @@
      dado da instituição, não do aluno.                                 */
   var VQ_EVOL = 'vq_evolucao';
   var evolTimer = null;
+  /* A demonstração ABRE SEMPRE ZERADA (decisão do gestor, 03/08): a evolução
+     vale para a SESSÃO — recarregar (F5) mantém tudo, como a DA-10 exige —,
+     mas fechar a aba e voltar depois começa do estado de fábrica. Quem marca
+     a sessão é o sessionStorage, que o navegador descarta ao fechar a aba;
+     o localStorage segue guardando a evolução dentro dela.                */
+  var VQ_SESSAO = 'vq_sessao';
+  function sessaoViva() {
+    try { return window.sessionStorage.getItem(VQ_SESSAO) === '1'; } catch (e) { return false; }
+  }
+  function sessaoAbrir() {
+    try { window.sessionStorage.setItem(VQ_SESSAO, '1'); } catch (e) {}
+  }
   function evolSalvar() {
     try {
       lsSet(VQ_EVOL, JSON.stringify({
@@ -254,6 +266,9 @@
   /* restaura a evolução de quem já usou o app neste dispositivo e passa a
      salvar a cada mudança de saldo/mochila/identidade (DA-10)            */
   (function () {
+    /* aba nova = demonstração nova: descarta a evolução da visita anterior */
+    if (!sessaoViva()) { lsDel(VQ_EVOL); }
+    sessaoAbrir();
     if (evolCarregar()) {
       if (typeof aplicarAvatar === 'function') aplicarAvatar();
       if (typeof renderCarreira === 'function') renderCarreira();
