@@ -26,14 +26,14 @@ if (g){ await p.fill('#admEmail','npp@quadconcursos.com.br'); await p.fill('#adm
 await navAdm('v-adm-hoje'); await p.waitForTimeout(400);
 await p.fill('#admEvNovoNome','Aulão da segunda 20h');
 await p.fill('#admEvNovoResumo','choque com a turma da noite');
-await p.fill('#admEvNovoData','2026-08-03');           // segunda-feira
+await p.fill('#admEvNovoData','2026-09-07');           // segunda-feira (data futura — dec. 189)
 await p.fill('#admEvNovoInicio','20:00'); await p.fill('#admEvNovoFim','21:30');
 await p.selectOption('#admEvSala','Sala 4');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
 // e um evento em horário livre (sábado de manhã)
 await p.fill('#admEvNovoNome','Aulão de sábado 9h');
 await p.fill('#admEvNovoResumo','sem choque');
-await p.fill('#admEvNovoData','2026-08-08');           // sábado
+await p.fill('#admEvNovoData','2026-09-12');           // sábado (data futura — dec. 189)
 await p.fill('#admEvNovoInicio','09:00'); await p.fill('#admEvNovoFim','11:00');
 await p.selectOption('#admEvSala','Sala 4');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);

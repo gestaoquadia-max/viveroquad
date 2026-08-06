@@ -130,7 +130,7 @@ const persona = q => p.evaluate(pp=>{ document.querySelector('.persona-btn[data-
 { await p.evaluate(()=>document.querySelector('#navAdmin .nav-btn[data-view="v-adm-hoje"]').click()); await p.waitForTimeout(300);
   /* presencial: sempre vendido, com vagas e preços por moeda */
   await p.fill('#admSimNome','Simulado 64 · SD PMBA'); await p.selectOption('#admSimModal','presencial');
-  await p.fill('#admSimData','2026-07-26'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
+  await p.fill('#admSimData','2026-11-01'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
   await p.fill('#admSimVagas','0'); await p.fill('#admSimVagasQdc','100'); await p.fill('#admSimPrecoQdc','150');   /* vagas POR MOEDA (dec. 155) */
   await p.selectOption('#admSimSala','Sala 1');
   await p.click('#btnAdmSimLancar'); await p.waitForTimeout(300);

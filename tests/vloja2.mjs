@@ -94,14 +94,14 @@ async function entrarAdmin(p){ await persona(p,'admin'); await p.waitForTimeout(
   ok(await p.evaluate(()=>document.getElementById('admEvNovoData').type==='date'), 'ITEM2: campo de data é um seletor de calendário (type=date)');
   ok(await p.evaluate(()=>document.getElementById('admEvNovoInicio').type==='time'), 'ITEM2: campo de horário é um seletor de hora (type=time)');
   await p.fill('#admEvNovoNome','Aulão da virada');
-  await p.fill('#admEvNovoData','2026-07-29'); await p.fill('#admEvNovoInicio','19:30'); await p.fill('#admEvNovoFim','21:30');
+  await p.fill('#admEvNovoData','2026-11-04'); await p.fill('#admEvNovoInicio','19:30'); await p.fill('#admEvNovoFim','21:30');
   await p.evaluate(()=>document.getElementById('admEvNovoData').dispatchEvent(new Event('change')));
   await p.waitForTimeout(200);
-  ok(/QUA · 29\/07 · 19H30/.test(await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent)), 'ITEM2: prévia monta "QUA · 29/07 · 19H30…": '+await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent));
-  await p.selectOption('#admEvSala','Sala 1');
+  ok(/QUA · 04\/11 · 19H30/.test(await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent)), 'ITEM2: prévia monta "QUA · 04/11 · 19H30…": '+await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent));
+  await p.selectOption('#admEvSala','Sala 4');   /* Sala 4 é a livre à noite (1/2/3 têm turma) */
   await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
   ok(/Aulão da virada/.test(await p.evaluate(()=>document.getElementById('admEvList').textContent)), 'ITEM2: evento criado aparece na lista do admin');
-  ok(/QUA · 29\/07/.test(await p.evaluate(()=>document.getElementById('admEvList').textContent)), 'ITEM2: data formatada a partir da agenda entra no evento');
+  ok(/QUA · 04\/11/.test(await p.evaluate(()=>document.getElementById('admEvList').textContent)), 'ITEM2: data formatada a partir da agenda entra no evento');
   await p.context().close();
 }
 

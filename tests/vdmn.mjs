@@ -126,7 +126,7 @@ const confirmar = p => p.evaluate(()=>document.getElementById('btnCompraOk').cli
   await entrarAdmin(p);
   await p.evaluate(()=>document.querySelector('#navAdmin .nav-btn[data-view="v-adm-hoje"]').click()); await p.waitForTimeout(300);
   await p.fill('#admSimNome','Simulado 77 · PRF'); await p.selectOption('#admSimModal','presencial');
-  await p.fill('#admSimData','2026-08-09'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
+  await p.fill('#admSimData','2026-11-15'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
   await p.fill('#admSimVagas','40'); await p.fill('#admSimVagasQdc','0'); await p.fill('#admSimPrecoDmn','200');
   await p.selectOption('#admSimSala','Sala 1');
   await p.click('#btnAdmSimLancar'); await p.waitForTimeout(300);

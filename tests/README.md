@@ -39,7 +39,12 @@ de ambiente (`VQ_NODE`, `VQ_PW`, `VQ_CHROME` — ver `run.sh`).
    suíte acompanha (e a decisão é citada no commit). Se não mudou, o
    código regrediu — conserte o código, nunca afrouxe a suíte.
 2. **Datas**: suítes que criam turmas/eventos usam datas futuras; ao
-   vencerem no calendário real, reancore-as (precedente: dec. 189).
+   vencerem no calendário real, reancore-as (precedente: dec. 189) —
+   **desloque em múltiplos de 7 dias** para preservar o dia da semana, e
+   confira: (a) as asserções que citam a data formatada (`DD/MM`), (b) se
+   a data nova cai **dentro** do período de alguma turma, o que faz a sala
+   passar a ter choque de horário (foi o que aconteceu com a `vloja2` em
+   06/08 — resolvido usando a Sala 4, livre à noite).
    As suítes de "aula de hoje" (vaula*) usam relógio simulado e não vencem.
 3. As suítes conversam com o protótipo pelos 42 ganchos `window.__*`
    do fonte — eles são contrato estável; não remova sem atualizar aqui.

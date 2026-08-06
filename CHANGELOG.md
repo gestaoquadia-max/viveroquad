@@ -1,6 +1,6 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
-## 03/08/2026 — A demonstração volta a abrir zerada
+## 06/08/2026 — A demonstração volta a abrir zerada
 
 - **Persistência com escopo de sessão** (dec. 198): a DA-10 fez a evolução
   do aluno sobreviver ao recarregar — e, sem querer, também entre

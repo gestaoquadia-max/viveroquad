@@ -114,7 +114,7 @@ async function responderQuiz(p){ const total = await p.evaluate(()=>window.__sim
 { const p = await loginAluno(); await entrarAdmin(p); await navAdm(p,'v-adm-hoje'); await p.waitForTimeout(300);
   /* presencial já nasce "pago" (o seletor fica travado) e pede as vagas por moeda */
   await p.fill('#admSimNome','Simulado 70 · Soldado'); await p.selectOption('#admSimModal','presencial');
-  await p.fill('#admSimData','2026-08-02'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
+  await p.fill('#admSimData','2026-11-08'); await p.fill('#admSimIni','08:00'); await p.fill('#admSimFim','12:00');
   await p.fill('#admSimVagas','30'); await p.fill('#admSimVagasQdc','70');   /* vagas POR MOEDA (dec. 155): 30 Dmn + 70 QdC */
   await p.fill('#admSimPrecoDmn','90'); await p.fill('#admSimPrecoQdc','120');
   await p.selectOption('#admSimSala','Sala 1');

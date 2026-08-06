@@ -69,7 +69,7 @@ const preco = (p,nome) => p.evaluate(n=>document.querySelector('.loja-item[data-
   await p.evaluate(()=>document.querySelector('#navAdmin .nav-btn[data-view="v-adm-hoje"]').click()); await p.waitForTimeout(300);
   await p.fill('#admEvNovoNome','Mentoria online'); await p.fill('#admEvNovoResumo','tira-dúvidas ao vivo');
   await p.selectOption('#admEvNovoModal','online'); await p.fill('#admEvNovoLink','https://meet.quad/xyz');
-  await p.fill('#admEvNovoData','2026-08-08'); await p.fill('#admEvNovoInicio','10:00'); await p.fill('#admEvNovoFim','12:00');
+  await p.fill('#admEvNovoData','2026-11-14'); await p.fill('#admEvNovoInicio','10:00'); await p.fill('#admEvNovoFim','12:00');
   await p.selectOption('#admEvSala','Estúdio');   /* dec. 136: o online reserva o Estúdio à mão */
   await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
   ok(/Mentoria online/.test(await p.evaluate(()=>document.getElementById('admEvList').textContent)) &&

@@ -168,7 +168,7 @@ await p.evaluate(() => document.querySelector('#jumpInterno .jp[data-jump="simul
 await p.click('#btnAdmSimLancar'); await p.waitForTimeout(250);
 t('simulado: cobra o nome', /falta o nome/i.test(await txt('admSimErro')));
 await set('admSimNome', 'Simulado 70 · sala grande');
-await set('admSimData', '2026-08-16');
+await set('admSimData', '2026-11-22');
 t('presencial é sempre vendido (gratuito travado)', await p.evaluate(() => {
   const s = document.getElementById('admSimTipo'); return s.value === 'pago' && s.disabled === true;
 }));
@@ -264,19 +264,19 @@ await set('admProdNome', 'Mentoria CFO · turma online');
 await set('admProdPreco', '900');
 await p.click('#btnAdmProd'); await p.waitForTimeout(300);
 t('mentoria: cobra a data de início', /data de início/i.test(await txt('admProdErro')));
-await set('admProdData', '2026-08-10');
+await set('admProdData', '2026-11-16');
 await p.click('#btnAdmProd'); await p.waitForTimeout(300);
 t('mentoria: cobra a data de término', /data de término/i.test(await txt('admProdErro')));
 await set('admProdDataFim', '2026-06-10');
 await p.click('#btnAdmProd'); await p.waitForTimeout(300);
 t('mentoria: recusa término antes do início', /depois do início/i.test(await txt('admProdErro')));
-await set('admProdDataFim', '2026-10-10');
+await set('admProdDataFim', '2026-12-16');
 await p.click('#btnAdmProd'); await p.waitForTimeout(400);
-t('mentoria: publicada com o período', /10\/08\/2026 a 10\/10\/2026/.test(await txt('admProdErro')));
+t('mentoria: publicada com o período', /16\/11\/2026 a 16\/12\/2026/.test(await txt('admProdErro')));
 await set('admProdCat', 'pres:modulos');
 t('produto sem período esconde o término', await p.evaluate(() => document.getElementById('admProdDataFim').style.display === 'none'));
 await persona('aluno'); await p.waitForTimeout(400); await nav('v-loja'); await p.waitForTimeout(500);
-t('mentoria na Loja mostra o período', /10\/08\/2026 → 10\/10\/2026/.test(await txt('lojaExtras-mentoria')));
+t('mentoria na Loja mostra o período', /16\/11\/2026 → 16\/12\/2026/.test(await txt('lojaExtras-mentoria')));
 
 /* ================= 6) PREÇOS E VAGAS: TURMAS E ISOLADAS ================= */
 await persona('admin'); await p.waitForTimeout(400); await navAdm('v-adm-loja'); await p.waitForTimeout(400);
@@ -389,7 +389,7 @@ t('seletor: a 1ª opção é a pergunta, não uma sala', /Em qual sala a turma f
 t('seletor: o Estúdio não é opção de turma', !ops.some(o => /Estúdio/.test(o)));
 await set('admCtApelido', 'CORE');
 await set('admCtConc', 'pcba');
-await set('admCtIni', '2026-08-10'); await set('admCtFim', '2027-02-10');
+await set('admCtIni', '2026-11-16'); await set('admCtFim', '2027-02-10');
 await set('admCtH1i', '19:00'); await set('admCtH1f', '20:30'); await set('admCtH2f', '22:00');
 await set('admCtPrecoDmn', '900'); await set('admCtPrecoQdc', '1000');
 await set('admCtVagas', '40'); await set('admCtVagasQdc', '5');
