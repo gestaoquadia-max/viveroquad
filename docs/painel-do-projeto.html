@@ -1,0 +1,924 @@
+<title>Viver o Quad — Painel do Projeto</title>
+<style>
+  :root {
+    --ground: #EFF5FB;
+    --surface: #FFFFFF;
+    --surface-2: #F7FBFE;
+    --ink: #0E2A44;
+    --ink-2: #37587A;
+    --ink-3: #6B8CAB;
+    --line: #D6E5F2;
+    --line-strong: #B9D2E8;
+    --accent: #1B7FC4;
+    --accent-deep: #0B5488;
+    --accent-soft: #E2F0FB;
+    --ok: #1B7A4B;
+    --ok-soft: #E1F3E9;
+    --warn: #A96200;
+    --warn-soft: #FBEEDC;
+    --shadow: 0 1px 2px rgba(14, 42, 68, 0.05), 0 8px 24px rgba(14, 42, 68, 0.06);
+
+    --sans: "Inter", "Roboto", "SF Pro Text", -apple-system, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Roboto Mono", monospace;
+
+    --f-micro: 10.5px;
+    --f-xs: 12px;
+    --f-sm: 13.5px;
+    --f-base: 15.5px;
+    --f-lg: 18px;
+    --f-xl: 21px;
+    --f-2xl: 26px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #08192A;
+      --surface: #0F2942;
+      --surface-2: #123150;
+      --ink: #DDEBF8;
+      --ink-2: #A6C4DE;
+      --ink-3: #7E9DBA;
+      --line: #1D3E5D;
+      --line-strong: #2A5479;
+      --accent: #52ACE6;
+      --accent-deep: #8ECBF3;
+      --accent-soft: #10344F;
+      --ok: #4FC98A;
+      --ok-soft: #0E3527;
+      --warn: #E0A44E;
+      --warn-soft: #382913;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #08192A;
+    --surface: #0F2942;
+    --surface-2: #123150;
+    --ink: #DDEBF8;
+    --ink-2: #A6C4DE;
+    --ink-3: #7E9DBA;
+    --line: #1D3E5D;
+    --line-strong: #2A5479;
+    --accent: #52ACE6;
+    --accent-deep: #8ECBF3;
+    --accent-soft: #10344F;
+    --ok: #4FC98A;
+    --ok-soft: #0E3527;
+    --warn: #E0A44E;
+    --warn-soft: #382913;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--f-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 22px 96px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  /* ---------- trilho de navegação ---------- */
+
+  .rail { display: none; }
+
+  @media (min-width: 1000px) {
+    .page { grid-template-columns: 170px minmax(0, 1fr); gap: 56px; }
+    .rail { display: block; }
+    .rail-inner {
+      position: sticky;
+      top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-left: 1px solid var(--line);
+      padding-left: 14px;
+    }
+  }
+
+  .rail a {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    text-decoration: none;
+    padding: 5px 0;
+    border-bottom: 1px solid transparent;
+  }
+  .rail a:hover { color: var(--accent); }
+  .rail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* ---------- cabeçalho ---------- */
+
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 26px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+  .eyebrow span { color: var(--ink-3); }
+
+  h1 {
+    font-size: clamp(34px, 6vw, 50px);
+    font-weight: 800;
+    letter-spacing: -0.028em;
+    line-height: 1.02;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  .thesis {
+    font-size: var(--f-xl);
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: 30ch;
+    margin: 0 0 26px;
+    font-weight: 450;
+    text-wrap: balance;
+  }
+  .thesis strong { color: var(--ink); font-weight: 650; }
+
+  .credits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    color: var(--ink-3);
+  }
+  .credits b { color: var(--ink-2); font-weight: 500; }
+
+  /* ---------- quadro-resumo ---------- */
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .tile { background: var(--surface); padding: 16px 18px; }
+  .tile dt {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 7px;
+  }
+  .tile dd {
+    margin: 0;
+    font-size: var(--f-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .tile dd small {
+    display: block;
+    font-size: var(--f-xs);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--ink-3);
+    margin-top: 4px;
+  }
+
+  /* ---------- seções ---------- */
+
+  section { scroll-margin-top: 28px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 9px;
+    margin-bottom: 22px;
+  }
+  .sec-head h2 {
+    font-size: var(--f-xl);
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    margin: 0;
+  }
+  .sec-head .tag {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .prose { max-width: 66ch; }
+  .prose p { margin: 0 0 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+
+  main { display: flex; flex-direction: column; gap: 52px; }
+
+  /* ---------- métrica governante ---------- */
+
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 24px 26px;
+    box-shadow: var(--shadow);
+  }
+  .metric h3 {
+    margin: 0 0 6px;
+    font-size: var(--f-2xl);
+    font-weight: 750;
+    letter-spacing: -0.022em;
+  }
+  .metric p { margin: 0 0 18px; color: var(--ink-2); max-width: 62ch; }
+  .metric p:last-child { margin-bottom: 0; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    color: var(--ink-3);
+    background: var(--surface-2);
+  }
+  .chip.on {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--surface);
+    font-weight: 600;
+  }
+  :root[data-theme="dark"] .chip.on { color: #08192A; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .chip.on { color: #08192A; }
+  }
+
+  /* ---------- fases ---------- */
+
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow);
+  }
+  .phase.now { border-color: var(--accent); }
+  .phase-top { display: flex; align-items: center; gap: 10px; }
+  .phase-code {
+    font-family: var(--mono);
+    font-size: var(--f-lg);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  .phase h3 {
+    margin: 0;
+    font-size: var(--f-base);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .pill {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-left: auto;
+    white-space: nowrap;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-3);
+  }
+  .pill.live { background: var(--ok-soft); color: var(--ok); border-color: transparent; font-weight: 600; }
+  .phase p { margin: 0; font-size: var(--f-sm); color: var(--ink-2); line-height: 1.55; }
+  .phase .note {
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    color: var(--warn);
+    border-top: 1px dashed var(--line-strong);
+    padding-top: 10px;
+    margin-top: auto;
+  }
+
+  /* ---------- leituras ---------- */
+
+  .layers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .layers li {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+    align-items: baseline;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .layers li:last-child { border-bottom: 0; }
+  .layers .n {
+    font-family: var(--mono);
+    font-size: var(--f-sm);
+    color: var(--accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .layers b { font-weight: 650; }
+  .layers .desc { color: var(--ink-2); }
+  .layers .when {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+
+  /* ---------- listas de escopo e regras ---------- */
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px 28px;
+  }
+  .marked { list-style: none; margin: 0; padding: 0; }
+  .marked li {
+    position: relative;
+    padding: 7px 0 7px 20px;
+    font-size: var(--f-sm);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .marked li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+  }
+  .marked li b { color: var(--ink); font-weight: 650; }
+
+  /* ---------- linha do tempo (a espinha) ---------- */
+
+  .spine { position: relative; padding-left: 26px; }
+  .spine::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--line-strong);
+  }
+  .entry { position: relative; padding-bottom: 26px; }
+  .entry:last-child { padding-bottom: 0; }
+  .entry::before {
+    content: "";
+    position: absolute;
+    left: -26px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    background: var(--ground);
+    border: 1px solid var(--accent);
+  }
+  .entry.mark::before { background: var(--accent); }
+  .entry h3 {
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    margin: 0 0 8px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .entry ul { margin: 0; padding-left: 17px; }
+  .entry li { font-size: var(--f-sm); color: var(--ink-2); padding: 2px 0; line-height: 1.55; }
+  .entry li b { color: var(--ink); font-weight: 650; }
+
+  /* ---------- tabela de decisões ---------- */
+
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+  }
+  table { border-collapse: collapse; width: 100%; min-width: 660px; font-size: var(--f-sm); }
+  thead th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--surface-2); }
+  td.num, td.date {
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td.what { color: var(--ink); min-width: 230px; }
+  td.what b { font-weight: 650; }
+  tr.flag td.what { box-shadow: inset 2px 0 0 var(--warn); }
+  .flagmark {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.1em;
+    color: var(--warn);
+    background: var(--warn-soft);
+    padding: 1px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---------- ponto em aberto ---------- */
+
+  .open {
+    background: var(--warn-soft);
+    border: 1px solid var(--warn);
+    border-radius: 3px;
+    padding: 22px 24px;
+  }
+  .open .label {
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warn);
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  .open h3 { margin: 0 0 10px; font-size: var(--f-lg); font-weight: 700; letter-spacing: -0.015em; }
+  .open p { margin: 0 0 12px; color: var(--ink-2); max-width: 64ch; }
+  .open p:last-child { margin-bottom: 0; }
+  .open code { background: transparent; border: 1px solid var(--warn); color: var(--warn); }
+
+  /* ---------- rodapé ---------- */
+
+  footer {
+    border-top: 1px solid var(--line-strong);
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 30px;
+    align-items: baseline;
+  }
+  footer .files { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+  footer .files span {
+    font-family: var(--mono);
+    font-size: var(--f-xs);
+    color: var(--ink-3);
+  }
+  footer .files b { color: var(--ink-2); font-weight: 500; }
+  footer .sig {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: var(--f-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+
+<div class="page">
+  <nav class="rail" aria-label="Seções do painel">
+    <div class="rail-inner">
+      <a href="#visao">Visão</a>
+      <a href="#metrica">Métrica</a>
+      <a href="#fases">Faseamento</a>
+      <a href="#leituras">Cinco leituras</a>
+      <a href="#escopo">Escopo V0</a>
+      <a href="#regras">Regras</a>
+      <a href="#linha">Linha do tempo</a>
+      <a href="#decisoes">Decisões</a>
+      <a href="#aberto">Em aberto</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">Quad Concursos <span>·</span> Protótipo V0 <span>·</span> Prova de vida</p>
+      <h1>Viver o Quad</h1>
+      <p class="thesis">
+        Do primeiro contato ao <strong>dia da farda</strong>: transformar o dia a dia
+        do aluno em dado, e o dado em cuidado e direcionamento.
+      </p>
+      <div class="credits">
+        <span>Documento-base <b>Relatório de Projeto rev. 2.3</b></span>
+        <span>Condução <b>Danilo Moura, Fundador</b></span>
+        <span>Julho de 2026</span>
+      </div>
+    </header>
+
+    <section id="visao">
+      <dl class="tiles">
+        <div class="tile">
+          <dt>Fase corrente</dt>
+          <dd>V0<small>Prova de vida</small></dd>
+        </div>
+        <div class="tile">
+          <dt>Janela do coorte</dt>
+          <dd>30<small>dias, coorte pequeno</small></dd>
+        </div>
+        <div class="tile">
+          <dt>Perfis no protótipo</dt>
+          <dd>3<small>Aluno · Professor · Admin</small></dd>
+        </div>
+        <div class="tile">
+          <dt>Decisões travadas</dt>
+          <dd>14<small>1 em divergência</small></dd>
+        </div>
+      </dl>
+
+      <div class="sec-head" style="margin-top: 34px;">
+        <h2>O que é</h2>
+        <span class="tag">docs/01 · visão e escopo</span>
+      </div>
+      <div class="prose">
+        <p>
+          O Viver o Quad é um aplicativo (iOS e Android) que acompanha a jornada do
+          aluno — da compra do curso até o curso de formação. É um braço da plataforma
+          web já em construção, a grande base de dados, e conversa diretamente com ela.
+        </p>
+        <p>
+          Em uma frase: <b>engajar, reter e fazer o aluno evoluir</b> — medindo
+          participação, mapeando dificuldade e antecipando o abandono, do ingresso até
+          a aprovação.
+        </p>
+        <p>
+          O maior risco do projeto é <b>comportamental, não tecnológico</b>. A V0 existe
+          para responder, com número, se o aluno abre o app sozinho, numa terça, sem
+          ninguém mandar.
+        </p>
+      </div>
+    </section>
+
+    <section id="metrica">
+      <div class="sec-head">
+        <h2>A métrica que governa tudo</h2>
+        <span class="tag">pré-requisito da V0</span>
+      </div>
+      <div class="metric">
+        <h3>Retorno espontâneo</h3>
+        <p>
+          Apenas aberturas <code>OPEN_ORGANIC</code> contam. A taxonomia de origem da
+          sessão é pré-requisito da V0, junto com a linha de base comportamental —
+          tempo por questão, padrões de resposta, abandono e constância.
+        </p>
+        <div class="chips">
+          <span class="chip on">ORGANIC</span>
+          <span class="chip">CLASS</span>
+          <span class="chip">PUSH</span>
+          <span class="chip">MENTOR</span>
+          <span class="chip">NOTICE</span>
+          <span class="chip">CAMPAIGN</span>
+        </div>
+        <p>
+          O IRA (Índice de Risco de Abandono) é <i>fast-follow</i>, mas os eventos são
+          logados desde o dia 1 — sem histórico não há como calcular risco depois.
+        </p>
+      </div>
+    </section>
+
+    <section id="fases">
+      <div class="sec-head">
+        <h2>Faseamento</h2>
+        <span class="tag">V0 → V1 → V2</span>
+      </div>
+      <div class="phases">
+        <article class="phase now">
+          <div class="phase-top">
+            <span class="phase-code">V0</span>
+            <h3>Prova de vida</h3>
+            <span class="pill live">Em execução</span>
+          </div>
+          <p>
+            Login, identidade, quiz, missão e pontuação de participação; admin com
+            edital e questões; log de eventos, origem da sessão e linha de base.
+            Coorte pequeno, 30 dias.
+          </p>
+          <p class="note">Sem economia ativa</p>
+        </article>
+        <article class="phase">
+          <div class="phase-top">
+            <span class="phase-code">V1</span>
+            <h3>Expansão (A→B→C)</h3>
+            <span class="pill">Planejada</span>
+          </div>
+          <p>
+            Geofencing, painel de domínio completo, relatórios e push; economia
+            Quadcoin faseada, com ledger e governança.
+          </p>
+        </article>
+        <article class="phase">
+          <div class="phase-top">
+            <span class="phase-code">V2</span>
+            <h3>Camada viva</h3>
+            <span class="pill">Futura</span>
+          </div>
+          <p>
+            Chat, grupos de questões, guarnições e as disputas GvG / PvP.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="leituras">
+      <div class="sec-head">
+        <h2>As cinco leituras da jornada</h2>
+        <span class="tag">rev. 2.3</span>
+      </div>
+      <ol class="layers">
+        <li>
+          <span class="n">01</span>
+          <span><b>Domínio</b> — <span class="desc">o quanto o aluno demonstra saber, que não é o mesmo que acerto bruto.</span></span>
+        </li>
+        <li>
+          <span class="n">02</span>
+          <span><b>Score</b> — <span class="desc">o quanto vive o Quad, isto é, participação. Na interface do protótipo aparece rebatizado como “Quad Coin”.</span></span>
+        </li>
+        <li>
+          <span class="n">03</span>
+          <span><b>Score Qualificado</b> — <span class="desc">o quanto da atividade recente é elegível a recompensa.</span></span>
+        </li>
+        <li>
+          <span class="n">04</span>
+          <span><b>Ciclo de Conquista</b> — <span class="desc">a progressão econômica.</span><span class="when">V1</span></span>
+        </li>
+        <li>
+          <span class="n">05</span>
+          <span><b>Quadcoin</b> — <span class="desc">o poder de utilização interna.</span><span class="when">V1</span></span>
+        </li>
+      </ol>
+    </section>
+
+    <section id="escopo">
+      <div class="sec-head">
+        <h2>O que o protótipo cobre</h2>
+        <span class="tag">escopo V0 · src.html</span>
+      </div>
+      <div class="grid-2">
+        <ul class="marked">
+          <li><b>Fluxo de entrada</b> — login, vinheta “Comece seu sonho por aqui...” com barra de carregamento e o portão “Já sou aluno” (código por e-mail) ou “Minha primeira vez” (cadastro com preenchimento automático da plataforma-base).</li>
+          <li><b>Tour obrigatório do Danilo</b> no 1º acesso: 9 passos com holofote em cada ícone; a plataforma só libera ao concluir.</li>
+          <li><b>Três perfis</b> — Aluno, Professor (quiz ao vivo com polling) e Administrador N.P.P. (Turma = Edital × Modalidade, árvore do edital, banco de questões).</li>
+          <li><b>Identidade de combate</b> — nome de guerra e avatar da coleção oficial da PM, com o nome estampado na farda.</li>
+        </ul>
+        <ul class="marked">
+          <li><b>Missões 10+10</b> com expiração, quiz sem feedback imediato e garimpo de Coins em eventos.</li>
+          <li><b>Botão “+”</b> — Perfil do aluno, Pré-TAF (marcas contra as metas do edital), Calendário e Materiais; prévias bloqueadas de V1 (Quadcoin, geofencing) e V2 (chat, guarnições).</li>
+          <li><b>Quadrômetro</b> — a jornada do aluno em números.</li>
+          <li><b>Engrenagem</b> — cartões giram em 3D na rolagem, com scroll infinito: o fim da lista emenda no início.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="regras">
+      <div class="sec-head">
+        <h2>Regras estruturais</h2>
+        <span class="tag">travadas</span>
+      </div>
+      <div class="grid-2">
+        <ul class="marked">
+          <li>A <b>árvore de conteúdo</b> (Concurso → Edital → Matéria → Assunto) é separada da <b>Turma = Edital × Modalidade</b> (RONDESP / PATAMO / BOPE).</li>
+          <li>O <b>edital é a espinha</b>: lançá-lo monta o painel de domínio e cria os baldes.</li>
+          <li>Banco de questões geral etiquetado por tag, com campo de uso — aula ou missão.</li>
+        </ul>
+        <ul class="marked">
+          <li>Regra comercial: <b>Dado → Cuidado → Valor → Oferta</b>. Nunca Dado → Oferta.</li>
+          <li>Comportamento é <b>computado, nunca gravado como rótulo</b> (LGPD).</li>
+          <li>Público da V0 é interno: todo aluno já existe na plataforma-base, e é por isso que o cadastro do app usa preenchimento automático.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="linha">
+      <div class="sec-head">
+        <h2>Linha do tempo</h2>
+        <span class="tag">CHANGELOG.md</span>
+      </div>
+      <div class="spine">
+        <article class="entry mark">
+          <h3>18 / 07 / 2026</h3>
+          <ul>
+            <li>Projeto estruturado como <b>repositório Git</b> para armazenamento no GitHub.</li>
+            <li>Documentação criada: visão e escopo, registro de decisões, guia de build.</li>
+          </ul>
+        </article>
+        <article class="entry mark">
+          <h3>16 / 07 / 2026</h3>
+          <ul>
+            <li><b>Danilo Moura (Fundador) assume o controle do projeto.</b></li>
+          </ul>
+        </article>
+        <article class="entry">
+          <h3>14 / 07 / 2026 — tarde</h3>
+          <ul>
+            <li>Pontuação de participação rebatizada <b>Quad Coin</b> em toda a interface, com alerta de divergência registrado.</li>
+            <li>Efeito <b>engrenagem</b> e scroll infinito nas telas de cartões.</li>
+            <li>Portão de acesso com as duas entradas; cadastro chega campo a campo.</li>
+            <li><b>Tour obrigatório do Danilo</b> no 1º acesso, com 9 passos.</li>
+            <li><b>Perfil do aluno</b>: nome de guerra, senha e avatar da coleção da PM.</li>
+            <li>Aba de métricas rebatizada <b>Quadrômetro</b>.</li>
+            <li>Tema azul e branco da marca, logo oficial e tipografia de app.</li>
+            <li>Botão <b>“+”</b> central e vídeo 3D do Danilo no botão flutuante.</li>
+            <li>Correção de processo: republicar o Artefato a cada alteração.</li>
+          </ul>
+        </article>
+        <article class="entry">
+          <h3>14 / 07 / 2026 — manhã</h3>
+          <ul>
+            <li>Tela de login com logo animada e vinheta de abertura.</li>
+            <li><b>Correção de rumo</b>: padrão azul/branco, abandono do tema escuro e dourado.</li>
+            <li>Danilo, o mascote, vetorizado com popup de orientações contextuais.</li>
+          </ul>
+        </article>
+        <article class="entry">
+          <h3>13 / 07 / 2026</h3>
+          <ul>
+            <li>Primeira versão do protótipo a partir do documento-base rev. 2.3: três perfis, missões, quiz sem feedback imediato, minerar pontos, admin por edital e a fronteira V0/V1 marcada.</li>
+            <li>Publicação do Artefato.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="decisoes">
+      <div class="sec-head">
+        <h2>Registro de decisões</h2>
+        <span class="tag">docs/02 · 14 registros</span>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Data</th>
+              <th scope="col">Decisão</th>
+              <th scope="col">Observações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="num">01</td><td class="date">13/07</td>
+              <td class="what">Protótipo como HTML único — Artefato no claude.ai e arquivo local</td>
+              <td>Três perfis: aluno, professor, admin</td>
+            </tr>
+            <tr>
+              <td class="num">02</td><td class="date">14/07</td>
+              <td class="what"><b>Padrão visual</b>: azul e branco da marca em todos os projetos Quad</td>
+              <td>Correção após tentativa de tema escuro e dourado</td>
+            </tr>
+            <tr>
+              <td class="num">03</td><td class="date">14/07</td>
+              <td class="what"><b>Danilo</b> é o mascote-guia, robô azul com folha de personagem própria</td>
+              <td>Nome homenageia o Fundador; vídeo 3D em loop</td>
+            </tr>
+            <tr>
+              <td class="num">04</td><td class="date">14/07</td>
+              <td class="what">Logo oficial (Q em três azuis) no login, vinheta e cabeçalho</td>
+              <td>Arquivo da marca, sem redesenho</td>
+            </tr>
+            <tr>
+              <td class="num">05</td><td class="date">14/07</td>
+              <td class="what">Fluxo de entrada: login → vinheta → portão</td>
+              <td>“Comece seu sonho por aqui...” com barra de carregamento</td>
+            </tr>
+            <tr>
+              <td class="num">06</td><td class="date">14/07</td>
+              <td class="what">Cadastro do 1º acesso com <b>preenchimento automático</b> da plataforma-base</td>
+              <td>A tela seguinte abre carregando; os dados chegam campo a campo</td>
+            </tr>
+            <tr>
+              <td class="num">07</td><td class="date">14/07</td>
+              <td class="what"><b>Tour obrigatório do Danilo</b> no 1º acesso, com 9 passos</td>
+              <td>A plataforma só libera após concluir</td>
+            </tr>
+            <tr>
+              <td class="num">08</td><td class="date">14/07</td>
+              <td class="what">Aba de métricas é o <b>Quadrômetro</b>, nunca “Perfil”</td>
+              <td>“Perfil do aluno” é a tela de conta: nome de guerra, avatar, senha</td>
+            </tr>
+            <tr>
+              <td class="num">09</td><td class="date">14/07</td>
+              <td class="what">Avatares da coleção oficial da PM, com nome de guerra na farda</td>
+              <td>Sprite recortado do arquivo do gestor; 12 opções</td>
+            </tr>
+            <tr>
+              <td class="num">10</td><td class="date">14/07</td>
+              <td class="what">Tipografia de app: Inter / Roboto / SF Pro</td>
+              <td>Fallback Segoe UI</td>
+            </tr>
+            <tr class="flag">
+              <td class="num">11</td><td class="date">14/07</td>
+              <td class="what">Pontuação de participação rebatizada <b>“Quad Coin”</b> na interface</td>
+              <td>
+                <span class="flagmark">DIVERGE DA REV. 2.3</span>
+                Anexo A, princípio 2: “Score não é moeda”. Decisão do gestor; a
+                intendência segue bloqueada até a V1.
+              </td>
+            </tr>
+            <tr>
+              <td class="num">12</td><td class="date">14/07</td>
+              <td class="what">Efeito <b>engrenagem</b> com scroll infinito</td>
+              <td>Conteúdo triplicado em segmentos; pausado durante o tour</td>
+            </tr>
+            <tr>
+              <td class="num">13</td><td class="date">16/07</td>
+              <td class="what"><b>Danilo Moura (Fundador) assume o controle do projeto</b></td>
+              <td>Ele guia; execução com resumos de entendimento e perguntas em etapas</td>
+            </tr>
+            <tr>
+              <td class="num">14</td><td class="date">18/07</td>
+              <td class="what">Projeto versionado em Git para armazenamento no GitHub</td>
+              <td>Este repositório</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="aberto">
+      <div class="open">
+        <p class="label">Pede decisão do Fundador</p>
+        <h3>“Quad Coin” contra o princípio “Score não é moeda”</h3>
+        <p>
+          A pontuação de participação foi rebatizada <b>Quad Coin</b> na interface, e
+          isso diverge do Anexo A da rev. 2.3, princípio 2. O protótipo está
+          funcionando assim, mas o documento-base precisa da palavra final do Fundador
+          para realinhar as cinco camadas da economia. Detalhes na decisão nº 11.
+        </p>
+        <p>
+          Enquanto a decisão não sai: a intendência — gastar — segue bloqueada até a V1.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="files">
+        <span>Fonte editável <b>src.html</b></span>
+        <span>Build <b>build.ps1</b></span>
+        <span>Saída <b>index.html</b></span>
+        <span>Relatório <b>docs/Viver-o-Quad-Relatorio-rev2-3.pdf</b></span>
+      </div>
+      <p class="sig">Painel do projeto · Quad Concursos</p>
+    </footer>
+  </main>
+</div>
