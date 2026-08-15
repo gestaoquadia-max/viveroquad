@@ -25,11 +25,12 @@ const roll = await p.evaluate(()=>{ const d=document.querySelector('.dia-scroll'
 ok(roll.ch <= 280 && roll.sh > roll.ch, 'lista rola dentro do card (tamanho médio: ' + roll.ch + 'px de ' + roll.sh + 'px)');
 await el.screenshot({ path: OUT+'/tr-01-missoes.png' });
 
-// abre o treinamento — rodízio de GERAIS na ordem: PT → EN → INFO → MAT
+// abre o treinamento — rodízio de GERAIS desce a subassunto, alternando as matérias (dec. 204)
 await p.click('#btnTreinoRapido'); await p.waitForTimeout(400);
 const fila = await p.evaluate(()=>[...document.querySelectorAll('.tr-fila-row .nm')].map(e=>e.textContent));
 console.log('   fila gerais:', fila.join(' | '));
-ok(fila.length===4 && fila[0].includes('Língua Portuguesa') && fila[1].includes('Inglesa') && fila[2].includes('Informática') && fila[3].includes('Matemática'), 'rodízio alterna as matérias gerais (1º assunto de cada)');
+ok(fila.length===8 && fila[0].includes('Língua Portuguesa') && fila[1].includes('Inglesa') && fila[2].includes('Informática') && fila[3].includes('Matemática') && fila[4].includes('História') && fila[5].includes('Geografia'), 'rodízio alterna as matérias gerais (1º subassunto de cada, em janela)');
+ok(await p.evaluate(()=>/mais \d+ blocos/.test(document.getElementById('trBody').textContent)), 'a fila mostra janela + contagem do que falta (o edital inteiro não cabe)');
 await el.screenshot({ path: OUT+'/tr-02-rodizio.png' });
 
 // responde o 1º bloco (PT): erra a 1ª de propósito, acerta as demais
@@ -45,7 +46,7 @@ for (let i=0;i<10;i++){
   // lê o gabarito da carta via banco: responder correto = clicar no botão que bate com c.c — simulamos acertando sempre, menos a 1ª
   const cardTxt = await p.evaluate(()=>document.querySelector('.fc-enun').textContent);
   const certoEh = await p.evaluate(t=>{
-    const c = window.TR_BANK.find(x=>x.t===t); return c ? c.c : true;
+    const c = window.QB_MODELO.flat().find(x=>x[1]===t); return c ? c[0]==='C' : true;
   }, cardTxt);
   const acertar = i !== 0;
   const clicarCerto = acertar ? certoEh : !certoEh;
@@ -60,7 +61,8 @@ for (let i=0;i<10;i++){
 }
 const resumo = await p.evaluate(()=>document.getElementById('trBody').textContent);
 ok(resumo.includes('9 de 10') && resumo.includes('+9 score') && resumo.includes('+5 Quad Coins'), 'resumo do bloco: 9/10, +9 score, +5 QdC');
-ok(resumo.includes('Interpretação de textos'), 'resumo cita o Domínio atualizado');
+ok(resumo.includes('Textos verbais'), 'resumo cita o SUBASSUNTO atualizado no Domínio');
+ok(resumo.includes('reorganizado'), 'resumo avisa que o pacote volta reorganizado pela dificuldade');
 await el.screenshot({ path: OUT+'/tr-04-resumo.png' });
 const scoreDepois = await p.evaluate(()=>document.getElementById('xpNum').textContent);
 const coinsDepois = await p.evaluate(()=>document.getElementById('scoreVal').textContent);
@@ -82,8 +84,9 @@ ok(domAntes !== domDepois, 'barra do assunto Interpretação de textos mudou com
 await p.click('#tabTrEsp'); await p.waitForTimeout(300);
 const filaE = await p.evaluate(()=>[...document.querySelectorAll('.tr-fila-row .nm')].map(e=>e.textContent));
 console.log('   fila específicas:', filaE.join(' | '));
-ok(filaE[0].includes('Princípios fundamentais'), 'específicas começam em Dir. Constitucional');
-ok(!filaE.some(t=>t.includes('Poderes administrativos')), 'Poderes ainda NÃO está no banco (aula não respondida)');
+ok(filaE[0].includes('Fundamentos da República') && filaE[0].includes('Direito Constitucional'), 'específicas começam no 1º subassunto de Dir. Constitucional');
+ok(filaE[2].includes('Direito Administrativo'), 'as matérias de Direito alternam na fila (DA em 3º)');
+ok(await p.evaluate(()=>window.__qbPacotes('Direito Administrativo','Poderes administrativos','Poder vinculado').length===2), 'antes da aula, Poder vinculado só tem os 2 pacotes-modelo (sem Reforço)');
 await p.click('#btnTrSair'); await p.waitForTimeout(300);
 
 // RÁPIDA D+1 da aula (demo): responde as 10 → FEITO e cartas entram no banco
@@ -103,8 +106,7 @@ ok(await p.evaluate(()=>document.querySelectorAll('#diaList .mission-row').lengt
 // agora Poderes aparece nas Específicas
 await p.click('#btnTreinoRapido'); await p.waitForTimeout(300);
 await p.click('#tabTrEsp'); await p.waitForTimeout(300);
-const filaE2 = await p.evaluate(()=>[...document.querySelectorAll('.tr-fila-row .nm')].map(e=>e.textContent));
-ok(filaE2.some(t=>t.includes('Poderes administrativos')), 'após a rápida, Poderes entrou no banco das Específicas');
+ok(await p.evaluate(()=>window.__qbPacotes('Direito Administrativo','Poderes administrativos','Poder vinculado').length===3), 'após a rápida, as cartas da aula viram o pacote de REFORÇO de Poderes administrativos');
 await el.screenshot({ path: OUT+'/tr-05-especificas.png' });
 // ATRASADAS: blocos com +7 dias caem lá; recuperar faz sumir
 await p.click('#btnTrSair'); await p.waitForTimeout(300);

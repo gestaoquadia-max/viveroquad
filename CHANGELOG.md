@@ -1,5 +1,29 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — Banco por subassunto: pacotes de 10 que voltam reorganizados pela dificuldade
+
+- **Todo subassunto da árvore tem seu banco de pacotes de 10 certo/errado**
+  (dec. 204). Na demo, cada subassunto nasce com dois pacotes-modelo de
+  questões rápidas (`QB_MODELO`), em instância própria — nota, resposta e
+  ordem não vazam entre subassuntos. O banco real substituirá os modelos
+  sem mexer no motor `[INTEGRAÇÃO REAL]`.
+- **Pacote concluído volta REORGANIZADO pela dificuldade marcada**: as
+  erradas vêm primeiro, depois as difíceis, as boas e as fáceis — a volta
+  força a lembrança com evidência no que o aluno apontou como dificuldade.
+- **O play do Domínio abre o próximo pacote da rotação** do subassunto
+  (Pacote 1 → Pacote 2 → Reforço, quando houver → volta ao 1 reorganizado)
+  e está sempre aceso.
+- **O rodízio do Abrir Treinamento desce a subassunto**, alternando as
+  matérias da aba (o 1º subassunto de cada, depois o 2º…), e consome os
+  MESMOS pacotes do Domínio — estado compartilhado. A fila mostra a régua
+  do progresso e uma janela dos próximos blocos.
+- **As cartas de aula/quiz convivem**: viram o pacote de "Reforço" do
+  subassunto quando o assunto tem cartas; os blocos do dia das Missões
+  seguem como estão.
+- Suíte nova `vz1` prova a rotação, a reordenação (3 erradas → 2 difíceis
+  → 4 boas → 1 fácil, na ordem), a instância própria por subassunto, o
+  Reforço e o rodízio novo.
+
 ## 15/08/2026 — O atalho de revisão vira botão de play; mecanismo certificado para o banco real
 
 - **O botão do subassunto virou um PLAY** (dec. 203): a pílula "▸ 10"

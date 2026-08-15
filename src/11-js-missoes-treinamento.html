@@ -2,15 +2,19 @@
      TREINAMENTO RÁPIDO · flashcards estilo Anki
      · Aula presencial → operador extrai 2 PDFs → PDF 01: 40 certo/errado
        em 4 ondas (D0 22h15 · D+1 22h15 · D+7 · D+30); PDF 02: banco geral
-     · Rodízio de 10 por assunto, alternando as matérias da aba
+     · Banco por SUBASSUNTO (dec. 204): pacotes de 10 certo/errado; o
+       rodízio alterna as matérias da aba descendo a subassunto, e o play
+       do Domínio abre o próximo pacote daquele subassunto
      · Feedback imediato + autoavaliação (Errei/Difícil/Bom/Fácil)
      · Acerto: +1 score · bloco de 10: +5 Quad Coins · atualiza o Domínio
-     · Zerou a aba: baralho é redistribuído pela dificuldade informada
+     · Pacote concluído volta REORGANIZADO: erradas → difíceis → boas → fáceis
      ================================================================== */
   var TR_GERAIS = ['Língua Portuguesa', 'Língua Inglesa', 'Informática', 'Matemática', 'História', 'Geografia'];
   var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
   function fc(m, a, c, t, o, s) { return { m: m, a: a, s: s || '', c: c, t: t, o: o, nota: -1, resp: null }; }
   __SEED_TR_BANK__
+  /* dois pacotes-modelo de 10 C/E — o banco de TODO subassunto na demo */
+  __SEED_QB_MODELO__
 
   /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
   __SEED_AULA_DEMO__
@@ -480,19 +484,22 @@
     trTurmaDoEstado = id;
   }
   function trEhGeral(m) { return TR_GERAIS.indexOf(m) >= 0; }
+  /* dec. 204 — o rodízio desce ao SUBASSUNTO e alterna as matérias da aba:
+     o 1º subassunto de cada matéria, depois o 2º de cada, e assim por
+     diante. Todo subassunto tem pacotes (o banco-modelo cobre a árvore
+     inteira), então a fila é o edital completo da aba, na ordem da árvore. */
   function trMontarFila(tab) {
     /* o rodízio segue o edital da turma ativa (o Domínio já trocou junto) */
     var arvore = (typeof EDITAL_ATUAL !== 'undefined' && EDITAL_ATUAL) ? EDITAL_ATUAL : EDITAL_CFO;
     var mats = arvore.filter(function (m) { return trEhGeral(m[0]) === (tab === 'gerais'); });
-    var fila = [], maxA = 0;
-    mats.forEach(function (m) { maxA = Math.max(maxA, m[1].length); });
-    for (var r = 0; r < maxA; r++) {
-      mats.forEach(function (m) {
-        if (!m[1][r]) return;
-        var a = m[1][r][0];
-        if (TR_BANK.some(function (c) { return c.m === m[0] && c.a === a; })) fila.push({ m: m[0], a: a });
-      });
-    }
+    var listas = mats.map(function (m) {
+      var flat = [];
+      m[1].forEach(function (a) { a[1].forEach(function (s) { flat.push({ m: m[0], a: a[0], s: s }); }); });
+      return flat;
+    });
+    var fila = [], maxN = 0;
+    listas.forEach(function (l) { maxN = Math.max(maxN, l.length); });
+    for (var r = 0; r < maxN; r++) listas.forEach(function (l) { if (l[r]) fila.push(l[r]); });
     return fila;
   }
   function trPeso(c) { return { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] !== undefined ? { 0: 3, 1: 2, 2: 1, 3: 0 }[c.nota] : 2; }
@@ -501,31 +508,71 @@
     cs.sort(function (x, y) { return trPeso(y) - trPeso(x); });   /* difíceis primeiro na 2ª volta */
     return cs.slice(0, TR_REW.blocoTam);
   }
-  /* dec. 202 — bloco de revisão do SUBASSUNTO, aberto pelo Domínio: as
-     cartas etiquetadas com o subassunto vêm primeiro; as demais do mesmo
-     assunto completam o bloco de 10 (o banco da demo tem 10 por assunto) */
-  function trCartasSub(m, a, sub) {
+  /* ========== dec. 204 — BANCO POR SUBASSUNTO ==========
+     Cada subassunto da árvore tem PACOTES de 10 certo/errado. Na demo,
+     todo subassunto nasce com os dois pacotes-modelo (QB_MODELO), cada um
+     em instância própria: nota, resposta e ordem não vazam entre
+     subassuntos. Concluído, o pacote volta REORGANIZADO pela dificuldade
+     que o aluno informou: erradas → difíceis → boas → fáceis — a volta
+     força a lembrança com evidência no que ele marcou como dificuldade.
+     As cartas de aula/quiz do assunto (dec. 202/203) convivem: viram o
+     pacote de "Reforço" do subassunto, no fim do rodízio de pacotes.
+     [INTEGRAÇÃO REAL] — o banco real troca QB_MODELO por pacotes próprios
+     de cada subassunto; o motor (rotação + reordenação) não muda.       */
+  var QB_EST = {};   /* 'concurso|matéria|assunto|sub' → { prox, pacotes } */
+  function qbEst(m, a, s) {
+    var k = CONCURSO_ATUAL_ID + '|' + m + '|' + a + '|' + s;
+    if (!QB_EST[k]) QB_EST[k] = {
+      prox: 0,
+      pacotes: QB_MODELO.map(function (p) {
+        return p.map(function (r) { return fc(m, a, r[0] === 'C', r[1], r[2], s); });
+      })
+    };
+    return QB_EST[k];
+  }
+  /* pacote de Reforço: as cartas de aula/quiz do assunto — as etiquetadas
+     com o subassunto vêm primeiro; as demais completam o bloco de 10 */
+  function qbReforco(m, a, sub) {
     var cs = TR_BANK.filter(function (c) { return c.m === m && c.a === a; });
+    if (!cs.length) return [];
     cs.sort(function (x, y) {
       var dx = (x.s === sub ? 0 : 1) - (y.s === sub ? 0 : 1);
       return dx !== 0 ? dx : trPeso(y) - trPeso(x);
     });
     return cs.slice(0, TR_REW.blocoTam);
   }
-  var trRev = null;   /* {m, a, s} quando o bloco veio da revisão do Domínio */
-  function trAbrirSub(m, a, sub) {
-    var cards = trCartasSub(m, a, sub);
-    if (!cards.length) { toast('Sem cartas ainda — as aulas alimentam este bloco.'); return; }
-    trRev = { m: m, a: a, s: sub };
-    trDeck = { m: m, a: a }; trCards = cards; trIdx = 0; trAcertos = 0; trDia = -1;
+  function qbPacotes(m, a, sub) {
+    var lista = qbEst(m, a, sub).pacotes.slice();
+    var ref = qbReforco(m, a, sub);
+    if (ref.length) lista.push(ref);
+    return lista;
+  }
+  function qbRotulo(i, nModelo) { return i < nModelo ? 'Pacote ' + (i + 1) : 'Reforço'; }
+  /* a categoria da carta na volta: errada < difícil < boa < fácil
+     (errou a resposta OU marcou "Errei" = errada; sem nota = boa)   */
+  function qbCat(c) {
+    if (c.resp === false || c.nota === 0) return 0;
+    return c.nota === 1 ? 1 : c.nota === 3 ? 3 : 2;
+  }
+  function qbReordena(cards) {
+    return cards.map(function (c, i) { return { c: c, i: i }; })
+      .sort(function (x, y) { return (qbCat(x.c) - qbCat(y.c)) || (x.i - y.i); })
+      .map(function (x) { return x.c; });
+  }
+  var trQb = null;   /* {m, a, s, idx, rodizio} quando o bloco é um pacote do banco */
+  function trAbrirSub(m, a, sub, doRodizio) {
+    var st = qbEst(m, a, sub), lista = qbPacotes(m, a, sub);
+    var i = st.prox % lista.length;
+    trQb = { m: m, a: a, s: sub, idx: i, rodizio: !!doRodizio };
+    trDeck = { m: m, a: a }; trCards = lista[i]; trIdx = 0; trAcertos = 0; trDia = -1;
     $('trLayer').style.display = 'flex';
-    $('trTitulo').textContent = 'Revisão · ' + sub;
+    $('trTitulo').textContent = qbRotulo(i, st.pacotes.length) + ' · ' + sub;
     trCarta();
   }
   function trAbrir() {
     trFila.gerais = trMontarFila('gerais');
     trFila.esp = trMontarFila('esp');
-    trDeck = null; trDia = -1; trRev = null;
+    trDeck = null; trDia = -1; trQb = null;
     $('trLayer').style.display = 'flex';
     trHome();
   }
@@ -541,26 +588,30 @@
     if (!fila.length) { $('trBody').innerHTML = '<div class="q-card"><p class="sub">Sem cartas ainda — as aulas alimentam este bloco.</p></div>'; return; }
     if (pos >= fila.length) { trRedistribuir(); return; }
     var prox = fila[pos];
+    /* a fila agora é o edital inteiro da aba (dec. 204) — mostra a régua
+       do que já foi e uma janela dos próximos blocos, não a lista toda  */
+    var fim = Math.min(fila.length, pos + 8);
     var h = '<div class="q-card">' +
-      '<div class="k-label">Rodízio · 10 por assunto, alternando as matérias</div>' +
-      '<p class="sub" style="margin:6px 0 12px">Próximo: <strong>' + prox.a + '</strong> (' + prox.m + ')</p>' +
-      '<button class="btn" id="btnTrComecar" style="width:100%">Responder 10 de ' + prox.a + '</button>' +
+      '<div class="k-label">Rodízio · pacotes de 10 por subassunto, alternando as matérias</div>' +
+      '<p class="sub" style="margin:6px 0 12px">Próximo: <strong>' + prox.s + '</strong> (' + prox.a + ' · ' + prox.m + ')</p>' +
+      '<button class="btn" id="btnTrComecar" style="width:100%">Responder 10 de ' + prox.s + '</button>' +
       '<div class="tr-fila" style="margin-top:14px">' +
-      fila.map(function (d, i) {
-        var cls = i < pos ? ' done' : (i === pos ? ' next' : '');
-        return '<div class="tr-fila-row' + cls + '"><div class="m-dot' + (i < pos ? ' done' : '') + '">' + (i < pos ? '✓' : (i + 1)) + '</div>' +
-          '<span class="nm">' + d.a + ' · ' + d.m + '</span></div>';
-      }).join('') + '</div>' +
-      '<p class="sub" style="margin-top:10px; font-size:11px">Novos assuntos entram conforme as aulas alimentam o banco (PDF 02 do operador).</p></div>';
+      (pos > 0 ? '<div class="tr-fila-row done"><div class="m-dot done">✓</div><span class="nm">' + pos + ' bloco' + (pos > 1 ? 's' : '') + ' já concluído' + (pos > 1 ? 's' : '') + '</span></div>' : '') +
+      fila.slice(pos, fim).map(function (d, j) {
+        var i = pos + j;
+        return '<div class="tr-fila-row' + (i === pos ? ' next' : '') + '"><div class="m-dot">' + (i + 1) + '</div>' +
+          '<span class="nm">' + d.s + ' · ' + d.a + ' (' + d.m + ')</span></div>';
+      }).join('') +
+      (fim < fila.length ? '<p class="sub" style="margin:6px 0 0">… e mais ' + (fila.length - fim) + ' blocos até zerar a aba</p>' : '') + '</div>' +
+      '<p class="sub" style="margin-top:10px; font-size:11px">Pacote concluído volta reorganizado pela dificuldade que você marcar: erradas primeiro, depois difíceis, boas e fáceis.</p></div>';
     $('trBody').innerHTML = h;
     $('btnTrComecar').addEventListener('click', function () {
-      trDeck = prox; trCards = trCartasDo(prox); trIdx = 0; trAcertos = 0; trDia = -1;
-      trCarta();
+      trAbrirSub(prox.m, prox.a, prox.s, true);
     });
   }
   function trAbrirBloco(i) {
     var b = diaBlocos()[i];
-    trDia = i; trDiaArr = diaBlocos(); trRev = null;   /* trocar de turma no meio não desvia o crédito */
+    trDia = i; trDiaArr = diaBlocos(); trQb = null;   /* trocar de turma no meio não desvia o crédito */
     if (b.fonte === 'aula') {
       trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
       trCards = AULA_DEMO.cards.slice(b.ini, b.ini + 10).map(function (r) {
@@ -617,11 +668,17 @@
     addScore(TR_REW.coinsPorBloco, '+' + TR_REW.coinsPorBloco + ' Quad Coins · bloco de flashcards');
     /* o ajuste do Domínio é POR CONCURSO — acerto na turma da PC-BA não
        mexe na barra homônima do CFO                                    */
-    if (trRev) {
-      /* dec. 202 — a revisão mexe na barra DAQUELE subassunto, não no
-         assunto inteiro: é exatamente a barra que o aluno foi revisar */
-      var chaveS = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a + '|' + trRev.s;
+    if (trQb) {
+      /* dec. 202 — o pacote mexe na barra DAQUELE subassunto, não no
+         assunto inteiro: é exatamente a barra que o aluno foi treinar */
+      var chaveS = CONCURSO_ATUAL_ID + '|' + trQb.m + '|' + trQb.a + '|' + trQb.s;
       trAjSub[chaveS] = (trAjSub[chaveS] || 0) + Math.round((trAcertos - trCards.length / 2) * 2.4);
+      /* dec. 204 — o pacote volta REORGANIZADO pela dificuldade marcada:
+         erradas → difíceis → boas → fáceis (o Reforço, montado das cartas
+         de aula/quiz, já se reordena sozinho pelo peso das notas)       */
+      var stQb = qbEst(trQb.m, trQb.a, trQb.s);
+      if (trQb.idx < stQb.pacotes.length) stQb.pacotes[trQb.idx] = qbReordena(stQb.pacotes[trQb.idx]);
+      stQb.prox++;
     } else {
       var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
       trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
@@ -639,23 +696,24 @@
       renderDia();
       renderAtrasadas();
     }
-    /* a árvore redesenha DEPOIS da migração das cartas: um assunto que
-       acabou de ganhar banco acende o play na mesma hora (dec. 203) —
-       redesenhar antes deixava o botão apagado até o bloco seguinte  */
+    /* a árvore redesenha DEPOIS da migração das cartas (dec. 203/204):
+       as barras refletem o ajuste e o assunto recém-abastecido já conta
+       com o pacote de Reforço na próxima abertura                     */
     if (typeof renderEdital === 'function') renderEdital();
-    var drop = (typeof dropSortear === 'function') ? dropSortear(trRev ? 'na revisão do Domínio' : deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
+    var drop = (typeof dropSortear === 'function') ? dropSortear(trQb ? (trQb.rodizio ? 'no treinamento rápido' : 'na revisão do Domínio') : deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
       '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
       '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
-      'O Domínio de <strong>' + (trRev ? trRev.s : trDeck.a) + '</strong> foi atualizado.' +
+      'O Domínio de <strong>' + (trQb ? trQb.s : trDeck.a) + '</strong> foi atualizado.' +
+      (trQb ? '<br>↺ Na volta, este pacote vem <strong>reorganizado</strong>: erradas primeiro, depois difíceis, boas e fáceis.' : '') +
       (drop.length ? '<br>🎁 <strong>DROP!</strong> ' + drop.map(function (i) { return i.nome; }).join(' e ') + ' caiu para a sua mochila.' : '') +
       (deDia ? '<br>As 10 rápidas entraram no banco do Treinamento Rápido.' : '') + '</p>' +
-      '<button class="btn" id="btnTrProx" style="width:100%">' + ((deDia || trRev) ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
+      '<button class="btn" id="btnTrProx" style="width:100%">' + ((deDia || (trQb && !trQb.rodizio)) ? 'Fechar' : 'Próximo bloco do rodízio') + '</button></div>';
     $('trBody').innerHTML = h;
     $('btnTrProx').addEventListener('click', function () {
-      if (trRev) { trRev = null; $('trLayer').style.display = 'none'; return; }
-      if (deDia) { $('trLayer').style.display = 'none'; return; }
+      var qb = trQb; trQb = null;
+      if (deDia || (qb && !qb.rodizio)) { $('trLayer').style.display = 'none'; return; }
       trPos[trTab]++;
       trHome();
     });
@@ -665,15 +723,16 @@
     trFila[trTab] = trMontarFila(trTab);
     $('trBody').innerHTML = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Você zerou o bloco! 🎖️</p>' +
-      '<p class="sub" style="margin:8px 0 14px">O baralho foi <strong>redistribuído pela dificuldade</strong> que você informou: as cartas marcadas como Errei e Difícil voltam primeiro.</p>' +
+      '<p class="sub" style="margin:8px 0 14px">Os pacotes voltaram <strong>reorganizados pela dificuldade</strong> que você informou: em cada um, as erradas vêm primeiro, depois as difíceis, as boas e as fáceis.</p>' +
       '<button class="btn" id="btnTrDeNovo" style="width:100%">Recomeçar o rodízio</button></div>';
     $('btnTrDeNovo').addEventListener('click', trHome);
   }
   window.TR_BANK = TR_BANK; window.AULA_DEMO = AULA_DEMO;   /* exposto para a suíte de testes */
+  window.QB_MODELO = QB_MODELO; window.__qbEst = qbEst; window.__qbPacotes = qbPacotes;
   /* a árvore do Domínio desenhou antes do banco de cartas existir (parte 07
      roda antes desta): re-render para os botões de 10 questões acenderem  */
   if (typeof renderEdital === 'function') renderEdital();
-  $('btnTrSair').addEventListener('click', function () { trRev = null; $('trLayer').style.display = 'none'; });
+  $('btnTrSair').addEventListener('click', function () { trQb = null; $('trLayer').style.display = 'none'; });
   $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
   $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
   trTrocaTurma();   /* registra o rodízio da turma inicial */

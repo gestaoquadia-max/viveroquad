@@ -41,7 +41,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 08-js-eventos-cal-quiz | Eventos + página do evento, calendário do aluno, motor de quiz, aula de hoje; **recompensa de participação** (`EV_SCORE_PADRAO` = 10, `evScoreRegra`/`evCoinsRegra`/`evRegrasScore`/`evRegrasCoins`) e as duas etiquetas de tipo do carrossel — `evTemBonus` olha só para os Coins (dec. 200) |
 | 09-js-professor | Gate/login do professor, painel, relatórios, quiz ao vivo com polling |
 | 10-js-acesso-tutorial | Conectividade, acesso ao portal, tutorial do QUAD |
-| 11-js-missoes-treinamento | Treinamento rápido, blocos do dia por turma, **revisão por subassunto** (`trAbrirSub`/`trCartasSub`/`trAjSub`, dec. 202), simulados do aluno, avatares |
+| 11-js-missoes-treinamento | Treinamento rápido, **banco por subassunto** (`QB_MODELO`/`qbEst`/`qbReordena` — pacotes de 10 com volta reorganizada pela dificuldade, dec. 204; `trAbrirSub`/`trAjSub`, dec. 202), rodízio por subassunto alternando matérias, blocos do dia por turma, simulados do aluno, avatares |
 | 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais, bloco **"Minhas turmas · ativas e arquivadas"** com a etiqueta ARQUIVADA (DA-06, dec. 196) |
 | 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo (**limpa as 3 chaves `vq_*`**: `vq_tut_skip`, `vq_intro_done` e `vq_evolucao` — dec. 196) |
 | 14-js-loja-economia | Loja: moedas, compras, catálogos, salas/lotações, overlay de compra, skins |

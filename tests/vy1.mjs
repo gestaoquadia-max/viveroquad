@@ -1,8 +1,9 @@
 /* vy1 — dec. 201/202/203: o Início rola e PARA no fim (a rolagem
    infinita vertical saiu; roda 3D e esteira de eventos ficam); cada
    subassunto do Domínio tem o botão de PLAY que abre seu bloco de 10
-   questões; e o mecanismo acende sozinho quando um banco de questões
-   é inserido depois (prova: as cartas da aula migradas em runtime). */
+   questões; com o banco por subassunto (dec. 204) o play está sempre
+   aceso, e as cartas de aula migradas em runtime viram o pacote de
+   Reforço do subassunto — o mecanismo continua ligando sozinho. */
 const pw = (await import(process.env.VQ_PW ?? '/opt/node22/lib/node_modules/playwright/index.js')).default;
 const { chromium } = pw;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
@@ -44,19 +45,12 @@ const arvore = await p.evaluate(() => {
            numerados: rows.every(r => /^\d+\.\d+\.\d+ /.test(r.querySelector('.ed-nm').textContent)) };
 });
 t('todo subassunto da árvore tem o botão de 10 questões', arvore.total > 300 && arvore.comBotao === arvore.total);
-t('os subassuntos dos 6 assuntos com cartas estão acesos (21 na demo)', arvore.acesos === 21);
+t('todos os plays estão ACESOS — o banco-modelo cobre a árvore inteira (dec. 204)', arvore.acesos === arvore.total);
 t('os subassuntos ganharam numeração 1.1.1 (o aluno acha o conteúdo pelo número)', arvore.numerados);
 t('o botão é um ícone de play, não um número (dec. 203)',
   await p.evaluate(() => { const b = document.querySelector('#editalTree .ed-q10'); return !!b.querySelector('svg path') && b.textContent.trim() === ''; }));
 
-/* botão apagado explica; não abre nada */
-await p.evaluate(() => [...document.querySelectorAll('#editalTree .ed-q10.off')][0].click());
-await p.waitForTimeout(300);
-t('subassunto ainda sem cartas avisa que as aulas alimentam o bloco',
-  await p.evaluate(() => /Sem cartas ainda/.test(document.getElementById('toast').textContent) &&
-                         document.getElementById('trLayer').style.display !== 'flex'));
-
-/* abre a revisão de "Textos mistos" (LP · Interpretação de textos) */
+/* abre o pacote de "Textos mistos" (LP · Interpretação de textos) */
 const pctAntes = await p.evaluate(() => {
   const row = [...document.querySelectorAll('#editalTree .ed-srow')].find(r => /Textos mistos/.test(r.textContent));
   return parseInt(row.querySelector('.ed-pc').textContent, 10);
@@ -68,13 +62,12 @@ await p.evaluate(() => {
 await p.waitForTimeout(500);
 t('o botão abre o mesmo overlay do Treinamento Rápido',
   await p.evaluate(() => document.getElementById('trLayer').style.display === 'flex'));
-t('o título diz que é a revisão daquele subassunto',
-  await p.evaluate(() => document.getElementById('trTitulo').textContent === 'Revisão · Textos mistos'));
-t('as cartas etiquetadas com o subassunto vêm primeiro no baralho',
+t('o título diz qual pacote do subassunto abriu (dec. 204)',
+  await p.evaluate(() => document.getElementById('trTitulo').textContent === 'Pacote 1 · Textos mistos'));
+t('o pacote é a instância DESTE subassunto (cartas etiquetadas com ele)',
   await p.evaluate(() => {
-    const enun = document.querySelector('#trBody .fc-enun').textContent;
-    const card = window.TR_BANK.filter(c => c.t === enun)[0];
-    return card && card.s === 'Textos mistos';
+    const est = window.__qbEst('Língua Portuguesa', 'Interpretação de textos', 'Textos mistos');
+    return est.pacotes[0].every(c => c.s === 'Textos mistos');
   }));
 
 /* responde as 10 acertando tudo (o gabarito vem do banco exposto) */
@@ -82,8 +75,8 @@ const antes = await p.evaluate(() => window.__carteira());
 for (let i = 0; i < 10; i++) {
   await p.evaluate(() => {
     const enun = document.querySelector('#trBody .fc-enun').textContent;
-    const card = window.TR_BANK.filter(c => c.t === enun)[0];
-    document.getElementById(card.c ? 'fcCerto' : 'fcErrado').click();
+    const card = window.QB_MODELO.flat().find(r => r[1] === enun);
+    document.getElementById(card && card[0] === 'C' ? 'fcCerto' : 'fcErrado').click();
   });
   await p.waitForTimeout(100);
   await p.evaluate(() => document.querySelector('#trBody [data-nota="3"]').click());
@@ -123,11 +116,8 @@ await p.evaluate(() => document.getElementById('btnTrSair').click());
    migra as 10 cartas do PDF para o TR_BANK — os 8 subassuntos de
    "Poderes administrativos" têm de acender sozinhos, na hora.          */
 await nav('v-dominio'); await p.waitForTimeout(300);
-t('antes do banco chegar, "Poder vinculado" está apagado',
-  await p.evaluate(() => {
-    const row = [...document.querySelectorAll('#editalTree .ed-srow')].find(r => /Poder vinculado/.test(r.textContent));
-    return !!row.querySelector('.ed-q10.off');
-  }));
+t('antes da aula, "Poder vinculado" tem só os 2 pacotes-modelo (sem Reforço)',
+  await p.evaluate(() => window.__qbPacotes('Direito Administrativo', 'Poderes administrativos', 'Poder vinculado').length === 2));
 await nav('v-missoes'); await p.waitForTimeout(400);
 await p.evaluate(() => {
   const bt = [...document.querySelectorAll('#diaList [data-dia]')].find(b => /Dir\. Administrativo/.test(b.closest('.mission-row').textContent));
@@ -144,21 +134,19 @@ await p.evaluate(() => document.getElementById('btnTrProx').click());
 await p.waitForTimeout(400);
 await nav('v-dominio'); await p.waitForTimeout(400);
 const posAula = await p.evaluate(() => {
-  const rows = [...document.querySelectorAll('#editalTree .ed-srow')];
-  const vinc = rows.find(r => /Poder vinculado/.test(r.textContent));
-  return { vincAceso: !!vinc.querySelector('.ed-q10:not(.off)'),
-           acesos: rows.filter(r => r.querySelector('.ed-q10:not(.off)')).length };
+  const subs = ['Poder vinculado', 'Poder discricionário', 'Poder hierárquico', 'Poder disciplinar',
+                'Poder regulamentar', 'Poder de polícia', 'Uso do poder', 'Abuso de poder'];
+  return subs.filter(su => window.__qbPacotes('Direito Administrativo', 'Poderes administrativos', su).length === 3).length;
 });
-t('o banco chegou (cartas da aula) e "Poder vinculado" acendeu SOZINHO', posAula.vincAceso);
-t('os 8 subassuntos de Poderes administrativos acenderam (21 → 29)', posAula.acesos === 29);
+t('o banco chegou (cartas da aula) e virou pacote de Reforço SOZINHO nos 8 subassuntos de Poderes administrativos', posAula === 8);
 await p.evaluate(() => {
   const row = [...document.querySelectorAll('#editalTree .ed-srow')].find(r => /Poder vinculado/.test(r.textContent));
   row.querySelector('.ed-q10').click();
 });
 await p.waitForTimeout(500);
-t('e o play recém-aceso abre a revisão daquele subassunto',
+t('e o play abre o pacote daquele subassunto',
   await p.evaluate(() => document.getElementById('trLayer').style.display === 'flex' &&
-                         document.getElementById('trTitulo').textContent === 'Revisão · Poder vinculado'));
+                         document.getElementById('trTitulo').textContent === 'Pacote 1 · Poder vinculado'));
 await p.evaluate(() => document.getElementById('btnTrSair').click());
 
 console.log('\nvy1 :: ' + ok + ' ok / ' + falhas.length + ' falhas');

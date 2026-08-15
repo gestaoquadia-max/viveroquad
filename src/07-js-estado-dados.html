@@ -486,15 +486,14 @@
           '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent('aula ' + matNm + ' ' + ass[0] + ' concurso') + '" target="_blank" rel="noopener">\u25B6 Assistir aula</a>' +
           '<a href="https://www.qconcursos.com/questoes-de-concursos/questoes?q=' + q + '" target="_blank" rel="noopener">\u270E Fazer quest\u00F5es</a>' +
           '</div>';
-        var temCartas = (typeof TR_BANK !== 'undefined') && TR_BANK.some(function (c) { return c.m === matNm && c.a === ass[0]; });
         var subHtml = ass[1].map(function (sub, si) {
           var sp = edSubPct(mi, matNm, ass[0], sub);
-          /* dec. 202 — cada subassunto leva ao seu bloco de 10 questões:
-             é o mesmo bloco do Treinamento Rápido, aberto direto no
-             conteúdo que o aluno quer revisar                          */
+          /* dec. 204 — o play abre o PRÓXIMO pacote de 10 daquele
+             subassunto (banco por subassunto); está sempre aceso porque
+             todo subassunto tem os pacotes-modelo na demo             */
           return '<div class="ed-srow"><span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + '.' + (si + 1) + ' ' + sub + '</span>' +
-                 '<button type="button" class="ed-q10' + (temCartas ? '' : ' off') + '" data-q10-m="' + matNm + '" data-q10-a="' + ass[0] + '" data-q10-s="' + sub + '"' +
-                 ' title="Treinar aqui — bloco de 10 questões de ' + sub + '" aria-label="Treinar ' + sub + '">' +
+                 '<button type="button" class="ed-q10" data-q10-m="' + matNm + '" data-q10-a="' + ass[0] + '" data-q10-s="' + sub + '"' +
+                 ' title="Treinar aqui — pacotes de 10 questões de ' + sub + '" aria-label="Treinar ' + sub + '">' +
                  '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5 L10.5 6 L3 10.5 Z" fill="currentColor"/></svg></button>' + edBar(sp) +
                  '<span class="ed-pc" style="color:' + edPcColor(sp) + '">' + Math.round(sp) + '%</span></div>';
         }).join('');
@@ -526,7 +525,6 @@
   $('editalTree').addEventListener('click', function (ev) {
     var q10 = ev.target.closest('.ed-q10');
     if (q10) {
-      if (q10.classList.contains('off')) { toast('Sem cartas ainda — as aulas alimentam este bloco.'); return; }
       if (typeof trAbrirSub === 'function') trAbrirSub(q10.dataset.q10M, q10.dataset.q10A, q10.dataset.q10S);
       return;
     }

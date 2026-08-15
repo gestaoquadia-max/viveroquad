@@ -34,9 +34,9 @@ e o material de marca usado na construção.
 viveroquad/
 ├── src/                            ← FONTE do protótipo em 20 partes (01-…20-…)
 │   └── README.md                   ← tabela das partes e regras de edição
-├── data/                           ← dados demonstrativos (19 fragmentos __SEED_*__)
+├── data/                           ← dados demonstrativos (20 fragmentos __SEED_*__)
 │   └── README.md                   ← o que é cada conjunto e as relações entre eles
-├── tests/                          ← 58 suítes de regressão Playwright (rede de segurança)
+├── tests/                          ← 61 suítes de regressão Playwright (rede de segurança)
 │   ├── run.sh                      ← roda as suítes (./run.sh [suíte…])
 │   └── README.md                   ← requisitos e regras de manutenção
 ├── verify.py                       ← portão de verificação: build + regressão completa
@@ -73,7 +73,7 @@ Os arquivos do mascote chamam-se `danilo.*` por razão histórica — o guia do 
    20 partes, injeta os dados demonstrativos de `data/`, valida os tokens,
    embute as mídias como data URI e gera `index.html` (~9,4 MB) e
    `artifact.html` (versão para publicação).
-3. **Verificar**: `python3 verify.py` roda o build e as **58 suítes de
+3. **Verificar**: `python3 verify.py` roda o build e as **61 suítes de
    regressão** de `tests/` — nenhuma mudança é boa sem a regressão verde.
 4. **Publicar**: o Artefato no claude.ai deve ser republicado a **cada** alteração
    — regra inegociável do projeto. Detalhes no
