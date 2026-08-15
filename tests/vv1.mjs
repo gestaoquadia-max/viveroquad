@@ -103,6 +103,24 @@ t('mas participa do sorteio', await p.evaluate(() => {
   return g.indexOf('Medalha do sorteio') >= 0;
 }));
 
+/* ====== DEC. 199 · O CARD DO CARROSSEL ABRE AS INFORMAÇÕES ====== */
+await nav('v-inicio'); await p.waitForTimeout(500);
+await p.evaluate(() => { const x = [...document.querySelectorAll('#evStrip .ev-tile')].find(y => /AULÃO ESPECIAL/i.test(y.textContent)); if (x) x.click(); });
+await p.waitForTimeout(600);
+t('card de evento PAGO abre a página do evento, não a Loja',
+  await p.evaluate(() => getComputedStyle(document.getElementById('evLayer')).display !== 'none'));
+t('a página mostra as regras antes de comprar',
+  /Regras de score/.test(await T('evBody')) && /Regras de Quad Coins/.test(await T('evBody')));
+t('o botão convida para a compra com o preço na frente',
+  /Comprar na Quad Store · 80 QdC/.test(await T('btnEvInscrever')));
+await p.evaluate(() => document.getElementById('btnEvInscrever').click());
+await p.waitForTimeout(900);
+t('o botão leva à Loja, com a página do evento fechada',
+  await p.evaluate(() => document.getElementById('v-loja').classList.contains('on')) &&
+  await p.evaluate(() => getComputedStyle(document.getElementById('evLayer')).display === 'none'));
+t('o item do evento entra destacado na Loja',
+  await p.evaluate(() => !!document.querySelector('[data-ev-buy="aulao-especial"].achei')));
+
 /* ============ 1) EVENTO: INSCRITO → CONCLUÍDO / FALTOSO ============ */
 /* compra um evento futuro e confere INSCRITO no calendário */
 const evId = 'aulao-especial';   /* pago · presencial · 80 QdC */

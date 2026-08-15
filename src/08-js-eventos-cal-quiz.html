@@ -207,15 +207,9 @@
     var id = tile.dataset.ev, ev = null;
     EVENTOS.forEach(function (x) { if (x.id === id) ev = x; });
     var st = evState[id] || {};
-    /* pago ainda não comprado: a inscrição é na Loja → leva o aluno
-       DIRETO ao item, não só à aba (dec. 173)                         */
-    if (ev && ev.pago && !(st.comprado || st.inscrito)) {
-      showView('v-loja', 'navAluno');
-      if (typeof renderEventosLoja === 'function') renderEventosLoja();
-      lojaLevarAte('[data-ev-buy="' + id + '"]');
-      toast('Este evento é pago — a inscrição é aqui na Loja.');
-      return;
-    }
+    /* todo card abre a PÁGINA DO EVENTO — pago ou gratuito. Quem decide
+       se vale a pena precisa ler as regras antes de comprar; a ida à Loja
+       virou o botão de ação lá dentro (dec. 199, revê a dec. 173).      */
     openEvento(id);
   });
   /* leva o aluno até o item exato dentro da Loja e o faz piscar — vale
@@ -252,8 +246,10 @@
     h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
     var jaTem = st.inscrito || st.comprado;
     var lotadoEv = !jaTem && (typeof evLotado === 'function') && evLotado(ev);
+    var moEv = ev.moeda || 'qdc';
     var rotInsc = lotadoEv ? ('Lotado — ' + (ev.sala || 'sala') + ' com ' + evLot(ev) + ' lugares')
-                : ev.pago ? (jaTem ? 'Comprado ✓ · no seu calendário' : 'Comprado — acesso liberado')
+                : ev.pago ? (jaTem ? 'Comprado ✓ · no seu calendário'
+                                   : 'Comprar na Quad Store · ' + fmt(ev.preco) + ' ' + moedaTxt(moEv))
                           : (jaTem ? 'Inscrito ✓ · no seu calendário' : 'Confirmar inscrição');
     h += '<button class="btn" id="btnEvInscrever"' + (jaTem || lotadoEv ? ' disabled' : '') + '>' + rotInsc + '</button>';
     /* evento online: o link de acesso aparece para quem está inscrito */
@@ -279,7 +275,16 @@
       if (!(st.inscrito || st.comprado) && typeof evLotado === 'function' && evLotado(ev)) {
         toast('Lotado — a ' + (ev.sala || 'sala') + ' comporta ' + evLot(ev) + ' pessoas.'); return;
       }
-      if (ev.pago) { comprarEvento(ev.id); return; }   /* pago passa pela compra (e pela agenda) */
+      /* pago: a compra é na Quad Store — fecha a página e leva ao item
+         exato, já com o preço na frente (dec. 199)                     */
+      if (ev.pago) {
+        $('evLayer').style.display = 'none';
+        showView('v-loja', 'navAluno');
+        if (typeof renderEventosLoja === 'function') renderEventosLoja();
+        lojaLevarAte('[data-ev-buy="' + ev.id + '"]');
+        toast('Inscrição pela Quad Store — o item está destacado aí embaixo.');
+        return;
+      }
       var chq = choqueDeAgenda(agendaDoEvento(ev));
       if (chq && this.dataset.okChoque !== '1') {
         this.dataset.okChoque = '1';

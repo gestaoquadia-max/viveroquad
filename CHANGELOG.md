@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 06/08/2026 — O evento pago abre as informações antes de mandar para a Loja
+
+- **Card do carrossel abre a página do evento** (dec. 199): tocar num
+  evento **pago** levava direto à Quad Store, pulando as informações —
+  o aluno era mandado comprar sem ler as regras de score e de Quad Coins,
+  o professor, a sala e o horário. Agora **todo** card abre a página do
+  evento, igual aos gratuitos.
+- **A ida à Loja virou o botão de ação**: no lugar de "Confirmar
+  inscrição", o evento pago mostra **"Comprar na Quad Store · N QdC"** —
+  fecha a página, abre a Loja e destaca o item. (De quebra, sumiu o
+  rótulo errado "Comprado — acesso liberado", que aparecia em evento
+  ainda **não** comprado.)
+- Revê a dec. 173, que criara o atalho direto à Loja para reduzir
+  fricção: a fricção que importa aqui é a boa — ler antes de decidir.
+
 ## 06/08/2026 — A demonstração volta a abrir zerada
 
 - **Persistência com escopo de sessão** (dec. 198): a DA-10 fez a evolução
