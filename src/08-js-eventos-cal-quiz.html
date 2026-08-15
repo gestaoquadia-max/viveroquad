@@ -10,10 +10,38 @@
   /* professores do evento: alimentam o card do aluno, o painel do admin e,
      mais adiante, a agenda do próprio professor. */
   function evProfs(ev) { return (ev && ev.profs) ? ev.profs.slice() : []; }
-  /* evento gratuito que premia (score e/ou Quad Coins) ganha o selo +BÔNUS */
+  /* dec. 200 — todo evento pontua: participar vale EV_SCORE_PADRAO de
+     score de carreira, e é o valor que já vem preenchido no formulário
+     do administrador. Como é padrão, não diferencia evento nenhum.    */
+  var EV_SCORE_PADRAO = 10;
+  function evScoreRegra(n) { return ['Participação no evento', '+' + (n >= 0 ? n : EV_SCORE_PADRAO) + ' score']; }
+  function evCoinsRegra(n) { return ['Participação no evento', '+' + n]; }
+  /* a regra de participação é a que o formulário do admin edita; as
+     demais (quiz, ranking, garimpo, semana completa) são curadoria e
+     seguem intocadas ao salvar                                        */
+  function evRegraPart(r) { return /^Participação/.test(r && r[0] ? r[0] : ''); }
+  function evValorRegra(lista, padrao) {
+    var achou = null;
+    (lista || []).forEach(function (r) { if (!achou && evRegraPart(r)) achou = r; });
+    if (!achou) return padrao;
+    var n = parseInt(String(achou[1]).replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? padrao : n;
+  }
+  function evOutrasRegras(lista) { return (lista || []).filter(function (r) { return !evRegraPart(r); }); }
+  function evRegrasScore(atual, n) { return [evScoreRegra(n)].concat(evOutrasRegras(atual)); }
+  function evRegrasCoins(atual, n) {
+    var resto = evOutrasRegras(atual);
+    return n > 0 ? [evCoinsRegra(n)].concat(resto) : resto;
+  }
+  /* dec. 200 — o vocabulário do carrossel tem DUAS etiquetas de tipo:
+     "NA LOJA" (evento pago) e "+BÔNUS" (evento gratuito que dá Quad
+     Coins). Score todo evento dá — o padrão é EV_SCORE_PADRAO —, então
+     score não distingue nada; o que distingue é o Coin, que a
+     administração insere ao criar o evento. A antiga etiqueta "+COINS"
+     dizia exatamente isso e foi absorvida por esta.                    */
   function evTemBonus(ev) {
     if (!ev || ev.pago) return false;
-    return (ev.score && ev.score.length > 0) || (ev.coins && ev.coins.length > 0);
+    return !!(ev.coins && ev.coins.length > 0);
   }
   function evProfsTxt(ev) {
     var ps = evProfs(ev);
@@ -51,7 +79,6 @@
       : (typeof evLotado === 'function' && evLotado(ev)) ? '<span class="tag warn">LOTADO</span>'
       : choque ? '<span class="tag warn em-choque">EM CHOQUE</span>'
       : ev.pago ? '<span class="tag gold">NA LOJA</span>'
-      : ev.tag ? '<span class="tag gold">' + ev.tag + '</span>'
       : evTemBonus(ev) ? '<span class="tag gold">+BÔNUS</span>' : '';
     return '<button class="ev-tile ' + (ev.cor || '') + '" data-ev="' + ev.id + '">' +
       '<span class="ev-date">' + ev.quando.split(' · ').slice(0, 2).join(' · ') + '</span>' +
@@ -241,8 +268,12 @@
     var h = '<div class="p-card"><p class="sub" style="font-size:12.5px">' + ev.desc + '</p></div>';
     h += '<div class="p-card"><div class="k-label">Regras de score</div>' +
       ev.score.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts">' + r[1] + '</span></div>'; }).join('') + '</div>';
-    h += '<div class="p-card"><div class="k-label">Regras de Quad Coins</div>' +
-      ev.coins.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts coin">' + coinSvg() + r[1] + '</span></div>'; }).join('') + '</div>';
+    /* dec. 200 — evento sem Coins não mostra o card vazio: o Coin é
+       opcional, e é justamente o que dá (ou não) a etiqueta +BÔNUS   */
+    if (ev.coins && ev.coins.length) {
+      h += '<div class="p-card"><div class="k-label">Regras de Quad Coins</div>' +
+        ev.coins.map(function (r) { return '<div class="ev-rule"><span class="r-nm">' + r[0] + '</span><span class="r-pts coin">' + coinSvg() + r[1] + '</span></div>'; }).join('') + '</div>';
+    }
     h += '<div style="display:flex; flex-direction:column; gap:9px; margin-top:2px">';
     var jaTem = st.inscrito || st.comprado;
     var lotadoEv = !jaTem && (typeof evLotado === 'function') && evLotado(ev);

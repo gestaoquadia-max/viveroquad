@@ -530,6 +530,7 @@ Textos decorativos da interface (cards descritivos, placeholders "EM BREVE") **n
 - **Classificação**: CONFIRMADO NO CÓDIGO + SIMULADO LOCALMENTE + DEPENDE DO BACK-END.
 - **Divergências / Decisão pendente**: —.
 - ***Nota 15/08 — o "clique leva ao item" foi revisto pela dec. 199:*** o toque num evento **pago** no carrossel **abre a página do evento**, como já acontecia com o gratuito de "+BÔNUS" — quem vai gastar precisa ler as regras de score e de Quad Coins antes de decidir. A ida à Loja virou o **botão de ação** de lá dentro ("Comprar na Quad Store · N QdC"), que fecha a página e destaca o item (`lojaLevarAte` segue igual). O atalho direto permanece nos **simulados presenciais**, que não têm página própria.
+- ***Nota 15/08 — a dec. 200 padronizou a pontuação e o vocabulário:*** **todo evento pontua** — participar vale **+10 de score** (`EV_SCORE_PADRAO`), regra que passa a nascer em todo evento criado pela administração (antes ele nascia com `score: []`, sem dar nada) e que é **editável por evento** num campo novo do formulário, ao lado de outro para os **Quad Coins de participação**. Como o score virou padrão, ele não distingue evento nenhum: `evTemBonus` passou a olhar **só para os Coins**, e a etiqueta livre **+COINS foi absorvida pela +BÔNUS**. Restam duas etiquetas de tipo — **NA LOJA** e **+BÔNUS** —, com INSCRITO/LOTADO/EM CHOQUE mantendo a prioridade por serem estado, não tipo.
 
 ### RN-34 — Criação, edição e cancelamento de eventos pela administração
 - **Área**: Eventos/Admin.

@@ -1,5 +1,31 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — Todo evento pontua 10; o carrossel fica com duas etiquetas
+
+- **Score de participação padrão** (dec. 200): participar de qualquer
+  evento vale **+10 de score de carreira**. Antes, o evento criado pela
+  administração nascia **sem regra nenhuma** — não dava nada a quem
+  comparecia. Agora nasce pontuando, e os sete eventos de demonstração
+  publicam a mesma regra de participação.
+- **A recompensa virou campo do formulário**: "Recompensa de
+  participação · Score / Quad Coins". O score já vem preenchido com 10;
+  os **Quad Coins** são opcionais — é a "função de inserir quadcoin" que
+  faltava. Vale ao criar **e ao editar**, e a edição traz os valores
+  atuais de volta para os campos. As regras curadas de cada evento
+  (acerto no quiz, top 3, semana completa) não são tocadas ao salvar.
+- **Vocabulário do carrossel reduzido a duas etiquetas de tipo**:
+  **NA LOJA** (evento pago) e **+BÔNUS** (evento gratuito que dá Quad
+  Coins). A etiqueta **+COINS** saiu: ela dizia exatamente o que o
+  +BÔNUS já dizia. Como agora todo evento pontua, o score deixou de
+  distinguir qualquer coisa — quem distingue é o Coin, e é por isso que
+  `evTemBonus` passou a olhar só para os Coins.
+- INSCRITO, LOTADO e EM CHOQUE continuam: são **estado** do aluno
+  naquele evento, não tipo de evento, e seguem tendo prioridade sobre
+  as duas etiquetas de tipo.
+- Evento sem Coins não mostra mais o card vazio "Regras de Quad Coins"
+  na página do evento.
+- Suíte nova `vx1.mjs` (21 checagens). Regressão: 59 suítes.
+
 ## 15/08/2026 — O evento pago abre as informações antes de mandar para a Loja
 
 - **Card do carrossel abre a página do evento** (dec. 199): tocar num

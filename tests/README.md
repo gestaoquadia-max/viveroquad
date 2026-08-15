@@ -1,6 +1,6 @@
 # tests/ — a rede de segurança do protótipo
 
-58 suítes de regressão (Playwright headless) que verificam o comportamento
+59 suítes de regressão (Playwright headless) que verificam o comportamento
 do protótipo de ponta a ponta — aluno, professor e administrador. Foram
 construídas junto com o produto, rodada a rodada, e são o **critério de
 aceite oficial** de qualquer mudança: *nenhuma alteração no fonte é boa se
@@ -25,7 +25,7 @@ de ambiente (`VQ_NODE`, `VQ_PW`, `VQ_CHROME` — ver `run.sh`).
 |---|---|
 | vtut, vfase* | tutorial do QUAD, fases do pacote do aluno (a–h) |
 | vf[a-e], vfix*, vg[1-3] | rodadas de ajuste do gestor (regras pontuais) |
-| v[h-w]1 | uma suíte formal por rodada de evolução (vu1 = lotação/portaria/públicos; vv1 = drop de itens, status do evento no calendário e compra do tutorial fora do estorno; **vw1 = Decisões Administrativas no protótipo — ledger/extrato da carteira, IDs internos, turma arquivada, perfis administrativos e persistência da evolução**) |
+| v[h-w]1 | uma suíte formal por rodada de evolução (vu1 = lotação/portaria/públicos; vv1 = drop de itens, status do evento no calendário e compra do tutorial fora do estorno; **vw1** = Decisões Administrativas no protótipo — ledger/extrato da carteira, IDs internos, turma arquivada, perfis administrativos e persistência da evolução; **vx1 = score padrão de 10 em todo evento, recompensa de participação editável pelo admin e o carrossel reduzido a NA LOJA + BÔNUS**) |
 | vadmin, vinterno, vcontrole, vestrutura | as abas do administrador N.P.P. |
 | vloja*, vdmn, vbonus, vmochila, vevento | Quad Store, moedas, mochila, eventos |
 | vsim, vprova, vaula | simulados, prova de promoção, aula de hoje (com relógio simulado) |

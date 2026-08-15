@@ -35,6 +35,9 @@
     $('admEvNovoLink').value = ev.link || '';
     if ($('admEvNovoMoeda')) $('admEvNovoMoeda').value = ev.moeda || 'qdc';
     $('admEvNovoPreco').value = ev.pago ? ev.preco : '';
+    /* dec. 200 — a recompensa de participação volta para os campos */
+    if ($('admEvNovoScore')) $('admEvNovoScore').value = evValorRegra(ev.score, EV_SCORE_PADRAO);
+    if ($('admEvNovoCoins')) $('admEvNovoCoins').value = evValorRegra(ev.coins, '');
     if (ev.dataISO) $('admEvNovoData').value = ev.dataISO;
     if (ev.hi) $('admEvNovoInicio').value = ev.hi;
     if (ev.hf) $('admEvNovoFim').value = ev.hf;
@@ -185,6 +188,12 @@
     var profs = evProfChipsSel();
     var link = modalidade === 'online' ? $('admEvNovoLink').value.trim() : '';
     var preco = parseInt($('admEvNovoPreco').value, 10);
+    /* dec. 200 — recompensa de participação: score é padrão (10) e o
+       Coin é opcional; preenchido, é ele que dá a etiqueta +BÔNUS   */
+    var evScoreN = parseInt(($('admEvNovoScore') || {}).value, 10);
+    if (!(evScoreN >= 0)) evScoreN = EV_SCORE_PADRAO;
+    var evCoinsN = parseInt(($('admEvNovoCoins') || {}).value, 10);
+    if (!(evCoinsN > 0)) evCoinsN = 0;
     admAlerta('admEvErro', ''); admLimpaErro(EV_CAMPOS);
     if (evFalta(!nome, 'admEvNovoNome', 'Para cadastrar o evento falta o <b>nome</b>.')) return;
     if (evFalta(!$('admEvNovoData').value, 'admEvNovoData', 'Para cadastrar o evento falta a <b>data</b> — escolha o dia na agenda.')) return;
@@ -218,6 +227,8 @@
         ev.pago = pago; ev.preco = pago ? preco : 0; ev.moeda = moedaEv; ev.quando = quando; ev.dataISO = dataISO;
         ev.sala = online ? '' : evSala; ev.hi = evHi; ev.hf = evHf;
         ev.lot = online ? 0 : salaCap(evSala);   /* trocou de sala? a lotação acompanha */
+        ev.score = evRegrasScore(ev.score, evScoreN);
+        ev.coins = evRegrasCoins(ev.coins, evCoinsN);
         ev.tipo = (pago ? 'EVENTO PAGO' : 'EVENTO') + ' · ' + (online ? 'ONLINE' : 'PRESENCIAL');
         ev.meta = pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade);
       }
@@ -238,7 +249,8 @@
       modalidade: modalidade, online: online, link: link, pago: pago, preco: pago ? preco : 0, moeda: moedaEv, profs: profs,
       cor: ['', 'teal', 'gold', 'navy2', 'purple'][EVENTOS.length % 5],
       meta: pago ? (fmt(preco) + ' ' + moedaTxt(moedaEv) + ' · evento ' + modalidade) : ('evento ' + modalidade),
-      desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.', score: [], coins: [] });
+      desc: resumo || 'Evento lançado pela administração. Regras de score e Coins publicadas aqui.',
+      score: [evScoreRegra(evScoreN)], coins: evCoinsN ? [evCoinsRegra(evCoinsN)] : [] });
     $('admEvNovoNome').value = ''; $('admEvNovoResumo').value = ''; $('admEvNovoLink').value = ''; $('admEvNovoPreco').value = '';
     $('admEvNovoData').value = ''; $('admEvNovoInicio').value = '19:00'; $('admEvNovoFim').value = '21:00';
     $('admEvSala').value = '';

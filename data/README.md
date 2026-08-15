@@ -18,7 +18,7 @@ lugar onde o token vive; datas em `AAAA-MM-DD`.
 | `edital-cfo.js` · `edital-soldado.js` · `edital-ppba.js` · `edital-pcba.js` | `EDITAL_*` | 07 | Árvores matéria → assunto → subassunto usadas por Domínio, Pedagógico e criação de turmas |
 | `docentes.js` | `DOCENTES` | 07 | Corpo docente (nome é a CHAVE do professor em todo o app; e-mail de acesso deriva do sobrenome) |
 | `turmas-loja.js` | `TURMAS_LOJA` | 07 | Turmas à venda; `sala` deve respeitar a lotação (`SALA_CAP`, no código); `concurso` → `concursos.js`; vagas POR MOEDA (Dmn/QdC) |
-| `eventos.js` | `EVENTOS` | 08 | Eventos da semana (carrossel/Loja/portaria); datas fixas VENCEM no calendário real — reancorar preservando o dia da semana do rótulo `quando` (precedente: dec. 189) |
+| `eventos.js` | `EVENTOS` | 08 | Eventos da semana (carrossel/Loja/portaria); datas fixas VENCEM no calendário real — reancorar preservando o dia da semana do rótulo `quando` (precedente: dec. 189). Todo evento traz a regra **"Participação no evento · +10 score"** (dec. 200); a chave `tag` não existe mais — o vocabulário de tipo é NA LOJA (`pago`) e +BÔNUS (tem `coins`) |
 | `crono.js` | `CRONO` | 08 | Grade semanal de aulas por turma (chave = id da turma, dec. 163); professores citados deveriam existir em `docentes.js` (pendência conhecida) |
 | `questions.js` | `QUESTIONS` | 08 | Banco de questões do quiz de aula do aluno |
 | `qa-mult.js` · `qa-ce.js` | `QA_MULT` / `QA_CE` | 09 | Bancos do quiz ao vivo do professor (múltipla escolha / certo-errado) |
