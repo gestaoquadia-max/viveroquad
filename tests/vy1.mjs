@@ -75,7 +75,7 @@ const antes = await p.evaluate(() => window.__carteira());
 for (let i = 0; i < 10; i++) {
   await p.evaluate(() => {
     const enun = document.querySelector('#trBody .fc-enun').textContent;
-    const card = window.QB_MODELO.flat().find(r => r[1] === enun);
+    const card = Object.values(window.QB_MODELO).flat().find(r => r[1] === enun);
     document.getElementById(card && card[0] === 'C' ? 'fcCerto' : 'fcErrado').click();
   });
   await p.waitForTimeout(100);

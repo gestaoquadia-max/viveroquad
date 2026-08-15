@@ -46,7 +46,7 @@ for (let i=0;i<10;i++){
   // lê o gabarito da carta via banco: responder correto = clicar no botão que bate com c.c — simulamos acertando sempre, menos a 1ª
   const cardTxt = await p.evaluate(()=>document.querySelector('.fc-enun').textContent);
   const certoEh = await p.evaluate(t=>{
-    const c = window.QB_MODELO.flat().find(x=>x[1]===t); return c ? c[0]==='C' : true;
+    const c = Object.values(window.QB_MODELO).flat().find(x=>x[1]===t); return c ? c[0]==='C' : true;
   }, cardTxt);
   const acertar = i !== 0;
   const clicarCerto = acertar ? certoEh : !certoEh;

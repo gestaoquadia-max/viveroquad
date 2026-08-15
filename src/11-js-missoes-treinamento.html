@@ -13,7 +13,8 @@
   var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
   function fc(m, a, c, t, o, s) { return { m: m, a: a, s: s || '', c: c, t: t, o: o, nota: -1, resp: null }; }
   __SEED_TR_BANK__
-  /* dois pacotes-modelo de 10 C/E — o banco de TODO subassunto na demo */
+  /* 20 questões-modelo por MATÉRIA (2 pacotes de 10) — o banco de TODO
+     subassunto na demo; '*' é o conjunto neutro das matérias fora do CFO */
   __SEED_QB_MODELO__
 
   /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
@@ -510,9 +511,9 @@
   }
   /* ========== dec. 204 — BANCO POR SUBASSUNTO ==========
      Cada subassunto da árvore tem PACOTES de 10 certo/errado. Na demo,
-     todo subassunto nasce com os dois pacotes-modelo (QB_MODELO), cada um
-     em instância própria: nota, resposta e ordem não vazam entre
-     subassuntos. Concluído, o pacote volta REORGANIZADO pela dificuldade
+     todo subassunto nasce com dois pacotes montados das 20 questões-modelo
+     da SUA MATÉRIA (QB_MODELO), em instância própria: nota, resposta e
+     ordem não vazam entre subassuntos. Concluído, o pacote volta REORGANIZADO pela dificuldade
      que o aluno informou: erradas → difíceis → boas → fáceis — a volta
      força a lembrança com evidência no que ele marcou como dificuldade.
      As cartas de aula/quiz do assunto (dec. 202/203) convivem: viram o
@@ -520,14 +521,24 @@
      [INTEGRAÇÃO REAL] — o banco real troca QB_MODELO por pacotes próprios
      de cada subassunto; o motor (rotação + reordenação) não muda.       */
   var QB_EST = {};   /* 'concurso|matéria|assunto|sub' → { prox, pacotes } */
+  /* dec. 205 — as 20 questões-modelo são TEMÁTICAS DA MATÉRIA (abrir
+     Português mostra questão de português); '*' cobre matérias fora do
+     CFO. O conjunto é embaralhado por um hash do subassunto antes de
+     virar os dois pacotes de 10: subassuntos vizinhos não abrem pacotes
+     idênticos, e o embaralho é estável (mesmo subassunto, mesma ordem). */
   function qbEst(m, a, s) {
     var k = CONCURSO_ATUAL_ID + '|' + m + '|' + a + '|' + s;
-    if (!QB_EST[k]) QB_EST[k] = {
-      prox: 0,
-      pacotes: QB_MODELO.map(function (p) {
-        return p.map(function (r) { return fc(m, a, r[0] === 'C', r[1], r[2], s); });
-      })
-    };
+    if (!QB_EST[k]) {
+      var pool = (QB_MODELO[m] || QB_MODELO['*']).slice();
+      var h = edHash(k);
+      for (var i = pool.length - 1; i > 0; i--) {
+        h = (h * 1103515245 + 12345) >>> 0;
+        var j = h % (i + 1);
+        var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+      }
+      var cards = pool.map(function (r) { return fc(m, a, r[0] === 'C', r[1], r[2], s); });
+      QB_EST[k] = { prox: 0, pacotes: [cards.slice(0, TR_REW.blocoTam), cards.slice(TR_REW.blocoTam, TR_REW.blocoTam * 2)] };
+    }
     return QB_EST[k];
   }
   /* pacote de Reforço: as cartas de aula/quiz do assunto — as etiquetadas

@@ -32,7 +32,7 @@ async function respondePacote(plano) {
     const txt = await p.evaluate(() => document.querySelector('.fc-enun').textContent);
     vistos.push(txt);
     const certoEh = await p.evaluate(tx => {
-      const c = window.QB_MODELO.flat().find(r => r[1] === tx);
+      const c = Object.values(window.QB_MODELO).flat().find(r => r[1] === tx);
       return c ? c[0] === 'C' : true;
     }, txt);
     const errar = plano[i] === 'errada';
@@ -102,10 +102,30 @@ await p.evaluate(() => document.getElementById('btnTrSair').click()); await p.wa
 /* ============ INSTÂNCIA PRÓPRIA POR SUBASSUNTO ============ */
 await abrePlay('Mundo Medieval'); await p.waitForTimeout(400);
 t('outro subassunto começa do SEU Pacote 1 (estado não vaza)', (await titulo()) === 'Pacote 1 · Mundo Medieval');
-t('e com a ordem original do modelo (nada reorganizado)',
+t('intocado: nenhuma nota registrada na instância do vizinho (e as cartas levam a etiqueta dele)',
   await p.evaluate(() => {
     const est = window.__qbEst('História', 'História Geral', 'Mundo Medieval');
-    return est.pacotes[0].every((c, i) => c.t === window.QB_MODELO[0][i][1]);
+    return est.pacotes.flat().every(c => c.nota === -1 && c.resp === null && c.s === 'Mundo Medieval');
+  }));
+t('o embaralho por subassunto varia: Pacote 1 de Mundo Medieval ≠ Pacote 1 de Mundo Moderno',
+  await p.evaluate(() => {
+    const mm = window.__qbEst('História', 'História Geral', 'Mundo Medieval').pacotes[0].map(c => c.t).join('|');
+    const mo = window.__qbEst('História', 'História Geral', 'Mundo Moderno').pacotes[0].map(c => c.t).join('|');
+    return mm !== mo;
+  }));
+/* dec. 205 — o tema acompanha a MATÉRIA (relato do gestor: Português abria
+   questão de matemática) */
+t('as questões do pacote são DA MATÉRIA: subassunto de Português só carrega questões do conjunto de Português',
+  await p.evaluate(() => {
+    const pool = new Set(window.QB_MODELO['Língua Portuguesa'].map(r => r[1]));
+    return window.__qbEst('Língua Portuguesa', 'Interpretação de textos', 'Textos mistos')
+      .pacotes.flat().every(c => pool.has(c.t));
+  }));
+t('e subassunto de História só carrega questões do conjunto de História',
+  await p.evaluate(() => {
+    const pool = new Set(window.QB_MODELO['História'].map(r => r[1]));
+    return window.__qbEst('História', 'História Geral', 'Mundo Medieval')
+      .pacotes.flat().every(c => pool.has(c.t));
   }));
 await p.evaluate(() => document.getElementById('btnTrSair').click()); await p.waitForTimeout(200);
 
