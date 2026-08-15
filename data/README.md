@@ -23,7 +23,7 @@ lugar onde o token vive; datas em `AAAA-MM-DD`.
 | `questions.js` | `QUESTIONS` | 08 | Banco de questões do quiz de aula do aluno |
 | `qa-mult.js` · `qa-ce.js` | `QA_MULT` / `QA_CE` | 09 | Bancos do quiz ao vivo do professor (múltipla escolha / certo-errado) |
 | `tr-bank.js` | `TR_BANK` | 11 | Cartas de aula/quiz do treinamento; cada carta leva a **etiqueta de subassunto** (6º argumento de `fc`, dec. 202) com o nome EXATO da árvore `EDITAL_CFO` — desde a dec. 204 elas formam o pacote de **Reforço** dos subassuntos do assunto |
-| `qb-modelo.js` | `QB_MODELO` | 11 | **Dois pacotes-modelo de 10 certo/errado** (dec. 204) — o banco de TODO subassunto na demo, instanciado por subassunto (nota/ordem próprias); o banco real substitui os modelos `[INTEGRAÇÃO REAL]` |
+| `qb-modelo.js` | `QB_MODELO` | 11 | **20 questões-modelo certo/errado POR MATÉRIA** (dec. 204/205) — viram os dois pacotes de 10 de cada subassunto, embaralhados por hash do subassunto (instância própria); chave `*` = conjunto neutro p/ matérias fora do CFO; o banco real substitui os modelos `[INTEGRAÇÃO REAL]` |
 | `aula-demo.js` | `AULA_DEMO` | 11 | Aula demonstrativa do tutorial |
 | `simulados.js` | `SIMULADOS` | 11 | Simulados do aluno; vagas POR MOEDA; presencial vende entrada, digital premia score/QdC |
 | `loja-extras.js` | `LOJA_EXTRAS` | 14 | Itens avulsos da Quad Store (ex.: Mentoria Quad, com data) |

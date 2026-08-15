@@ -1,5 +1,18 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — Questões-modelo temáticas por matéria, embaralhadas por subassunto
+
+- **O banco-modelo ganhou tema** (dec. 205): abrir um subassunto de
+  Português mostra questões de português; História, de história — 20
+  questões rápidas de nível básico por matéria (as 13 do CFO + conjunto
+  neutro para outras árvores). Corrige o relato do gestor: o conjunto
+  único da dec. 204 fazia Português abrir questão de matemática.
+- **Subassuntos vizinhos não abrem pacotes idênticos**: as 20 questões da
+  matéria são embaralhadas por um hash do subassunto antes de virar os
+  dois pacotes de 10 — embaralho estável (mesmo subassunto, mesma ordem).
+- A mecânica da dec. 204 permanece: rotação de pacotes, volta
+  reorganizada pela dificuldade, instância própria e Reforço de aula/quiz.
+
 ## 15/08/2026 — Banco por subassunto: pacotes de 10 que voltam reorganizados pela dificuldade
 
 - **Todo subassunto da árvore tem seu banco de pacotes de 10 certo/errado**
