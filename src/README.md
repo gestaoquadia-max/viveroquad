@@ -37,11 +37,11 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 04-html-professor | As 5 views do professor |
 | 05-html-admin | As 8 views do administrador N.P.P. |
 | 06-html-overlays | Overlays (prova, quizzes, compra, chat, portões, tutorial), artes vetoriais, 3 navbars |
-| 07-js-estado-dados | Abertura do `<script>`/IIFE, estado global, moedas, docentes, turmas, matrículas, concursos; **ledger da carteira** (`LEDGER`, `ledgerLancar`, `ledgerOp` — DA-03), **IDs internos** (`MEU_ID`, `novoId()` — DA-01) e **`matriculasArquivadas()`** (DA-06), dec. 196 |
+| 07-js-estado-dados | Abertura do `<script>`/IIFE, estado global, moedas, docentes, turmas, matrículas, concursos; árvore do Domínio com a **pílula "▸ 10" por subassunto** (`.ed-q10`, dec. 202) e sem a rolagem infinita vertical do Início (dec. 201 — ficou só a roda 3D, `RODA_VIEWS`); **ledger da carteira** (`LEDGER`, `ledgerLancar`, `ledgerOp` — DA-03), **IDs internos** (`MEU_ID`, `novoId()` — DA-01) e **`matriculasArquivadas()`** (DA-06), dec. 196 |
 | 08-js-eventos-cal-quiz | Eventos + página do evento, calendário do aluno, motor de quiz, aula de hoje; **recompensa de participação** (`EV_SCORE_PADRAO` = 10, `evScoreRegra`/`evCoinsRegra`/`evRegrasScore`/`evRegrasCoins`) e as duas etiquetas de tipo do carrossel — `evTemBonus` olha só para os Coins (dec. 200) |
 | 09-js-professor | Gate/login do professor, painel, relatórios, quiz ao vivo com polling |
 | 10-js-acesso-tutorial | Conectividade, acesso ao portal, tutorial do QUAD |
-| 11-js-missoes-treinamento | Treinamento rápido, blocos do dia por turma, simulados do aluno, avatares |
+| 11-js-missoes-treinamento | Treinamento rápido, blocos do dia por turma, **revisão por subassunto** (`trAbrirSub`/`trCartasSub`/`trAjSub`, dec. 202), simulados do aluno, avatares |
 | 12-js-gamificacao-perfil | Insígnias, rankings/Quadrômetro, promoções, simulado digital, central de tutoriais, bloco **"Minhas turmas · ativas e arquivadas"** com a etiqueta ARQUIVADA (DA-06, dec. 196) |
 | 13-js-admin-estrutura | Estrutura/Domínio, criação de turmas e isoladas, banco de professores, reset da demo (**limpa as 3 chaves `vq_*`**: `vq_tut_skip`, `vq_intro_done` e `vq_evolucao` — dec. 196) |
 | 14-js-loja-economia | Loja: moedas, compras, catálogos, salas/lotações, overlay de compra, skins |

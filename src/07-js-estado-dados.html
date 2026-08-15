@@ -75,7 +75,6 @@
     t.classList.remove('go');
     void t.offsetWidth;
     t.classList.add('go');
-    if (typeof queueSync === 'function') queueSync(); // estado mudou → replica nos clones do loop
   }
 
   /* ---------- DA-01: identidade por ID interno imutável ----------
@@ -139,7 +138,6 @@
     var el = $('dmnVal'); if (el) el.textContent = fmt(diamantes);
     var ls = $('lojaSaldoDmn'); if (ls) ls.textContent = fmt(diamantes);
     if (msg) toast(msg);
-    if (typeof queueSync === 'function') queueSync();
   }
   /* [DEMO] códigos de recarga usados só para demonstrar a tela — os gift cards
      de verdade nascem em lote no Painel de controle, no formato QG<lote>-<código>. */
@@ -307,8 +305,10 @@
      [INTEGRAÇÃO REAL] preenchidos a partir da matrícula ativa do aluno. */
   var DB_ALUNO = { id: MEU_ID, nome: 'Danilo de Almeida Moura', fone: '(71) 9 8877-2301' };
 
-  /* ---------- engrenagem: roda 3D + scroll infinito ---------- */
-  var LOOP_VIEWS = ['v-inicio']; // rolagem infinita apenas no Início
+  /* ---------- engrenagem: roda 3D do Início ----------
+     (a rolagem infinita vertical que triplicava o conteúdo saiu na
+      dec. 201 — o Início rola e PARA no fim, como as demais abas)   */
+  var RODA_VIEWS = ['v-inicio']; // roda 3D apenas no Início
   var tourOn = false;
   function spotlight(view) {
     var cards = view.querySelectorAll('.p-card');
@@ -316,7 +316,7 @@
     /* a "engrenagem" 3D é exclusiva do Início — nas demais views (Loja,
        Missões, Domínio, admin) os blocos ficam PLANOS, senão um card alto
        tomba e invade o vizinho (ex.: presenciais × itens digitais). */
-    if (LOOP_VIEWS.indexOf(view.id) < 0) {
+    if (RODA_VIEWS.indexOf(view.id) < 0) {
       cards.forEach(function (c) { c.style.transform = ''; c.style.opacity = ''; c.classList.remove('spot'); });
       return;
     }
@@ -343,58 +343,8 @@
       c.classList.toggle('spot', c === best);
     });
   }
-  function loopPeriod(v) {
-    var segs = v.querySelectorAll(':scope > .loop-seg');
-    return segs.length > 1 ? segs[1].offsetTop - segs[0].offsetTop : 0;
-  }
-  function initLoop(v) {
-    if (v.dataset.loop) return;
-    v.dataset.loop = '1';
-    // triplica o conteúdo: [original][clone][clone] — o fim liga com o início
-    var seg = document.createElement('div');
-    seg.className = 'loop-seg';
-    while (v.firstChild) seg.appendChild(v.firstChild);
-    v.appendChild(seg);
-    var c1 = seg.cloneNode(true), c2 = seg.cloneNode(true);
-    c1.setAttribute('aria-hidden', 'true'); c2.setAttribute('aria-hidden', 'true');
-    v.appendChild(c1); v.appendChild(c2);
-    // clique num clone dispara o botão equivalente do original (mapeado pela ordem)
-    [c1, c2].forEach(function (clone) {
-      clone.addEventListener('click', function (e) {
-        var b = e.target.closest('button');
-        if (!b || !clone.contains(b)) return;
-        if (Date.now() < zoomSupTs) return;   /* soltar do zoom não vira clique */
-        var i = [].indexOf.call(clone.querySelectorAll('button'), b);
-        var alvo = seg.querySelectorAll('button')[i];
-        if (alvo) { alvo.click(); queueSync(); }
-      });
-    });
-    v.scrollTop = loopPeriod(v);
-  }
-  function loopJump(v) {
-    if (tourOn || v.dataset.loop !== '1') return;
-    var H = loopPeriod(v);
-    if (!H) return;
-    if (v.scrollTop < H * 0.5) v.scrollTop += H;
-    else if (v.scrollTop > H * 1.5) v.scrollTop -= H;
-  }
-  function syncLoops() {
-    document.querySelectorAll('.view[data-loop="1"]').forEach(function (v) {
-      var segs = v.querySelectorAll(':scope > .loop-seg');
-      if (segs.length === 3) {
-        segs[1].innerHTML = segs[0].innerHTML;
-        segs[2].innerHTML = segs[0].innerHTML;
-      }
-      v.querySelectorAll('.ev-strip').forEach(function (st) {
-        if (st.scrollLeft === 0 && typeof evPeriod === 'function') st.scrollLeft = evPeriod(st);
-      });
-      if (v.classList.contains('on')) spotlight(v);
-    });
-  }
-  var syncT = null;
-  function queueSync() { clearTimeout(syncT); syncT = setTimeout(syncLoops, 300); }
   document.querySelectorAll('.view').forEach(function (v) {
-    v.addEventListener('scroll', function () { loopJump(v); spotlight(v); }, { passive: true });
+    v.addEventListener('scroll', function () { spotlight(v); }, { passive: true });
   });
 
   /* ---------- nav ---------- */
@@ -408,7 +358,6 @@
         nb.classList.toggle('active', nb.dataset.view === id);
       });
     }
-    if (LOOP_VIEWS.indexOf(id) >= 0) initLoop($(id));
     /* área do admin abre limpa (ou no bloco que estava aberto) */
     if (id.indexOf('v-adm-') === 0 && typeof admJumpRestaura === 'function') admJumpRestaura(id);
     /* ao abrir o Início, a "Aula de hoje" se atualiza com o cronograma e o horário */
@@ -434,7 +383,6 @@
     if (id === 'v-prof-chat' && typeof renderProfRecados === 'function') renderProfRecados();
     spotlight($(id));
   }
-  initLoop($('v-inicio'));
   spotlight($('v-inicio'));
   document.querySelectorAll('.nav-btn').forEach(function (nb) {
     nb.addEventListener('click', function () {
@@ -492,10 +440,13 @@
     for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
     return h;
   }
-  var trAj = {};   /* 'matéria|assunto' → deslocamento vindo do Treinamento Rápido */
+  var trAj = {};    /* 'concurso|matéria|assunto' → deslocamento do Treinamento Rápido */
+  var trAjSub = {}; /* 'concurso|matéria|assunto|sub' → deslocamento da revisão do Domínio (dec. 202) */
   function edSubPct(mi, mat, ass, sub) {
     var base = (ED_BASE[mi] != null) ? ED_BASE[mi] : (40 + (edHash(mat) % 40));
-    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20 + (trAj[CONCURSO_ATUAL_ID + '|' + mat + '|' + ass] || 0);
+    var v = base + (edHash(mat + '|' + ass + '|' + sub) % 41) - 20
+          + (trAj[CONCURSO_ATUAL_ID + '|' + mat + '|' + ass] || 0)
+          + (trAjSub[CONCURSO_ATUAL_ID + '|' + mat + '|' + ass + '|' + sub] || 0);
     return Math.max(0, Math.min(100, v));
   }
   function edAvg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / (arr.length || 1); }
@@ -513,6 +464,15 @@
   function renderEdital() {
     var box = $('editalTree');
     if (!box) { return; }
+    /* re-render não fecha o que o aluno abriu: quem volta da revisão de
+       um subassunto encontra a árvore como deixou (dec. 202). Se a
+       ÁRVORE trocou (Definir Domínio), a memória não vale — recomeça. */
+    var abertos = (renderEdital.arvore === EDITAL_ATUAL)
+      ? [].map.call(box.querySelectorAll('.ed-mat, .ed-ass'), function (el, i) {
+          return el.classList.contains('open') ? i : -1;
+        }).filter(function (i) { return i >= 0; })
+      : [];
+    renderEdital.arvore = EDITAL_ATUAL;
     var html = '';
     EDITAL_ATUAL.forEach(function (mat, mi) {
       var matNm = mat[0], assuntos = mat[1];
@@ -526,9 +486,15 @@
           '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent('aula ' + matNm + ' ' + ass[0] + ' concurso') + '" target="_blank" rel="noopener">\u25B6 Assistir aula</a>' +
           '<a href="https://www.qconcursos.com/questoes-de-concursos/questoes?q=' + q + '" target="_blank" rel="noopener">\u270E Fazer quest\u00F5es</a>' +
           '</div>';
-        var subHtml = ass[1].map(function (sub) {
+        var temCartas = (typeof TR_BANK !== 'undefined') && TR_BANK.some(function (c) { return c.m === matNm && c.a === ass[0]; });
+        var subHtml = ass[1].map(function (sub, si) {
           var sp = edSubPct(mi, matNm, ass[0], sub);
-          return '<div class="ed-srow"><span class="ed-nm">' + sub + '</span>' + edBar(sp) +
+          /* dec. 202 — cada subassunto leva ao seu bloco de 10 questões:
+             é o mesmo bloco do Treinamento Rápido, aberto direto no
+             conteúdo que o aluno quer revisar                          */
+          return '<div class="ed-srow"><span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + '.' + (si + 1) + ' ' + sub + '</span>' +
+                 '<button type="button" class="ed-q10' + (temCartas ? '' : ' off') + '" data-q10-m="' + matNm + '" data-q10-a="' + ass[0] + '" data-q10-s="' + sub + '"' +
+                 ' title="Responder um bloco de 10 questões de ' + sub + '">10</button>' + edBar(sp) +
                  '<span class="ed-pc" style="color:' + edPcColor(sp) + '">' + Math.round(sp) + '%</span></div>';
         }).join('');
         return '<div class="ed-ass">' +
@@ -546,14 +512,27 @@
         '<div class="ed-asslist">' + assHtml + '</div></div>';
     });
     box.innerHTML = html;
+    if (abertos.length) {
+      var els = box.querySelectorAll('.ed-mat, .ed-ass');
+      abertos.forEach(function (i) {
+        if (!els[i]) return;
+        els[i].classList.add('open');
+        var ch = els[i].querySelector('.ed-head .chev'); if (ch) ch.textContent = '\u25BE';
+      });
+    }
   }
   renderEdital();
   $('editalTree').addEventListener('click', function (ev) {
+    var q10 = ev.target.closest('.ed-q10');
+    if (q10) {
+      if (q10.classList.contains('off')) { toast('Sem cartas ainda — as aulas alimentam este bloco.'); return; }
+      if (typeof trAbrirSub === 'function') trAbrirSub(q10.dataset.q10M, q10.dataset.q10A, q10.dataset.q10S);
+      return;
+    }
     var head = ev.target.closest('.ed-head');
     if (!head) { return; }
     var item = head.parentElement;
     item.classList.toggle('open');
     head.querySelector('.chev').textContent = item.classList.contains('open') ? '\u25BE' : '\u25B8';
-    queueSync();
   });
 

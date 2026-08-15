@@ -39,7 +39,7 @@
           it.dataset.estoque = resta;
           var bd = it.querySelector('.li-estoque');
           if (bd) bd.textContent = resta + (resta === 1 ? ' vaga' : ' vagas');
-          if (resta <= 0) setTimeout(function () { it.remove(); if (typeof queueSync === 'function') queueSync(); }, 900);
+          if (resta <= 0) setTimeout(function () { it.remove(); }, 900);
         }
         /* a boina do tutorial sai da vitrine assim que comprada */
         if (nome === 'Boina exclusiva') it.style.display = 'none';
@@ -82,7 +82,6 @@
     host.querySelectorAll('[data-turma]').forEach(function (bt) {
       bt.addEventListener('click', function () { turmaClick(bt.dataset.turma); });
     });
-    if (typeof queueSync === 'function') queueSync();
   }
   var turmaAberta = null, simMoedaAlvo = null;
   function turmaClick(id) {
@@ -525,7 +524,6 @@
         bt.addEventListener('click', function () { presClick(bt.dataset.presId); });
       });
     });
-    if (typeof queueSync === 'function') queueSync();
   }
   /* quantos pedidos MEUS deste item ainda estão em aberto — é isso que
      vira a etiqueta "seu pedido"; o estoque continua livre para todos  */

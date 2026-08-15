@@ -169,7 +169,6 @@
     var pb = $('plusBadge'), cb = $('chatBadge');
     if (pb) { pb.style.display = n ? 'grid' : 'none'; pb.textContent = n; }
     if (cb) { cb.style.display = n ? 'grid' : 'none'; cb.textContent = n; }
-    if (typeof queueSync === 'function') queueSync();
   }
   function renderChat() {
     var el = $('chatList'); if (!el) return;
@@ -453,7 +452,6 @@
         bt.addEventListener('click', function () { editarAviso(parseInt(bt.dataset.avEd, 10)); });
       });
     }
-    if (typeof queueSync === 'function') queueSync();
   }
   var avisoEdit = null;
   function editarAviso(i) {

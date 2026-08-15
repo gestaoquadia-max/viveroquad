@@ -22,7 +22,7 @@ lugar onde o token vive; datas em `AAAA-MM-DD`.
 | `crono.js` | `CRONO` | 08 | Grade semanal de aulas por turma (chave = id da turma, dec. 163); professores citados deveriam existir em `docentes.js` (pendência conhecida) |
 | `questions.js` | `QUESTIONS` | 08 | Banco de questões do quiz de aula do aluno |
 | `qa-mult.js` · `qa-ce.js` | `QA_MULT` / `QA_CE` | 09 | Bancos do quiz ao vivo do professor (múltipla escolha / certo-errado) |
-| `tr-bank.js` | `TR_BANK` | 11 | Banco do treinamento rápido (flashcards) |
+| `tr-bank.js` | `TR_BANK` | 11 | Banco do treinamento rápido (flashcards); cada carta leva a **etiqueta de subassunto** (6º argumento de `fc`, dec. 202) com o nome EXATO da árvore `EDITAL_CFO` — é ela que ordena o baralho da revisão aberta pelo Domínio |
 | `aula-demo.js` | `AULA_DEMO` | 11 | Aula demonstrativa do tutorial |
 | `simulados.js` | `SIMULADOS` | 11 | Simulados do aluno; vagas POR MOEDA; presencial vende entrada, digital premia score/QdC |
 | `loja-extras.js` | `LOJA_EXTRAS` | 14 | Itens avulsos da Quad Store (ex.: Mentoria Quad, com data) |

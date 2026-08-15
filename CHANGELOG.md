@@ -1,5 +1,32 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — O Início para de rodar em círculo; o Domínio vira porta de revisão
+
+- **A rolagem infinita vertical do Início saiu** (dec. 201): a aba
+  triplicava o próprio conteúdo e teleportava o scroll para emendar o
+  fim no início — nenhuma outra aba faz isso. Agora o Início rola e
+  **para no fim**, como todas. A **roda 3D** dos cards continua; a
+  **esteira horizontal** de eventos (que é carrossel por desenho)
+  também. Saíram junto ~70 linhas de máquina de clones (`initLoop`,
+  `queueSync` e 16 pontos de re-sincronização espalhados pelo fonte).
+- **Cada subassunto do Domínio ganhou o botão do seu bloco de 10
+  questões** (dec. 202): a pílula "▸ 10" ao lado do nome abre o mesmo
+  bloco do Treinamento Rápido, direto no conteúdo que o aluno quer
+  revisar — sem passar por Missões → Abrir treinamento → rodízio. As
+  cartas do banco ganharam **etiqueta de subassunto** e o baralho da
+  revisão traz as daquele subassunto primeiro, completadas pelas do
+  mesmo assunto.
+- A revisão **paga como todo bloco** (+1 score por acerto, +5 Quad
+  Coins, sorteio de DROP) e mexe na barra **daquele subassunto** — o
+  rodízio de Gerais/Específicas não anda nem é contaminado.
+- Subassunto cujo assunto ainda não tem cartas mostra o botão apagado
+  e explica: "as aulas alimentam este bloco" (na demo, 21 dos 427
+  subassuntos estão acesos — os 6 baralhos do banco).
+- Os subassuntos ganharam **numeração 1.1.1** e a árvore **preserva o
+  que estava aberto** ao se redesenhar (voltar da revisão não fecha o
+  caminho até o conteúdo; trocar de concurso zera a memória).
+- Suíte nova `vy1.mjs` (19 checagens). Regressão: 60 suítes.
+
 ## 15/08/2026 — Todo evento pontua 10; o carrossel fica com duas etiquetas
 
 - **Score de participação padrão** (dec. 200): participar de qualquer

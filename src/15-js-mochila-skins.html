@@ -39,7 +39,6 @@
     g.querySelectorAll('[data-combate]').forEach(function (bt) {
       bt.addEventListener('click', function () { mochilaComprar(bt.dataset.combate); });
     });
-    if (typeof queueSync === 'function') queueSync();
   }
   /* ---------- DROP: itens conquistados resolvendo questões ----------
      Ao concluir um bloco de 10 (dia/noite/tarde ou treinamento rápido) ou
@@ -182,7 +181,6 @@
     alvo.querySelectorAll('[data-skin]').forEach(function (bt) {
       bt.addEventListener('click', function () { skinComprar(bt); });
     });
-    queueSync();
   }
   function skinDados(id) {
     return SKIN_CADEIA.concat(SKIN_FARDAS).filter(function (sk) { return sk.id === id; })[0];
@@ -220,7 +218,6 @@
     var prev = document.querySelector('.avatar-preview');
     if (prev) prev.className = prev.className.replace(/\s*skin-[a-z]+/g, '') + marca;
     toast('Foto do personagem atualizada — ' + sk.nome + '.');
-    queueSync();
   }
   renderSkins();
 

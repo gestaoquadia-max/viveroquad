@@ -64,7 +64,7 @@ O protótipo tem **22 views** com id `v-*`, alternadas por `showView(id, navId)`
 | 21 | `v-adm-alunos` (l.2904) | admin | Relatórios | Sim |
 | 22 | `v-adm-loja` (l.3043) | admin | Loja | Sim |
 
-Navbars: aluno `#navAluno` (l.3584–3590: Início · Missões · **+** · Domínio · Loja); professor `#navProfessor` (l.3591–3597); admin `#navAdmin` (l.3598–3604). O Início do aluno tem rolagem infinita vertical (`LOOP_VIEWS=['v-inicio']`, `initLoop`/`syncLoops`/`queueSync`, l.3948–4036) — APENAS VISUAL, efeito de vitrine.
+Navbars: aluno `#navAluno` (l.3584–3590: Início · Missões · **+** · Domínio · Loja); professor `#navProfessor` (l.3591–3597); admin `#navAdmin` (l.3598–3604). O Início do aluno tinha rolagem infinita vertical (`initLoop`/`syncLoops`/`queueSync`) — ***removida pela dec. 201 (15/08)***: a aba rola e para no fim como as demais; ficaram a roda 3D dos cards (`RODA_VIEWS`) e a esteira horizontal de eventos.
 
 **Bloqueio sem matrícula:** `checarMatricula()` (l.3900–3903) seta `appLock` quando não há matrícula ativa; a nav então bloqueia tudo exceto a Loja (l.4079–4082) e abre o pop-up `#matLayer` (ficha 3.9). SIMULADO LOCALMENTE; a vigência real da matrícula DEPENDE DE BANCO DE DADOS.
 
@@ -321,10 +321,10 @@ Componentes pequenos agrupados (sem ficha individual):
 - **Identificador:** `#v-dominio` — HTML l.1753–1770; card "PRÉVIA · V1" (l.1755).
 - **Finalidade:** visão térmica do domínio do aluno sobre a árvore do edital do concurso da turma ativa.
 - **Acesso:** aba 4 da navbar; faixa `#domTurmaBox` + `#btnDomTrocar` para trocar de turma (`renderDomTurma`, l.7390–7397).
-- **Ações:** expandir/colapsar matérias/assuntos (l.4210–4217); links por assunto "▶ Assistir aula" (busca no YouTube) e "✎ Fazer questões" (qconcursos.com) — l.4184–4187.
+- **Ações:** expandir/colapsar matérias/assuntos (l.4210–4217); links por assunto "▶ Assistir aula" (busca no YouTube) e "✎ Fazer questões" (qconcursos.com) — l.4184–4187; ***desde a dec. 202 (15/08)***, pílula **"▸ 10"** em cada subassunto (`.ed-q10`) abrindo o bloco de 10 questões de revisão daquele conteúdo (`trAbrirSub`, src/11) — apagada com aviso quando o assunto não tem cartas; subassuntos numerados 1.1.1; a árvore preserva o que estava aberto ao se redesenhar.
 - **Dados e origem:** `renderEdital()` (l.4172–4208) sobre `EDITAL_ATUAL` — CFO PM-BA completo (`EDITAL_CFO`, l.4092, 13 matérias) ou árvores compactas (SOLDADO/PPBA/PCBA/PRF, l.4099–4121) conforme `CONCURSOS` (l.4122–4129). **Percentuais determinísticos por hash** (`edSubPct` com `ED_BASE` + `edHash`, l.4149–4159) + deslocamento vindo dos flashcards (`trAj`); agregação de baixo para cima (`edAvg`); escala térmica (`edHue`, l.4163–4166).
 - **Estado local:** `CONCURSO_ATUAL_ID`/`EDITAL_ATUAL` (trocados por `definirDominio`, l.7845–7855); hooks `window.__dominio`/`__arvoreDe`.
-- **Simulado hoje:** a árvore é viva (reage a turma e a flashcards), mas os percentuais **não vêm de desempenho real**.
+- **Simulado hoje:** a árvore é viva (reage a turma, a flashcards e, dec. 202, à revisão por subassunto — `trAjSub`), mas os percentuais **não vêm de desempenho real**.
 - **Necessário no real:** métrica de domínio calculada de respostas reais, com metodologia calibrada.
 - **Dependência técnica:** DEPENDE DO BACK-END · DEPENDE DE SISTEMA EXTERNO (links YouTube/QConcursos).
 - **Validações:** — (leitura; links externos abrem fora do app).

@@ -386,7 +386,6 @@
     });
     renderSkins();   /* a vitrine da cadeia reflete o preço novo */
     if (typeof renderAdmProdList === 'function') renderAdmProdList();
-    if (typeof queueSync === 'function') queueSync();
     toast(mudados ? 'Preços atualizados na Loja dos alunos.' : 'Nenhum preço alterado.');
   });
   var DIA_MS = 86400000;

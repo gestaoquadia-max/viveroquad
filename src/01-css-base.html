@@ -211,6 +211,13 @@
   .ed-actions a:active { transform: scale(0.97); }
   .ed-ass.open > .ed-sublist { display: block; }
   .ed-srow { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .ed-q10 {
+    flex: none; border: 1px solid var(--p-blue); background: #F0F9FF; color: var(--p-blue);
+    font: 700 10px var(--ui); border-radius: 999px; padding: 2px 8px; cursor: pointer; line-height: 1.5;
+  }
+  .ed-q10::before { content: '\25B8 '; }
+  .ed-q10:active { transform: scale(0.94); }
+  .ed-q10.off { border-color: #CBD5E1; background: transparent; color: #94A3B8; }
   .ed-srow .ed-nm { flex: 1; font-size: 12px; color: var(--p-dim); }
   .ed-srow .ed-bar { width: 56px; height: 4px; flex: none; }
   .ed-srow .ed-pc { font: 600 11px Consolas, monospace; width: 34px; text-align: right; color: var(--p-dim); font-variant-numeric: tabular-nums; flex: none; }

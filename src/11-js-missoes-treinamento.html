@@ -9,7 +9,7 @@
      ================================================================== */
   var TR_GERAIS = ['Língua Portuguesa', 'Língua Inglesa', 'Informática', 'Matemática', 'História', 'Geografia'];
   var TR_REW = { scorePorAcerto: 1, coinsPorBloco: 5, blocoTam: 10 };
-  function fc(m, a, c, t, o) { return { m: m, a: a, c: c, t: t, o: o, nota: -1, resp: null }; }
+  function fc(m, a, c, t, o, s) { return { m: m, a: a, s: s || '', c: c, t: t, o: o, nota: -1, resp: null }; }
   __SEED_TR_BANK__
 
   /* PDF 01 — aula de hoje: 40 certo/errado em 4 ondas de 10 */
@@ -501,10 +501,31 @@
     cs.sort(function (x, y) { return trPeso(y) - trPeso(x); });   /* difíceis primeiro na 2ª volta */
     return cs.slice(0, TR_REW.blocoTam);
   }
+  /* dec. 202 — bloco de revisão do SUBASSUNTO, aberto pelo Domínio: as
+     cartas etiquetadas com o subassunto vêm primeiro; as demais do mesmo
+     assunto completam o bloco de 10 (o banco da demo tem 10 por assunto) */
+  function trCartasSub(m, a, sub) {
+    var cs = TR_BANK.filter(function (c) { return c.m === m && c.a === a; });
+    cs.sort(function (x, y) {
+      var dx = (x.s === sub ? 0 : 1) - (y.s === sub ? 0 : 1);
+      return dx !== 0 ? dx : trPeso(y) - trPeso(x);
+    });
+    return cs.slice(0, TR_REW.blocoTam);
+  }
+  var trRev = null;   /* {m, a, s} quando o bloco veio da revisão do Domínio */
+  function trAbrirSub(m, a, sub) {
+    var cards = trCartasSub(m, a, sub);
+    if (!cards.length) { toast('Sem cartas ainda — as aulas alimentam este bloco.'); return; }
+    trRev = { m: m, a: a, s: sub };
+    trDeck = { m: m, a: a }; trCards = cards; trIdx = 0; trAcertos = 0; trDia = -1;
+    $('trLayer').style.display = 'flex';
+    $('trTitulo').textContent = 'Revisão · ' + sub;
+    trCarta();
+  }
   function trAbrir() {
     trFila.gerais = trMontarFila('gerais');
     trFila.esp = trMontarFila('esp');
-    trDeck = null; trDia = -1;
+    trDeck = null; trDia = -1; trRev = null;
     $('trLayer').style.display = 'flex';
     trHome();
   }
@@ -539,7 +560,7 @@
   }
   function trAbrirBloco(i) {
     var b = diaBlocos()[i];
-    trDia = i; trDiaArr = diaBlocos();   /* trocar de turma no meio não desvia o crédito */
+    trDia = i; trDiaArr = diaBlocos(); trRev = null;   /* trocar de turma no meio não desvia o crédito */
     if (b.fonte === 'aula') {
       trDeck = { m: AULA_DEMO.m, a: AULA_DEMO.a };
       trCards = AULA_DEMO.cards.slice(b.ini, b.ini + 10).map(function (r) {
@@ -596,8 +617,15 @@
     addScore(TR_REW.coinsPorBloco, '+' + TR_REW.coinsPorBloco + ' Quad Coins · bloco de flashcards');
     /* o ajuste do Domínio é POR CONCURSO — acerto na turma da PC-BA não
        mexe na barra homônima do CFO                                    */
-    var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
-    trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
+    if (trRev) {
+      /* dec. 202 — a revisão mexe na barra DAQUELE subassunto, não no
+         assunto inteiro: é exatamente a barra que o aluno foi revisar */
+      var chaveS = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a + '|' + trRev.s;
+      trAjSub[chaveS] = (trAjSub[chaveS] || 0) + Math.round((trAcertos - trCards.length / 2) * 2.4);
+    } else {
+      var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
+      trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
+    }
     if (typeof renderEdital === 'function') renderEdital();
     var deDia = trDia >= 0;
     if (deDia) {
@@ -612,17 +640,18 @@
       renderDia();
       renderAtrasadas();
     }
-    var drop = (typeof dropSortear === 'function') ? dropSortear(deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
+    var drop = (typeof dropSortear === 'function') ? dropSortear(trRev ? 'na revisão do Domínio' : deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +
       '<p class="sub" style="margin:8px 0 14px">Você acertou <strong>' + trAcertos + ' de ' + trCards.length + '</strong> · ' +
       '<strong>+' + (trAcertos * TR_REW.scorePorAcerto) + ' score</strong> · <strong>+' + TR_REW.coinsPorBloco + ' Quad Coins</strong><br>' +
-      'O Domínio de <strong>' + trDeck.a + '</strong> foi atualizado.' +
+      'O Domínio de <strong>' + (trRev ? trRev.s : trDeck.a) + '</strong> foi atualizado.' +
       (drop.length ? '<br>🎁 <strong>DROP!</strong> ' + drop.map(function (i) { return i.nome; }).join(' e ') + ' caiu para a sua mochila.' : '') +
       (deDia ? '<br>As 10 rápidas entraram no banco do Treinamento Rápido.' : '') + '</p>' +
-      '<button class="btn" id="btnTrProx" style="width:100%">' + (deDia ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
+      '<button class="btn" id="btnTrProx" style="width:100%">' + ((deDia || trRev) ? 'Fechar' : 'Próximo assunto do rodízio') + '</button></div>';
     $('trBody').innerHTML = h;
     $('btnTrProx').addEventListener('click', function () {
+      if (trRev) { trRev = null; $('trLayer').style.display = 'none'; return; }
       if (deDia) { $('trLayer').style.display = 'none'; return; }
       trPos[trTab]++;
       trHome();
@@ -638,7 +667,10 @@
     $('btnTrDeNovo').addEventListener('click', trHome);
   }
   window.TR_BANK = TR_BANK; window.AULA_DEMO = AULA_DEMO;   /* exposto para a suíte de testes */
-  $('btnTrSair').addEventListener('click', function () { $('trLayer').style.display = 'none'; });
+  /* a árvore do Domínio desenhou antes do banco de cartas existir (parte 07
+     roda antes desta): re-render para os botões de 10 questões acenderem  */
+  if (typeof renderEdital === 'function') renderEdital();
+  $('btnTrSair').addEventListener('click', function () { trRev = null; $('trLayer').style.display = 'none'; });
   $('tabTrGerais').addEventListener('click', function () { trSetTab('gerais'); });
   $('tabTrEsp').addEventListener('click', function () { trSetTab('esp'); });
   trTrocaTurma();   /* registra o rodízio da turma inicial */
@@ -848,7 +880,6 @@
   var avatarThumbs = [], avatarZoom = [], avatarIdx = 0;
   /* segurar para ampliar a foto do personagem */
   var zoomHold = { t: null, on: false, el: null };
-  var zoomSupTs = 0;   /* após soltar o zoom, cliques ficam suprimidos por instantes */
   function zoomShow(src, nome) {
     $('zoomImg').src = src;
     $('zoomNome').textContent = nome || '';
@@ -882,7 +913,6 @@
     clearTimeout(zoomHold.t);
     if (zoomHold.on) {
       zoomHide();
-      zoomSupTs = Date.now() + 300;   /* clique do mesmo gesto não navega/escolhe */
       if (zoomHold.el) {
         (function (el) { el.dataset.zoomed = '1'; setTimeout(function () { delete el.dataset.zoomed; }, 260); })(zoomHold.el);
       }
@@ -914,7 +944,6 @@
     var src = fotoPersonagem();
     $('homeAvatar').innerHTML = '<img src="' + src + '" alt="">';
     $('avPreview').src = src;
-    if (typeof queueSync === 'function') queueSync();
   }
   function montarAvatares() {
     var img = new Image();
