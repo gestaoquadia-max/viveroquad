@@ -494,7 +494,8 @@
              conteúdo que o aluno quer revisar                          */
           return '<div class="ed-srow"><span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + '.' + (si + 1) + ' ' + sub + '</span>' +
                  '<button type="button" class="ed-q10' + (temCartas ? '' : ' off') + '" data-q10-m="' + matNm + '" data-q10-a="' + ass[0] + '" data-q10-s="' + sub + '"' +
-                 ' title="Responder um bloco de 10 questões de ' + sub + '">10</button>' + edBar(sp) +
+                 ' title="Treinar aqui — bloco de 10 questões de ' + sub + '" aria-label="Treinar ' + sub + '">' +
+                 '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5 L10.5 6 L3 10.5 Z" fill="currentColor"/></svg></button>' + edBar(sp) +
                  '<span class="ed-pc" style="color:' + edPcColor(sp) + '">' + Math.round(sp) + '%</span></div>';
         }).join('');
         return '<div class="ed-ass">' +

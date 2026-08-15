@@ -1,5 +1,22 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — O atalho de revisão vira botão de play; mecanismo certificado para o banco real
+
+- **O botão do subassunto virou um PLAY** (dec. 203): a pílula "▸ 10"
+  saiu; no lugar, um botão redondo azul com o triângulo de play — o
+  ícone universal de "tem treinamento aqui". O rótulo acessível e o
+  tooltip explicam: "Treinar aqui — bloco de 10 questões de X".
+- **Certificação para o banco futuro**: os botões apagados nos demais
+  assuntos são propositais (não há banco de questões ainda) e o
+  mecanismo está pronto para o banco chegar depois — **nenhuma lista
+  fixa no código decide quais acendem**; é a presença de cartas
+  (matéria+assunto) no banco. A prova agora é executada pela suíte:
+  responder o bloco da aula migra as 10 cartas do PDF para o banco e os
+  **8 subassuntos de "Poderes administrativos" acendem sozinhos**, na
+  hora, e o play recém-aceso abre a revisão. O contrato de dados para a
+  integração real ficou escrito no handoff (doc. 05).
+- `vy1.mjs` cresceu para 24 checagens (ícone + prova do banco futuro).
+
 ## 15/08/2026 — O Início para de rodar em círculo; o Domínio vira porta de revisão
 
 - **A rolagem infinita vertical do Início saiu** (dec. 201): a aba

@@ -626,7 +626,6 @@
       var chave = CONCURSO_ATUAL_ID + '|' + trDeck.m + '|' + trDeck.a;
       trAj[chave] = (trAj[chave] || 0) + Math.round((trAcertos - trCards.length / 2) * 1.2);
     }
-    if (typeof renderEdital === 'function') renderEdital();
     var deDia = trDia >= 0;
     if (deDia) {
       var arrDia = trDiaArr || diaBlocos();
@@ -640,6 +639,10 @@
       renderDia();
       renderAtrasadas();
     }
+    /* a árvore redesenha DEPOIS da migração das cartas: um assunto que
+       acabou de ganhar banco acende o play na mesma hora (dec. 203) —
+       redesenhar antes deixava o botão apagado até o bloco seguinte  */
+    if (typeof renderEdital === 'function') renderEdital();
     var drop = (typeof dropSortear === 'function') ? dropSortear(trRev ? 'na revisão do Domínio' : deDia ? 'ao concluir o bloco do dia' : 'no treinamento rápido') : [];
     var h = '<div class="q-card" style="text-align:center">' +
       '<p class="q-enun" style="font-size:16px">Bloco concluído!</p>' +

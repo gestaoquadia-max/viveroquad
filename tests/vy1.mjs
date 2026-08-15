@@ -1,6 +1,8 @@
-/* vy1 — dec. 201/202: o Início rola e PARA no fim (a rolagem infinita
-   vertical saiu; roda 3D e esteira de eventos ficam) e cada subassunto
-   do Domínio tem o botão que abre seu bloco de 10 questões de revisão. */
+/* vy1 — dec. 201/202/203: o Início rola e PARA no fim (a rolagem
+   infinita vertical saiu; roda 3D e esteira de eventos ficam); cada
+   subassunto do Domínio tem o botão de PLAY que abre seu bloco de 10
+   questões; e o mecanismo acende sozinho quando um banco de questões
+   é inserido depois (prova: as cartas da aula migradas em runtime). */
 const pw = (await import(process.env.VQ_PW ?? '/opt/node22/lib/node_modules/playwright/index.js')).default;
 const { chromium } = pw;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
@@ -44,6 +46,8 @@ const arvore = await p.evaluate(() => {
 t('todo subassunto da árvore tem o botão de 10 questões', arvore.total > 300 && arvore.comBotao === arvore.total);
 t('os subassuntos dos 6 assuntos com cartas estão acesos (21 na demo)', arvore.acesos === 21);
 t('os subassuntos ganharam numeração 1.1.1 (o aluno acha o conteúdo pelo número)', arvore.numerados);
+t('o botão é um ícone de play, não um número (dec. 203)',
+  await p.evaluate(() => { const b = document.querySelector('#editalTree .ed-q10'); return !!b.querySelector('svg path') && b.textContent.trim() === ''; }));
 
 /* botão apagado explica; não abre nada */
 await p.evaluate(() => [...document.querySelectorAll('#editalTree .ed-q10.off')][0].click());
@@ -111,6 +115,50 @@ await p.waitForTimeout(500);
 t('o Treinamento Rápido abre normal depois da revisão (rodízio intacto)',
   await p.evaluate(() => document.getElementById('trLayer').style.display === 'flex' &&
                          /Bloco de Gerais/.test(document.getElementById('trTitulo').textContent)));
+await p.evaluate(() => document.getElementById('btnTrSair').click());
+
+/* ============ DEC. 203 · O MECANISMO ESTÁ PRONTO PARA UM BANCO FUTURO ============
+   Nenhuma lista fixa decide quais botões acendem: é a presença de cartas
+   no banco (matéria+assunto). Prova em runtime: responder o bloco da aula
+   migra as 10 cartas do PDF para o TR_BANK — os 8 subassuntos de
+   "Poderes administrativos" têm de acender sozinhos, na hora.          */
+await nav('v-dominio'); await p.waitForTimeout(300);
+t('antes do banco chegar, "Poder vinculado" está apagado',
+  await p.evaluate(() => {
+    const row = [...document.querySelectorAll('#editalTree .ed-srow')].find(r => /Poder vinculado/.test(r.textContent));
+    return !!row.querySelector('.ed-q10.off');
+  }));
+await nav('v-missoes'); await p.waitForTimeout(400);
+await p.evaluate(() => {
+  const bt = [...document.querySelectorAll('#diaList [data-dia]')].find(b => /Dir\. Administrativo/.test(b.closest('.mission-row').textContent));
+  bt.click();
+});
+await p.waitForTimeout(500);
+for (let i = 0; i < 10; i++) {   /* responde as 10 do PDF (acerto não importa aqui) */
+  await p.evaluate(() => document.getElementById('fcCerto').click());
+  await p.waitForTimeout(80);
+  await p.evaluate(() => document.querySelector('#trBody [data-nota="2"]').click());
+  await p.waitForTimeout(80);
+}
+await p.evaluate(() => document.getElementById('btnTrProx').click());
+await p.waitForTimeout(400);
+await nav('v-dominio'); await p.waitForTimeout(400);
+const posAula = await p.evaluate(() => {
+  const rows = [...document.querySelectorAll('#editalTree .ed-srow')];
+  const vinc = rows.find(r => /Poder vinculado/.test(r.textContent));
+  return { vincAceso: !!vinc.querySelector('.ed-q10:not(.off)'),
+           acesos: rows.filter(r => r.querySelector('.ed-q10:not(.off)')).length };
+});
+t('o banco chegou (cartas da aula) e "Poder vinculado" acendeu SOZINHO', posAula.vincAceso);
+t('os 8 subassuntos de Poderes administrativos acenderam (21 → 29)', posAula.acesos === 29);
+await p.evaluate(() => {
+  const row = [...document.querySelectorAll('#editalTree .ed-srow')].find(r => /Poder vinculado/.test(r.textContent));
+  row.querySelector('.ed-q10').click();
+});
+await p.waitForTimeout(500);
+t('e o play recém-aceso abre a revisão daquele subassunto',
+  await p.evaluate(() => document.getElementById('trLayer').style.display === 'flex' &&
+                         document.getElementById('trTitulo').textContent === 'Revisão · Poder vinculado'));
 await p.evaluate(() => document.getElementById('btnTrSair').click());
 
 console.log('\nvy1 :: ' + ok + ' ok / ' + falhas.length + ' falhas');
