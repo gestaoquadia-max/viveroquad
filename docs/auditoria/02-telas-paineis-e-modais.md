@@ -236,7 +236,7 @@ Componentes pequenos agrupados (sem ficha individual):
 - **Identificador:** `#v-inicio` — `src.html` HTML l.1661–1713.
 - **Finalidade:** hub diário: aula de hoje, bloco de missões do turno, avisos e eventos da semana.
 - **Acesso:** aba 1 da navbar; view inicial da persona.
-- **Ações:** entrar no quiz da aula (`#btnEntrarQuiz`); abrir a próxima missão pendente (`#btnMissaoHome`, l.4731–4738); resgatar benefícios da noite completa (`resgatarBeneficios`, l.6612–6628: +1 score por bloco + 1 Quad Coin com animação); abrir página de evento; clique em evento pago não comprado leva ao item na Loja (`lojaLevarAte`, l.4477–4488 — decisão 173).
+- **Ações:** entrar no quiz da aula (`#btnEntrarQuiz`); abrir a próxima missão pendente (`#btnMissaoHome`, l.4731–4738); resgatar benefícios da noite completa (`resgatarBeneficios`, l.6612–6628: +1 score por bloco + 1 Quad Coin com animação); abrir página de evento; clique em evento pago não comprado **abre a página do evento** e o botão de lá leva ao item na Loja (`lojaLevarAte`, l.4477–4488 — decisão 173, revista pela **decisão 199 de 15/08**).
 - **Dados apresentados e origem:**
   - **Aula de hoje** (`#salaCard`): `renderAulaHoje()` (l.4839–4876) sobre o snapshot `CRONO` (semana 30, l.4745–4774); estados AGORA/ENCERRADO pelo relógio local; rodapé "atualizado pela planilha da coordenação". Selo do quiz (`refreshQuizAula`, l.5458–5487: SEM QUIZ ABERTO → AULA COM QUIZ → ATIVO → RESPONDIDO).
   - **Missão de hoje / Bloco do turno** (cartão herói, l.1677–1696): `heroSync()` (l.6571–6604), contador `#missCount`, segmentos `#missSegs`, resgate por turma (`NOITE_RESG`).

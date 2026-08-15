@@ -529,6 +529,7 @@ Textos decorativos da interface (cards descritivos, placeholders "EM BREVE") **n
 - **Sistema aplicador**: eventos + loja/checkout + notificações (entrega do link).
 - **Classificação**: CONFIRMADO NO CÓDIGO + SIMULADO LOCALMENTE + DEPENDE DO BACK-END.
 - **Divergências / Decisão pendente**: —.
+- ***Nota 15/08 — o "clique leva ao item" foi revisto pela dec. 199:*** o toque num evento **pago** no carrossel **abre a página do evento**, como já acontecia com o gratuito de "+BÔNUS" — quem vai gastar precisa ler as regras de score e de Quad Coins antes de decidir. A ida à Loja virou o **botão de ação** de lá dentro ("Comprar na Quad Store · N QdC"), que fecha a página e destaca o item (`lojaLevarAte` segue igual). O atalho direto permanece nos **simulados presenciais**, que não têm página própria.
 
 ### RN-34 — Criação, edição e cancelamento de eventos pela administração
 - **Área**: Eventos/Admin.

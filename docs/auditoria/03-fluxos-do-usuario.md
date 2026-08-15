@@ -496,7 +496,7 @@
 
 ### F13-d · Evento pago
 
-1. Vitrine de eventos (`renderEventosLoja`, l.4338–4369) com lugares restantes e etiquetas LOTADO / EM CHOQUE; do carrossel do Início, o clique num evento pago não comprado **leva direto ao item** na Loja (`lojaLevarAte`, dec. 173).
+1. Vitrine de eventos (`renderEventosLoja`, l.4338–4369) com lugares restantes e etiquetas LOTADO / EM CHOQUE; do carrossel do Início, o clique num evento pago não comprado **abre a página do evento**, cujo botão "Comprar na Quad Store" **leva ao item** na Loja (`lojaLevarAte`, dec. 173 revista pela **dec. 199 de 15/08**).
 2. `comprarEvento` (l.4398–4421): confirmação (com aviso de choque quando houver), débito, marca INSCRITO, alimenta a **portaria** (`renderAcessos`) e o calendário.
 3. Evento multi-dia permanece na vitrine como INSCRITO até o fim.
 

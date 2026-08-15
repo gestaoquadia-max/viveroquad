@@ -1,6 +1,6 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
-## 06/08/2026 — O evento pago abre as informações antes de mandar para a Loja
+## 15/08/2026 — O evento pago abre as informações antes de mandar para a Loja
 
 - **Card do carrossel abre a página do evento** (dec. 199): tocar num
   evento **pago** levava direto à Quad Store, pulando as informações —
@@ -14,6 +14,16 @@
   ainda **não** comprado.)
 - Revê a dec. 173, que criara o atalho direto à Loja para reduzir
   fricção: a fricção que importa aqui é a boa — ler antes de decidir.
+- **Semente vencida**: a "Mentoria Quad" estava marcada para 12/08 e já
+  tinha passado — sumia do carrossel e da vitrine. Reancorada para 07/10
+  (mesma quarta-feira). Terceira ocorrência do mesmo problema (dec. 189):
+  **datas fixas de demonstração vencem**; a recomendação de torná-las
+  relativas à data atual segue em aberto para a fase de construção.
+- **Documentação sincronizada** (9 pontos): a especificação funcional, o
+  fluxo do aluno e as fichas de auditoria descreviam o atalho da dec. 173
+  ("o clique leva direto ao item na Loja"). Passam a descrever o fluxo
+  novo — e registram que o atalho direto **sobrevive nos simulados
+  presenciais**, que não têm página de informações própria.
 
 ## 06/08/2026 — A demonstração volta a abrir zerada
 

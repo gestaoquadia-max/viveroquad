@@ -82,10 +82,13 @@ const confirmar = async p => { await p.evaluate(()=>{ var b=document.getElementB
   const strip = await p.evaluate(()=>[...document.querySelectorAll('#evStrip .ev-tile')].map(t=>t.textContent));
   ok(strip.some(t=>/Aulão Pago Semana/.test(t) && /NA LOJA/.test(t)), '2.3: evento pago da semana aparece no carrossel com "Na Loja"');
   ok(!strip.some(t=>/Aulão Vencido/.test(t)), '2.3: evento com data passada não aparece (expirou)');
-  // clicar no tile do pago leva à Loja
-  await p.evaluate(()=>{ const t=[...document.querySelectorAll('#evStrip .ev-tile')].find(x=>/Aulão Pago Semana/.test(x.textContent)); t.click(); }); await p.waitForTimeout(400);
-  /* dec. 173: leva ao ITEM, centralizado e piscando — não só à aba */
-  ok(await p.evaluate(()=>document.getElementById('v-loja').classList.contains('on')) && /a inscrição é aqui na Loja/.test(await toast(p)), '2.3: clicar no evento pago leva à Loja');
+  // dec. 199: o tile abre a PÁGINA DO EVENTO; a Loja é o botão de lá
+  await p.evaluate(()=>{ const t=[...document.querySelectorAll('#evStrip .ev-tile')].find(x=>/Aulão Pago Semana/.test(x.textContent)); t.click(); }); await p.waitForTimeout(500);
+  ok(await p.evaluate(()=>getComputedStyle(document.getElementById('evLayer')).display!=='none'), '2.3: clicar no evento pago abre as informações do evento (dec. 199)');
+  ok(/Comprar na Quad Store/.test(await p.evaluate(()=>document.getElementById('btnEvInscrever').textContent)), '2.3: o botão convida para a compra na Loja');
+  await p.evaluate(()=>document.getElementById('btnEvInscrever').click()); await p.waitForTimeout(700);
+  /* dec. 173 preservada no destino: leva ao ITEM, centralizado e piscando */
+  ok(await p.evaluate(()=>document.getElementById('v-loja').classList.contains('on')), '2.3: o botão leva à Loja');
   ok(await p.evaluate(()=>{ const el=[...document.querySelectorAll('#v-loja [data-ev-buy]')].find(x=>/Aulão Pago Semana/.test(x.textContent));
     return !!el && el.classList.contains('achei'); }), '2.3: e destaca o item exato que ele veio comprar');
   ok(await p.evaluate(()=>/Aulão Pago Semana/.test(document.getElementById('lojaEventos-pres').textContent)), '2.3: evento à venda na vitrine de eventos presenciais');
