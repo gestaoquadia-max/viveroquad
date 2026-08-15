@@ -52,19 +52,21 @@ for (let i = 0; i < 10; i++) {
 /* a celebração dourada abre por cima do resultado */
 t('a celebração de DROP abre ao concluir o bloco', await p.evaluate(() => document.getElementById('dropLayer').classList.contains('on')));
 const celebra = await p.evaluate(() => document.querySelector('#dropLayer .drop-card').textContent.replace(/\s+/g, ' '));
-t('a celebração traz o título e o item em destaque', /DROP CONQUISTADO!/.test(celebra) && /RECOMPENSA DE CAMPO/.test(celebra) && /Patch da sorte/.test(celebra));
+t('a celebração traz o título e o item em destaque', /DROP CONQUISTADO!/.test(celebra) && /RECOMPENSA DE CAMPO/.test(celebra) && /Cantil/.test(celebra));
+t('SÓ UM item cai por vez, mesmo com dois vencendo o sorteio (dec. 206)',
+  await p.evaluate(() => document.querySelectorAll('#dropLayer .drop-item').length === 1));
 t('o texto motiva a continuar resolvendo', /sorte encontra quem está em combate/.test(celebra) && /nova chance de drop/.test(celebra));
 await p.evaluate(() => document.getElementById('btnDropOk').click());
 t('"Guardar na mochila" fecha a celebração', await p.evaluate(() => !document.getElementById('dropLayer').classList.contains('on')));
 const fimBloco = await p.evaluate(() => document.getElementById('trBody').textContent.replace(/\s+/g, ' '));
-t('bloco concluído anuncia o DROP no cartão de resultado', /DROP!/.test(fimBloco) && /Patch da sorte/.test(fimBloco));
+t('bloco concluído anuncia o DROP no cartão de resultado', /DROP!/.test(fimBloco) && /Cantil/.test(fimBloco));
 await p.evaluate(() => { document.getElementById('btnTrProx')?.click(); document.getElementById('trLayer').style.display = 'none'; });
 await p.waitForTimeout(200);
 const naMochila = await p.evaluate(() => {
   const g = document.getElementById('storageGrid');
   return g ? g.textContent.replace(/\s+/g, ' ') : '';
 });
-t('mochila mostra o Patch da sorte e o Cantil dropados', /Patch da sorte/.test(naMochila) && /Cantil/.test(naMochila));
+t('mochila mostra APENAS o Cantil — o Patch não caiu junto (um por vez)', /Cantil/.test(naMochila) && !/Patch da sorte/.test(naMochila));
 /* sorteio forçado a PERDER: nada muda */
 await p.evaluate(() => { window.__dropRng = () => 0.999; });
 const antes = await p.evaluate(() => window.__dropSortear('teste').length);
@@ -95,12 +97,12 @@ await persona('aluno'); await p.waitForTimeout(400);
 await nav('v-loja'); await p.waitForTimeout(400);
 t('o item recém-criado só de drop não entra na vitrine',
   !/Medalha do sorteio/.test(await p.evaluate(() => document.getElementById('combatGrid').textContent)));
-t('mas participa do sorteio', await p.evaluate(() => {
-  window.__dropRng = () => 0;
+t('mas participa do sorteio (RNG 0.15: só a chance de 25% vence)', await p.evaluate(() => {
+  window.__dropRng = () => 0.15;
   const g = window.__dropSortear('em teste').map(i => i.nome);
   window.__dropRng = null;
   document.getElementById('dropLayer').classList.remove('on');   /* fecha a celebração do teste */
-  return g.indexOf('Medalha do sorteio') >= 0;
+  return g.length === 1 && g[0] === 'Medalha do sorteio';
 }));
 
 /* ====== DEC. 199 · O CARD DO CARROSSEL ABRE AS INFORMAÇÕES ====== */

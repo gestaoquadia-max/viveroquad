@@ -1,5 +1,14 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 15/08/2026 — Só um item de drop por vez
+
+- **Regra de negócio do DROP** (dec. 206): cada item configurado continua
+  sendo sorteado pela própria chance, mas se mais de um vencer o mesmo
+  sorteio, apenas UM cai — sorteado entre os vencedores. No teste do
+  gestor, dois itens caíam juntos ao concluir um bloco.
+- A celebração dourada passou ao singular; a suíte `vv1` prova a regra
+  (dois vencedores → um só na celebração e na mochila).
+
 ## 15/08/2026 — Questões-modelo temáticas por matéria, embaralhadas por subassunto
 
 - **O banco-modelo ganhou tema** (dec. 205): abrir um subassunto de
