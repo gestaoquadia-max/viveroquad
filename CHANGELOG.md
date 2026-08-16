@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Persistência versionada: a Loja e a mochila andam juntas
+
+- **Causa do descompasso relatado no teste** (dec. 208): a aba aberta
+  desde antes da rodada 207 restaurou a mochila salva ANTIGA por cima da
+  coleta nova — a vitrine dizia "18 na mochila" com a mochila mostrando
+  Cantil + Patch, e a construção parecia não consumir os insumos.
+- **A evolução salva ganhou versão (`v: 2`)**: estado gravado por um
+  build antigo é descartado no carregamento e a demonstração renasce de
+  fábrica. Regra registrada: mudou a estrutura do estado salvo → sobe a
+  versão.
+- **O restauro redesenha a Loja junto com a mochila** (etiquetas "N na
+  mochila" e progresso das quests) e o **item de quest equipado persiste
+  ao F5** — a foto do operador se mantém.
+- `vz2` ganhou as provas do relato: receita Cantil+Patch consome os dois
+  insumos, e depois do F5 vitrine e mochila conferem.
+
 ## 16/08/2026 — Itens de Quest: construção paga com os itens da mochila
 
 - **Área nova na Quad Store** (dec. 207): "Itens de Quest" — a moeda são

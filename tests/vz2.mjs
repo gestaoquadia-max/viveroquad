@@ -125,6 +125,61 @@ await nav('v-loja'); await p.waitForTimeout(300);
 t('o item criado aparece na área Itens de Quest da Loja',
   await p.evaluate(() => [...document.querySelectorAll('#questGrid [data-quest]')].some(x => /Radar de patrulha/.test(x.textContent))));
 
+/* ===== O RELATO DO GESTOR (dec. 208): receita Cantil+Patch consome OS DOIS ===== */
+await p.evaluate(() => document.querySelector('#combatGrid [data-combate="cantil"]').click());
+await p.waitForTimeout(250); await comprarOk();
+await p.evaluate(() => {   /* Patch da sorte cai no drop: RNG 0.11 vence só ele */
+  window.__dropRng = () => 0.11;
+  window.__dropSortear('em teste');
+  window.__dropRng = () => 0.999;
+  document.getElementById('dropLayer').classList.remove('on');
+});
+await persona('admin'); await p.waitForTimeout(400);
+await navAdm('v-adm-hoje'); await p.waitForTimeout(300);
+await set('admSkTipo', 'combate'); await set('admSkDisp', 'quest');
+await set('admSkNome', 'Torre de vigia'); await set('admSkDesc', 'observação avançada');
+await p.evaluate(() => { document.getElementById('admQstIns').value = 'cantil'; });
+await set('admQstN', '1');
+await p.evaluate(() => document.getElementById('btnAdmQstAdd').click()); await p.waitForTimeout(150);
+await p.evaluate(() => { document.getElementById('admQstIns').value = 'patch-sorte'; });
+await set('admQstN', '1');
+await p.evaluate(() => document.getElementById('btnAdmQstAdd').click()); await p.waitForTimeout(150);
+await set('admQstEfeito', 'qdc');
+await p.evaluate(() => document.getElementById('btnAdmSkin').click()); await p.waitForTimeout(300);
+await persona('aluno'); await p.waitForTimeout(400);
+await nav('v-loja'); await p.waitForTimeout(300);
+await p.evaluate(() => [...document.querySelectorAll('#questGrid [data-quest]')].find(x => /Torre de vigia/.test(x.textContent)).click());
+await p.waitForTimeout(300); await comprarOk();
+const mochila2 = await p.evaluate(() => { window.scrollTo(0, 0); return null; }) ||
+  await (async () => { await nav('v-inicio'); await p.waitForTimeout(200);
+    await p.evaluate(() => document.getElementById('btnAvatarPerfil').click()); await p.waitForTimeout(300);
+    await p.evaluate(() => document.getElementById('btnMochila').click()); await p.waitForTimeout(300);
+    return p.evaluate(() => document.getElementById('storageGrid').textContent.replace(/\s+/g, ' ')); })();
+t('construir com receita Cantil+Patch consome OS DOIS insumos (o Patch não sobra)',
+  !/Cantil/.test(mochila2) && !/Patch da sorte/.test(mochila2));
+t('e a Torre de vigia entra na mochila', /Torre de vigia/.test(mochila2));
+
+/* ===== F5 MANTÉM LOJA E MOCHILA CORRESPONDENTES (dec. 208) ===== */
+await p.evaluate(() => document.querySelector('#storageGrid [data-eq="blindado"]').click());
+await p.waitForTimeout(300);
+const fotoEq = await p.evaluate(() => document.querySelector('#homeAvatar img').src);
+await p.evaluate(() => document.getElementById('btnStorageFechar').click());
+await p.waitForTimeout(700);   /* o salvamento da evolução tem debounce de 400ms */
+await p.reload({ waitUntil: 'load' });
+await p.evaluate(() => { document.getElementById('loginLayer').classList.add('off'); });
+await p.waitForTimeout(1200);
+t('depois do F5 o Blindado segue EQUIPADO e a foto se mantém',
+  await p.evaluate(() => window.__questEquipada() === 'blindado') &&
+  (await p.evaluate(() => document.querySelector('#homeAvatar img').src)) === fotoEq);
+await nav('v-loja'); await p.waitForTimeout(400);
+t('depois do F5 a vitrine confere com a mochila: nenhum insumo consumido diz "na mochila"',
+  await p.evaluate(() => {
+    const liga = document.querySelector('#combatGrid [data-combate="liga"]');
+    const mag = [...document.querySelectorAll('#combatGrid [data-combate]')].find(x => /MAG/.test(x.textContent));
+    return liga && !/na mochila/.test(liga.textContent) && (!mag || !/na mochila/.test(mag.textContent));
+  }));
+t('e o card do Blindado segue marcando "1 na mochila"', /1 na mochila/.test(await questCard()));
+
 console.log('\nvz2 :: ' + ok + ' ok / ' + falhas.length + ' falhas');
 falhas.forEach(f => console.log('   XX ' + f));
 console.log('erros JS: ' + (erros.length ? erros.join(' | ') : 'nenhum'));

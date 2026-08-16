@@ -239,6 +239,7 @@
     var q = questDe(id); if (!q) return;
     questEquipada = questEquipada === id ? null : id;
     if (typeof aplicarAvatar === 'function') aplicarAvatar();
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
     renderMochila();
     toast(questEquipada ? 'Foto do operador atualizada — ' + q.nome + ' equipado.' : q.nome + ' desequipado — a foto anterior voltou.');
   }

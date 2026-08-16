@@ -82,8 +82,8 @@ await p2.goto(new URL('../index.html', import.meta.url).href, { waitUntil: 'load
 await p2.evaluate(() => { document.getElementById('loginLayer').classList.add('off'); });
 await p2.waitForTimeout(1000);
 const fabrica = await p2.evaluate(() => window.__carteira());
-t('aba nova abre com a carteira de fábrica (não herda a visita anterior)',
-  fabrica.diamantes === 150 && fabrica.mochila === 0 && fabrica.diamantes !== depoisF5.dmn);
+t('aba nova abre com a carteira de fábrica (não herda a visita anterior; a coleta da quest é de fábrica — dec. 207)',
+  fabrica.diamantes === 150 && fabrica.mochila === 22 && fabrica.diamantes !== depoisF5.dmn);
 t('a evolução da visita anterior foi descartada do armazenamento',
   await p2.evaluate(() => { try { return !localStorage.getItem('vq_evolucao') || JSON.parse(localStorage.getItem('vq_evolucao')).diamantes === 150; } catch (e) { return false; } }));
 await p2.close();
