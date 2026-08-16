@@ -1,0 +1,317 @@
+  /* ==================================================================
+     MINHA LOJA · MERCADO INTERNO (dec. 216)
+     O aluno abre a própria loja e vende itens da mochila para os outros
+     alunos. Regra de moeda: comércio entre alunos é SEMPRE em Quad Coins
+     — Diamante é recarga do site e não circula aqui.
+     · anunciar RESERVA as unidades: elas saem da mochila e vão para a
+       vitrine (senão daria para vender o que já foi gasto numa quest);
+       retirar o anúncio devolve tudo na hora
+     · comprar no mercado junta no carrinho e finaliza de uma vez
+     ================================================================== */
+  __SEED_LOJAS_ALUNOS__
+  var MINHA_LOJA = { nome: '', lema: '', aberta: false, anuncios: [], vendas: [] };
+  var mlSeq = 0;
+  var CARRINHO = [];   /* [{ lojaId, anunId, item, preco, qtd }] */
+
+  function mlNomePadrao() {
+    var g = (carreira.nomeGuerra || 'Quad');
+    return 'Arsenal do ' + g.charAt(0).toUpperCase() + g.slice(1);
+  }
+  function mlNome() { return MINHA_LOJA.nome || mlNomePadrao(); }
+  function mlLema() { return MINHA_LOJA.lema || 'itens de campo direto da minha mochila'; }
+  /* a minha loja entra no mercado com a mesma forma das outras */
+  function mlComoLoja() {
+    return { id: 'eu', nome: mlNome(), dono: nomeCurto(), lema: mlLema(),
+             aberta: MINHA_LOJA.aberta, eu: true,
+             itens: MINHA_LOJA.anuncios.map(function (a) { return { anunId: a.id, item: a.item, qtd: a.qtd, preco: a.preco }; }) };
+  }
+  function lojasDoMercado() {
+    var lista = LOJAS_DEMO.map(function (l) { return l; });
+    if (MINHA_LOJA.aberta) lista.unshift(mlComoLoja());
+    return lista;
+  }
+  function lojaPorId(id) {
+    if (id === 'eu') return mlComoLoja();
+    return LOJAS_DEMO.filter(function (l) { return l.id === id; })[0];
+  }
+
+  /* ---------------- MINHA LOJA: identidade e estado ---------------- */
+  function renderMinhaLoja() {
+    if (!$('mlVitrine')) return;
+    $('mlTitulo').textContent = mlNome();
+    $('mlSaldo').textContent = fmt(score);
+    if ($('mlNome') && document.activeElement !== $('mlNome')) $('mlNome').value = MINHA_LOJA.nome;
+    if ($('mlLema') && document.activeElement !== $('mlLema')) $('mlLema').value = MINHA_LOJA.lema;
+    $('mlNome').placeholder = 'Nome da loja (ex.: ' + mlNomePadrao() + ')';
+    var bt = $('btnMlAbrir');
+    bt.classList.toggle('on', MINHA_LOJA.aberta);
+    bt.setAttribute('aria-checked', MINHA_LOJA.aberta ? 'true' : 'false');
+    $('mlEstadoTxt').innerHTML = MINHA_LOJA.aberta
+      ? 'Aberta — a sua vitrine aparece no <strong>Mercado interno</strong> da Quad Store para todos os alunos.'
+      : 'Fechada — ninguém vê a sua vitrine. Os itens anunciados continuam reservados.';
+    mlOpcoesItem();
+    mlRenderVitrine();
+    mlRenderVendas();
+  }
+  /* o que dá para anunciar: o que está na mochila agora */
+  function mlOpcoesItem() {
+    var sel = $('mlItem'); if (!sel) return;
+    var grupos = [];
+    MOCHILA.forEach(function (id) {
+      var g = grupos.filter(function (x) { return x.id === id; })[0];
+      if (g) g.n++; else grupos.push({ id: id, n: 1 });
+    });
+    var antes = sel.value;
+    sel.innerHTML = grupos.map(function (gr) {
+      var it = itemDe(gr.id);
+      return it ? '<option value="' + gr.id + '">' + it.nome + ' · ' + gr.n + ' na mochila</option>' : '';
+    }).join('') || '<option value="">Nada na mochila para vender</option>';
+    if (antes) sel.value = antes;
+  }
+  function mlRenderVitrine() {
+    var el = $('mlVitrine'); if (!el) return;
+    var tot = MINHA_LOJA.anuncios.reduce(function (s, a) { return s + a.qtd; }, 0);
+    $('mlVitrineHead').textContent = 'Produtos à venda' + (tot ? ' · ' + tot + (tot === 1 ? ' unidade' : ' unidades') : '');
+    el.innerHTML = MINHA_LOJA.anuncios.map(function (a) {
+      var it = itemDe(a.item);
+      return '<div class="adm-bar"><span class="nm">' + (it ? it.nome : a.item) +
+        ' <span class="tag gold">' + a.qtd + '×</span>' +
+        '<small>' + fmt(a.preco) + ' QdC cada · ' + fmt(a.preco * a.qtd) + ' QdC no total</small></span>' +
+        '<button class="adm-x" data-ml-rm="' + a.id + '" aria-label="Retirar anúncio">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhum item anunciado. Escolha algo da mochila acima e defina o preço.</p>';
+    el.querySelectorAll('[data-ml-rm]').forEach(function (b) {
+      b.addEventListener('click', function () { mlRetirar(b.dataset.mlRm); });
+    });
+  }
+  function mlRenderVendas() {
+    var el = $('mlVendas'); if (!el) return;
+    el.innerHTML = MINHA_LOJA.vendas.length
+      ? MINHA_LOJA.vendas.map(function (v) {
+          return '<div class="uso-row"><span>' + v.qtd + '× ' + v.nome + ' <small style="color:var(--p-dim)">para ' + v.comprador + '</small></span><b>+' + fmt(v.total) + ' QdC</b></div>';
+        }).join('')
+      : '<p class="sub" style="padding:8px 0">Nenhuma venda ainda. Quando um aluno comprar na sua loja, o lançamento aparece aqui e as moedas entram na sua conta.</p>';
+  }
+  function mlAnunciar() {
+    var erro = $('mlErro');
+    function falha(msg) { erro.textContent = msg; erro.style.display = 'block'; }
+    erro.style.display = 'none';
+    var id = $('mlItem').value;
+    var qtd = parseInt($('mlQtd').value, 10);
+    var preco = parseInt($('mlPreco').value, 10);
+    var it = id ? itemDe(id) : null;
+    if (!it) { falha('Não há nada na mochila para anunciar.'); return; }
+    var tem = mochilaConta(id);
+    if (!qtd || qtd < 1) { falha('Informe quantas unidades você quer vender.'); return; }
+    if (qtd > tem) { falha('Você tem ' + tem + (tem === 1 ? ' unidade' : ' unidades') + ' de ' + it.nome + ' na mochila.'); return; }
+    if (!preco || preco < 1) { falha('Informe o preço por unidade, em Quad Coins.'); return; }
+    /* reserva: sai da mochila e vai para a vitrine */
+    for (var i = MOCHILA.length - 1, falta = qtd; i >= 0 && falta > 0; i--) {
+      if (MOCHILA[i] === id) { MOCHILA.splice(i, 1); falta--; }
+    }
+    if (typeof histDel === 'function') histDel(id, qtd);
+    mlSeq += 1;
+    MINHA_LOJA.anuncios.push({ id: 'an' + mlSeq, item: id, qtd: qtd, preco: preco });
+    $('mlQtd').value = ''; $('mlPreco').value = '';
+    mlMudou();
+    toast(qtd + '× ' + it.nome + ' na vitrine por ' + fmt(preco) + ' QdC cada.');
+  }
+  function mlRetirar(anunId) {
+    var a = MINHA_LOJA.anuncios.filter(function (x) { return x.id === anunId; })[0];
+    if (!a) return;
+    var it = itemDe(a.item);
+    for (var i = 0; i < a.qtd; i++) {
+      MOCHILA.push(a.item);
+      if (typeof histAdd === 'function') histAdd(a.item, 'devolvido');
+    }
+    MINHA_LOJA.anuncios = MINHA_LOJA.anuncios.filter(function (x) { return x.id !== anunId; });
+    mlMudou();
+    toast(a.qtd + '× ' + (it ? it.nome : a.item) + ' de volta na mochila.');
+  }
+  /* toda mudança da loja repinta o que depende dela e grava a evolução */
+  function mlMudou() {
+    renderMinhaLoja();
+    if (typeof renderMochila === 'function') renderMochila();
+    if (typeof renderLojaQuest === 'function') renderLojaQuest();
+    if (typeof renderLojaCombate === 'function') renderLojaCombate();
+    renderMercado();
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+  }
+  (function () {
+    if (!$('btnMlAnunciar')) return;
+    $('btnMlAnunciar').addEventListener('click', mlAnunciar);
+    $('btnMlAbrir').addEventListener('click', function () {
+      if (!MINHA_LOJA.aberta && !MINHA_LOJA.anuncios.length) {
+        toast('Anuncie ao menos um item antes de abrir a loja.');
+        return;
+      }
+      MINHA_LOJA.aberta = !MINHA_LOJA.aberta;
+      mlMudou();
+      toast(MINHA_LOJA.aberta
+        ? 'Loja aberta — “' + mlNome() + '” já aparece no Mercado interno.'
+        : 'Loja fechada — a sua vitrine saiu do mercado.');
+    });
+    ['mlNome', 'mlLema'].forEach(function (id) {
+      $(id).addEventListener('input', function () {
+        MINHA_LOJA[id === 'mlNome' ? 'nome' : 'lema'] = $(id).value.replace(/["<>]/g, '').trim();
+        $('mlTitulo').textContent = mlNome();
+        renderMercado();
+        if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+      });
+    });
+  })();
+
+  /* ---------------- MERCADO INTERNO: as lojas na Quad Store ---------------- */
+  function renderMercado() {
+    var el = $('mercadoLista'); if (!el) return;
+    var lojas = lojasDoMercado();
+    el.innerHTML = lojas.map(function (l) {
+      var unid = l.itens.reduce(function (s, i) { return s + i.qtd; }, 0);
+      var fechada = !l.aberta;
+      return '<button type="button" class="mkt-loja' + (fechada ? ' fechada' : '') + (l.eu ? ' minha' : '') + '" data-loja="' + l.id + '">' +
+        '<span class="mkt-ico"><svg viewBox="0 0 24 24"><path d="M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8Z"/><path d="M3 9 5.5 4h13L21 9"/></svg></span>' +
+        '<span class="mkt-txt"><b>' + l.nome + (l.eu ? ' <span class="tag gold">SUA</span>' : '') + '</b>' +
+        '<small>' + l.dono + ' · ' + (fechada ? 'fechada no momento' : unid + (unid === 1 ? ' unidade à venda' : ' unidades à venda')) + '</small></span>' +
+        '<span class="mkt-seta">›</span></button>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma loja aberta no mercado agora.</p>';
+    el.querySelectorAll('[data-loja]').forEach(function (bt) {
+      bt.addEventListener('click', function () { mktAbrirLoja(bt.dataset.loja); });
+    });
+    var badge = $('btnAbrirMinhaLoja');
+    if (badge) badge.textContent = MINHA_LOJA.aberta ? 'Gerenciar a minha loja' : 'Abrir a minha loja no mercado';
+  }
+  var mktLojaAtual = null;
+  function mktAbrirLoja(id) {
+    var l = lojaPorId(id); if (!l) return;
+    if (!l.aberta) { toast('“' + l.nome + '” está fechada no momento.'); return; }
+    mktLojaAtual = id;
+    $('lojaNome').textContent = l.nome;
+    $('lojaDono').textContent = l.dono;
+    $('lojaLema').textContent = l.lema;
+    mktRenderVitrine();
+    $('lojaLayer').classList.add('on');
+  }
+  function mktRestante(lojaId, it) {
+    var noCarrinho = CARRINHO.filter(function (c) {
+      return c.lojaId === lojaId && c.item === it.item && c.preco === it.preco;
+    }).reduce(function (s, c) { return s + c.qtd; }, 0);
+    return it.qtd - noCarrinho;
+  }
+  function mktRenderVitrine() {
+    var l = lojaPorId(mktLojaAtual); if (!l) return;
+    var el = $('lojaVitrine');
+    el.innerHTML = l.itens.map(function (it, idx) {
+      var item = itemDe(it.item);
+      if (!item) return '';
+      var resta = mktRestante(l.id, it);
+      return '<div class="mkt-item' + (resta <= 0 ? ' esgotado' : '') + '">' +
+        '<span class="mkt-i-ico">' + itemIcoHtml(item) + '</span>' +
+        '<span class="mkt-i-txt"><b>' + item.nome + '</b><small>' + (item.desc || 'item de campo') + '</small>' +
+        '<span class="mkt-i-preco">' + fmt(it.preco) + ' QdC · ' + (resta > 0 ? resta + ' disponíve' + (resta === 1 ? 'l' : 'is') : 'tudo no seu carrinho') + '</span></span>' +
+        (l.eu ? '<span class="mkt-i-sua">sua</span>'
+              : '<button type="button" class="btn small mkt-add" data-add="' + idx + '"' + (resta <= 0 ? ' disabled' : '') + '>+ carrinho</button>') +
+        '</div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Esta loja está sem itens no momento.</p>';
+    el.querySelectorAll('[data-add]').forEach(function (bt) {
+      bt.addEventListener('click', function () { cartAdd(l.id, parseInt(bt.dataset.add, 10)); });
+    });
+    $('btnLojaCarrinho').textContent = CARRINHO.length
+      ? 'Ver carrinho · ' + cartUnidades() + (cartUnidades() === 1 ? ' item' : ' itens')
+      : 'Ver carrinho';
+  }
+
+  /* ---------------- CARRINHO ---------------- */
+  function cartUnidades() { return CARRINHO.reduce(function (s, c) { return s + c.qtd; }, 0); }
+  function cartTotal() { return CARRINHO.reduce(function (s, c) { return s + c.qtd * c.preco; }, 0); }
+  function cartAdd(lojaId, idx) {
+    var l = lojaPorId(lojaId); if (!l) return;
+    var it = l.itens[idx]; if (!it) return;
+    if (mktRestante(lojaId, it) <= 0) { toast('Você já colocou todas as unidades disponíveis no carrinho.'); return; }
+    var ja = CARRINHO.filter(function (c) { return c.lojaId === lojaId && c.item === it.item && c.preco === it.preco; })[0];
+    if (ja) ja.qtd += 1;
+    else CARRINHO.push({ lojaId: lojaId, loja: l.nome, item: it.item, preco: it.preco, qtd: 1 });
+    mktRenderVitrine();
+    var item = itemDe(it.item);
+    toast((item ? item.nome : it.item) + ' no carrinho · ' + fmt(cartTotal()) + ' QdC no total.');
+  }
+  function cartRenderizar() {
+    var el = $('cartLista'); if (!el) return;
+    el.innerHTML = CARRINHO.map(function (c, i) {
+      var item = itemDe(c.item);
+      return '<div class="adm-bar"><span class="nm">' + c.qtd + '× ' + (item ? item.nome : c.item) +
+        '<small>' + c.loja + ' · ' + fmt(c.preco) + ' QdC cada</small></span>' +
+        '<b style="margin-right:8px; white-space:nowrap">' + fmt(c.qtd * c.preco) + ' QdC</b>' +
+        '<button class="adm-x" data-cart-rm="' + i + '" aria-label="Tirar do carrinho">✕</button></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">Carrinho vazio — escolha itens nas lojas do mercado.</p>';
+    el.querySelectorAll('[data-cart-rm]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var c = CARRINHO[parseInt(b.dataset.cartRm, 10)];
+        if (c.qtd > 1) c.qtd -= 1; else CARRINHO.splice(parseInt(b.dataset.cartRm, 10), 1);
+        cartRenderizar();
+        if ($('lojaLayer').classList.contains('on')) mktRenderVitrine();
+      });
+    });
+    var n = cartUnidades();
+    $('cartSub').textContent = n ? n + (n === 1 ? ' item de ' : ' itens de ') + new Set(CARRINHO.map(function (c) { return c.loja; })).size + ' loja(s)' : 'nenhum item ainda';
+    $('cartTotal').textContent = fmt(cartTotal()) + ' QdC';
+  }
+  function cartFinalizar() {
+    if (!CARRINHO.length) { toast('O carrinho está vazio.'); return; }
+    var total = cartTotal();
+    if (score < total) { toast('Quad Coins insuficientes — faltam ' + fmt(total - score) + ' QdC para fechar este carrinho.'); return; }
+    var compras = CARRINHO.map(function (c) { return c; });
+    /* DA-03: o débito nasce da operação que o originou */
+    var lojas = new Set(compras.map(function (c) { return c.loja; }));
+    ledgerOp({ tipo: 'compra · mercado interno', destino: Array.from(lojas).join(' · '), autor: nomeCurto() }, function () {
+      addScore(-total, 'Compra no mercado interno · −' + fmt(total) + ' QdC');
+    });
+    compras.forEach(function (c) {
+      var item = itemDe(c.item);
+      for (var i = 0; i < c.qtd; i++) {
+        MOCHILA.push(c.item);
+        if (typeof histAdd === 'function') histAdd(c.item, 'mercado', null, c.loja);
+      }
+      if (typeof lojaCompraLog === 'function') {
+        lojaCompraLog((item ? item.nome : c.item) + (c.qtd > 1 ? ' (×' + c.qtd + ')' : '') + ' · ' + c.loja,
+                      c.qtd * c.preco, 'qdc', 'mercado', c.item, { qtd: c.qtd });
+      }
+      /* vendeu na sua própria loja? o estoque baixa e a venda é registrada */
+      if (c.lojaId === 'eu') mlBaixaVenda(c);
+    });
+    CARRINHO = [];
+    cartRenderizar();
+    $('cartLayer').classList.remove('on');
+    $('lojaLayer').classList.remove('on');
+    if (typeof renderMochila === 'function') renderMochila();
+    if (typeof renderLojaQuest === 'function') renderLojaQuest();
+    if (typeof renderLojaCombate === 'function') renderLojaCombate();
+    renderMercado();
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+    toast('Compra fechada · −' + fmt(total) + ' QdC. Tudo foi para a sua mochila.');
+  }
+  function mlBaixaVenda(c) {
+    var a = MINHA_LOJA.anuncios.filter(function (x) { return x.item === c.item && x.preco === c.preco; })[0];
+    if (!a) return;
+    a.qtd -= c.qtd;
+    if (a.qtd <= 0) MINHA_LOJA.anuncios = MINHA_LOJA.anuncios.filter(function (x) { return x.id !== a.id; });
+    var item = itemDe(c.item);
+    MINHA_LOJA.vendas.unshift({ nome: item ? item.nome : c.item, qtd: c.qtd, total: c.qtd * c.preco, comprador: nomeCurto() });
+    renderMinhaLoja();
+  }
+  (function () {
+    if (!$('lojaLayer')) return;
+    $('btnLojaFechar').addEventListener('click', function () { $('lojaLayer').classList.remove('on'); });
+    $('lojaLayer').addEventListener('click', function (e) { if (e.target === $('lojaLayer')) $('lojaLayer').classList.remove('on'); });
+    $('btnLojaCarrinho').addEventListener('click', function () { cartRenderizar(); $('cartLayer').classList.add('on'); });
+    $('btnCartFechar').addEventListener('click', function () { $('cartLayer').classList.remove('on'); });
+    $('cartLayer').addEventListener('click', function (e) { if (e.target === $('cartLayer')) $('cartLayer').classList.remove('on'); });
+    $('btnCartLimpar').addEventListener('click', function () {
+      CARRINHO = []; cartRenderizar();
+      if ($('lojaLayer').classList.contains('on')) mktRenderVitrine();
+      toast('Carrinho esvaziado.');
+    });
+    $('btnCartFinalizar').addEventListener('click', cartFinalizar);
+    var atalho = $('btnAbrirMinhaLoja');
+    if (atalho) atalho.addEventListener('click', function () { showView('v-minha-loja'); });
+  })();
+  window.__mercado = function () { return { minha: MINHA_LOJA, carrinho: CARRINHO }; };   /* para a suíte de testes */
+

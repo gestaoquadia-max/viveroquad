@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Minha Loja e Mercado interno
+
+- **Minha loja** (dec. 216), no menu "+": nome e lema da loja, anúncio de
+  itens da mochila com preço em Quad Coins, abrir/fechar a vitrine e o
+  registro das vendas realizadas. Anunciar **reserva** as unidades — elas
+  saem da mochila; retirar o anúncio devolve na hora.
+- **Mercado interno**, na Quad Store: as lojas abertas dos alunos (a sua
+  marcada como SUA, as fechadas apagadas). Entra na loja, vê preço e
+  disponibilidade, junta no **carrinho** — que acumula entre lojas — e
+  finaliza: debita o total e manda tudo para a mochila.
+- **Comércio entre alunos é sempre em Quad Coins**; Diamante não circula
+  no mercado. A ficha do item passa a registrar a loja de origem.
+- Suíte nova `vz6` (35 provas), do anúncio ao fechamento do carrinho,
+  incluindo saldo insuficiente e a loja sobrevivendo ao F5.
+
 ## 16/08/2026 — Correção: perfis que não abriam
 
 - **Metade dos perfis da demonstração quebrava ao abrir** (dec. 215),

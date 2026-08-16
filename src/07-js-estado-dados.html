@@ -372,6 +372,8 @@
     if (id === 'v-inicio' && typeof renderEvStrip === 'function') renderEvStrip();       /* tira do carrossel o que venceu */
     if (id === 'v-loja' && typeof renderEventosLoja === 'function') renderEventosLoja(); /* e da vitrine */
     if (id === 'v-loja' && typeof renderRelCompras === 'function') renderRelCompras();   /* relatório de compras sempre atual */
+    if (id === 'v-loja' && typeof renderMercado === 'function') renderMercado();         /* mercado interno (dec. 216) */
+    if (id === 'v-minha-loja' && typeof renderMinhaLoja === 'function') renderMinhaLoja();
     /* abrir Missões revalida os 7 dias: o que venceu sai de "Hoje" e entra em "Atrasadas" */
     if (id === 'v-missoes') {
       if (typeof renderDia === 'function') renderDia();

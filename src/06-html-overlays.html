@@ -182,6 +182,10 @@
               <span class="p-ico">▦</span>
               <span class="grow"><span class="t">Calendário</span><span class="d">agendamentos, simulados e momentos importantes</span></span>
             </button>
+            <button class="plus-row" data-goto="v-minha-loja">
+              <span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8Z"/><path d="M3 9 5.5 4h13L21 9"/><path d="M9 13v4M15 13v4"/></svg></span>
+              <span class="grow"><span class="t">Minha loja</span><span class="d">venda itens da sua mochila no mercado interno</span></span>
+            </button>
             <button class="plus-row" data-goto="v-materiais">
               <span class="p-ico">▤</span>
               <span class="grow"><span class="t">Materiais das aulas</span><span class="d">slides, resumos, listas e vídeos por aula</span></span>
@@ -326,6 +330,45 @@
         </div>
 
         <!-- ============ COMPRA COM QUANTIDADE (itens presenciais) ============ -->
+        <!-- ============ VITRINE DE UMA LOJA DO MERCADO (dec. 216) ============ -->
+        <div class="item-layer" id="lojaLayer">
+          <div class="item-card">
+            <button class="storage-close" id="btnLojaFechar" aria-label="Fechar loja">✕</button>
+            <div class="item-topo">
+              <span class="item-ico" id="lojaIco"><svg viewBox="0 0 24 24"><path d="M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8Z"/><path d="M3 9 5.5 4h13L21 9"/><path d="M9 13v4M15 13v4"/></svg></span>
+              <div class="item-id">
+                <h3 id="lojaNome"></h3>
+                <div class="sh-sub" id="lojaDono"></div>
+                <span class="item-qtd" id="lojaLema"></span>
+              </div>
+            </div>
+            <div id="lojaVitrine" style="margin-top:14px"></div>
+            <div class="item-acoes">
+              <button class="btn" id="btnLojaCarrinho">Ver carrinho</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ CARRINHO DO MERCADO INTERNO (dec. 216) ============ -->
+        <div class="item-layer" id="cartLayer">
+          <div class="item-card">
+            <button class="storage-close" id="btnCartFechar" aria-label="Fechar carrinho">✕</button>
+            <div class="item-topo">
+              <span class="item-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg></span>
+              <div class="item-id">
+                <h3>Carrinho do mercado</h3>
+                <div class="sh-sub" id="cartSub">nenhum item ainda</div>
+              </div>
+            </div>
+            <div id="cartLista" style="margin-top:14px"></div>
+            <div class="cart-total"><span>Total</span><b id="cartTotal">0 QdC</b></div>
+            <div class="item-acoes">
+              <button class="btn ghost" id="btnCartLimpar">Esvaziar</button>
+              <button class="btn" id="btnCartFinalizar">Finalizar compra</button>
+            </div>
+          </div>
+        </div>
+
         <!-- ============ PERFIL PÚBLICO DO ALUNO (dec. 212) ============ -->
         <div class="item-layer" id="perfPubLayer">
           <div class="item-card perf-card">

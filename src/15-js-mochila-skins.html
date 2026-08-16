@@ -34,10 +34,11 @@
   /* dec. 211 — de onde veio cada unidade: a ficha do item conta a história
      (construído por quem e quando · conquistado no drop · comprado)      */
   var ITEM_HIST = {};   /* id → [{ ori: 'compra'|'drop'|'quest', ts, autor }] */
-  function histAdd(id, ori, autor) {
+  function histAdd(id, ori, autor, de) {
     (ITEM_HIST[id] = ITEM_HIST[id] || []).push({
       ori: ori, ts: Date.now(),
-      autor: autor || ((typeof nomeCurto === 'function') ? nomeCurto() : '')
+      autor: autor || ((typeof nomeCurto === 'function') ? nomeCurto() : ''),
+      de: de || ''   /* dec. 216 — a loja do mercado de onde veio */
     });
   }
   function histDel(id, n) {
@@ -203,7 +204,7 @@
           return '<strong>' + r[1] + '×</strong> ' + (ins ? ins.nome : r[0]);
         }).join(' · ') + '. <em>Não é vendido.</em>';
     }
-    if (it.disp === 'drop') return 'Só no <strong>DROP</strong> — conquistado ao concluir pacotes de 10 questões (' + (+it.drop || 0) + '% de chance por bloco). <em>Não é vendido na Loja.</em>';
+    if (it.disp === 'drop') return 'Só no <strong>DROP</strong> — conquistado ao concluir pacotes de 10 questões (' + (+it.drop || 0) + '% de chance por bloco). <em>Não é vendido na Quad Store</em> — mas outro aluno pode revendê-lo no <strong>Mercado interno</strong>.';
     if (it.disp === 'ambos') return 'À venda na Quad Store por <strong>' + it.preco + ' QdC</strong> e também cai no <strong>DROP</strong> (' + (+it.drop || 0) + '% por bloco de questões).';
     return 'À venda na Quad Store, em <strong>Itens de combate</strong>, por <strong>' + it.preco + ' QdC</strong>.';
   }
@@ -220,9 +221,11 @@
     $('itemFichaNome').textContent = it.nome;
     $('itemFichaDesc').textContent = it.desc || 'item de campo';
     $('itemFichaQtd').textContent = n + (n === 1 ? ' unidade na mochila' : ' unidades na mochila');
-    var ORI_TXT = { quest: 'Construído por', drop: 'Conquistado no drop por', compra: 'Comprado na Quad Store por' };
+    var ORI_TXT = { quest: 'Construído por', drop: 'Conquistado no drop por', compra: 'Comprado na Quad Store por',
+                    mercado: 'Comprado no Mercado interno por', devolvido: 'Retirado da sua vitrine por' };
     var linhas = hist.slice(-4).reverse().map(function (h) {
-      return '<li>' + ORI_TXT[h.ori] + ' <b>' + h.autor + '</b> em <b>' + histData(h.ts) + '</b></li>';
+      return '<li>' + (ORI_TXT[h.ori] || 'Obtido por') + ' <b>' + h.autor + '</b>' +
+        (h.de ? ', na loja <b>' + h.de + '</b>,' : '') + ' em <b>' + histData(h.ts) + '</b></li>';
     }).join('');
     var corpo = '';
     corpo += '<div class="item-bloco"><div class="ib-t">Como chegou até você</div><div class="ib-v">' +

@@ -226,12 +226,13 @@
            build novo DESCARTA o estado antigo em vez de restaurá-lo por
            cima do seed (dec. 208 — a Loja dizia "18 na mochila" com a
            mochila mostrando outra coisa). v:3 = dec. 211, histórico de
-           aquisição de cada item.                                      */
-        v: 3, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
+           aquisição de cada item; v:4 = dec. 216, a loja do aluno.     */
+        v: 4, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
         carreira: carreira,
         mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA : [],
         questEq: (typeof questEquipada !== 'undefined') ? questEquipada : null,
         itemHist: (typeof ITEM_HIST !== 'undefined') ? ITEM_HIST : {},
+        minhaLoja: (typeof MINHA_LOJA !== 'undefined') ? MINHA_LOJA : null,
         avatarIdx: (typeof avatarIdx !== 'undefined') ? avatarIdx : 0,
         guerra: $('nomeGuerra') ? $('nomeGuerra').value : '',
         turmaAtivaId: (typeof turmaAtivaId !== 'undefined') ? turmaAtivaId : '',
@@ -245,7 +246,7 @@
   function evolCarregar() {
     var raw = lsGet(VQ_EVOL); if (!raw) return false;
     var d; try { d = JSON.parse(raw); } catch (e) { return false; }
-    if (!d || d.v !== 3) return false;   /* build antigo → demonstração zera */
+    if (!d || d.v !== 4) return false;   /* build antigo → demonstração zera */
     if (typeof d.score === 'number') score = d.score;
     if (typeof d.diamantes === 'number') diamantes = d.diamantes;
     if (d.carreira) for (var k in d.carreira) if (d.carreira.hasOwnProperty(k)) carreira[k] = d.carreira[k];
@@ -254,6 +255,8 @@
     if (d.questEq && typeof questEquipada !== 'undefined' && typeof itemDe === 'function' && itemDe(d.questEq)) questEquipada = d.questEq;
     /* a ficha do item conta a história certa depois do F5 (dec. 211) */
     if (d.itemHist && typeof ITEM_HIST !== 'undefined') { for (var h in d.itemHist) if (d.itemHist.hasOwnProperty(h)) ITEM_HIST[h] = d.itemHist[h]; }
+    /* a loja do aluno e a vitrine dela sobrevivem ao F5 (dec. 216) */
+    if (d.minhaLoja && typeof MINHA_LOJA !== 'undefined') { for (var ml in d.minhaLoja) if (d.minhaLoja.hasOwnProperty(ml)) MINHA_LOJA[ml] = d.minhaLoja[ml]; }
     if (d.lojaOwned && typeof lojaOwned !== 'undefined') for (var o in d.lojaOwned) if (d.lojaOwned.hasOwnProperty(o)) lojaOwned[o] = d.lojaOwned[o];
     if (d.trAj && typeof trAj !== 'undefined') for (var a in d.trAj) if (d.trAj.hasOwnProperty(a)) trAj[a] = d.trAj[a];
     if (d.ledger && typeof LEDGER !== 'undefined' && d.ledger.length) {
@@ -288,6 +291,8 @@
          "N na mochila" e o progresso das quests se redesenham juntos   */
       if (typeof renderLojaCombate === 'function') renderLojaCombate();
       if (typeof renderLojaQuest === 'function') renderLojaQuest();
+      if (typeof renderMinhaLoja === 'function') renderMinhaLoja();
+      if (typeof renderMercado === 'function') renderMercado();
       if (typeof renderExtrato === 'function') renderExtrato();
       if (typeof definirTurmaAtiva === 'function') definirTurmaAtiva(turmaAtivaId, true);
       $('scoreVal').textContent = fmt(score);

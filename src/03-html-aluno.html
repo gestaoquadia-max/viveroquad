@@ -356,6 +356,14 @@
             <p class="sub" style="margin-top:8px">Aqui a moeda são os <strong>itens da sua mochila</strong> — e os insumos <strong>não são vendidos</strong>: todos são conquistados no <strong>DROP</strong>, resolvendo os pacotes de 10 questões. Complete a coleta e toque em <strong>CONSTRUIR</strong> — os insumos são consumidos e o item vai para a mochila.</p>
           </div>
 
+          <!-- ================= MERCADO INTERNO (dec. 216) ================= -->
+          <div class="p-card">
+            <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8Z"/><path d="M3 9 5.5 4h13L21 9"/><path d="M9 13v4M15 13v4"/></svg></span>Mercado interno · alunos vendendo para alunos</div>
+            <p class="sub">Cada loja aqui é de um aluno vendendo itens da <strong>própria mochila</strong>. Toque numa loja para ver a vitrine, junte o que quiser no <strong>carrinho</strong> e finalize — o valor sai em <strong>Quad Coins</strong> e os itens caem na sua mochila. <strong>Diamante não circula no mercado interno.</strong></p>
+            <div id="mercadoLista" style="margin-top:10px"></div>
+            <button class="btn ghost small" id="btnAbrirMinhaLoja" style="margin-top:10px; width:100%">Abrir a minha loja no mercado</button>
+          </div>
+
           <!-- ================= ESTORNOS · ATÉ 7 DIAS ================= -->
           <div class="p-card">
             <div class="loja-macro"><span class="lm-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>Estornos · até 7 dias</div>
@@ -560,6 +568,57 @@
         </div>
 
         <!-- ============ ALUNO · MATERIAIS ============ -->
+        <!-- ================= MINHA LOJA (dec. 216) ================= -->
+        <div class="view" id="v-minha-loja">
+          <div class="p-card loja-hero">
+            <div class="lh-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8Z"/><path d="M3 9 5.5 4h13L21 9"/><path d="M9 13v4M15 13v4"/></svg></div>
+            <h2 class="mil lh-title" id="mlTitulo">Minha loja</h2>
+            <p class="lh-sub">Venda para os outros alunos os itens que estão na sua <strong>mochila</strong>. Tudo em <strong>Quad Coins</strong>.</p>
+            <div class="lh-saldos"><span class="loja-saldo"><img src="__QUAD_COIN__" alt="" aria-hidden="true"><b id="mlSaldo">0</b>&nbsp;QdC</span></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Identidade da loja</div>
+            <div class="adm-row" style="margin-top:6px">
+              <input class="fld" id="mlNome" placeholder="Nome da loja (ex.: Arsenal do Moura)" maxlength="34">
+            </div>
+            <div class="adm-row" style="margin-top:8px">
+              <input class="fld" id="mlLema" placeholder="Lema da loja (ex.: equipamento de campo, sem enrolação)" maxlength="48">
+            </div>
+            <div class="priv-box" style="margin-top:10px">
+              <div class="priv-info">
+                <div class="priv-t">Loja aberta no mercado</div>
+                <div class="priv-d" id="mlEstadoTxt">Fechada — ninguém vê a sua vitrine.</div>
+              </div>
+              <button class="priv-switch" id="btnMlAbrir" role="switch" aria-checked="false" aria-label="Abrir ou fechar a loja no mercado interno"><span class="priv-knob"></span></button>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Anunciar um item da mochila</div>
+            <div class="adm-row" style="margin-top:6px">
+              <select class="fld" id="mlItem" title="Item da mochila que vai à venda"></select>
+            </div>
+            <div class="adm-row" style="margin-top:8px">
+              <input class="fld" id="mlQtd" placeholder="Qtd." inputmode="numeric" style="max-width:80px">
+              <input class="fld" id="mlPreco" placeholder="Preço por unidade (QdC)" inputmode="numeric">
+              <button class="btn small" id="btnMlAnunciar">Anunciar</button>
+            </div>
+            <div class="adm-alerta" id="mlErro"></div>
+            <p class="sub" style="margin-top:8px">O item anunciado <strong>sai da mochila e vai para a vitrine</strong> — assim você não gasta numa quest o que já prometeu vender. Retirando o anúncio, ele volta na hora.</p>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label" id="mlVitrineHead">Produtos à venda</div>
+            <div id="mlVitrine"></div>
+          </div>
+
+          <div class="p-card">
+            <div class="k-label">Vendas realizadas</div>
+            <div id="mlVendas"></div>
+          </div>
+        </div>
+
         <div class="view" id="v-materiais">
           <div class="p-card">
             <div class="k-label">Materiais das aulas · por matéria e assunto</div>

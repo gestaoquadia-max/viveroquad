@@ -738,6 +738,37 @@
   .qtd-btn:disabled { opacity: 0.4; cursor: default; }
   .qtd-val { font: 800 24px var(--ui); color: var(--p-text); min-width: 40px; font-variant-numeric: tabular-nums; }
   /* seletor de ícones no cadastro de produto (admin) */
+  /* ---------- mercado interno · lojas de alunos (dec. 216) ---------- */
+  .mkt-loja { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer;
+    background: #F9FBFF; border: 1px solid var(--p-line); border-radius: 13px; padding: 10px 12px; margin-bottom: 8px; }
+  .mkt-loja:last-child { margin-bottom: 0; }
+  .mkt-loja:active { transform: scale(.99); }
+  .mkt-loja.minha { background: #FFFBEF; border-color: #F0DFAE; }
+  .mkt-loja.fechada { opacity: .55; }
+  .mkt-ico { width: 36px; height: 36px; flex: none; border-radius: 11px; display: grid; place-items: center;
+    background: linear-gradient(160deg, #123B72, #0B2649); }
+  .mkt-ico svg { width: 20px; height: 20px; stroke: #BFE0FF; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .mkt-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .mkt-txt b { font: 700 12.5px var(--ui); color: var(--p-text); }
+  .mkt-txt small { font: 600 10.5px var(--font); color: var(--p-dim); }
+  .mkt-seta { font-size: 18px; color: var(--p-dim); flex: none; }
+  .mkt-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--p-line); }
+  .mkt-item:last-child { border-bottom: none; }
+  .mkt-item.esgotado { opacity: .5; }
+  .mkt-i-ico { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center;
+    background: #EEF4FC; font-size: 20px; }
+  .mkt-i-ico svg { width: 20px; height: 20px; stroke: #4A79B8; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .mkt-i-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .mkt-i-txt b { font: 700 12.5px var(--ui); color: var(--p-text); }
+  .mkt-i-txt small { font: 600 10.5px var(--font); color: var(--p-dim); }
+  .mkt-i-preco { font: 800 11px var(--ui); color: #1E874F; margin-top: 2px; }
+  .mkt-add { flex: none; font-size: 11px; padding: 6px 10px; }
+  .mkt-add[disabled] { opacity: .45; pointer-events: none; }
+  .mkt-i-sua { font: 700 10px var(--ui); color: #9A6B00; background: #FFF1CF; border: 1px solid #F0DFAE;
+    border-radius: 999px; padding: 3px 9px; flex: none; text-transform: uppercase; letter-spacing: .05em; }
+  .cart-total { display: flex; align-items: center; justify-content: space-between; margin-top: 12px;
+    padding-top: 10px; border-top: 2px solid var(--p-line); font: 700 13px var(--ui); color: var(--p-text); }
+  .cart-total b { font-size: 16px; color: #12325F; }
   /* ---------- perfil público nos rankings (dec. 212) ---------- */
   .perf-card { text-align: center; }
   .perf-topo { padding-right: 30px; }
