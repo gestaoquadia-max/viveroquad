@@ -73,7 +73,7 @@ const toast = p => p.evaluate(()=>document.getElementById('toast').textContent);
   ok(await p.evaluate(()=>document.querySelector('#v-loja .lh-title').textContent)==='Quad Store', '3: cabeçalho "Quad Store"');
   const macro = await p.evaluate(()=>[...document.querySelectorAll('#v-loja .loja-macro')].map(m=>m.textContent.trim()));
   ok(/Atividades e itens · presenciais/.test(macro[0]), '3: bloco "Atividades e itens · presenciais" ('+macro[0]+')');
-  ok(await p.evaluate(()=>document.querySelectorAll('#v-loja .loja-sec').length)===18, '3: 18 seções com o divisor novo (barra azul) — 4 no card "Carteira · extrato e compras" (dec. 197: movimentações + as 3 de situação)');
+  ok(await p.evaluate(()=>document.querySelectorAll('#v-loja .loja-sec').length)===19, '3: 19 seções com o divisor novo (barra azul) — com a de Itens de Quest (dec. 207)');
   const iso = await p.evaluate(()=>[...document.querySelectorAll('#v-loja .loja-sec')].map(x=>x.textContent.trim()).find(t=>/Isoladas/.test(t)));
   ok(iso==='Isoladas', '3: seção "Isoladas" sem "um professor à frente" ('+iso+')');
   // sobreposição hero × bloco presencial resolvida (roda 3D atenuada)
