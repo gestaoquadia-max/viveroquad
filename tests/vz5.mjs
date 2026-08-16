@@ -130,24 +130,88 @@ t('e mostra a minha data de entrada na plataforma', /11\/05\/2026/.test(fEu));
 t('e a minha turma em uso', /PATAMO|RONDESP|BOPE/.test(fEu));
 await fechaPerfil();
 
-/* ============ A CHAVE DE PRIVACIDADE FECHA O MEU PERFIL ============ */
+/* ============ A CHAVE DE PRIVACIDADE FECHA O MEU PERFIL ============
+   Na SALA eu estou em 10º — dentro do hall, onde ninguém se esconde
+   (dec. 214). A chave se prova no GERAL, onde estou em 87º.          */
 await p.evaluate(() => document.getElementById('btnPriv').click());
 await p.waitForTimeout(400);
-t('virando privado, o meu botão de perfil apaga',
-  await p.evaluate(() => document.querySelector('#rankSalaList .rk-row.me .rk-perf').classList.contains('off')));
-await p.evaluate(() => document.querySelector('#rankSalaList .rk-row.me .rk-perf').click());
+t('virando privado, o meu botão de perfil apaga no ranking geral',
+  await p.evaluate(() => document.querySelector('#rankGeralList .rk-row.me .rk-perf').classList.contains('off')));
+t('mas na sala, onde estou no hall dos 10, ele continua aberto',
+  await p.evaluate(() => !document.querySelector('#rankSalaList .rk-row.me .rk-perf').classList.contains('off')));
+await p.evaluate(() => document.querySelector('#rankGeralList .rk-row.me .rk-perf').click());
 await p.waitForTimeout(300);
-t('e o meu perfil deixa de abrir', !(await aberto()));
+t('e o meu perfil deixa de abrir por ali', !(await aberto()));
 t('o texto da chave explica que o perfil não abre para ninguém',
   await p.evaluate(() => /perfil não abre para ninguém/.test(document.getElementById('privDesc').textContent)));
 await p.evaluate(() => document.getElementById('btnPriv').click());
 await p.waitForTimeout(400);
 t('voltando a público, o perfil abre de novo',
-  await p.evaluate(() => !document.querySelector('#rankSalaList .rk-row.me .rk-perf').classList.contains('off')) &&
+  await p.evaluate(() => !document.querySelector('#rankGeralList .rk-row.me .rk-perf').classList.contains('off')) &&
   /perfil abre para quem tocar/.test(await p.evaluate(() => document.getElementById('privDesc').textContent)));
 
-/* ============ VALE NO RANKING COMPLETO TAMBÉM ============ */
+/* ===== DEC. 214 · PATENTES VARIADAS, COERENTES COM O SCORE ===== */
+await p.evaluate(() => document.getElementById('rkSalaBtn').click());
+await p.waitForTimeout(400);
+t('o ranking da sala mostra patentes variadas, não só AL SD e SD',
+  await p.evaluate(() => {
+    const abrevs = [...document.querySelectorAll('#rankSalaList .rk-nome')]
+      .map(n => (/^(.*?) QUAD /.exec(n.textContent) || [, ''])[1].trim());
+    return new Set(abrevs).size >= 4;
+  }));
+t('a patente de cada linha é coerente com o score dela (mais pontos, patente maior)',
+  await p.evaluate(() => {
+    const ORD = ['AL SD', 'SD', 'AL CB', 'CB', 'AL SGT', 'SGT', 'ST', 'AL OF', 'ASP', 'TEN', 'CAP', 'MAJ', 'TC', 'CEL'];
+    const linhas = [...document.querySelectorAll('#rankSalaList .rk-row')].map(r => ({
+      ab: (/^(.*?) QUAD /.exec(r.querySelector('.rk-nome').textContent) || [, ''])[1].trim(),
+      pts: parseInt(r.querySelector('.rk-pts').textContent.replace(/\D/g, ''), 10)
+    })).filter(x => ORD.indexOf(x.ab) >= 0);
+    /* a lista desce em pontos: a patente nunca pode subir descendo a lista */
+    for (let i = 1; i < linhas.length; i++) {
+      if (linhas[i].pts <= linhas[i - 1].pts && ORD.indexOf(linhas[i].ab) > ORD.indexOf(linhas[i - 1].ab)) return false;
+    }
+    return true;
+  }));
 await p.evaluate(() => document.getElementById('rkGeralBtn').click());
+await p.waitForTimeout(400);
+t('o hall dos 10 primeiros traz os oficiais superiores (Coronel no topo)',
+  await p.evaluate(() => /CEL QUAD/.test(document.querySelector('#rankGeralList .rk-row').textContent)));
+
+/* ===== DEC. 214 · A PRIVACIDADE FECHA OS PERFIS DA 11ª EM DIANTE ===== */
+const perfEstado = () => p.evaluate(() => {
+  const rows = [...document.querySelectorAll('#rankGeralList .rk-row')];
+  return {
+    hall: rows.slice(0, 10).filter(r => !r.querySelector('.rk-perf').classList.contains('off')).length,
+    fora: rows.slice(11).filter(r => !r.querySelector('.rk-perf').classList.contains('off')).length
+  };
+});
+const pub = await perfEstado();
+t('público: o hall inteiro abre e a maioria de fora do hall também',
+  pub.hall === 10 && pub.fora > 0);
+await p.evaluate(() => document.getElementById('btnPriv').click());
+await p.waitForTimeout(500);
+await p.evaluate(() => { if (!document.getElementById('rankGeralList').textContent.includes('···')) document.getElementById('rkGeralBtn').click(); });
+await p.waitForTimeout(300);
+const priv = await perfEstado();
+t('privado: NENHUM perfil da 11ª posição em diante abre (reciprocidade)', priv.fora === 0);
+t('mas o hall dos 10 primeiros continua aberto — no topo não há como se esconder',
+  priv.hall === 10);
+await p.evaluate(() => document.getElementById('btnPriv').click());
+await p.waitForTimeout(500);
+
+/* ===== DEC. 214 · A ESCALA DE PATENTES CRESCE ATÉ O FIM ===== */
+t('na Jornada de patentes a pontuação não trava em 12.500 — cresce até Tenente-Coronel',
+  await p.evaluate(() => {
+    const vals = [...document.querySelectorAll('#trilhaList .tr-item')]
+      .map(x => x.textContent).filter(x => /pts/.test(x))
+      .map(x => parseInt(x.replace(/\D/g, ''), 10));
+    const fim = vals.slice(-5);   /* Aspirante → Tenente-Coronel */
+    for (let i = 1; i < fim.length; i++) if (fim[i] <= fim[i - 1]) return false;
+    return fim[fim.length - 1] === 18500;
+  }));
+
+/* ============ VALE NO RANKING COMPLETO TAMBÉM ============ */
+await p.evaluate(() => { if (!document.getElementById('rankGeralList').textContent.includes('···')) document.getElementById('rkGeralBtn').click(); });
 await p.waitForTimeout(400);
 t('abrindo o ranking geral completo, o hall dos 10 primeiros também tem perfil',
   await p.evaluate(() => {

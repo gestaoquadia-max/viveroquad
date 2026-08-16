@@ -132,9 +132,29 @@
      Quem escolheu perfil fechado não abre: o botão fica apagado e explica.
      O meu próprio botão respeita a minha chave de privacidade.          */
   var RK_PERF_ICO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.4"/><path d="M6 19.2a6 6 0 0 1 12 0"/></svg>';
+  /* dec. 214 — a patente de cada aluno SAI DO SCORE dele: a soma dos
+     degraus da tabela diz a partir de quanto se chega a cada patente.
+     Assim nome, insígnia e pontos contam sempre a mesma história.     */
+  var RK_CUM = (function () {
+    var acc = 0, arr = [0];
+    for (var i = 0; i < GAMI.patentes.length - 1; i++) { acc += GAMI.patentes[i].pontos || 0; arr.push(acc); }
+    return arr;
+  })();
+  function patenteDoScore(pts) {
+    var idx = 0;
+    for (var i = 0; i < RK_CUM.length; i++) if (pts >= RK_CUM[i]) idx = i;
+    return idx;
+  }
+  function rkNomeDoScore(pts, sobrenome) {
+    return GAMI.patentes[patenteDoScore(pts)].abrev + ' QUAD ' + sobrenome;
+  }
   function rkRow(pos, nome, pts, me, top3, privado) {
-    var fechado = me ? perfilPrivado : !!privado;
+    /* dec. 214 — o perfil abre EXATAMENTE quando o nome está visível:
+       · top 10 = hall seleto, sempre aberto (não há como se esconder lá)
+       · da 11ª em diante: fechado se aquele aluno se ocultou OU se EU me
+         ocultei (a reciprocidade que já valia para o nome)             */
     var escondido = me ? perfilPrivado : (perfilPrivado || !!privado);
+    var fechado = pos <= 10 ? false : escondido;
     var exibido = rkNomeExibido(nome, pos, escondido);
     var bt = '<button type="button" class="rk-perf' + (fechado ? ' off' : '') + '"' +
       ' data-perf="' + encodeURIComponent(nome) + '" data-perf-pos="' + pos + '" data-perf-pts="' + pts + '"' +
@@ -147,11 +167,15 @@
       '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
       bt + '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
   }
-  function rkScores(total, meuPos, meuScore) {
-    var arr = new Array(total + 1);
+  /* dec. 214 — a escada do ranking é multiplicativa: com degraus fixos de
+     dezenas de pontos, a lista inteira ficava na mesma patente (só AL SD e
+     SD). Subindo por fator, o topo da sala chega a Subtenente e a lista
+     mostra a progressão de verdade.                                     */
+  function rkScores(total, meuPos, meuScore, fator) {
+    var f = fator || 1.55, arr = new Array(total + 1);
     arr[meuPos] = meuScore;
-    for (var i = meuPos - 1; i >= 1; i--) arr[i] = arr[i + 1] + RK_OFF[(i * 3) % RK_OFF.length];
-    for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, arr[j - 1] - RK_OFF[(j * 5) % RK_OFF.length]);
+    for (var i = meuPos - 1; i >= 1; i--) arr[i] = Math.round(arr[i + 1] * f) + RK_OFF[(i * 3) % RK_OFF.length];
+    for (var j = meuPos + 1; j <= total; j++) arr[j] = Math.max(5, Math.round(arr[j - 1] * 0.86) - RK_OFF[(j * 5) % RK_OFF.length]);
     return arr;
   }
   /* todas as matrículas ativas do aluno — inclusive a 2ª turma comprada na Quad Store */
@@ -283,9 +307,8 @@
     var sTot = salaTotal(), sPos = salaPos(sTot), sc = rkScores(sTot, sPos, carreira.scoreCarreira);
     function salaRow(i) {
       if (i === sPos) return rkRow(i, nomeCurto(), carreira.scoreCarreira, true, false);
-      var pref = (i % 6 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
       /* parte da sala escolheu o perfil privado (demo: 1 a cada 4) */
-      return rkRow(i, pref + RK_NOMES[(i * 7) % RK_NOMES.length], sc[i], false, i <= 3, i % 4 === 2);
+      return rkRow(i, rkNomeDoScore(sc[i], RK_NOMES[(i * 7) % RK_NOMES.length]), sc[i], false, i <= 3, i % 4 === 2);
     }
     var html = '';
     if (rkOpen.sala) {
@@ -298,22 +321,22 @@
     $('rkSalaBtn').onclick = function () { rkOpen.sala = !rkOpen.sala; renderRankings(); };
     // geral: 1.286 usuários, aluno em 87º
     var gTot = 1286, gPos = 87;
-    var topPref = ['CEL QUAD ', 'TC QUAD ', 'MAJ QUAD ', 'CAP QUAD ', 'TEN QUAD ', 'ASP QUAD ', 'SGT QUAD ', 'SGT QUAD ', 'CB QUAD ', 'CB QUAD '];
-    var gv = rkScores(gPos + 12, gPos, carreira.scoreCarreira);
+    /* hall dos 10 primeiros: score de veterano — daí saem as patentes altas */
+    var HALL_PTS = [132400, 121000, 112000, 104000, 96000, 88000, 79000, 71000, 64000, 57000];
+    var gv = rkScores(gPos + 12, gPos, carreira.scoreCarreira, 1.22);
     function geralRow(v) {
       if (v === gPos) return rkRow(v, nomeCurto(), carreira.scoreCarreira, true, false);
-      var pf = (v % 2 === 0) ? 'SD QUAD ' : 'AL SD QUAD ';
-      return rkRow(v, pf + RK_NOMES[(v * 13) % RK_NOMES.length], gv[v], false, false, v % 4 === 2);
+      return rkRow(v, rkNomeDoScore(gv[v], RK_NOMES[(v * 13) % RK_NOMES.length]), gv[v], false, false, v % 4 === 2);
     }
     var g = '';
     if (rkOpen.geral) {
-      var topBase = 24870;
-      /* hall dos 10 primeiros: a máscara cai mesmo para quem é privado */
-      for (var t = 1; t <= 10; t++) g += rkRow(t, topPref[t - 1] + RK_NOMES[(t * 11) % RK_NOMES.length], topBase - (t - 1) * (900 + (t * 37) % 220), false, t <= 3, t % 4 === 2);
+      /* hall dos 10 primeiros: sempre visível e sempre de perfil aberto —
+         no topo não existe a faculdade de se esconder (dec. 214)      */
+      for (var t = 1; t <= 10; t++) g += rkRow(t, rkNomeDoScore(HALL_PTS[t - 1], RK_NOMES[(t * 11) % RK_NOMES.length]), HALL_PTS[t - 1], false, t <= 3, false);
       g += '<div class="rk-sep">···</div>';
       for (var v = gPos - 10; v <= gPos + 10; v++) g += geralRow(v);
       g += '<div class="rk-sep">···</div>';
-      g += rkRow(gTot, 'AL SD QUAD ' + RK_NOMES[19], 15, false, false);
+      g += rkRow(gTot, rkNomeDoScore(15, RK_NOMES[19]), 15, false, false);
     } else {
       for (var v2 = gPos - 2; v2 <= gPos + 2; v2++) g += geralRow(v2);
     }

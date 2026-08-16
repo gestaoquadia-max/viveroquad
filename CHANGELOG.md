@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Coerência do ranking: patente, privacidade e escala
+
+- **A patente de cada aluno agora sai do score dele** (dec. 214): a lista
+  mostrava só AL SD e SD porque os degraus entre posições eram de dezenas
+  de pontos. A escada virou multiplicativa e a patente é lida da soma dos
+  degraus da tabela — a sala vai de Subtenente a Aluno Soldado, e o hall
+  geral de Coronel a Aspirante.
+- **A privacidade do perfil segue a regra do nome**: o perfil abre
+  exatamente quando o nome está visível. O top 10 é sempre aberto (no
+  hall não há como se esconder) e, da 11ª em diante, fecha se aquele
+  aluno se ocultou ou se você se ocultou.
+- **A escala de pontos volta a crescer até o fim**: de Aspirante em
+  diante estava travada em 12.500 desde a primeira versão — agora segue
+  o passo do topo da tabela, +1.500 por patente.
+
 ## 16/08/2026 — Acabamento do perfil público
 
 - **O botão de perfil ganhou coluna própria** (dec. 213): dentro do nome
