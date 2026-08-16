@@ -322,10 +322,26 @@
             <button class="storage-close" id="btnStorageFechar" aria-label="Fechar mochila">✕</button>
           </div>
           <div class="storage-grid" id="storageGrid"></div>
-          <div class="storage-quest">🎯 <strong>Quests:</strong> os itens daqui são a moeda da área <strong>Itens de Quest</strong> da Quad Store — os insumos caem no <strong>drop</strong> dos pacotes de 10 questões; reúna e construa equipamentos.</div>
+          <div class="storage-quest">🎯 <strong>Quests:</strong> os itens daqui são a moeda da área <strong>Itens de Quest</strong> da Quad Store — os insumos caem no <strong>drop</strong> dos pacotes de 10 questões; reúna e construa equipamentos. <strong>Toque num item</strong> para ver a ficha dele.</div>
         </div>
 
         <!-- ============ COMPRA COM QUANTIDADE (itens presenciais) ============ -->
+        <!-- ============ FICHA DO ITEM DA MOCHILA (dec. 211) ============ -->
+        <div class="item-layer" id="itemLayer">
+          <div class="item-card">
+            <button class="storage-close" id="btnItemFechar" aria-label="Fechar ficha do item">✕</button>
+            <div class="item-topo">
+              <span class="item-ico" id="itemFichaIco"></span>
+              <div class="item-id">
+                <h3 id="itemFichaNome"></h3>
+                <div class="sh-sub" id="itemFichaDesc"></div>
+                <span class="item-qtd" id="itemFichaQtd"></span>
+              </div>
+            </div>
+            <div class="item-corpo" id="itemFichaCorpo"></div>
+            <div class="item-acoes" id="itemFichaAcoes"></div>
+          </div>
+        </div>
         <!-- ============ SELETOR DE ÍCONES · biblioteca completa (dec. 210) ============ -->
         <div class="ico-layer" id="icoLayer">
           <div class="ico-card">

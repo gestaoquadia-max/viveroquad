@@ -222,15 +222,16 @@
   function evolSalvar() {
     try {
       lsSet(VQ_EVOL, JSON.stringify({
-        /* v: 2 — dec. 208: mudou a estrutura da mochila (coleta da quest +
-           agrupamento) e entrou o item de quest equipado. Estado salvo por
-           um build antigo é DESCARTADO no carregamento: restaurá-lo por
-           cima do seed novo deixava a Loja dizendo "18 na mochila" com a
-           mochila mostrando outra coisa (relato do gestor)             */
-        v: 2, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
+        /* A versão sobe sempre que a estrutura do estado salvo muda: o
+           build novo DESCARTA o estado antigo em vez de restaurá-lo por
+           cima do seed (dec. 208 — a Loja dizia "18 na mochila" com a
+           mochila mostrando outra coisa). v:3 = dec. 211, histórico de
+           aquisição de cada item.                                      */
+        v: 3, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
         carreira: carreira,
         mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA : [],
         questEq: (typeof questEquipada !== 'undefined') ? questEquipada : null,
+        itemHist: (typeof ITEM_HIST !== 'undefined') ? ITEM_HIST : {},
         avatarIdx: (typeof avatarIdx !== 'undefined') ? avatarIdx : 0,
         guerra: $('nomeGuerra') ? $('nomeGuerra').value : '',
         turmaAtivaId: (typeof turmaAtivaId !== 'undefined') ? turmaAtivaId : '',
@@ -244,13 +245,15 @@
   function evolCarregar() {
     var raw = lsGet(VQ_EVOL); if (!raw) return false;
     var d; try { d = JSON.parse(raw); } catch (e) { return false; }
-    if (!d || d.v !== 2) return false;   /* build antigo → demonstração zera */
+    if (!d || d.v !== 3) return false;   /* build antigo → demonstração zera */
     if (typeof d.score === 'number') score = d.score;
     if (typeof d.diamantes === 'number') diamantes = d.diamantes;
     if (d.carreira) for (var k in d.carreira) if (d.carreira.hasOwnProperty(k)) carreira[k] = d.carreira[k];
     if (d.mochila && typeof MOCHILA !== 'undefined') { MOCHILA.length = 0; d.mochila.forEach(function (x) { MOCHILA.push(x); }); }
     /* a foto equipada pela quest sobrevive ao F5 (se o item ainda existe) */
     if (d.questEq && typeof questEquipada !== 'undefined' && typeof itemDe === 'function' && itemDe(d.questEq)) questEquipada = d.questEq;
+    /* a ficha do item conta a história certa depois do F5 (dec. 211) */
+    if (d.itemHist && typeof ITEM_HIST !== 'undefined') { for (var h in d.itemHist) if (d.itemHist.hasOwnProperty(h)) ITEM_HIST[h] = d.itemHist[h]; }
     if (d.lojaOwned && typeof lojaOwned !== 'undefined') for (var o in d.lojaOwned) if (d.lojaOwned.hasOwnProperty(o)) lojaOwned[o] = d.lojaOwned[o];
     if (d.trAj && typeof trAj !== 'undefined') for (var a in d.trAj) if (d.trAj.hasOwnProperty(a)) trAj[a] = d.trAj[a];
     if (d.ledger && typeof LEDGER !== 'undefined' && d.ledger.length) {

@@ -84,22 +84,25 @@ await p.evaluate(() => document.getElementById('btnAvatarPerfil').click()); awai
 await p.evaluate(() => document.getElementById('btnMochila').click()); await p.waitForTimeout(300);
 const mochila = await p.evaluate(() => document.getElementById('storageGrid').textContent.replace(/\s+/g, ' '));
 t('os insumos foram CONSUMIDOS da mochila', !/Liga metálica|Pneu blindado|MAG/.test(mochila));
-t('o Blindado militar está na mochila com o botão Equipar',
-  /Blindado militar/.test(mochila) && await p.evaluate(() => !!document.querySelector('#storageGrid [data-eq="blindado"]')));
+t('o Blindado militar está na mochila e o slot abre a ficha dele (dec. 211)',
+  /Blindado militar/.test(mochila) && await p.evaluate(() => !!document.querySelector('#storageGrid [data-item="blindado"]')));
 
 /* ============ EQUIPAR TROCA A FOTO DO OPERADOR ============ */
 const fotoAntes = await p.evaluate(() => document.querySelector('#homeAvatar img').src);
-await p.evaluate(() => document.querySelector('#storageGrid [data-eq="blindado"]').click());
+await p.evaluate(() => document.querySelector('#storageGrid [data-item="blindado"]').click());
+await p.waitForTimeout(300);
+await p.evaluate(() => document.getElementById('btnItemEquipar').click());
 await p.waitForTimeout(300);
 const fotoDepois = await p.evaluate(() => document.querySelector('#homeAvatar img').src);
 t('equipar o Blindado TROCA a foto do operador (marcador PATAMO até a arte oficial)',
   fotoDepois !== fotoAntes && await p.evaluate(() => window.__questEquipada() === 'blindado'));
-t('o slot marca Equipado ✓',
-  await p.evaluate(() => /Equipado/.test(document.querySelector('#storageGrid [data-eq="blindado"]').textContent)));
-await p.evaluate(() => document.querySelector('#storageGrid [data-eq="blindado"]').click());
+t('o slot marca o item equipado com ✓',
+  await p.evaluate(() => !!document.querySelector('#storageGrid [data-item="blindado"] .st-eqmark')));
+await p.evaluate(() => document.getElementById('btnItemEquipar').click());
 await p.waitForTimeout(300);
 t('desequipar devolve a foto anterior',
   (await p.evaluate(() => document.querySelector('#homeAvatar img').src)) === fotoAntes);
+await p.evaluate(() => document.getElementById('btnItemFechar').click()); await p.waitForTimeout(200);
 await p.evaluate(() => document.getElementById('btnStorageFechar').click()); await p.waitForTimeout(200);
 
 /* ============ ADMIN: CRIA ITEM CONSTRUÍDO POR QUEST ============ */
@@ -169,9 +172,12 @@ t('construir com receita Cantil+Patch consome OS DOIS insumos (o Patch não sobr
 t('e a Torre de vigia entra na mochila', /Torre de vigia/.test(mochila2));
 
 /* ===== F5 MANTÉM LOJA E MOCHILA CORRESPONDENTES (dec. 208) ===== */
-await p.evaluate(() => document.querySelector('#storageGrid [data-eq="blindado"]').click());
+await p.evaluate(() => document.querySelector('#storageGrid [data-item="blindado"]').click());
+await p.waitForTimeout(300);
+await p.evaluate(() => document.getElementById('btnItemEquipar').click());
 await p.waitForTimeout(300);
 const fotoEq = await p.evaluate(() => document.querySelector('#homeAvatar img').src);
+await p.evaluate(() => document.getElementById('btnItemFechar').click()); await p.waitForTimeout(200);
 await p.evaluate(() => document.getElementById('btnStorageFechar').click());
 await p.waitForTimeout(700);   /* o salvamento da evolução tem debounce de 400ms */
 await p.reload({ waitUntil: 'load' });

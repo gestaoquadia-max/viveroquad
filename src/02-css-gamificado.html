@@ -680,8 +680,10 @@
   .st-slot { aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 8px; position: relative; }
   /* dec. 207 — mochila agrupada (×N) e itens de quest equipáveis */
   .st-qtd { position: absolute; top: 6px; right: 6px; font-size: 10px; font-weight: 800; background: #12325F; color: #fff; border-radius: 9px; padding: 1px 6px; }
-  .st-eq { font-size: 10px; padding: 3px 9px; }
-  .st-eq.on { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
+  button.st-slot { border: 0; font: inherit; cursor: pointer; }
+  button.st-slot:active { transform: scale(.97); }
+  .st-eqmark { position: absolute; top: 6px; left: 6px; font-size: 10px; font-weight: 800; background: #1E874F;
+    color: #fff; border-radius: 999px; width: 16px; height: 16px; display: grid; place-items: center; }
   .qst-receita { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
   .qst-ins { font-size: 10px; color: #7A8698; }
   .qst-ins.ok { color: #1E874F; font-weight: 700; }
@@ -734,6 +736,33 @@
   .qtd-btn:disabled { opacity: 0.4; cursor: default; }
   .qtd-val { font: 800 24px var(--ui); color: var(--p-text); min-width: 40px; font-variant-numeric: tabular-nums; }
   /* seletor de ícones no cadastro de produto (admin) */
+  /* ---------- ficha do item da mochila (dec. 211) ---------- */
+  .item-layer { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(8, 22, 44, .55); z-index: 72; padding: 16px; }
+  .item-layer.on { display: flex; }
+  .item-card { background: #fff; border-radius: 18px; width: 100%; max-height: 84%; overflow-y: auto;
+    padding: 16px; position: relative; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+  .item-card .storage-close { position: absolute; top: 10px; right: 10px; }
+  .item-topo { display: flex; gap: 12px; align-items: center; padding-right: 30px; }
+  .item-ico { width: 60px; height: 60px; flex: none; border-radius: 16px; display: grid; place-items: center;
+    background: linear-gradient(160deg, #123B72, #0B2649); color: #BFE0FF; font-size: 32px; }
+  .item-ico svg { width: 32px; height: 32px; stroke: #BFE0FF; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .item-ico .ico-emo { font-size: 32px; }
+  .item-id h3 { font-size: 16px; line-height: 1.2; }
+  .item-qtd { display: inline-block; margin-top: 5px; font-size: 11px; font-weight: 800; color: #12325F;
+    background: #E8F1FF; border: 1px solid #C7DDFB; border-radius: 999px; padding: 2px 9px; }
+  .item-corpo { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .item-bloco { border: 1px solid var(--p-line); border-radius: 13px; padding: 10px 12px; background: #F9FBFF; }
+  .item-bloco .ib-t { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--p-dim); margin-bottom: 4px; }
+  .item-bloco .ib-v { font-size: 13px; color: var(--p-ink); line-height: 1.45; }
+  .item-bloco .ib-v strong { color: #12325F; }
+  .item-bloco.efeito { background: #FFFBEF; border-color: #F0DFAE; }
+  .item-hist { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .item-hist li { font-size: 12px; color: var(--p-dim); }
+  .item-hist li b { color: var(--p-ink); font-weight: 700; }
+  .item-acoes { margin-top: 14px; display: flex; gap: 8px; }
+  .item-acoes .btn { flex: 1; }
   /* ---------- seletor de ícones · biblioteca completa (dec. 210) ---------- */
   .ico-layer { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: rgba(8, 22, 44, .55); z-index: 70; padding: 16px; }

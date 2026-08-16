@@ -31,6 +31,24 @@
     MOCHILA.push('pneu', 'pneu', 'pneu', 'pneu', 'mag', 'geo');
   })();
   var questEquipada = null;   /* id do item de quest com efeito de foto vestido */
+  /* dec. 211 — de onde veio cada unidade: a ficha do item conta a história
+     (construído por quem e quando · conquistado no drop · comprado)      */
+  var ITEM_HIST = {};   /* id → [{ ori: 'compra'|'drop'|'quest', ts, autor }] */
+  function histAdd(id, ori, autor) {
+    (ITEM_HIST[id] = ITEM_HIST[id] || []).push({
+      ori: ori, ts: Date.now(),
+      autor: autor || ((typeof nomeCurto === 'function') ? nomeCurto() : '')
+    });
+  }
+  function histDel(id, n) {
+    var a = ITEM_HIST[id]; if (!a) return;
+    a.splice(Math.max(0, a.length - n), n);
+    if (!a.length) delete ITEM_HIST[id];
+  }
+  function histData(ts) {
+    var d = new Date(ts);
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
   function itemDe(id) {
     var tudo = ITENS_COMBATE.concat(typeof ITENS_QUEST !== 'undefined' ? ITENS_QUEST : []);
     return tudo.filter(function (x) { return x.id === id; })[0];
@@ -82,7 +100,7 @@
     var ganhos = vencedores.length > 1
       ? [vencedores[Math.floor(rng() * vencedores.length) % vencedores.length]]
       : vencedores;
-    ganhos.forEach(function (it) { MOCHILA.push(it.id); });
+    ganhos.forEach(function (it) { MOCHILA.push(it.id); histAdd(it.id, 'drop'); });   /* dec. 211 */
     if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
     if (ganhos.length) {
       if (typeof renderMochila === 'function') renderMochila();
@@ -116,6 +134,7 @@
   window.__dropRng = window.__dropRng || null;   /* a suíte pluga um RNG determinístico aqui (preservado se vier antes do boot) */
   window.__dropSortear = dropSortear;   /* para a suíte de testes */
   window.ITENS_QUEST = (typeof ITENS_QUEST !== 'undefined') ? ITENS_QUEST : [];   /* idem (dec. 207) */
+  window.__itemHist = function () { return ITEM_HIST; };   /* idem (dec. 211) */
 
   function mochilaComprar(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
@@ -128,6 +147,7 @@
         addScore(-it.preco, it.nome + ' guardado na mochila · −' + it.preco + ' QdC');
       });
       MOCHILA.push(id);
+      histAdd(id, 'compra');   /* dec. 211 */
       if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
       renderLojaCombate();
       renderMochila();
@@ -158,21 +178,82 @@
     var html = grupos.map(function (gr) {
       var it = itemDe(gr.id);
       if (!it) return '';
-      var eq = '';
-      if (it.efeito && it.efeito.tipo === 'foto') {
-        var on = questEquipada === it.id;
-        eq = '<button type="button" class="btn ghost small st-eq' + (on ? ' on' : '') + '" data-eq="' + it.id + '">' + (on ? 'Equipado ✓' : 'Equipar') + '</button>';
-      }
-      return '<div class="st-slot cheio" title="' + it.nome + '">' +
+      /* dec. 211 — o slot inteiro abre a FICHA do item (origem, efeito,
+         como se obtém, valor); equipar mora lá dentro                  */
+      var on = questEquipada === it.id;
+      return '<button type="button" class="st-slot cheio" data-item="' + it.id + '" title="Ver a ficha de ' + it.nome + '">' +
         (gr.n > 1 ? '<span class="st-qtd">×' + gr.n + '</span>' : '') +
-        '<span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span>' + eq + '</div>';
+        (on ? '<span class="st-eqmark">✓</span>' : '') +
+        '<span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span></button>';
     }).join('');
     for (var i = grupos.length; i < slots; i++) html += '<div class="st-slot vazio"></div>';
     grid.innerHTML = html;
-    grid.querySelectorAll('[data-eq]').forEach(function (bt) {
-      bt.addEventListener('click', function () { questEquipar(bt.dataset.eq); });
+    grid.querySelectorAll('[data-item]').forEach(function (bt) {
+      bt.addEventListener('click', function () { itemFicha(bt.dataset.item); });
     });
   }
+  /* ================= FICHA DO ITEM (dec. 211) =================
+     A página do item: o que é, como veio parar na mochila, o que faz no
+     sistema, como se obtém e quanto vale.                            */
+  function itemComoObter(it) {
+    if (it.receita) {
+      return 'Construído na área <strong>Itens de Quest</strong> da Quad Store, com ' +
+        it.receita.map(function (r) {
+          var ins = itemDe(r[0]);
+          return '<strong>' + r[1] + '×</strong> ' + (ins ? ins.nome : r[0]);
+        }).join(' · ') + '. <em>Não é vendido.</em>';
+    }
+    if (it.disp === 'drop') return 'Só no <strong>DROP</strong> — conquistado ao concluir pacotes de 10 questões (' + (+it.drop || 0) + '% de chance por bloco). <em>Não é vendido na Loja.</em>';
+    if (it.disp === 'ambos') return 'À venda na Quad Store por <strong>' + it.preco + ' QdC</strong> e também cai no <strong>DROP</strong> (' + (+it.drop || 0) + '% por bloco de questões).';
+    return 'À venda na Quad Store, em <strong>Itens de combate</strong>, por <strong>' + it.preco + ' QdC</strong>.';
+  }
+  var ITEM_EFEITO_TXT = {
+    foto: 'Equipado, <strong>troca a foto do seu operador</strong> — o retrato passa a mostrar este equipamento.',
+    score: 'Altera o seu <strong>ganho de score</strong>. <em>Regra a definir pela administração.</em>',
+    qdc: 'Altera o seu <strong>ganho de Quad Coins</strong>. <em>Regra a definir pela administração.</em>',
+    diamante: 'Troca o <strong>drop de Quad Coins por Diamante</strong>. <em>Regra a definir pela administração.</em>'
+  };
+  function itemFicha(id) {
+    var it = itemDe(id); if (!it) return;
+    var n = mochilaConta(id), hist = (ITEM_HIST[id] || []).slice();
+    $('itemFichaIco').innerHTML = itemIcoHtml(it);
+    $('itemFichaNome').textContent = it.nome;
+    $('itemFichaDesc').textContent = it.desc || 'item de campo';
+    $('itemFichaQtd').textContent = n + (n === 1 ? ' unidade na mochila' : ' unidades na mochila');
+    var ORI_TXT = { quest: 'Construído por', drop: 'Conquistado no drop por', compra: 'Comprado na Quad Store por' };
+    var linhas = hist.slice(-4).reverse().map(function (h) {
+      return '<li>' + ORI_TXT[h.ori] + ' <b>' + h.autor + '</b> em <b>' + histData(h.ts) + '</b></li>';
+    }).join('');
+    var corpo = '';
+    corpo += '<div class="item-bloco"><div class="ib-t">Como chegou até você</div><div class="ib-v">' +
+      (linhas ? '<ul class="item-hist">' + linhas + '</ul>' +
+        (hist.length > 4 ? '<p class="sub" style="margin-top:4px">… e mais ' + (hist.length - 4) + ' unidade' + (hist.length - 4 > 1 ? 's' : '') + ' antes desta lista.</p>' : '')
+        : 'Item de dotação inicial — já estava na sua mochila quando você entrou.') + '</div></div>';
+    corpo += '<div class="item-bloco' + (it.efeito ? ' efeito' : '') + '"><div class="ib-t">O que faz no sistema</div><div class="ib-v">' +
+      (it.efeito ? (ITEM_EFEITO_TXT[it.efeito.tipo] || 'Efeito a definir pela administração.')
+        : 'Equipamento de campo — <strong>sem efeito no sistema</strong>. Serve de <strong>insumo</strong> para construir itens de quest.') + '</div></div>';
+    corpo += '<div class="item-bloco"><div class="ib-t">Como se obtém</div><div class="ib-v">' + itemComoObter(it) + '</div></div>';
+    corpo += '<div class="item-bloco"><div class="ib-t">Valor</div><div class="ib-v">' +
+      (it.receita ? 'Não tem preço em moeda — <strong>vale os insumos da receita</strong>.'
+        : (+it.preco > 0 ? 'Vale <strong>' + it.preco + ' Quad Coins</strong> na Loja.'
+          : '<strong>Não é vendido</strong> — só se conquista resolvendo questões.')) + '</div></div>';
+    $('itemFichaCorpo').innerHTML = corpo;
+    var acoes = '';
+    if (it.efeito && it.efeito.tipo === 'foto') {
+      var on = questEquipada === it.id;
+      acoes = '<button class="btn' + (on ? ' ghost' : '') + '" id="btnItemEquipar">' + (on ? 'Desequipar' : 'Equipar — trocar a foto') + '</button>';
+    }
+    $('itemFichaAcoes').innerHTML = acoes;
+    var be = $('btnItemEquipar');
+    if (be) be.addEventListener('click', function () { questEquipar(it.id); itemFicha(it.id); });
+    $('itemLayer').classList.add('on');
+  }
+  window.__itemFicha = itemFicha;   /* para a suíte de testes */
+  (function () {
+    var l = $('itemLayer'); if (!l) return;
+    $('btnItemFechar').addEventListener('click', function () { l.classList.remove('on'); });
+    l.addEventListener('click', function (e) { if (e.target === l) l.classList.remove('on'); });
+  })();
   /* ================== ITENS DE QUEST (dec. 207) ==================
      Comprados com ITENS DA MOCHILA como moeda: a receita lista os
      insumos; a construção consome as unidades e entrega o item. Efeito
@@ -193,6 +274,7 @@
       for (var i = MOCHILA.length - 1; i >= 0 && falta > 0; i--) {
         if (MOCHILA[i] === r[0]) { MOCHILA.splice(i, 1); falta--; }
       }
+      histDel(r[0], r[1]);   /* o histórico some junto com as unidades (dec. 211) */
     });
   }
   var EFEITO_TXT = {
@@ -236,6 +318,7 @@
       aviso: 'A construção consome: ' + q.receita.map(function (r) { var it = itemDe(r[0]); return '<strong>' + r[1] + '×</strong> ' + (it ? it.nome : r[0]); }).join(' · ') }, function () {
       questConsumir(q);
       MOCHILA.push(q.id);
+      histAdd(q.id, 'quest');   /* dec. 211 — quem construiu e quando */
       renderMochila(); renderLojaQuest(); renderLojaCombate();
       if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
       toast(q.nome + ' construído! O item está na sua mochila' + (q.efeito && q.efeito.tipo === 'foto' ? ' — equipe para trocar a foto do operador' : '') + '.');

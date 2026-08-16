@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Ficha do item: a página de cada item da mochila
+
+- **Tocar um item da mochila abre a ficha dele** (dec. 211), com quatro
+  blocos: *Como chegou até você* (construído por quem e quando,
+  conquistado no drop, comprado na Loja), *O que faz no sistema*, *Como
+  se obtém* (venda, drop com a chance por bloco, ou a receita da
+  construção) e *Valor*.
+- **Equipar migrou do slot para a ficha**; o slot do item equipado passa
+  a mostrar a marca ✓.
+- O histórico de aquisição é registrado por unidade e **sobrevive ao
+  F5** (estado salvo na versão 3); insumos consumidos numa construção
+  saem do histórico junto com as unidades.
+- Suíte nova `vz4` (23 provas) cobre insumo, item comprado, item dropado
+  e item construído, mais a persistência.
+
 ## 16/08/2026 — Biblioteca completa de ícones (padrão Notion)
 
 - **Seletor novo** (dec. 210): busca em português, 13 categorias e grade
