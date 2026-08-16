@@ -1,5 +1,20 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Biblioteca completa de ícones (padrão Notion)
+
+- **Seletor novo** (dec. 210): busca em português, 13 categorias e grade
+  grande, no padrão do seletor do Notion. A primeira categoria são os
+  símbolos SVG da casa (preservados); as demais trazem ~480 emojis
+  nativos — militar e tático, estudo, conquistas, equipamentos, veículos,
+  comunicação, comida, esportes, natureza, animais, símbolos e vestuário.
+- **Nos dois formulários do painel**: Criar skin/item de combate e Criar
+  produto da Loja ganharam o botão "Buscar na biblioteca de ícones…" com
+  preview do escolhido; a paleta rápida antiga continua ali.
+- **O ícone escolhido rende em todo lugar**: vitrine, mochila,
+  confirmação de compra, celebração de drop e listas do admin.
+- Emoji é do sistema: peso zero e funciona offline, sem biblioteca
+  externa (o protótipo não usa CDN). Suíte nova `vz3`.
+
 ## 16/08/2026 — Insumos de quest só no drop: conquistados resolvendo questões
 
 - **Os insumos saíram da vitrine** (dec. 209): liga metálica, pneu

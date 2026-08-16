@@ -40,7 +40,11 @@
      liam só o dicionário fixo e imprimiam "undefined"                 */
   function itemIcoHtml(it) {
     if (!it) return '';
-    return ITEM_ICO[it.id] || (typeof ICON_CAT !== 'undefined' ? (ICON_CAT[it.ico] || ICON_CAT.medalha) : '');
+    if (ITEM_ICO[it.id]) return ITEM_ICO[it.id];
+    if (typeof ICON_CAT !== 'undefined' && ICON_CAT[it.ico]) return ICON_CAT[it.ico];
+    /* dec. 210 — ícone da biblioteca completa: um emoji literal */
+    if (it.ico && !/^[a-z]+$/.test(it.ico)) return '<span class="ico-emo">' + it.ico + '</span>';
+    return (typeof ICON_CAT !== 'undefined') ? ICON_CAT.medalha : '';
   }
   function renderLojaCombate() {
     var g = $('combatGrid'); if (!g) return;

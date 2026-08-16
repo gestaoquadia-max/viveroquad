@@ -734,6 +734,26 @@
   .qtd-btn:disabled { opacity: 0.4; cursor: default; }
   .qtd-val { font: 800 24px var(--ui); color: var(--p-text); min-width: 40px; font-variant-numeric: tabular-nums; }
   /* seletor de ícones no cadastro de produto (admin) */
+  /* ---------- seletor de ícones · biblioteca completa (dec. 210) ---------- */
+  .ico-layer { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(8, 22, 44, .55); z-index: 70; padding: 16px; }
+  .ico-layer.on { display: flex; }
+  .ico-card { background: #fff; border-radius: 18px; width: 100%; max-height: 82%; display: flex;
+    flex-direction: column; gap: 10px; padding: 14px; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+  .ico-head { display: flex; align-items: center; gap: 10px; }
+  .ico-head h3 { font-size: 15px; }
+  .ico-head .storage-close { margin-left: auto; position: static; }
+  .ico-cats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; flex: none; scrollbar-width: none; }
+  .ico-cat { flex: none; border: 1px solid var(--p-line); background: #F7FAFF; border-radius: 999px;
+    padding: 5px 11px; font-size: 11px; font-weight: 700; color: var(--p-dim); cursor: pointer; }
+  .ico-cat.on { border-color: var(--p-gold); color: var(--p-gold); background: #E6F3FC; }
+  .ico-grade { overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+  .ico-cel { aspect-ratio: 1; border: 1px solid var(--p-line); border-radius: 11px; background: #F7FAFF;
+    display: grid; place-items: center; font-size: 22px; line-height: 1; cursor: pointer; padding: 0; }
+  .ico-cel svg { width: 22px; height: 22px; stroke: var(--p-dim); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ico-emo { line-height: 1; font-size: 22px; display: inline-block; }
+  .st-slot .st-ico .ico-emo { font-size: 28px; }
+  .drop-item .di-ico .ico-emo { font-size: 26px; }
   .ico-pick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .ico-opt { width: 40px; height: 40px; border-radius: 11px; border: 1px solid var(--p-line); background: #F7FAFF;
     display: grid; place-items: center; cursor: pointer; padding: 0; }
