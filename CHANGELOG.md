@@ -1,5 +1,15 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Correção: perfis que não abriam
+
+- **Metade dos perfis da demonstração quebrava ao abrir** (dec. 215),
+  "ST QUAD Pires" entre eles. O hash do nome é um inteiro sem sinal (até
+  4,29 bi), mas os desdobramentos usavam deslocamento com sinal, que
+  vira negativo acima de 2³¹ — o índice da medalha ficava negativo e a
+  montagem do perfil estourava.
+- A `vz5` passou a **varrer a lista inteira**: 56 perfis abertos, cada um
+  exigindo foto, medalhas e zero erro de JavaScript.
+
 ## 16/08/2026 — Coerência do ranking: patente, privacidade e escala
 
 - **A patente de cada aluno agora sai do score dele** (dec. 214): a lista

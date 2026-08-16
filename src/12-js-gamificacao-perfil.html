@@ -399,15 +399,21 @@
     /* dec. 213 — a insígnia é a da patente que está NO NOME: sorteá-la por
        hash punha aspirante num Soldado (relato do gestor)             */
     var patIdx = perfPatenteDoNome(nome);
-    var dia = 1 + (h % 27), mes = 1 + ((h >> 3) % 8);
+    /* dec. 215 — deslocamento SEM SINAL: o hash vai até 4,29 bi e o `>>`
+       (com sinal) virava negativo acima de 2³¹, gerando índice negativo
+       de medalha — o perfil quebrava ao abrir (ex.: ST QUAD Pires)   */
+    var dia = 1 + (h % 27), mes = 1 + ((h >>> 3) % 8);
     var nMed = 1 + (h % 4);
-    var ini = (h >> 5) % PERF_MEDALHAS.length;
+    var ini = (h >>> 5) % PERF_MEDALHAS.length;
     var meds = [];
-    for (var i = 0; i < nMed; i++) meds.push(PERF_MEDALHAS[(ini + i) % PERF_MEDALHAS.length]);
+    for (var i = 0; i < nMed; i++) {
+      var md = PERF_MEDALHAS[(ini + i) % PERF_MEDALHAS.length];
+      if (md) meds.push(md);
+    }
     var guerra = (/QUAD (.+)$/.exec(nome) || [, 'aluno'])[1].toLowerCase().replace(/[^a-z0-9]/g, '');
     var variantes = ['cipe', 'patamo', 'bope', 'gandola', 'colete', 'fuzil', 'boina'];
     var vr = variantes[h % variantes.length];
-    var av = (h >> 7) % 12;
+    var av = (h >>> 7) % 12;
     var foto = (typeof AVATAR_VARIANTES !== 'undefined' && AVATAR_VARIANTES[vr] && AVATAR_VARIANTES[vr][av])
       ? AVATAR_VARIANTES[vr][av]
       : ((typeof avatarThumbs !== 'undefined' && avatarThumbs[av]) ? avatarThumbs[av] : '');

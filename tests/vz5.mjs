@@ -219,6 +219,41 @@ t('abrindo o ranking geral completo, o hall dos 10 primeiros também tem perfil'
     return rows.length > 0 && rows.every(r => !!r.querySelector('.rk-perf'));
   }));
 
+/* ===== DEC. 215 · TODO PERFIL ABERTO REALMENTE ABRE =====
+   O hash ia até 4,29 bi e o deslocamento COM sinal virava negativo acima
+   de 2³¹: o índice da medalha ficava negativo e o perfil quebrava ao
+   abrir (ST QUAD Pires era um deles). Esta prova varre a lista inteira. */
+await p.evaluate(() => { if (!document.getElementById('rankSalaList').textContent.includes('Mostrar menos')) document.getElementById('rkSalaBtn').click(); });
+await p.evaluate(() => { if (!document.getElementById('rankGeralList').textContent.includes('···')) document.getElementById('rkGeralBtn').click(); });
+await p.waitForTimeout(400);
+let varridos = 0; const quebrados = [];
+for (const lista of ['rankSalaList', 'rankGeralList']) {
+  const n = await p.evaluate(l => document.querySelectorAll('#' + l + ' .rk-perf').length, lista);
+  for (let i = 0; i < n; i++) {
+    const info = await p.evaluate(a => {
+      const bt = [...document.querySelectorAll('#' + a.l + ' .rk-perf')][a.i];
+      if (bt.classList.contains('off')) return { pular: true };
+      const nome = bt.parentElement.querySelector('.rk-nome').textContent.trim();
+      bt.click();
+      return { nome };
+    }, { l: lista, i });
+    if (info.pular) continue;
+    await p.waitForTimeout(60);
+    varridos++;
+    const st = await p.evaluate(() => ({
+      on: document.getElementById('perfPubLayer').classList.contains('on'),
+      foto: !!document.querySelector('#perfPubFoto img'),
+      med: document.querySelectorAll('#perfPubCorpo .perf-med li').length
+    }));
+    if (!st.on || !st.foto || !st.med) quebrados.push(info.nome + (st.on ? (st.foto ? ' (sem medalha)' : ' (sem foto)') : ' (não abriu)'));
+    if (st.on) { await p.evaluate(() => document.getElementById('btnPerfPubFechar').click()); await p.waitForTimeout(50); }
+  }
+}
+t('a lista inteira foi varrida (mais de 40 perfis abertos)', varridos > 40);
+t('TODO perfil aberto abre de verdade, com foto e medalhas' + (quebrados.length ? ' — quebrados: ' + quebrados.join(', ') : ''),
+  quebrados.length === 0);
+t('e nenhum erro de JavaScript apareceu na varredura', erros.length === 0);
+
 console.log('\nvz5 :: ' + ok + ' ok / ' + falhas.length + ' falhas');
 falhas.forEach(f => console.log('   XX ' + f));
 console.log('erros JS: ' + (erros.length ? erros.join(' | ') : 'nenhum'));
