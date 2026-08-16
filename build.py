@@ -25,7 +25,10 @@ rep = {
 }
 # fotos por variante do personagem (fotos/<variante>-<índice>.webp)
 import re as _re
-VARIANTES = ['boina', 'gandola', 'colete', 'fuzil', 'cipe', 'patamo', 'bope']
+# 'blindado' é o ENCAIXE da arte da quest (dec. 207): sem arquivos ainda,
+# entra vazio e o app usa o marcador PATAMO; ao subir fotos/blindado-N.webp
+# a foto oficial troca sozinha, sem mexer em código
+VARIANTES = ['boina', 'gandola', 'colete', 'fuzil', 'cipe', 'patamo', 'bope', 'blindado']
 def fotos_variante(prefixo):
     itens = []
     for f in sorted((root/'fotos').glob(prefixo + '-*.webp')):

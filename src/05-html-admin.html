@@ -548,8 +548,26 @@
                   <option value="venda">Só vender na Loja</option>
                   <option value="ambos">Vender e cair no drop</option>
                   <option value="drop">Só cair no drop (não vai à Loja)</option>
+                  <option value="quest">Construído por quest (insumos da mochila)</option>
                 </select>
                 <input class="fld" id="admSkDrop" placeholder="Chance no drop (%)" inputmode="numeric" style="max-width:150px">
+              </div>
+              <div id="admQstRow" style="display:none">
+                <div class="k-label sub-k" style="margin-top:10px">Receita da construção · a moeda são itens da mochila</div>
+                <div class="adm-row">
+                  <select class="fld" id="admQstIns" title="Insumo da receita"></select>
+                  <input class="fld" id="admQstN" placeholder="Qtd." inputmode="numeric" style="max-width:80px">
+                  <button class="btn ghost small" id="btnAdmQstAdd" type="button">Adicionar</button>
+                </div>
+                <div id="admQstLista" class="sub" style="margin-top:6px"></div>
+                <div class="adm-row" style="margin-top:8px">
+                  <select class="fld" id="admQstEfeito" title="O que o item construído faz no sistema">
+                    <option value="foto">Efeito: muda a foto do operador</option>
+                    <option value="score">Efeito: muda o ganho de score (regra a definir)</option>
+                    <option value="qdc">Efeito: muda o ganho de Quad Coins (regra a definir)</option>
+                    <option value="diamante">Efeito: troca drop de QdC por Diamante (regra a definir)</option>
+                  </select>
+                </div>
               </div>
               <div class="k-label sub-k" style="margin-top:10px">Visual da skin</div>
               <div class="ico-pick" id="admSkIcones"></div>
@@ -557,7 +575,7 @@
             </div>
             <div class="adm-sep"><span>Skins e itens criados</span></div>
             <div id="admSkinList"></div>
-            <p class="sub" style="margin-top:8px">A <strong>skin</strong> entra em <strong>Itens do personagem</strong> e veste o avatar; o <strong>item de combate</strong> entra em <strong>Itens de combate</strong> e vai para a <strong>mochila</strong> do aluno (sempre em Quad Coins). Toque no ✕ para tirar da Loja.</p>
+            <p class="sub" style="margin-top:8px">A <strong>skin</strong> entra em <strong>Itens do personagem</strong> e veste o avatar; o <strong>item de combate</strong> entra em <strong>Itens de combate</strong> e vai para a <strong>mochila</strong> do aluno (sempre em Quad Coins); o modo <strong>construído por quest</strong> entra em <strong>Itens de Quest</strong> — a moeda são os insumos da mochila e o efeito escolhido liga o item ao sistema (a foto já funciona; as demais regras serão definidas). Toque no ✕ para tirar da Loja.</p>
           </div>
 
           <div class="p-card" data-bl="quests">

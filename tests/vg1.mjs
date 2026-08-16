@@ -32,7 +32,7 @@ ok(n1===n0,'1.1 o item comprado CONTINUA na vitrine — não é de compra única
 ok(await p.evaluate(()=>{ const c=document.querySelector('#combatGrid [data-combate="faca"]');
   const e=c&&c.querySelector('.li-estoque'); return !!c && !!e && /1 na mochila/.test(e.textContent); }),
   '1.2 a faca segue à venda, marcada com quantas unidades o aluno tem');
-ok(/1 item guardado/.test(await txt('mochilaQtd')),'1.3 e está na mochila');
+ok(/23 itens guardados/.test(await txt('mochilaQtd')),'1.3 e está na mochila (22 da coleta da quest + a faca)');
 ok(!/NA MOCHILA/.test(await txt('combatGrid')),'1.4 acabou o rótulo "NA MOCHILA" na vitrine');
 
 console.log('\n== 2) ESTORNO DESFAZ A COMPRA ==');
@@ -42,7 +42,7 @@ ok((await estornarPor('Faca'))==='OK','2.1 o item de combate entra na lista de e
 const q2 = await qdc();
 ok(q2===q0,'2.2 o valor volta em QdC ('+q1+'→'+q2+', original '+q0+')');
 ok(await p.evaluate(()=>!!document.querySelector('#combatGrid [data-combate="faca"]')),'2.3 a faca VOLTA para a loja');
-ok(/0 itens guardados/.test(await txt('mochilaQtd')),'2.4 e sai da mochila');
+ok(/22 itens guardados/.test(await txt('mochilaQtd')),'2.4 e sai da mochila (fica só a coleta da quest)');
 // item avulso da vitrine
 const q3 = await qdc();
 await p.evaluate(()=>document.querySelector('.loja-item[data-nome="Garrafinha Quad"]').click()); await p.waitForTimeout(300);

@@ -1,5 +1,25 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Itens de Quest: construção paga com os itens da mochila
+
+- **Área nova na Quad Store** (dec. 207): "Itens de Quest" — a moeda são
+  os insumos da mochila. Cada quest mostra a receita com o progresso da
+  coleta (✓ no que está completo); CONSTRUIR consome as unidades e
+  entrega o item.
+- **Primeira quest: Blindado militar** — 20 ligas metálicas + 4 pneus
+  blindados + 1 MAG (7,62 mm) + 1 sistema de geolocalização. O item é
+  equipável e troca a foto do operador; a arte oficial do gestor entra no
+  encaixe `fotos/blindado-N.webp` (até lá vale o marcador PATAMO). A demo
+  nasce com a coleta adiantada (18/20 ligas, 3/4 pneus, MAG).
+- **Admin · Skin de personagem**: modo novo "Construído por quest" —
+  receita montada insumo a insumo + efeito (mudar a foto: ATIVO; score /
+  QdC / drop em Diamante: regras a definir). O item criado aparece na
+  área de Quest na hora.
+- **Mochila agrupada por tipo** (×N): 20 ligas são um slot só; itens de
+  quest com efeito de foto ganham o botão Equipar / Equipado ✓.
+- Os 4 insumos entraram no catálogo (venda e/ou drop). Suíte nova `vz2`
+  cobre o fluxo inteiro; `vmochila` e `vg1` acompanham a coleta.
+
 ## 15/08/2026 — Só um item de drop por vez
 
 - **Regra de negócio do DROP** (dec. 206): cada item configurado continua

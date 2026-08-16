@@ -576,7 +576,8 @@
       if (info.aviso) { av.innerHTML = info.aviso; av.style.display = 'block'; }
       else { av.innerHTML = ''; av.style.display = 'none'; }
     }
-    $('compraTotal').textContent = fmt(info.preco) + ' ' + moedaTxt(info.moeda || 'qdc');
+    /* dec. 207 — construção de quest paga em ITENS, não em moeda */
+    $('compraTotal').textContent = info.totalTxt || (fmt(info.preco) + ' ' + moedaTxt(info.moeda || 'qdc'));
     $('compraLayer').classList.add('on');
   }
   function fecharCompra() { $('compraLayer').classList.remove('on'); compraAtual = null; }
@@ -819,10 +820,20 @@
     var el = $('admSkinList'); if (!el) return;
     var sk = LOJA_EXTRAS.filter(function (p) { return p.skin; });
     var cb = (typeof ITENS_COMBATE !== 'undefined') ? ITENS_COMBATE.filter(function (i) { return i.criado; }) : [];
+    var qs = (typeof ITENS_QUEST !== 'undefined') ? ITENS_QUEST.filter(function (q) { return q.criado; }) : [];
     el.innerHTML = sk.map(function (p) {
       return '<div class="adm-bar"><span class="nm">' + p.nome + ' <span class="tag">SKIN</span>' +
         '<small>' + p.desc + ' · ' + fmt(p.preco) + ' ' + moedaTxt(p.moeda) + '</small></span>' +
         '<button class="adm-x" data-rm-skin="' + p.nome + '" aria-label="Remover">✕</button></div>';
+    }).join('') + qs.map(function (q) {
+      var receita = q.receita.map(function (r) {
+        var it = (typeof ITENS_COMBATE !== 'undefined') ? ITENS_COMBATE.filter(function (x) { return x.id === r[0]; })[0] : null;
+        return r[1] + '× ' + (it ? it.nome : r[0]);
+      }).join(' · ');
+      var ef = { foto: 'muda a foto do operador', score: 'ganho de score (regra a definir)', qdc: 'ganho de QdC (regra a definir)', diamante: 'drop em Diamante (regra a definir)' }[q.efeito && q.efeito.tipo] || 'efeito a definir';
+      return '<div class="adm-bar"><span class="nm">' + q.nome + ' <span class="tag">QUEST</span>' +
+        '<small>constrói com ' + receita + ' · ' + ef + '</small></span>' +
+        '<button class="adm-x" data-rm-qst="' + q.id + '" aria-label="Remover">✕</button></div>';
     }).join('') + cb.map(function (i) {
       var modo = i.disp === 'drop' ? 'só no drop · ' + (+i.drop || 0) + '% de chance'
         : i.disp === 'ambos' ? fmt(i.preco) + ' QdC · na Loja e no drop (' + (+i.drop || 0) + '%)'
@@ -836,6 +847,19 @@
         LOJA_EXTRAS = LOJA_EXTRAS.filter(function (p) { return p.nome !== b.dataset.rmSkin; });
         renderLojaExtras(); renderSkinsAdm();
         toast('Skin “' + b.dataset.rmSkin + '” removida da Loja.');
+      });
+    });
+    el.querySelectorAll('[data-rm-qst]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var q = (typeof ITENS_QUEST !== 'undefined') ? ITENS_QUEST.filter(function (x) { return x.id === b.dataset.rmQst; })[0] : null;
+        ITENS_QUEST = ITENS_QUEST.filter(function (x) { return x.id !== b.dataset.rmQst; });
+        window.ITENS_QUEST = ITENS_QUEST;
+        /* quest fora do catálogo sai das mochilas, como o item de combate */
+        if (typeof MOCHILA !== 'undefined') MOCHILA = MOCHILA.filter(function (x) { return x !== b.dataset.rmQst; });
+        if (typeof renderLojaQuest === 'function') renderLojaQuest();
+        renderSkinsAdm();
+        if (typeof renderMochila === 'function') renderMochila();
+        toast('Quest “' + (q ? q.nome : '') + '” removida da Loja.');
       });
     });
     el.querySelectorAll('[data-rm-comb]').forEach(function (b) {
@@ -864,6 +888,48 @@
         bt.classList.add('sel');
       });
     });
+    /* dec. 207 — modo "Construído por quest": receita de insumos + efeito */
+    var admQstReceita = [];
+    function admQstInsumos() {
+      var sel = $('admQstIns'); if (!sel) return;
+      sel.innerHTML = ITENS_COMBATE.map(function (it) {
+        return '<option value="' + it.id + '">' + it.nome + '</option>';
+      }).join('');
+    }
+    function admQstLista() {
+      var el = $('admQstLista'); if (!el) return;
+      el.innerHTML = admQstReceita.length
+        ? admQstReceita.map(function (r, i) {
+            var it = ITENS_COMBATE.filter(function (x) { return x.id === r.id; })[0];
+            return '<span class="qst-tag">' + r.n + '× ' + (it ? it.nome : r.id) + ' <button type="button" class="adm-x" data-qst-rm="' + i + '" aria-label="Tirar insumo">✕</button></span>';
+          }).join(' ')
+        : 'Nenhum insumo na receita ainda — adicione acima.';
+      el.querySelectorAll('[data-qst-rm]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          admQstReceita.splice(parseInt(b.dataset.qstRm, 10), 1);
+          admQstLista();
+        });
+      });
+    }
+    (function () {
+      var bt = $('btnAdmQstAdd'); if (!bt) return;
+      bt.addEventListener('click', function () {
+        var id = $('admQstIns').value, n = parseInt($('admQstN').value, 10) || 1;
+        var jaTem = admQstReceita.filter(function (r) { return r.id === id; })[0];
+        if (jaTem) jaTem.n = n; else admQstReceita.push({ id: id, n: n });
+        $('admQstN').value = '';
+        admQstLista();
+      });
+    })();
+    function skQuestRow() {
+      var quest = $('admSkTipo').value === 'combate' && $('admSkDisp') && $('admSkDisp').value === 'quest';
+      if ($('admQstRow')) $('admQstRow').style.display = quest ? '' : 'none';
+      /* quest não tem preço em moeda nem chance de drop — a moeda é o insumo */
+      $('admSkPreco').style.display = quest ? 'none' : '';
+      if ($('admSkDrop')) $('admSkDrop').style.display = quest ? 'none' : '';
+      if (quest) { admQstInsumos(); admQstLista(); }
+    }
+    if ($('admSkDisp')) $('admSkDisp').addEventListener('change', skQuestRow);
     var skMoeda = $('admSkMoeda');
     function skPrecoLabel() {
       var comb = $('admSkTipo') && $('admSkTipo').value === 'combate';
@@ -880,6 +946,7 @@
       $('admSkNome').placeholder = comb ? 'Nome do item (ex.: Rádio comunicador)' : 'Nome da skin (ex.: Boina de instrutor)';
       $('admSkDesc').placeholder = comb ? 'Descrição curta (ex.: comunicação em campo)' : 'Descrição curta (ex.: edição limitada)';
       $('btnAdmSkin').textContent = comb ? 'Publicar item de combate' : 'Publicar skin';
+      skQuestRow();
     });
     $('btnAdmSkin').addEventListener('click', function () {
       var nome = $('admSkNome').value.trim(), desc = $('admSkDesc').value.trim();
@@ -888,14 +955,28 @@
       var preco = parseInt($('admSkPreco').value, 10);
       var disp = (ehCombate && $('admSkDisp')) ? $('admSkDisp').value : 'venda';
       var drop = (ehCombate && $('admSkDrop')) ? parseInt($('admSkDrop').value, 10) || 0 : 0;
+      var ehQuest = ehCombate && disp === 'quest';
       if (!nome || /["<>]/.test(nome)) { toast('Dê um nome válido ao item.'); return; }
-      /* item só de drop não é vendido — preço deixa de ser obrigatório */
-      if (!(ehCombate && disp === 'drop') && (!preco || preco < 1)) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
-      if (ehCombate && disp !== 'venda' && (drop < 1 || drop > 100)) { toast('Item no drop precisa de uma chance entre 1% e 100%.'); return; }
+      /* só drop e quest não são vendidos — preço deixa de ser obrigatório */
+      if (!(ehCombate && (disp === 'drop' || ehQuest)) && (!preco || preco < 1)) { toast('Informe um preço em ' + (moeda === 'dmn' ? 'Diamantes' : 'Quad Coins') + '.'); return; }
+      if (ehQuest && !admQstReceita.length) { toast('A quest precisa de pelo menos um insumo na receita.'); return; }
+      if (ehCombate && (disp === 'drop' || disp === 'ambos') && (drop < 1 || drop > 100)) { toast('Item no drop precisa de uma chance entre 1% e 100%.'); return; }
       if (LOJA_EXTRAS.some(function (p) { return p.nome === nome; }) || ITENS_PRESENCIAIS.some(function (p) { return p.nome === nome; }) ||
           (typeof ITENS_COMBATE !== 'undefined' && ITENS_COMBATE.some(function (p) { return p.nome === nome; })) ||
           document.querySelector('.loja-item[data-nome="' + nome + '"]')) {
         toast('Já existe um item com esse nome na Loja.'); return;
+      }
+      if (ehQuest) {
+        /* dec. 207 — item construído: entra em Itens de Quest da Loja */
+        ITENS_QUEST.push({ id: 'qs' + Date.now(), nome: nome, desc: desc || 'item de quest', ico: admSkIco, criado: true,
+          receita: admQstReceita.map(function (r) { return [r.id, r.n]; }),
+          efeito: { tipo: $('admQstEfeito') ? $('admQstEfeito').value : 'foto' } });
+        admQstReceita = []; admQstLista();
+        if (typeof renderLojaQuest === 'function') renderLojaQuest();
+        renderSkinsAdm();
+        $('admSkNome').value = ''; $('admSkDesc').value = '';
+        toast('Quest “' + nome + '” publicada — constrói com os insumos da receita.');
+        return;
       }
       if (ehCombate) {
         ITENS_COMBATE.push({ id: 'cb' + Date.now(), nome: nome, desc: desc || 'utilitário de campo', preco: preco || 0, ico: admSkIco, criado: true, disp: disp, drop: drop });

@@ -677,7 +677,17 @@
   .storage-head .sh-sub { font-size: 11px; color: #9FC2F0; }
   .storage-close { margin-left: auto; background: rgba(255,255,255,0.12); border: none; color: #EAF4FF; border-radius: 10px; width: 34px; height: 34px; font-size: 18px; cursor: pointer; }
   .storage-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 6px 18px 18px; align-content: start; }
-  .st-slot { aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 8px; }
+  .st-slot { aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 8px; position: relative; }
+  /* dec. 207 — mochila agrupada (×N) e itens de quest equipáveis */
+  .st-qtd { position: absolute; top: 6px; right: 6px; font-size: 10px; font-weight: 800; background: #12325F; color: #fff; border-radius: 9px; padding: 1px 6px; }
+  .st-eq { font-size: 10px; padding: 3px 9px; }
+  .st-eq.on { background: #E9FAF1; border-color: #A7E3C4; color: #1E874F; }
+  .qst-receita { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+  .qst-ins { font-size: 10px; color: #7A8698; }
+  .qst-ins.ok { color: #1E874F; font-weight: 700; }
+  .li-preco.off { background: #EEF1F5; border-color: #D4DAE3; color: #7A8698; }
+  .li-preco.off::before { background: #9AA6B5; box-shadow: none; }
+  .qst-tag { display: inline-flex; align-items: center; gap: 4px; background: #EEF3FA; border: 1px solid #D4DFF0; border-radius: 9px; padding: 2px 4px 2px 8px; font-size: 11px; margin: 2px 4px 2px 0; }
   .st-slot.vazio { border: 1.5px dashed rgba(120,170,255,0.3); background: rgba(120,170,255,0.05); }
   .st-slot.cheio { background: linear-gradient(160deg, #123E8C, #0C2A63); box-shadow: inset 0 0 0 1.5px rgba(120,180,255,0.35); }
   .st-slot .st-ico svg { width: 30px; height: 30px; stroke: #BFE0FF; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }

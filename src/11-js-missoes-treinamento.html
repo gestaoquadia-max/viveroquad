@@ -1003,6 +1003,16 @@
   var AVATAR_VARIANTES = __FOTOS_VARIANTES__;   /* fotos oficiais por variante → índice do avatar */
   window.AVATAR_VARIANTES = AVATAR_VARIANTES;   /* suíte de testes injeta variantes */
   function fotoPersonagem() {
+    /* dec. 207 — item de QUEST equipado vence tudo: é a conquista maior.
+       Sem a arte oficial da variante no build (fotos/<variante>-N.webp),
+       vale o marcador PATAMO até a arte entrar                          */
+    if (typeof questEquipada !== 'undefined' && questEquipada && typeof ITENS_QUEST !== 'undefined') {
+      var qq = ITENS_QUEST.filter(function (x) { return x.id === questEquipada; })[0];
+      var qv = qq && qq.efeito && qq.efeito.variante;
+      var vv = (qv && AVATAR_VARIANTES[qv] && AVATAR_VARIANTES[qv][avatarIdx]) ? qv
+             : (AVATAR_VARIANTES.patamo && AVATAR_VARIANTES.patamo[avatarIdx]) ? 'patamo' : null;
+      if (vv) return AVATAR_VARIANTES[vv][avatarIdx];
+    }
     if (typeof skinAtual !== 'undefined' && skinAtual &&
         AVATAR_VARIANTES[skinAtual.id] && AVATAR_VARIANTES[skinAtual.id][avatarIdx]) {
       return AVATAR_VARIANTES[skinAtual.id][avatarIdx];   /* skin vestida tem prioridade */

@@ -2,7 +2,8 @@
      MOCHILA DE COMBATE (storage de itens)
      · itens comprados com Quad Coins (armas, broches, utilitários) ficam
        guardados aqui — não vão para o personagem
-     · base pronta para as quests futuras (reunir itens → forjar novos)
+     · os itens da mochila são a MOEDA das quests (dec. 207): a área
+       "Itens de Quest" da Loja consome insumos daqui para construir
      ================================================================== */
   var ITEM_ICO = {
     faca:     '<svg viewBox="0 0 24 24"><path d="M3 21l6-6"/><path d="M15 9l6-6-2 6-4 4"/><path d="M9 15l6-6"/><path d="M9 15l-2 2-4-1 1-3 2-2"/></svg>',
@@ -10,11 +11,28 @@
     bussola:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 11 11l-2.5 4.5L13 13Z"/></svg>',
     broche:   '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="m12 6 1 2 2 .2-1.5 1.4.4 2.1L12 12l-1.9 -.3.4-2.1L9 8.2 11 8Z"/><path d="M9 13.5 7.5 21 12 18l4.5 3-1.5-7.5"/></svg>',
     cantil:   '<svg viewBox="0 0 24 24"><path d="M10 2h4v3h-4Z"/><rect x="7" y="5" width="10" height="16" rx="4"/><path d="M9 11h6"/></svg>',
-    corda:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="5"/><circle cx="12" cy="7" r="1.6"/><path d="M9 11.5 7 21m8-9.5L17 21"/></svg>'
+    corda:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="5"/><circle cx="12" cy="7" r="1.6"/><path d="M9 11.5 7 21m8-9.5L17 21"/></svg>',
+    liga:     '<svg viewBox="0 0 24 24"><path d="M4 10.5h6.5L9 15.5H2.5Z"/><path d="M13.5 10.5H20l1.5 5H12Z"/><path d="M8.5 4.5h6.5l1.5 5H7Z"/></svg>',
+    pneu:     '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>',
+    mag:      '<svg viewBox="0 0 24 24"><path d="M2 11h15l4-2v4.5l-3 .5h-3l1 6h-3l-2-6H6.5L5 18H2l1.5-4Z"/><path d="M6 8v3"/></svg>',
+    geo:      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',
+    blindado: '<svg viewBox="0 0 24 24"><path d="M2 15V9.5h9L14 6h5.5L22 10v5"/><circle cx="7" cy="17" r="2.2"/><circle cx="16.5" cy="17" r="2.2"/><path d="M9.2 17h5M2 15h2.6M18.7 17H22v-2"/></svg>'
   };
   __SEED_ITENS_COMBATE__
+  __SEED_ITENS_QUEST__
   var MOCHILA = [];   /* ids dos itens guardados */
-  function itemDe(id) { return ITENS_COMBATE.filter(function (x) { return x.id === id; })[0]; }
+  /* dec. 207 — a demo nasce com a coleta da quest do Blindado adiantada
+     (18/20 ligas, 3/4 pneus e a MAG): o gestor sente o progresso e conclui
+     a construção comprando/dropando o que falta                          */
+  (function () {
+    for (var i = 0; i < 18; i++) MOCHILA.push('liga');
+    MOCHILA.push('pneu', 'pneu', 'pneu', 'mag');
+  })();
+  var questEquipada = null;   /* id do item de quest com efeito de foto vestido */
+  function itemDe(id) {
+    var tudo = ITENS_COMBATE.concat(typeof ITENS_QUEST !== 'undefined' ? ITENS_QUEST : []);
+    return tudo.filter(function (x) { return x.id === id; })[0];
+  }
   /* o sinal do item: os de fábrica têm desenho próprio; os criados no
      painel guardam a escolha da paleta em .ico — a mochila e o pop-up
      liam só o dicionário fixo e imprimiam "undefined"                 */
@@ -63,6 +81,7 @@
     if (ganhos.length) {
       if (typeof renderMochila === 'function') renderMochila();
       if (typeof renderLojaCombate === 'function') renderLojaCombate();
+      if (typeof renderLojaQuest === 'function') renderLojaQuest();   /* insumo dropado avança a quest */
       dropCelebrar(ganhos, origem);
     }
     return ganhos;
@@ -90,6 +109,7 @@
   })();
   window.__dropRng = window.__dropRng || null;   /* a suíte pluga um RNG determinístico aqui (preservado se vier antes do boot) */
   window.__dropSortear = dropSortear;   /* para a suíte de testes */
+  window.ITENS_QUEST = (typeof ITENS_QUEST !== 'undefined') ? ITENS_QUEST : [];   /* idem (dec. 207) */
 
   function mochilaComprar(id) {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, o foco é a boina — combate fica para depois */
@@ -105,6 +125,7 @@
       if (typeof lojaCompraLog === 'function') lojaCompraLog(it.nome, it.preco, 'qdc', 'combate', id);
       renderLojaCombate();
       renderMochila();
+      renderLojaQuest();   /* a coleta da quest avança junto (dec. 207) */
       var n = MOCHILA.filter(function (x) { return x === id; }).length;
       toast(it.nome + ' foi para a mochila' + (n > 1 ? ' — agora você tem ' + n : '') + '!');
     });
@@ -120,19 +141,108 @@
         : 'nenhum item guardado ainda';
     }
     var grid = $('storageGrid'); if (!grid) return;
-    var slots = Math.max(9, Math.ceil((MOCHILA.length + 1) / 3) * 3);
-    var html = '';
-    for (var i = 0; i < slots; i++) {
-      var id = MOCHILA[i];
-      var it = id ? itemDe(id) : null;
-      if (it) {
-        html += '<div class="st-slot cheio" title="' + it.nome + '"><span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span></div>';
-      } else {
-        html += '<div class="st-slot vazio"></div>';
+    /* dec. 207 — a mochila agrupa por TIPO (×N): 20 ligas são um slot só;
+       item de quest com efeito de foto ganha o botão Equipar            */
+    var grupos = [];
+    MOCHILA.forEach(function (id) {
+      var g = grupos.filter(function (x) { return x.id === id; })[0];
+      if (g) g.n++; else grupos.push({ id: id, n: 1 });
+    });
+    var slots = Math.max(9, Math.ceil((grupos.length + 1) / 3) * 3);
+    var html = grupos.map(function (gr) {
+      var it = itemDe(gr.id);
+      if (!it) return '';
+      var eq = '';
+      if (it.efeito && it.efeito.tipo === 'foto') {
+        var on = questEquipada === it.id;
+        eq = '<button type="button" class="btn ghost small st-eq' + (on ? ' on' : '') + '" data-eq="' + it.id + '">' + (on ? 'Equipado ✓' : 'Equipar') + '</button>';
       }
-    }
+      return '<div class="st-slot cheio" title="' + it.nome + '">' +
+        (gr.n > 1 ? '<span class="st-qtd">×' + gr.n + '</span>' : '') +
+        '<span class="st-ico">' + itemIcoHtml(it) + '</span><span class="st-nome">' + it.nome + '</span>' + eq + '</div>';
+    }).join('');
+    for (var i = grupos.length; i < slots; i++) html += '<div class="st-slot vazio"></div>';
     grid.innerHTML = html;
+    grid.querySelectorAll('[data-eq]').forEach(function (bt) {
+      bt.addEventListener('click', function () { questEquipar(bt.dataset.eq); });
+    });
   }
+  /* ================== ITENS DE QUEST (dec. 207) ==================
+     Comprados com ITENS DA MOCHILA como moeda: a receita lista os
+     insumos; a construção consome as unidades e entrega o item. Efeito
+     'foto' = equipável (troca a foto do operador; sem a arte oficial no
+     build vale o marcador PATAMO). Efeitos de score/QdC/diamante são
+     criáveis no painel, com regra a definir [INTEGRAÇÃO REAL].        */
+  function questDe(id) { return ITENS_QUEST.filter(function (q) { return q.id === id; })[0]; }
+  function mochilaConta(id) { return MOCHILA.filter(function (x) { return x === id; }).length; }
+  function questFaltas(q) {
+    return q.receita.map(function (r) {
+      return { id: r[0], precisa: r[1], tem: Math.min(mochilaConta(r[0]), r[1]) };
+    });
+  }
+  function questPronta(q) { return questFaltas(q).every(function (f) { return f.tem >= f.precisa; }); }
+  function questConsumir(q) {
+    q.receita.forEach(function (r) {
+      var falta = r[1];
+      for (var i = MOCHILA.length - 1; i >= 0 && falta > 0; i--) {
+        if (MOCHILA[i] === r[0]) { MOCHILA.splice(i, 1); falta--; }
+      }
+    });
+  }
+  var EFEITO_TXT = {
+    foto: 'muda a foto do operador',
+    score: 'muda o ganho de score · regra a definir',
+    qdc: 'muda o ganho de Quad Coins · regra a definir',
+    diamante: 'troca drop de QdC por Diamante · regra a definir'
+  };
+  function renderLojaQuest() {
+    var g = $('questGrid'); if (!g) return;
+    g.innerHTML = ITENS_QUEST.map(function (q) {
+      var faltas = questFaltas(q), pronta = questPronta(q), tem = mochilaConta(q.id);
+      var linhas = faltas.map(function (f) {
+        var it = itemDe(f.id), okk = f.tem >= f.precisa;
+        return '<span class="qst-ins' + (okk ? ' ok' : '') + '">' + (okk ? '✓ ' : '') + f.tem + '/' + f.precisa + ' · ' + (it ? it.nome : f.id) + '</span>';
+      }).join('');
+      return '<button class="loja-item qst-item" data-quest="' + q.id + '">' +
+        (tem ? '<span class="li-estoque meu">' + tem + ' na mochila</span>' : '') +
+        '<span class="li-ico">' + itemIcoHtml(q) + '</span>' +
+        '<span class="li-nome">' + q.nome + '</span>' +
+        '<span class="li-desc">' + q.desc + ' · ' + (EFEITO_TXT[q.efeito && q.efeito.tipo] || 'efeito a definir') + '</span>' +
+        '<span class="qst-receita">' + linhas + '</span>' +
+        '<span class="li-preco' + (pronta ? '' : ' off') + '">' + (pronta ? 'CONSTRUIR' : 'REÚNA OS INSUMOS') + '</span></button>';
+    }).join('') || '<p class="sub" style="grid-column:1/-1; padding:4px 0">Nenhuma quest publicada ainda.</p>';
+    g.querySelectorAll('[data-quest]').forEach(function (bt) {
+      bt.addEventListener('click', function () { questConstruir(bt.dataset.quest); });
+    });
+  }
+  function questConstruir(id) {
+    if (typeof tutOn !== 'undefined' && tutOn) return;
+    var q = questDe(id); if (!q) return;
+    if (!questPronta(q)) {
+      var falta = questFaltas(q).filter(function (f) { return f.tem < f.precisa; })
+        .map(function (f) { var it = itemDe(f.id); return (f.precisa - f.tem) + '× ' + (it ? it.nome : f.id); }).join(', ');
+      toast('Ainda faltam insumos: ' + falta + '. A Loja e o drop alimentam a coleta.');
+      return;
+    }
+    var total = q.receita.reduce(function (soma, r) { return soma + r[1]; }, 0);
+    confirmarCompra({ nome: q.nome, desc: 'construção de quest — consome os insumos da mochila', ico: itemIcoHtml(q),
+      totalTxt: total + ' itens da mochila',
+      aviso: 'A construção consome: ' + q.receita.map(function (r) { var it = itemDe(r[0]); return '<strong>' + r[1] + '×</strong> ' + (it ? it.nome : r[0]); }).join(' · ') }, function () {
+      questConsumir(q);
+      MOCHILA.push(q.id);
+      renderMochila(); renderLojaQuest(); renderLojaCombate();
+      if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
+      toast(q.nome + ' construído! O item está na sua mochila' + (q.efeito && q.efeito.tipo === 'foto' ? ' — equipe para trocar a foto do operador' : '') + '.');
+    });
+  }
+  function questEquipar(id) {
+    var q = questDe(id); if (!q) return;
+    questEquipada = questEquipada === id ? null : id;
+    if (typeof aplicarAvatar === 'function') aplicarAvatar();
+    renderMochila();
+    toast(questEquipada ? 'Foto do operador atualizada — ' + q.nome + ' equipado.' : q.nome + ' desequipado — a foto anterior voltou.');
+  }
+  window.__questEquipada = function () { return questEquipada; };   /* para a suíte de testes */
   $('btnMochila').addEventListener('click', function () {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, a mochila não abre — foco na escolha do personagem */
     renderMochila(); $('storageLayer').classList.add('on');
@@ -140,6 +250,7 @@
   $('btnStorageFechar').addEventListener('click', function () { $('storageLayer').classList.remove('on'); });
   renderLojaCombate();
   renderMochila();
+  renderLojaQuest();
 
   /* ==================================================================
      CADEIA DE SKINS DO PERSONAGEM (Loja · "Seu personagem")

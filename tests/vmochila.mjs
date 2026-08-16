@@ -10,7 +10,7 @@ await p.evaluate(()=>document.getElementById('loginLayer').classList.add('off'))
 // 1: Loja tem os itens de combate
 await p.evaluate(()=>document.querySelector('#navAluno .nav-btn[data-view="v-loja"]').click()); await p.waitForTimeout(400);
 const nComb = await p.evaluate(()=>document.querySelectorAll('#combatGrid [data-combate]').length);
-if (nComb!==6) errors.push('1: itens de combate na Loja: '+nComb);
+if (nComb!==10) errors.push('1: itens de combate na Loja (6 utilitários + 4 insumos da quest, dec. 207): '+nComb);
 else log.push('✔ 1: Loja tem 6 itens de combate (armas, broches, utilitários)');
 
 // 2: a área de ESCOLHA de personagem não aparece no perfil (travada)
@@ -22,17 +22,18 @@ const temMochilaBtn = await p.evaluate(()=>!!document.getElementById('btnMochila
 if (!temMochilaBtn) errors.push('2: botão da mochila ausente');
 log.push('✔ 2: escolha de personagem travada (grade oculta) e mochila no lugar');
 
-// 3: mochila abre vazia
+// 3: mochila abre com a coleta da quest adiantada (dec. 207)
 await p.evaluate(()=>document.getElementById('btnMochila').scrollIntoView({block:'center'})); await p.waitForTimeout(200);
 await p.evaluate(()=>document.getElementById('btnMochila').click()); await p.waitForTimeout(400);
 if (!await p.evaluate(()=>document.getElementById('storageLayer').classList.contains('on'))) errors.push('3: mochila não abriu');
-const vazios = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st-slot.vazio').length);
 const cheios0 = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st-slot.cheio').length);
-if (cheios0!==0 || vazios<9) errors.push('3: storage inicial: cheios '+cheios0+' vazios '+vazios);
-const quest = await p.evaluate(()=>/Quests em breve/i.test(document.getElementById('storageLayer').textContent));
-if (!quest) errors.push('3: aviso de quests ausente');
-await p.locator('.phone').first().screenshot({path:'_out/mochila-vazia.png'});
-log.push('✔ 3: mochila abre vazia, com slots e aviso de quests futuras');
+const ligas = await p.evaluate(()=>{ const s=[...document.querySelectorAll('#storageGrid .st-slot.cheio')].find(x=>/Liga metálica/.test(x.textContent)); return s?s.textContent:''; });
+if (cheios0!==3) errors.push('3: a demo nasce com 3 TIPOS na mochila (ligas, pneus, MAG), veio '+cheios0);
+if (!/×18/.test(ligas)) errors.push('3: as 18 ligas agrupam num slot só (×18): "'+ligas+'"');
+const quest = await p.evaluate(()=>/Itens de Quest/i.test(document.getElementById('storageLayer').textContent));
+if (!quest) errors.push('3: aviso apontando para a área Itens de Quest ausente');
+await p.locator('.phone').first().screenshot({path:'_out/mochila-coleta.png'});
+log.push('✔ 3: mochila nasce com a coleta da quest agrupada por tipo (Liga ×18, Pneu ×3, MAG)');
 await p.evaluate(()=>document.getElementById('btnStorageFechar').click()); await p.waitForTimeout(200);
 
 // 4: comprar itens de combate → vão para a mochila e o saldo debita
@@ -54,10 +55,10 @@ log.push('✔ 4: comprar Faca (40) + Broche (25) debita 65 QdC e os dois seguem 
 await p.evaluate(()=>document.querySelector('#navAluno .nav-btn[data-view="v-inicio"]').click()); await p.waitForTimeout(200);
 await p.evaluate(()=>document.getElementById('btnAvatarPerfil').click()); await p.waitForTimeout(300);
 const qtd = await p.evaluate(()=>document.getElementById('mochilaQtd').textContent);
-if (!/2 itens/.test(qtd)) errors.push('5: contador da mochila: '+qtd);
+if (!/24 itens/.test(qtd)) errors.push('5: contador da mochila (22 da coleta + 2 comprados): '+qtd);
 await p.evaluate(()=>document.getElementById('btnMochila').click()); await p.waitForTimeout(300);
 const cheios = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st-slot.cheio').length);
-if (cheios!==2) errors.push('5: itens guardados na storage: '+cheios);
+if (cheios!==5) errors.push('5: tipos guardados na storage (3 da coleta + faca + broche): '+cheios);
 const nomes = await p.evaluate(()=>[...document.querySelectorAll('#storageGrid .st-nome')].map(n=>n.textContent));
 if (!nomes.includes('Faca tática')||!nomes.includes('Broche de mérito')) errors.push('5: itens errados: '+nomes.join(','));
 await p.locator('.phone').first().screenshot({path:'_out/mochila-cheia.png'});
@@ -76,7 +77,9 @@ await p.evaluate(()=>document.querySelector('#navAluno .nav-btn[data-view="v-ini
 await p.evaluate(()=>document.getElementById('btnAvatarPerfil').click()); await p.waitForTimeout(300);
 await p.evaluate(()=>document.getElementById('btnMochila').click()); await p.waitForTimeout(300);
 const cheios2 = await p.evaluate(()=>document.querySelectorAll('#storageGrid .st-slot.cheio').length);
-if (cheios2 !== 3) errors.push('6: a mochila deveria ter 3 unidades, tem '+cheios2);
+if (cheios2 !== 5) errors.push('6: a 2ª faca AGRUPA no mesmo slot (5 tipos), veio '+cheios2);
+const facaSlot = await p.evaluate(()=>{ const s=[...document.querySelectorAll('#storageGrid .st-slot.cheio')].find(x=>/Faca tática/.test(x.textContent)); return s?s.textContent:''; });
+if (!/×2/.test(facaSlot)) errors.push('6: o slot da faca deveria marcar ×2: "'+facaSlot+'"');
 const semUndef = await p.evaluate(()=>!/undefined/.test(document.getElementById('storageGrid').textContent));
 if (!semUndef) errors.push('6: slot da mochila imprimiu "undefined" no lugar do sinal');
 log.push('✔ 6: item de combate se repete — 2 facas + 1 broche na mochila, item segue à venda');
