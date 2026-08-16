@@ -131,7 +131,7 @@
   /* dec. 212 — ao lado de cada nome, o botão que abre o PERFIL PÚBLICO.
      Quem escolheu perfil fechado não abre: o botão fica apagado e explica.
      O meu próprio botão respeita a minha chave de privacidade.          */
-  var RK_PERF_ICO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>';
+  var RK_PERF_ICO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.4"/><path d="M6 19.2a6 6 0 0 1 12 0"/></svg>';
   function rkRow(pos, nome, pts, me, top3, privado) {
     var fechado = me ? perfilPrivado : !!privado;
     var escondido = me ? perfilPrivado : (perfilPrivado || !!privado);
@@ -141,9 +141,11 @@
       (me ? ' data-perf-eu="1"' : '') + (fechado ? ' data-perf-off="1"' : '') +
       ' title="' + (fechado ? 'Perfil fechado por este aluno' : 'Ver o perfil de ' + exibido) + '"' +
       ' aria-label="' + (fechado ? 'Perfil fechado' : 'Ver perfil de ' + exibido) + '">' + RK_PERF_ICO + '</button>';
+    /* o botão tem COLUNA PRÓPRIA (dec. 213): dentro do nome ele parava
+       num ponto diferente em cada linha — a fileira ficava torta      */
     return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
-      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + bt + '</span>' +
-      '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
+      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
+      bt + '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
   }
   function rkScores(total, meuPos, meuScore) {
     var arr = new Array(total + 1);
@@ -344,6 +346,15 @@
     ['🏆', 'Medalha de primeiro lugar da sala']
   ];
   var PERF_TURMAS = ['PATAMO', 'RONDESP', 'BOPE'];
+  /* 'AL SD QUAD PEIXOTO' → índice da patente em GAMI.patentes */
+  function perfPatenteDoNome(nome) {
+    var m = /^(.*?) QUAD /.exec(nome || '');
+    var ab = m ? m[1].trim().toUpperCase() : '';
+    for (var i = 0; i < GAMI.patentes.length; i++) {
+      if (GAMI.patentes[i].abrev.toUpperCase() === ab) return i;
+    }
+    return 0;
+  }
   function perfHash(t) {
     var h = 0; for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
     return h;
@@ -362,7 +373,9 @@
       };
     }
     var h = perfHash(nome);
-    var patIdx = Math.min(GAMI.patentes.length - 1, 1 + (h % 9));
+    /* dec. 213 — a insígnia é a da patente que está NO NOME: sorteá-la por
+       hash punha aspirante num Soldado (relato do gestor)             */
+    var patIdx = perfPatenteDoNome(nome);
     var dia = 1 + (h % 27), mes = 1 + ((h >> 3) % 8);
     var nMed = 1 + (h % 4);
     var ini = (h >> 5) % PERF_MEDALHAS.length;
@@ -410,7 +423,8 @@
       ? d.skins.map(function (sk) { return '<span class="perf-skin">' + sk + '</span>'; }).join('')
       : '<span class="perf-skin nenhuma">Ainda sem skins no personagem</span>';
     var corpo = '';
-    corpo += '<div class="item-bloco"><div class="ib-t">Relatório rápido</div><div class="ib-v">' +
+    corpo += '<div class="item-bloco"><div class="ib-t">Sobre a carreira</div><div class="ib-v">' +
+      'Patente <strong>' + GAMI.patentes[d.insig].nome + '</strong><br>' +
       'Início na plataforma <strong>' + d.desde + '</strong><br>Turma <strong>' + d.turma + '</strong></div></div>';
     corpo += '<div class="item-bloco efeito"><div class="ib-t">Possui ' + d.medalhas.length +
       (d.medalhas.length === 1 ? ' medalha conquistada' : ' medalhas conquistadas') + '</div>' +

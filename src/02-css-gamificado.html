@@ -639,8 +639,10 @@
   .rank-tile small { font: 400 10.5px var(--font); color: var(--p-dim); }
 
   /* ---------- insígnias de patente (sprite 10 células, arte do gestor) ---------- */
+  /* a arte entra UMA vez no build e é reusada pela variável (dec. 213) */
   .insig-img { display: inline-block; width: 36px; height: 24px; border-radius: 6px; flex: none;
-    background-image: url(__INSIGNIAS__); background-size: 1000% 100%; background-position: 0 0;
+    --insig-src: url(__INSIGNIAS__);
+    background-image: var(--insig-src); background-size: 1000% 100%; background-position: 0 0;
     border: 1px solid rgba(90,160,255,0.4);
     box-shadow: 0 2px 6px rgba(9,30,80,0.35), 0 0 8px rgba(59,139,255,0.35); }
   .insig-img.big { width: 51px; height: 34px; border-radius: 8px; }
@@ -742,7 +744,19 @@
   .perf-foto { width: 108px; height: 108px; border-radius: 50%; display: inline-grid; place-items: center;
     overflow: hidden; background: #0B2649; border: 3px solid #fff; box-shadow: 0 6px 20px rgba(11, 38, 73, .28); }
   .perf-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .perf-insig { display: block; width: 46px; height: 46px; margin: -18px auto 4px; position: relative; z-index: 2; }
+  /* dec. 213 — duas correções na insígnia do perfil: (1) a arte é 3:2, em
+     quadrado ela esmagava; (2) nos ESCUDOS (Aluno Soldado a Sargento) o
+     desenho encosta nas bordas da célula do sprite e, dentro de um quadro,
+     ficava espremido — content-box dá respiro sem tocar na arte        */
+  .perf-insig { display: block; width: 54px; height: 36px; padding: 5px 7px; margin: -14px auto 6px;
+    position: relative; z-index: 2; border-radius: 10px;
+    /* duas camadas: o sprite recuado no content-box e a placa escura
+       preenchendo o padding — só assim a arte ganha margem sem cortar  */
+    background-image: var(--insig-src), linear-gradient(#0A1B33, #061225);
+    background-origin: content-box, padding-box;
+    background-clip: content-box, padding-box;
+    background-repeat: no-repeat;
+    box-shadow: 0 3px 10px rgba(9, 30, 80, .4), 0 0 10px rgba(59, 139, 255, .3); }
   .perf-topo h3 { font-size: 16px; line-height: 1.25; }
   .perf-skins { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
   .perf-skin { font-size: 11px; font-weight: 700; color: #12325F; background: #E8F1FF; border: 1px solid #C7DDFB;
@@ -755,12 +769,14 @@
     background: #FFF6E2; border: 1px solid #F0DFAE; font-size: 13px; }
   .perf-insta { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #12325F; }
   /* botão de perfil ao lado do nome no ranking */
-  .rk-perf { border: 1px solid var(--p-line); background: #F7FAFF; color: var(--p-dim); width: 22px; height: 22px;
-    flex: none; border-radius: 7px; display: grid; place-items: center; cursor: pointer; padding: 0; margin-left: 4px; }
-  .rk-perf svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
-  .rk-perf:active { transform: scale(.92); }
-  .rk-perf.off { opacity: .38; cursor: default; }
-  .rk-row .rk-nome { display: inline-flex; align-items: center; }
+  /* coluna própria: alinhada em todas as linhas, sem borda de caixinha */
+  .rk-perf { border: 0; background: #EDF3FB; color: #5580B8; width: 26px; height: 26px; flex: none;
+    border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .rk-perf svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .rk-perf:active { transform: scale(.9); }
+  .rk-perf.off { background: transparent; color: #C3CEDD; cursor: default; }
+  .rk-row.me .rk-perf { background: #FFF1CF; color: #9A6B00; }
+  .rk-row.top3 .rk-perf { background: #FFF6E2; color: #A87A1E; }
   /* ---------- ficha do item da mochila (dec. 211) ---------- */
   .item-layer { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: rgba(8, 22, 44, .55); z-index: 72; padding: 16px; }
@@ -844,12 +860,17 @@
   .tr-item.atual .tr-nome { color: var(--p-gold); }
 
   /* ---------- rankings do Quadrômetro (sala e geral) ---------- */
-  .rk-row { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid var(--p-line); }
+  .rk-row { display: flex; align-items: center; gap: 6px; padding: 6px 4px; border-bottom: 1px solid var(--p-line); }
   .rk-row:last-child { border-bottom: none; }
-  .rk-pos { font: 700 12px var(--ui); color: var(--p-dim); width: 40px; flex: none; font-variant-numeric: tabular-nums; }
+  .rk-pos { font: 700 12px var(--ui); color: var(--p-dim); width: 34px; flex: none; font-variant-numeric: tabular-nums; }
   .rk-nome { flex: 1; min-width: 0; font: 600 12px var(--ui); color: var(--p-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-pts { font: 700 12px var(--ui); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums; }
-  .rk-row.me { background: #FFF6DF; border: 1px solid #F1D488; border-radius: 10px; padding: 7px 8px; }
+  /* largura fixa: sem ela, um score de 4 dígitos empurrava o botão de
+     perfil da linha e a coluna saía torta (dec. 213)                  */
+  .rk-pts { font: 700 12px var(--ui); color: var(--p-dim); flex: none; font-variant-numeric: tabular-nums;
+    min-width: 60px; text-align: right; }
+  /* a linha "você" tem borda de 1px — o padding compensa para a coluna
+     do botão cair no mesmo lugar das demais                           */
+  .rk-row.me { background: #FFF6DF; border: 1px solid #F1D488; border-radius: 10px; padding: 6px 3px; }
   .rk-row.me .rk-pos, .rk-row.me .rk-nome { color: #9A6B00; font-weight: 800; }
   .rk-row.me .rk-pts { color: #9A6B00; }
   .rk-row.top3 .rk-pos { color: var(--p-gold); font-weight: 800; }

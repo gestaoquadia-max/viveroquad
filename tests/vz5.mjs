@@ -29,15 +29,28 @@ await p.waitForTimeout(1000);
 await abreQuadrometro();
 
 /* ============ O BOTÃO EXISTE EM TODOS OS NOMES ============ */
-t('cada linha do ranking da sala tem o botão de perfil ao lado do nome',
+t('cada linha do ranking da sala tem o botão de perfil',
   await p.evaluate(() => {
     const rows = [...document.querySelectorAll('#rankSalaList .rk-row')];
-    return rows.length > 0 && rows.every(r => !!r.querySelector('.rk-nome .rk-perf'));
+    return rows.length > 0 && rows.every(r => !!r.querySelector('.rk-perf'));
   }));
 t('o ranking geral também',
   await p.evaluate(() => {
     const rows = [...document.querySelectorAll('#rankGeralList .rk-row')];
-    return rows.length > 0 && rows.every(r => !!r.querySelector('.rk-nome .rk-perf'));
+    return rows.length > 0 && rows.every(r => !!r.querySelector('.rk-perf'));
+  }));
+/* dec. 213 — o botão tem COLUNA PRÓPRIA: dentro do nome ele parava num
+   ponto diferente em cada linha e a fileira ficava torta */
+t('o botão fica FORA do nome, em coluna própria',
+  await p.evaluate(() => {
+    const rows = [...document.querySelectorAll('#rankSalaList .rk-row')];
+    return rows.every(r => !r.querySelector('.rk-nome .rk-perf')) &&
+           rows.every(r => r.querySelector('.rk-perf').parentElement.classList.contains('rk-row'));
+  }));
+t('e todos os botões da lista ficam alinhados na mesma coluna',
+  await p.evaluate(() => {
+    const xs = [...document.querySelectorAll('#rankSalaList .rk-perf')].map(b => Math.round(b.getBoundingClientRect().left));
+    return xs.length > 1 && new Set(xs).size === 1;
   }));
 t('quem mantém o perfil fechado tem o botão apagado',
   await p.evaluate(() => document.querySelectorAll('#rankSalaList .rk-perf.off').length +
@@ -59,13 +72,31 @@ await p.waitForTimeout(400);
 t('o perfil de outro aluno abre', await aberto());
 const f = await perfil();
 t('mostra a foto do operador', await p.evaluate(() => !!document.querySelector('#perfPubFoto img')));
-t('mostra a insígnia da patente dele',
-  await p.evaluate(() => !!document.getElementById('perfPubInsig').style.backgroundPosition));
+/* dec. 213 — a insígnia é a da patente QUE ESTÁ NO NOME (antes vinha de
+   hash: um Soldado aparecia com insígnia de Aspirante) */
+t('a insígnia bate com a patente do nome do aluno',
+  await p.evaluate(() => {
+    const nome = document.getElementById('perfPubNome').textContent;
+    const ab = (/^(.*?) QUAD /.exec(nome) || [, ''])[1].trim();
+    const MAP = { 'AL SD': 0, 'SD': 0, 'AL CB': 1, 'CB': 1, 'AL SGT': 2, 'SGT': 2, 'ST': 3,
+                  'AL OF': 4, 'ASP': 4, 'TEN': 5, 'CAP': 6, 'MAJ': 7, 'TC': 8, 'CEL': 9 };
+    const esperado = (MAP[ab] * (100 / 9)).toFixed(4);
+    const real = parseFloat(document.getElementById('perfPubInsig').style.backgroundPosition).toFixed(4);
+    return esperado === real;
+  }));
+t('a arte da insígnia não fica esmagada — mantém a proporção 3:2 do sprite',
+  await p.evaluate(() => {
+    const r = document.getElementById('perfPubInsig').getBoundingClientRect();
+    return Math.abs((r.width / r.height) - 1.5) < 0.05;
+  }));
+t('o bloco de carreira mostra a patente por extenso',
+  /Patente/.test(await p.evaluate(() => document.getElementById('perfPubCorpo').textContent)));
 t('mostra o nome de guerra completo e a posição no ranking',
   /QUAD/.test(f) && /º no ranking/.test(f) && /pts de carreira/.test(f));
 t('lista as skins que ele veste na foto',
   await p.evaluate(() => document.querySelectorAll('#perfPubSkins .perf-skin').length >= 1));
-t('traz o relatório rápido: início na plataforma e turma',
+t('traz o bloco "Sobre a carreira" com início na plataforma e turma',
+  /Sobre a carreira/.test(f) && !/Relatório rápido/.test(f) &&
   /Início na plataforma/.test(f) && /\d\d\/\d\d\/2026/.test(f) && /Turma/.test(f));
 t('conta quantas medalhas ele conquistou e lista cada uma',
   /medalha/i.test(f) &&

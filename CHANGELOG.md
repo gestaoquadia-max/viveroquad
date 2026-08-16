@@ -1,5 +1,18 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Acabamento do perfil público
+
+- **O botão de perfil ganhou coluna própria** (dec. 213): dentro do nome
+  ele parava num ponto diferente a cada linha; agora é um círculo
+  discreto, alinhado em toda a lista (dourado na sua linha e no top 3).
+- **A insígnia passou a vir da patente do nome**: era sorteada, e um
+  Aluno Soldado aparecia com insígnia de Aspirante.
+- **A arte da insígnia não fica mais espremida**: o quadro era quadrado
+  (a arte é 3:2) e, nos escudos, o desenho encosta nas bordas da célula
+  do sprite — a placa agora dá margem sem cortar a arte.
+- **"Relatório rápido" virou "Sobre a carreira"**, abrindo com a patente
+  por extenso.
+
 ## 16/08/2026 — Perfil público nos rankings
 
 - **Botão ao lado de cada nome** (dec. 212) nos rankings da sala e geral:
