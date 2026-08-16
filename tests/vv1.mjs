@@ -97,8 +97,11 @@ await persona('aluno'); await p.waitForTimeout(400);
 await nav('v-loja'); await p.waitForTimeout(400);
 t('o item recém-criado só de drop não entra na vitrine',
   !/Medalha do sorteio/.test(await p.evaluate(() => document.getElementById('combatGrid').textContent)));
-t('mas participa do sorteio (RNG 0.15: só a chance de 25% vence)', await p.evaluate(() => {
-  window.__dropRng = () => 0.15;
+t('mas participa do sorteio (RNG favorável só na vez da Medalha)', await p.evaluate(() => {
+  /* elegíveis na ordem do catálogo: cantil, patch, liga, pneu, mag, geo e a
+     Medalha por último — o RNG perde nas 6 primeiras chamadas e vence na 7ª */
+  let chamada = 0;
+  window.__dropRng = () => (++chamada === 7 ? 0.1 : 0.999);
   const g = window.__dropSortear('em teste').map(i => i.nome);
   window.__dropRng = null;
   document.getElementById('dropLayer').classList.remove('on');   /* fecha a celebração do teste */

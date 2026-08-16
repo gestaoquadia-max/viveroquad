@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Insumos de quest só no drop: conquistados resolvendo questões
+
+- **Os insumos saíram da vitrine** (dec. 209): liga metálica, pneu
+  blindado, MAG e sistema de geolocalização não são vendidos — caem SÓ no
+  drop, ao concluir pacotes de 10 questões (um item por bloco, dec. 206).
+  Chances por raridade: liga 30% · pneu 12% · MAG 6% · geo 4% (valores de
+  demonstração).
+- **Coleta de fábrica recalibrada**: 19/20 ligas + 4/4 pneus + MAG + geo
+  — falta só a última liga, o insumo mais comum, para o gestor fechar o
+  ciclo resolver → dropar → construir em poucos pacotes.
+- Textos da Loja, do toast de falta e da mochila apontam o drop como o
+  caminho da coleta. Suítes acompanham (vz2 completa a coleta pelo
+  sorteio; vmochila/vg1/vw1/vv1 nos números novos).
+
 ## 16/08/2026 — Persistência versionada: a Loja e a mochila andam juntas
 
 - **Causa do descompasso relatado no teste** (dec. 208): a aba aberta

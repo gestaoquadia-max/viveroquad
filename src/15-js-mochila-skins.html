@@ -21,12 +21,14 @@
   __SEED_ITENS_COMBATE__
   __SEED_ITENS_QUEST__
   var MOCHILA = [];   /* ids dos itens guardados */
-  /* dec. 207 — a demo nasce com a coleta da quest do Blindado adiantada
-     (18/20 ligas, 3/4 pneus e a MAG): o gestor sente o progresso e conclui
-     a construção comprando/dropando o que falta                          */
+  /* dec. 207/209 — a demo nasce com a coleta da quest do Blindado quase
+     completa (19/20 ligas, 4/4 pneus, MAG e geolocalização): como os
+     insumos SÓ vêm do drop e cai um item por bloco (dec. 206), falta a
+     última liga — poucos pacotes de 10 e o gestor fecha o ciclo:
+     resolver → dropar → construir                                      */
   (function () {
-    for (var i = 0; i < 18; i++) MOCHILA.push('liga');
-    MOCHILA.push('pneu', 'pneu', 'pneu', 'mag');
+    for (var i = 0; i < 19; i++) MOCHILA.push('liga');
+    MOCHILA.push('pneu', 'pneu', 'pneu', 'pneu', 'mag', 'geo');
   })();
   var questEquipada = null;   /* id do item de quest com efeito de foto vestido */
   function itemDe(id) {
@@ -221,7 +223,7 @@
     if (!questPronta(q)) {
       var falta = questFaltas(q).filter(function (f) { return f.tem < f.precisa; })
         .map(function (f) { var it = itemDe(f.id); return (f.precisa - f.tem) + '× ' + (it ? it.nome : f.id); }).join(', ');
-      toast('Ainda faltam insumos: ' + falta + '. A Loja e o drop alimentam a coleta.');
+      toast('Ainda faltam insumos: ' + falta + '. Eles caem no DROP — resolva os pacotes de 10 questões.');
       return;
     }
     var total = q.receita.reduce(function (soma, r) { return soma + r[1]; }, 0);

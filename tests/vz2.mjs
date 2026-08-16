@@ -39,22 +39,31 @@ await nav('v-loja'); await p.waitForTimeout(400);
 t('a Loja tem a seção Itens de Quest com o card do Blindado militar',
   await p.evaluate(() => !!document.querySelector('#questGrid [data-quest="blindado"]')));
 const card0 = await questCard();
-t('a receita mostra o progresso da coleta adiantada (18/20 ligas · 3/4 pneus)',
-  /18\/20 · Liga metálica/.test(card0) && /3\/4 · Pneu blindado/.test(card0));
-t('insumo completo leva o ✓ (a MAG já está na mochila)', /✓ 1\/1 · MAG/.test(card0));
+t('a receita mostra o progresso da coleta adiantada (19/20 ligas · 4/4 pneus)',
+  /19\/20 · Liga metálica/.test(card0) && /✓ 4\/4 · Pneu blindado/.test(card0));
+t('insumos completos levam o ✓ (MAG e geolocalização já estão na mochila)',
+  /✓ 1\/1 · MAG/.test(card0) && /✓ 1\/1 · Sistema de geolocalização/.test(card0));
+t('os insumos NÃO estão à venda na vitrine de combate (dec. 209: só drop)',
+  await p.evaluate(() => !document.querySelector('#combatGrid [data-combate="liga"]') &&
+                         !document.querySelector('#combatGrid [data-combate="pneu"]') &&
+                         !document.querySelector('#combatGrid [data-combate="mag"]') &&
+                         !document.querySelector('#combatGrid [data-combate="geo"]')));
 t('o card explica o efeito da quest', /muda a foto do operador/.test(card0));
 t('faltando insumo, o botão diz REÚNA OS INSUMOS', /REÚNA OS INSUMOS/.test(card0));
 await p.evaluate(() => document.querySelector('#questGrid [data-quest="blindado"]').click());
 await p.waitForTimeout(300);
-t('tocar sem os insumos explica exatamente o que falta',
-  await p.evaluate(() => /faltam insumos: 2× Liga metálica, 1× Pneu blindado, 1× Sistema de geolocalização/.test(document.getElementById('toast').textContent)));
+t('tocar sem os insumos explica o que falta e aponta o DROP',
+  await p.evaluate(() => /faltam insumos: 1× Liga metálica/.test(document.getElementById('toast').textContent) &&
+                         /DROP/.test(document.getElementById('toast').textContent)));
 
-/* ============ COMPLETA A COLETA PELA VITRINE DE COMBATE ============ */
-for (const id of ['liga', 'liga', 'pneu', 'geo']) {
-  await p.evaluate(i => document.querySelector('#combatGrid [data-combate="' + i + '"]').click(), id);
-  await p.waitForTimeout(250);
-  await comprarOk();
-}
+/* ============ COMPLETA A COLETA PELO DROP (resolvendo questões) ============ */
+await p.evaluate(() => {   /* RNG 0.2: só a Liga metálica (30%) vence o sorteio */
+  window.__dropRng = () => 0.2;
+  window.__dropSortear('no treinamento rápido');
+  window.__dropRng = () => 0.999;
+  document.getElementById('dropLayer').classList.remove('on');
+});
+await p.waitForTimeout(300);
 const card1 = await questCard();
 t('com a coleta completa o botão vira CONSTRUIR', /CONSTRUIR/.test(card1) && !/REÚNA/.test(card1));
 t('todos os insumos marcam ✓', (card1.match(/✓/g) || []).length === 4);
@@ -172,12 +181,8 @@ t('depois do F5 o Blindado segue EQUIPADO e a foto se mantém',
   await p.evaluate(() => window.__questEquipada() === 'blindado') &&
   (await p.evaluate(() => document.querySelector('#homeAvatar img').src)) === fotoEq);
 await nav('v-loja'); await p.waitForTimeout(400);
-t('depois do F5 a vitrine confere com a mochila: nenhum insumo consumido diz "na mochila"',
-  await p.evaluate(() => {
-    const liga = document.querySelector('#combatGrid [data-combate="liga"]');
-    const mag = [...document.querySelectorAll('#combatGrid [data-combate]')].find(x => /MAG/.test(x.textContent));
-    return liga && !/na mochila/.test(liga.textContent) && (!mag || !/na mochila/.test(mag.textContent));
-  }));
+t('depois do F5 a Loja confere com a mochila: a receita mostra a coleta zerada (insumos consumidos)',
+  /0\/20 · Liga metálica/.test(await questCard()) && /0\/4 · Pneu blindado/.test(await questCard()));
 t('e o card do Blindado segue marcando "1 na mochila"', /1 na mochila/.test(await questCard()));
 
 console.log('\nvz2 :: ' + ok + ' ok / ' + falhas.length + ' falhas');
