@@ -1,5 +1,19 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Perfil público nos rankings
+
+- **Botão ao lado de cada nome** (dec. 212) nos rankings da sala e geral:
+  abre o perfil daquele aluno — foto do operador com a insígnia da
+  patente, as skins que ele veste, relatório rápido (início na
+  plataforma, turma, posição e score), as medalhas conquistadas e o
+  Instagram.
+- **A chave "Perfil nos rankings" governa a abertura**: quem está fechado
+  não abre (botão apagado, com explicação ao toque), e virar privado
+  fecha o próprio perfil também.
+- Os alunos da demonstração têm dados derivados do nome — o mesmo aluno
+  mostra sempre o mesmo perfil, nunca valores aleatórios. Suíte nova
+  `vz5` (22 provas).
+
 ## 16/08/2026 — Ficha do item: a página de cada item da mochila
 
 - **Tocar um item da mochila abre a ficha dele** (dec. 211), com quatro

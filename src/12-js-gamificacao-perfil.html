@@ -128,11 +128,21 @@
     if (!privado) return nome;
     return mascararNome(nome);
   }
+  /* dec. 212 — ao lado de cada nome, o botão que abre o PERFIL PÚBLICO.
+     Quem escolheu perfil fechado não abre: o botão fica apagado e explica.
+     O meu próprio botão respeita a minha chave de privacidade.          */
+  var RK_PERF_ICO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>';
   function rkRow(pos, nome, pts, me, top3, privado) {
+    var fechado = me ? perfilPrivado : !!privado;
     var escondido = me ? perfilPrivado : (perfilPrivado || !!privado);
     var exibido = rkNomeExibido(nome, pos, escondido);
+    var bt = '<button type="button" class="rk-perf' + (fechado ? ' off' : '') + '"' +
+      ' data-perf="' + encodeURIComponent(nome) + '" data-perf-pos="' + pos + '" data-perf-pts="' + pts + '"' +
+      (me ? ' data-perf-eu="1"' : '') + (fechado ? ' data-perf-off="1"' : '') +
+      ' title="' + (fechado ? 'Perfil fechado por este aluno' : 'Ver o perfil de ' + exibido) + '"' +
+      ' aria-label="' + (fechado ? 'Perfil fechado' : 'Ver perfil de ' + exibido) + '">' + RK_PERF_ICO + '</button>';
     return '<div class="rk-row' + (me ? ' me' : '') + (top3 ? ' top3' : '') + '">' +
-      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + '</span>' +
+      '<span class="rk-pos">' + fmt(pos) + 'º</span><span class="rk-nome">' + exibido + (me ? ' · você' : '') + bt + '</span>' +
       '<span class="rk-pts">' + fmt(pts) + ' pts</span></div>';
   }
   function rkScores(total, meuPos, meuScore) {
@@ -249,8 +259,8 @@
       bt.setAttribute('aria-checked', perfilPrivado ? 'true' : 'false');
       var d = $('privDesc');
       if (d) d.innerHTML = perfilPrivado
-        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong> e, em troca, <strong>também não vê o nome de ninguém</strong> do 11º lugar em diante. O <strong>hall dos 10 primeiros</strong> continua visível dos dois lados.'
-        : 'Público — seu nome de guerra aparece por inteiro e você <strong>vê o nome de quem também está público</strong>. Quem escolheu privado segue mascarado.';
+        ? 'Privado — nos rankings você aparece como <strong>' + mascararNome(nomeCurto()) + '</strong>, <strong>seu perfil não abre para ninguém</strong> e, em troca, <strong>também não vê o nome de ninguém</strong> do 11º lugar em diante. O <strong>hall dos 10 primeiros</strong> continua visível dos dois lados.'
+        : 'Público — seu nome de guerra aparece por inteiro, <strong>seu perfil abre para quem tocar no botão ao lado do seu nome</strong> e você <strong>vê o nome de quem também está público</strong>. Quem escolheu privado segue mascarado e de perfil fechado.';
     }
     bt.addEventListener('click', function () {
       perfilPrivado = !perfilPrivado;
@@ -308,7 +318,116 @@
     g += '<button class="btn ghost small rk-toggle" id="rkGeralBtn">' + (rkOpen.geral ? 'Mostrar menos' : 'Ver ranking completo · 1.286 usuários') + '</button>';
     elG.innerHTML = g;
     $('rkGeralBtn').onclick = function () { rkOpen.geral = !rkOpen.geral; renderRankings(); };
+    [elS, elG].forEach(function (el) {
+      el.querySelectorAll('[data-perf]').forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          if (bt.dataset.perfOff) { toast('Este aluno mantém o perfil fechado nos rankings.'); return; }
+          perfPublico(decodeURIComponent(bt.dataset.perf), parseInt(bt.dataset.perfPos, 10),
+                      parseInt(bt.dataset.perfPts, 10), !!bt.dataset.perfEu);
+        });
+      });
+    });
   }
+  /* ================= PERFIL PÚBLICO (dec. 212) =================
+     A página do aluno que deixou o perfil aberto: foto do operador com as
+     skins que ele veste, relatório rápido (entrada na plataforma, turma,
+     medalhas conquistadas) e o Instagram. Os alunos da demonstração têm
+     dados DERIVADOS do nome (sempre os mesmos para o mesmo aluno) — na
+     plataforma real virão do cadastro [INTEGRAÇÃO REAL].               */
+  var PERF_MEDALHAS = [
+    ['🎖️', 'Medalha de mérito por participação'],
+    ['📚', 'Medalha de questões resolvidas'],
+    ['⭐', 'Medalha de comando geral por uma semana'],
+    ['🏅', 'Medalha de presença integral no mês'],
+    ['🎯', 'Medalha de pontaria nos simulados'],
+    ['🔥', 'Medalha de constância — 30 dias seguidos'],
+    ['🏆', 'Medalha de primeiro lugar da sala']
+  ];
+  var PERF_TURMAS = ['PATAMO', 'RONDESP', 'BOPE'];
+  function perfHash(t) {
+    var h = 0; for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function perfDados(nome, pos, pts, euSou) {
+    if (euSou) {
+      var minhas = Math.min(PERF_MEDALHAS.length, 1 + Math.floor(carreira.scoreCarreira / 400));
+      return {
+        nome: nomeCurto(), insig: carreira.patenteIdx,
+        desde: (typeof MEU_DESDE !== 'undefined') ? MEU_DESDE : '11/05/2026',
+        turma: (typeof turmaLabel === 'function') ? turmaLabel().replace('Turma ', '') : 'PATAMO',
+        medalhas: PERF_MEDALHAS.slice(0, minhas),
+        insta: '@' + (carreira.nomeGuerra || 'aluno').toLowerCase().replace(/[^a-z0-9]/g, '') + '.quad',
+        foto: (typeof fotoPersonagem === 'function') ? fotoPersonagem() : '',
+        skins: perfMinhasSkins(), eu: true, pts: carreira.scoreCarreira, pos: pos
+      };
+    }
+    var h = perfHash(nome);
+    var patIdx = Math.min(GAMI.patentes.length - 1, 1 + (h % 9));
+    var dia = 1 + (h % 27), mes = 1 + ((h >> 3) % 8);
+    var nMed = 1 + (h % 4);
+    var ini = (h >> 5) % PERF_MEDALHAS.length;
+    var meds = [];
+    for (var i = 0; i < nMed; i++) meds.push(PERF_MEDALHAS[(ini + i) % PERF_MEDALHAS.length]);
+    var guerra = (/QUAD (.+)$/.exec(nome) || [, 'aluno'])[1].toLowerCase().replace(/[^a-z0-9]/g, '');
+    var variantes = ['cipe', 'patamo', 'bope', 'gandola', 'colete', 'fuzil', 'boina'];
+    var vr = variantes[h % variantes.length];
+    var av = (h >> 7) % 12;
+    var foto = (typeof AVATAR_VARIANTES !== 'undefined' && AVATAR_VARIANTES[vr] && AVATAR_VARIANTES[vr][av])
+      ? AVATAR_VARIANTES[vr][av]
+      : ((typeof avatarThumbs !== 'undefined' && avatarThumbs[av]) ? avatarThumbs[av] : '');
+    var NOMES_SKIN = { cipe: 'Farda CIPE', patamo: 'Farda PATAMO', bope: 'Farda BOPE', gandola: 'Gandola', colete: 'Capa de colete', fuzil: 'Fuzil', boina: 'Boina exclusiva' };
+    var skins = [NOMES_SKIN[vr]];
+    if (vr === 'cipe' || vr === 'patamo' || vr === 'bope') skins = ['Gandola', 'Capa de colete', 'Fuzil', NOMES_SKIN[vr]];
+    return {
+      nome: nome, insig: patIdx,
+      desde: String(dia).padStart(2, '0') + '/' + String(mes).padStart(2, '0') + '/2026',
+      turma: PERF_TURMAS[h % PERF_TURMAS.length],
+      medalhas: meds, insta: '@' + guerra + '.quad', foto: foto, skins: skins, eu: false, pts: pts, pos: pos
+    };
+  }
+  function perfMinhasSkins() {
+    var lista = [];
+    if (typeof boinaEquipada !== 'undefined' && boinaEquipada) lista.push('Boina exclusiva');
+    if (typeof skinEtapa !== 'undefined') {
+      var cad = ['Gandola', 'Capa de colete', 'Fuzil'];
+      for (var i = 0; i < Math.min(skinEtapa, 3); i++) lista.push(cad[i]);
+    }
+    if (typeof fardaEscolhida !== 'undefined' && fardaEscolhida) {
+      lista.push({ cipe: 'Farda CIPE', patamo: 'Farda PATAMO', bope: 'Farda BOPE' }[fardaEscolhida] || 'Farda');
+    }
+    if (typeof questEquipada !== 'undefined' && questEquipada && typeof itemDe === 'function') {
+      var q = itemDe(questEquipada); if (q) lista.push(q.nome + ' (quest)');
+    }
+    return lista;
+  }
+  function perfPublico(nome, pos, pts, euSou) {
+    var d = perfDados(nome, pos, pts, euSou);
+    $('perfPubFoto').innerHTML = d.foto ? '<img src="' + d.foto + '" alt="">' : '';
+    setInsig($('perfPubInsig'), d.insig);
+    $('perfPubNome').textContent = d.nome + (d.eu ? ' · você' : '');
+    $('perfPubSub').textContent = fmt(d.pos) + 'º no ranking · ' + fmt(d.pts) + ' pts de carreira';
+    $('perfPubSkins').innerHTML = d.skins.length
+      ? d.skins.map(function (sk) { return '<span class="perf-skin">' + sk + '</span>'; }).join('')
+      : '<span class="perf-skin nenhuma">Ainda sem skins no personagem</span>';
+    var corpo = '';
+    corpo += '<div class="item-bloco"><div class="ib-t">Relatório rápido</div><div class="ib-v">' +
+      'Início na plataforma <strong>' + d.desde + '</strong><br>Turma <strong>' + d.turma + '</strong></div></div>';
+    corpo += '<div class="item-bloco efeito"><div class="ib-t">Possui ' + d.medalhas.length +
+      (d.medalhas.length === 1 ? ' medalha conquistada' : ' medalhas conquistadas') + '</div>' +
+      '<ul class="perf-med">' + d.medalhas.map(function (m) {
+        return '<li><span class="pm-ico">' + m[0] + '</span>' + m[1] + '</li>';
+      }).join('') + '</ul></div>';
+    corpo += '<div class="item-bloco"><div class="ib-t">Instagram</div><div class="ib-v">' +
+      '<span class="perf-insta">📷 ' + d.insta + '</span></div></div>';
+    $('perfPubCorpo').innerHTML = corpo;
+    $('perfPubLayer').classList.add('on');
+  }
+  window.__perfPublico = perfPublico;   /* para a suíte de testes */
+  (function () {
+    var l = $('perfPubLayer'); if (!l) return;
+    $('btnPerfPubFechar').addEventListener('click', function () { l.classList.remove('on'); });
+    l.addEventListener('click', function (e) { if (e.target === l) l.classList.remove('on'); });
+  })();
 
   function renderHistorico() {
     var el = $('histCarreira'); if (!el) return;

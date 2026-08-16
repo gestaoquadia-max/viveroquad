@@ -736,6 +736,31 @@
   .qtd-btn:disabled { opacity: 0.4; cursor: default; }
   .qtd-val { font: 800 24px var(--ui); color: var(--p-text); min-width: 40px; font-variant-numeric: tabular-nums; }
   /* seletor de ícones no cadastro de produto (admin) */
+  /* ---------- perfil público nos rankings (dec. 212) ---------- */
+  .perf-card { text-align: center; }
+  .perf-topo { padding-right: 30px; }
+  .perf-foto { width: 108px; height: 108px; border-radius: 50%; display: inline-grid; place-items: center;
+    overflow: hidden; background: #0B2649; border: 3px solid #fff; box-shadow: 0 6px 20px rgba(11, 38, 73, .28); }
+  .perf-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .perf-insig { display: block; width: 46px; height: 46px; margin: -18px auto 4px; position: relative; z-index: 2; }
+  .perf-topo h3 { font-size: 16px; line-height: 1.25; }
+  .perf-skins { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+  .perf-skin { font-size: 11px; font-weight: 700; color: #12325F; background: #E8F1FF; border: 1px solid #C7DDFB;
+    border-radius: 999px; padding: 3px 10px; }
+  .perf-skin.nenhuma { color: var(--p-dim); background: #F1F4F9; border-color: var(--p-line); font-weight: 600; }
+  .item-card .item-bloco { text-align: left; }
+  .perf-med { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .perf-med li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--p-ink); }
+  .perf-med .pm-ico { width: 22px; height: 22px; flex: none; border-radius: 7px; display: grid; place-items: center;
+    background: #FFF6E2; border: 1px solid #F0DFAE; font-size: 13px; }
+  .perf-insta { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #12325F; }
+  /* botão de perfil ao lado do nome no ranking */
+  .rk-perf { border: 1px solid var(--p-line); background: #F7FAFF; color: var(--p-dim); width: 22px; height: 22px;
+    flex: none; border-radius: 7px; display: grid; place-items: center; cursor: pointer; padding: 0; margin-left: 4px; }
+  .rk-perf svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+  .rk-perf:active { transform: scale(.92); }
+  .rk-perf.off { opacity: .38; cursor: default; }
+  .rk-row .rk-nome { display: inline-flex; align-items: center; }
   /* ---------- ficha do item da mochila (dec. 211) ---------- */
   .item-layer { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
     background: rgba(8, 22, 44, .55); z-index: 72; padding: 16px; }

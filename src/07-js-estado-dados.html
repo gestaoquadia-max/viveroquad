@@ -49,6 +49,9 @@
     provaBloqueadaAte: null,
     historico: [ { patente: 'Aluno Soldado Quad', data: '10/07/2026', obs: 'entrada no aplicativo' } ]
   };
+  /* dec. 212 — entrada do aluno na plataforma (aparece no perfil público);
+     na plataforma real vem do cadastro [INTEGRAÇÃO REAL]              */
+  var MEU_DESDE = '11/05/2026';
   function patenteAtual() { return GAMI.patentes[carreira.patenteIdx]; }
   function proximaPatente() { return GAMI.patentes[carreira.patenteIdx + 1] || null; }
   function tituloCompleto() { return patenteAtual().nome + ' ' + carreira.nomeGuerra; }
