@@ -50,7 +50,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 17-js-admin-liberacoes | Eventos do admin (com os campos **Score / Quad Coins de participação**, dec. 200), pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
 | 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |
 | 19-js-compras-estornos | **Carteira do aluno** (card único "Carteira · extrato e compras", dec. 197: `renderRelCompras` com os KPIs recebido/gasto/compras/a receber + `renderExtrato` do ledger, saldo de abertura `MV-00000`/`MV-00001`) e os **estornos** de 7 dias, que também lançam no extrato |
-| 20-js-mercado-interno | **Minha loja** do aluno (nome, lema, anúncios com reserva da mochila, abrir/fechar, vendas) e **Mercado interno** com vitrine por loja e carrinho em Quad Coins (dec. 216) |
+| 20-js-mercado-interno | **Minha loja** do aluno (nome, lema, anúncios com reserva da mochila, abrir/fechar, vendas) e **Mercado interno** com vitrine por loja e carrinho em Quad Coins (dec. 216), mais o **Entreposto Quad** — a loja do sistema que compra qualquer item da mochila a 1 QdC por unidade (dec. 217) |
 | 21-js-relatorios-boot | Relatórios com gráficos, **persistência da evolução do aluno** (`evolSalvar`/`evolCarregar`/`evolMarcar`, chave `vq_evolucao`, debounce de 400 ms — DA-10, dec. 196), cascata de inicialização, fechamento do IIFE |
 
 > Referências antigas a "src.html l.N" (documentos da auditoria de

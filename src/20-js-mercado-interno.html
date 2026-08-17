@@ -25,13 +25,22 @@
              aberta: MINHA_LOJA.aberta, eu: true,
              itens: MINHA_LOJA.anuncios.map(function (a) { return { anunId: a.id, item: a.item, qtd: a.qtd, preco: a.preco }; }) };
   }
+  /* dec. 217 — o ENTREPOSTO QUAD é a loja do sistema: ele não vende, ele
+     COMPRA. Qualquer item da mochila vale 1 QdC por unidade — é a saída
+     para o que o aluno não usa mais, sem depender de outro aluno querer.
+     Está sempre aberto e não some da lista.                            */
+  var SYS_PRECO = 1;
+  var ENTREPOSTO = { id: 'sys', nome: 'Entreposto Quad', dono: 'Quad Concursos · loja do sistema',
+                     lema: 'compra qualquer item da sua mochila', aberta: true, sistema: true, itens: [] };
   function lojasDoMercado() {
     var lista = LOJAS_DEMO.map(function (l) { return l; });
+    lista.unshift(ENTREPOSTO);
     if (MINHA_LOJA.aberta) lista.unshift(mlComoLoja());
     return lista;
   }
   function lojaPorId(id) {
     if (id === 'eu') return mlComoLoja();
+    if (id === 'sys') return ENTREPOSTO;
     return LOJAS_DEMO.filter(function (l) { return l.id === id; })[0];
   }
 
@@ -165,6 +174,14 @@
     var el = $('mercadoLista'); if (!el) return;
     var lojas = lojasDoMercado();
     el.innerHTML = lojas.map(function (l) {
+      if (l.sistema) {
+        var meus = MOCHILA.length;
+        return '<button type="button" class="mkt-loja sistema" data-loja="sys">' +
+          '<span class="mkt-ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>' +
+          '<span class="mkt-txt"><b>' + l.nome + '</b>' +
+          '<small>COMPRA a ' + SYS_PRECO + ' QdC por unidade · ' + (meus ? meus + (meus === 1 ? ' item na sua mochila' : ' itens na sua mochila') : 'mochila vazia') + '</small></span>' +
+          '<span class="mkt-seta">›</span></button>';
+      }
       var unid = l.itens.reduce(function (s, i) { return s + i.qtd; }, 0);
       var fechada = !l.aberta;
       return '<button type="button" class="mkt-loja' + (fechada ? ' fechada' : '') + (l.eu ? ' minha' : '') + '" data-loja="' + l.id + '">' +
@@ -181,6 +198,7 @@
   }
   var mktLojaAtual = null;
   function mktAbrirLoja(id) {
+    if (id === 'sys') { sysAbrir(); return; }   /* dec. 217 */
     var l = lojaPorId(id); if (!l) return;
     if (!l.aberta) { toast('“' + l.nome + '” está fechada no momento.'); return; }
     mktLojaAtual = id;
@@ -313,5 +331,97 @@
     var atalho = $('btnAbrirMinhaLoja');
     if (atalho) atalho.addEventListener('click', function () { showView('v-minha-loja'); });
   })();
-  window.__mercado = function () { return { minha: MINHA_LOJA, carrinho: CARRINHO }; };   /* para a suíte de testes */
+  /* ---------------- ENTREPOSTO QUAD: vender para o sistema ----------------
+     A sacola diz quantas unidades de cada item vão embora; o total é
+     sempre unidades × 1 QdC. Vender consome da mochila e credita.     */
+  var SACOLA = {};   /* idDoItem → quantas unidades vão para a venda */
+  function sysUnidades() {
+    var n = 0; for (var k in SACOLA) if (SACOLA.hasOwnProperty(k)) n += SACOLA[k];
+    return n;
+  }
+  function sysAbrir() {
+    SACOLA = {};
+    sysRenderizar();
+    $('sysLayer').classList.add('on');
+  }
+  function sysRenderizar() {
+    var el = $('sysLista'); if (!el) return;
+    var grupos = [];
+    MOCHILA.forEach(function (id) {
+      var g = grupos.filter(function (x) { return x.id === id; })[0];
+      if (g) g.n++; else grupos.push({ id: id, n: 1 });
+    });
+    el.innerHTML = grupos.map(function (gr) {
+      var it = itemDe(gr.id); if (!it) return '';
+      var sel = SACOLA[gr.id] || 0;
+      return '<div class="mkt-item">' +
+        '<span class="mkt-i-ico">' + itemIcoHtml(it) + '</span>' +
+        '<span class="mkt-i-txt"><b>' + it.nome + '</b><small>' + gr.n + (gr.n === 1 ? ' unidade na mochila' : ' unidades na mochila') + '</small>' +
+        '<span class="mkt-i-preco">' + SYS_PRECO + ' QdC cada' + (sel ? ' · vendendo ' + sel : '') + '</span></span>' +
+        '<span class="sys-step">' +
+        '<button type="button" data-sys-menos="' + gr.id + '"' + (sel <= 0 ? ' disabled' : '') + ' aria-label="Tirar uma unidade">−</button>' +
+        '<b>' + sel + '</b>' +
+        '<button type="button" data-sys-mais="' + gr.id + '"' + (sel >= gr.n ? ' disabled' : '') + ' aria-label="Somar uma unidade">+</button>' +
+        '</span></div>';
+    }).join('') || '<p class="sub" style="padding:8px 0">A sua mochila está vazia — não há o que vender ao entreposto.</p>';
+    el.querySelectorAll('[data-sys-mais]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.dataset.sysMais;
+        SACOLA[id] = (SACOLA[id] || 0) + 1;
+        sysRenderizar();
+      });
+    });
+    el.querySelectorAll('[data-sys-menos]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.dataset.sysMenos;
+        SACOLA[id] = Math.max(0, (SACOLA[id] || 0) - 1);
+        if (!SACOLA[id]) delete SACOLA[id];
+        sysRenderizar();
+      });
+    });
+    var n = sysUnidades();
+    $('sysTotal').textContent = fmt(n * SYS_PRECO) + ' QdC';
+    $('btnSysVender').textContent = n ? 'Vender ' + n + (n === 1 ? ' item' : ' itens') : 'Vender ao entreposto';
+  }
+  function sysVender() {
+    var n = sysUnidades();
+    if (!n) { toast('Escolha ao menos uma unidade para vender ao entreposto.'); return; }
+    var nomes = [];
+    for (var id in SACOLA) {
+      if (!SACOLA.hasOwnProperty(id)) continue;
+      var qtd = SACOLA[id], it = itemDe(id);
+      for (var i = MOCHILA.length - 1, falta = qtd; i >= 0 && falta > 0; i--) {
+        if (MOCHILA[i] === id) { MOCHILA.splice(i, 1); falta--; }
+      }
+      if (typeof histDel === 'function') histDel(id, qtd);
+      /* vendeu o item de quest que estava vestido? a foto volta ao normal */
+      if (typeof questEquipada !== 'undefined' && questEquipada === id && mochilaConta(id) === 0) {
+        questEquipada = null;
+        if (typeof aplicarAvatar === 'function') aplicarAvatar();
+      }
+      nomes.push(qtd + '× ' + (it ? it.nome : id));
+    }
+    var total = n * SYS_PRECO;
+    /* DA-03: o crédito nasce da operação que o originou */
+    ledgerOp({ tipo: 'venda · Entreposto Quad', origem: 'Entreposto Quad', destino: nomeCurto(), autor: nomeCurto() }, function () {
+      addScore(total, 'Vendido ao Entreposto Quad · +' + fmt(total) + ' QdC');
+    });
+    SACOLA = {};
+    $('sysLayer').classList.remove('on');
+    if (typeof renderMochila === 'function') renderMochila();
+    if (typeof renderLojaQuest === 'function') renderLojaQuest();
+    if (typeof renderLojaCombate === 'function') renderLojaCombate();
+    if (typeof renderMinhaLoja === 'function') renderMinhaLoja();
+    renderMercado();
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+    toast(nomes.join(', ') + ' · +' + fmt(total) + ' QdC do entreposto.');
+  }
+  (function () {
+    if (!$('sysLayer')) return;
+    $('btnSysFechar').addEventListener('click', function () { $('sysLayer').classList.remove('on'); });
+    $('sysLayer').addEventListener('click', function (e) { if (e.target === $('sysLayer')) $('sysLayer').classList.remove('on'); });
+    $('btnSysLimpar').addEventListener('click', function () { SACOLA = {}; sysRenderizar(); });
+    $('btnSysVender').addEventListener('click', sysVender);
+  })();
+  window.__mercado = function () { return { minha: MINHA_LOJA, carrinho: CARRINHO, sacola: SACOLA }; };   /* para a suíte de testes */
 

@@ -766,6 +766,18 @@
   .mkt-add[disabled] { opacity: .45; pointer-events: none; }
   .mkt-i-sua { font: 700 10px var(--ui); color: #9A6B00; background: #FFF1CF; border: 1px solid #F0DFAE;
     border-radius: 999px; padding: 3px 9px; flex: none; text-transform: uppercase; letter-spacing: .05em; }
+  /* entreposto: quanto de cada item vai para a venda (dec. 217) */
+  .sys-step { display: flex; align-items: center; gap: 6px; flex: none; }
+  .sys-step button { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--p-line);
+    background: #fff; color: #12325F; font: 800 14px var(--ui); cursor: pointer; padding: 0; line-height: 1; }
+  .sys-step button[disabled] { opacity: .35; pointer-events: none; }
+  .sys-step b { min-width: 22px; text-align: center; font: 800 13px var(--ui); color: var(--p-text); }
+  .mkt-loja.sistema { background: linear-gradient(160deg, #0F2F5C, #0A2044); border-color: #16406F; }
+  .mkt-loja.sistema .mkt-txt b { color: #EAF3FF; }
+  .mkt-loja.sistema .mkt-txt small { color: #A8C6E8; }
+  .mkt-loja.sistema .mkt-seta { color: #A8C6E8; }
+  .mkt-loja.sistema .mkt-ico { background: #F4B63A; }
+  .mkt-loja.sistema .mkt-ico svg { stroke: #0B2649; }
   .cart-total { display: flex; align-items: center; justify-content: space-between; margin-top: 12px;
     padding-top: 10px; border-top: 2px solid var(--p-line); font: 700 13px var(--ui); color: var(--p-text); }
   .cart-total b { font-size: 16px; color: #12325F; }

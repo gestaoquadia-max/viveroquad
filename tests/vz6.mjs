@@ -226,6 +226,80 @@ t('depois do F5 a loja mantém nome, lema, anúncio e estado aberto',
     return m.nome === 'Depósito do Moura' && m.aberta === true && m.anuncios.length === 1 && m.anuncios[0].preco === 20;
   }));
 
+/* ===== DEC. 217 · ENTREPOSTO QUAD: VENDER PARA O SISTEMA ===== */
+await nav('v-loja'); await p.waitForTimeout(450);
+const sysCard = () => p.evaluate(() => {
+  const l = document.querySelector('#mercadoLista .mkt-loja.sistema');
+  return l ? l.textContent.replace(/\s+/g, ' ').trim() : '';
+});
+t('o Entreposto Quad está no mercado, marcado como loja do sistema',
+  /Entreposto Quad/.test(await sysCard()));
+t('o cartão diz que ele COMPRA a 1 QdC por unidade e conta a mochila',
+  /COMPRA a 1 QdC por unidade/.test(await sysCard()) && /itens na sua mochila/.test(await sysCard()));
+t('e ele vem antes das lojas dos alunos',
+  await p.evaluate(() => {
+    const todas = [...document.querySelectorAll('#mercadoLista .mkt-loja')];
+    const sys = todas.findIndex(x => x.classList.contains('sistema'));
+    const outra = todas.findIndex(x => !x.classList.contains('sistema') && !x.classList.contains('minha'));
+    return sys >= 0 && sys < outra;
+  }));
+await p.evaluate(() => document.querySelector('#mercadoLista .mkt-loja.sistema').click());
+await p.waitForTimeout(400);
+t('a tela do entreposto abre listando o que está na mochila',
+  await p.evaluate(() => document.getElementById('sysLayer').classList.contains('on') &&
+                         document.querySelectorAll('#sysLista .mkt-item').length >= 3));
+t('cada item mostra 1 QdC cada, qualquer que seja ele',
+  await p.evaluate(() => {
+    const linhas = [...document.querySelectorAll('#sysLista .mkt-i-preco')].map(x => x.textContent);
+    return linhas.length > 0 && linhas.every(x => /^1 QdC cada/.test(x));
+  }));
+t('a sacola começa zerada', await p.evaluate(() => document.getElementById('sysTotal').textContent === '0 QdC'));
+await p.evaluate(() => document.getElementById('btnSysVender').click());
+await p.waitForTimeout(250);
+t('vender sem escolher nada apenas explica',
+  await p.evaluate(() => document.getElementById('sysLayer').classList.contains('on') &&
+                         /Escolha ao menos uma unidade/.test(document.getElementById('toast').textContent)));
+/* o item mais raro vale o mesmo que o mais comum: 1 QdC */
+const antesQdc = await qdc();
+const ligasAntes = await p.evaluate(() => {
+  const l = [...document.querySelectorAll('#sysLista .mkt-item')].find(x => /Liga metálica/.test(x.textContent));
+  return parseInt(l.querySelector('small').textContent.replace(/\D/g, ''), 10);
+});
+for (let i = 0; i < 3; i++) {
+  await p.evaluate(() => document.querySelector('[data-sys-mais="liga"]').click());
+  await p.waitForTimeout(90);
+}
+await p.evaluate(() => document.querySelector('[data-sys-mais="mag"]').click());
+await p.waitForTimeout(150);
+t('a sacola soma 1 QdC por unidade — 3 ligas + 1 MAG = 4 QdC',
+  await p.evaluate(() => document.getElementById('sysTotal').textContent === '4 QdC'));
+t('o botão anuncia quantos itens vão embora',
+  await p.evaluate(() => /Vender 4 itens/.test(document.getElementById('btnSysVender').textContent)));
+t('não dá para vender mais unidades do que se tem (o + trava)',
+  await p.evaluate(() => document.querySelector('[data-sys-mais="mag"]').disabled === true));
+await p.evaluate(() => document.querySelector('[data-sys-menos="mag"]').click());
+await p.waitForTimeout(150);
+t('o − devolve à mochila antes de fechar', await p.evaluate(() => document.getElementById('sysTotal').textContent === '3 QdC'));
+await p.evaluate(() => document.querySelector('[data-sys-mais="mag"]').click());
+await p.waitForTimeout(150);
+await p.evaluate(() => document.getElementById('btnSysVender').click());
+await p.waitForTimeout(500);
+t('vender CREDITA em Quad Coins (o entreposto paga, não cobra)', (await qdc()) === antesQdc + 4);
+t('e a tela fecha', await p.evaluate(() => !document.getElementById('sysLayer').classList.contains('on')));
+await p.evaluate(() => document.querySelector('#mercadoLista .mkt-loja.sistema').click());
+await p.waitForTimeout(350);
+t('as unidades vendidas saíram da mochila',
+  await p.evaluate(a => {
+    const l = [...document.querySelectorAll('#sysLista .mkt-item')].find(x => /Liga metálica/.test(x.textContent));
+    return parseInt(l.querySelector('small').textContent.replace(/\D/g, ''), 10) === a - 3;
+  }, ligasAntes));
+t('e a MAG, que era única, sumiu da lista',
+  await p.evaluate(() => ![...document.querySelectorAll('#sysLista .mkt-item')].some(x => /MAG/.test(x.textContent))));
+await p.evaluate(() => document.getElementById('btnSysFechar').click());
+await p.waitForTimeout(250);
+t('o entreposto não some do mercado depois da venda',
+  /Entreposto Quad/.test(await sysCard()));
+
 console.log('\nvz6 :: ' + ok + ' ok / ' + falhas.length + ' falhas');
 falhas.forEach(f => console.log('   XX ' + f));
 console.log('erros JS: ' + (erros.length ? erros.join(' | ') : 'nenhum'));

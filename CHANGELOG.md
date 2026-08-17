@@ -1,5 +1,17 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Entreposto Quad: vender para o sistema
+
+- **A loja da administração entra no topo do Mercado interno** (dec. 217).
+  Ela não vende: **compra**. Está sempre aberta e paga **1 Quad Coin por
+  unidade, qualquer item** — do insumo mais comum ao mais raro.
+- A tela lista a mochila agrupada por tipo com um contador (− N +)
+  limitado ao que o aluno tem, soma "Você recebe" e credita ao fechar.
+- É a saída garantida para o que não se usa mais, sem depender de outro
+  aluno querer comprar. Vendendo o item de quest que estava vestido, a
+  foto do operador volta ao normal.
+- `vz6` cresceu para 51 provas.
+
 ## 16/08/2026 — Minha Loja e Mercado interno
 
 - **Minha loja** (dec. 216), no menu "+": nome e lema da loja, anúncio de
