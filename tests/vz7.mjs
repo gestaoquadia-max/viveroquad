@@ -48,6 +48,46 @@ t('a grade mostra só as conquistadas, sem nenhuma trancada',
 t('as condecorações de partida são as concedidas pela coordenação',
   (await titulos()).join(',') === 'merito,questoes');
 
+/* ===== DEC. 219 · DÁ PARA VOLTAR DA CONDECORAÇÃO PARA A MOCHILA =====
+   Dois defeitos somados no relato do gestor: (1) só a GRADE rolava, então
+   com a área de condecorações o conteúdo passava do painel e o ✕ da
+   mochila saía da tela; (2) o ✕ da ficha usava o estilo do painel escuro
+   e ficava quase invisível sobre o cartão branco.                     */
+t('o corpo da mochila rola inteiro (itens + quests + condecorações)',
+  await p.evaluate(() => !!document.querySelector('.storage-corpo') &&
+                         getComputedStyle(document.querySelector('.storage-corpo')).overflowY === 'auto'));
+t('e o cabeçalho com o ✕ fica FORA da área que rola',
+  await p.evaluate(() => !document.querySelector('.storage-corpo').contains(document.getElementById('btnStorageFechar'))));
+await p.evaluate(() => { const c = document.querySelector('.storage-corpo'); c.scrollTop = c.scrollHeight; });
+await p.waitForTimeout(300);
+t('rolando até o fim, o ✕ da mochila continua clicável na tela',
+  await p.evaluate(() => {
+    const b = document.getElementById('btnStorageFechar').getBoundingClientRect();
+    return document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2) === document.getElementById('btnStorageFechar');
+  }));
+await p.locator('#titGrade .tit-cel').first().click();
+await p.waitForTimeout(400);
+t('o ✕ da ficha é visível sobre o cartão branco (tem fundo próprio)',
+  await p.evaluate(() => {
+    const c = getComputedStyle(document.getElementById('btnItemFechar'));
+    return c.backgroundColor === 'rgb(238, 243, 250)' && c.color === 'rgb(74, 106, 147)';
+  }));
+await p.locator('#btnItemFechar').click();
+await p.waitForTimeout(400);
+t('e ele devolve o aluno para a mochila, que continua aberta',
+  await p.evaluate(() => !document.getElementById('itemLayer').classList.contains('on') &&
+                         document.getElementById('storageLayer').classList.contains('on')));
+t('a área de condecorações continua na tela depois de voltar',
+  await p.evaluate(() => document.querySelectorAll('#titGrade .tit-cel').length === 2));
+/* tocar fora do cartão também devolve para a mochila */
+await p.locator('#titGrade .tit-cel').first().click();
+await p.waitForTimeout(350);
+await p.evaluate(() => document.getElementById('itemLayer').click());
+await p.waitForTimeout(300);
+t('tocar fora do cartão também volta para a mochila',
+  await p.evaluate(() => !document.getElementById('itemLayer').classList.contains('on') &&
+                         document.getElementById('storageLayer').classList.contains('on')));
+
 /* ============ VER TODAS REVELA O CAMINHO DAS OUTRAS ============ */
 await p.evaluate(() => document.getElementById('btnTitMais').click());
 await p.waitForTimeout(300);

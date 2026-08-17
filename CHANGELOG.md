@@ -1,5 +1,16 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Correção: voltar da condecoração para a mochila
+
+- **Só a grade de itens rolava** dentro do painel (dec. 219). Com a área
+  de condecorações, o conteúdo ficou mais alto que a mochila e o
+  cabeçalho com o ✕ saía da tela ao rolar. Agora o corpo inteiro rola
+  junto e o cabeçalho fica fixo.
+- **O ✕ da ficha ficava quase invisível** sobre o cartão branco — usava o
+  estilo do painel escuro. Ganhou fundo e cor próprios.
+- `vz7` passou a provar as duas coisas, mais o retorno tocando fora do
+  cartão (29 provas).
+
 ## 16/08/2026 — Títulos e condecorações
 
 - **Área nova dentro da mochila** (dec. 218), abaixo dos itens: o que o

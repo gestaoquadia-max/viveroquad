@@ -325,6 +325,10 @@
             <div><h3>Mochila de combate</h3><div class="sh-sub" id="mochilaSub">seus itens guardados</div></div>
             <button class="storage-close" id="btnStorageFechar" aria-label="Fechar mochila">✕</button>
           </div>
+          <!-- dec. 219 — tudo abaixo do topo rola JUNTO, dentro do painel:
+               com a área de condecorações, o conteúdo passou a ser mais
+               alto que a mochila e o ✕ saía da tela ao rolar             -->
+          <div class="storage-corpo">
           <div class="storage-grid" id="storageGrid"></div>
           <div class="storage-quest">🎯 <strong>Quests:</strong> os itens daqui são a moeda da área <strong>Itens de Quest</strong> da Quad Store — os insumos caem no <strong>drop</strong> dos pacotes de 10 questões; reúna e construa equipamentos. <strong>Toque num item</strong> para ver a ficha dele.</div>
 
@@ -335,6 +339,7 @@
           </div>
           <div class="tit-grade" id="titGrade"></div>
           <button type="button" class="tit-mais" id="btnTitMais">Ver todas as condecorações</button>
+          </div>
         </div>
 
         <!-- ============ COMPRA COM QUANTIDADE (itens presenciais) ============ -->

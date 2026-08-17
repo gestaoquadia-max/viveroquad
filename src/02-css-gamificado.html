@@ -678,7 +678,10 @@
   .storage-head h3 { margin: 0; font: 800 16px var(--ui); }
   .storage-head .sh-sub { font-size: 11px; color: #9FC2F0; }
   .storage-close { margin-left: auto; background: rgba(255,255,255,0.12); border: none; color: #EAF4FF; border-radius: 10px; width: 34px; height: 34px; font-size: 18px; cursor: pointer; }
-  .storage-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 6px 18px 18px; align-content: start; }
+  /* dec. 219 — quem rola é o CORPO inteiro (itens + quests + condecorações),
+     não só a grade: assim o cabeçalho com o ✕ nunca sai da tela        */
+  .storage-corpo { flex: 1; overflow-y: auto; padding: 0 18px 18px; }
+  .storage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 6px 0 0; align-content: start; }
   .st-slot { aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 8px; position: relative; }
   /* dec. 207 — mochila agrupada (×N) e itens de quest equipáveis */
   .st-qtd { position: absolute; top: 6px; right: 6px; font-size: 10px; font-weight: 800; background: #12325F; color: #fff; border-radius: 9px; padding: 1px 6px; }
@@ -696,7 +699,7 @@
   .st-slot.cheio { background: linear-gradient(160deg, #123E8C, #0C2A63); box-shadow: inset 0 0 0 1.5px rgba(120,180,255,0.35); }
   .st-slot .st-ico svg { width: 30px; height: 30px; stroke: #BFE0FF; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .st-slot .st-nome { font: 700 10px var(--ui); color: #DCEBFF; line-height: 1.1; }
-  .storage-quest { margin: 0 18px 18px; padding: 12px 14px; border-radius: 14px; background: rgba(120,170,255,0.08);
+  .storage-quest { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: rgba(120,170,255,0.08);
     border: 1px solid rgba(120,170,255,0.2); color: #BFD8F5; font-size: 11.5px; line-height: 1.5; }
   .uso-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
     border-bottom: 1px solid var(--p-line); font-size: 13px; color: var(--p-dim); }
@@ -851,7 +854,10 @@
   .item-layer.on { display: flex; }
   .item-card { background: #fff; border-radius: 18px; width: 100%; max-height: 84%; overflow-y: auto;
     padding: 16px; position: relative; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
-  .item-card .storage-close { position: absolute; top: 10px; right: 10px; }
+  /* o ✕ da ficha vive sobre cartão BRANCO: com o estilo da mochila escura
+     ele ficava quase invisível e o aluno não achava a volta (dec. 219) */
+  .item-card .storage-close { position: absolute; top: 10px; right: 10px;
+    background: #EEF3FA; color: #4A6A93; }
   .item-topo { display: flex; gap: 12px; align-items: center; padding-right: 30px; }
   .item-ico { width: 60px; height: 60px; flex: none; border-radius: 16px; display: grid; place-items: center;
     background: linear-gradient(160deg, #123B72, #0B2649); color: #BFE0FF; font-size: 32px; }
