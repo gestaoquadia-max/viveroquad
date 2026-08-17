@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 16/08/2026 — Títulos e condecorações
+
+- **Área nova dentro da mochila** (dec. 218), abaixo dos itens: o que o
+  aluno conquistou por vitórias. "Ver todas" revela o catálogo inteiro
+  com as trancadas e o caminho de cada uma.
+- A ficha da condecoração traz a **data** e **qual vitória** deu o
+  título.
+- **Condecoração não é item**: não entra no seletor da Minha loja nem na
+  lista do Entreposto — não se vende.
+- Três vitórias já concedem de verdade: passar na prova de promoção,
+  construir um item de quest (Forjador) e conquistar um item raro no
+  drop (Tocado pela Sorte).
+- As medalhas do **perfil público** passaram a ser exatamente estas — 
+  antes eram uma contagem derivada do score.
+- Suíte nova `vz7` (22 provas).
+
 ## 16/08/2026 — Entreposto Quad: vender para o sistema
 
 - **A loja da administração entra no topo do Mercado interno** (dec. 217).

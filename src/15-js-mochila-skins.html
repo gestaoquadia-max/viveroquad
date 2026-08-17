@@ -101,7 +101,11 @@
     var ganhos = vencedores.length > 1
       ? [vencedores[Math.floor(rng() * vencedores.length) % vencedores.length]]
       : vencedores;
-    ganhos.forEach(function (it) { MOCHILA.push(it.id); histAdd(it.id, 'drop'); });   /* dec. 211 */
+    ganhos.forEach(function (it) {
+      MOCHILA.push(it.id); histAdd(it.id, 'drop');   /* dec. 211 */
+      /* dec. 218 — item raro no drop (10% ou menos) condecora */
+      if (typeof titConceder === 'function' && (+it.drop || 100) <= 10) titConceder('sortudo', 'conquistou ' + it.nome + ' no drop ' + origem);
+    });
     if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
     if (ganhos.length) {
       if (typeof renderMochila === 'function') renderMochila();
@@ -193,6 +197,73 @@
       bt.addEventListener('click', function () { itemFicha(bt.dataset.item); });
     });
   }
+  /* ================= TÍTULOS E CONDECORAÇÕES (dec. 218) =================
+     O que o aluno CONQUISTOU, não o que comprou. Não são itens: não vão
+     para a vitrine da Minha loja nem para o Entreposto — condecoração
+     não se vende. A grade mostra as conquistadas; "ver todas" revela o
+     catálogo com o caminho de cada uma.                                */
+  __SEED_TITULOS__
+  var TITULOS = [];   /* [{ id, quando, origem }] — as que o aluno tem */
+  var titTodas = false;
+  (function () { TITULOS_SEED.forEach(function (t) { TITULOS.push({ id: t.id, quando: t.quando, origem: t.origem }); }); })();
+  function titDe(id) { return TITULOS_CATALOGO.filter(function (t) { return t.id === id; })[0]; }
+  function titTem(id) { return TITULOS.some(function (t) { return t.id === id; }); }
+  /* concede uma condecoração — a vitória que a originou fica registrada */
+  function titConceder(id, origem) {
+    if (titTem(id)) return false;
+    var c = titDe(id); if (!c) return false;
+    var d = new Date();
+    TITULOS.push({
+      id: id, origem: origem || c.comoGanhar,
+      quando: String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear()
+    });
+    renderTitulos();
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+    toast('🎖️ Condecoração conquistada — ' + c.nome + '!');
+    return true;
+  }
+  function renderTitulos() {
+    var grade = $('titGrade'); if (!grade) return;
+    var sub = $('titSub');
+    if (sub) sub.textContent = TITULOS.length
+      ? TITULOS.length + (TITULOS.length === 1 ? ' condecoração conquistada' : ' condecorações conquistadas') +
+        ' de ' + TITULOS_CATALOGO.length
+      : 'nenhuma condecoração ainda';
+    var lista = titTodas
+      ? TITULOS_CATALOGO.map(function (c) { return { c: c, meu: titTem(c.id) }; })
+      : TITULOS.map(function (t) { return { c: titDe(t.id), meu: true }; }).filter(function (x) { return !!x.c; });
+    grade.innerHTML = lista.map(function (x) {
+      return '<button type="button" class="tit-cel' + (x.meu ? '' : ' trancado') + '" data-tit="' + x.c.id + '" title="' + x.c.nome + '">' +
+        '<span class="tc-ico">' + x.c.ico + '</span><span class="tc-nome">' + x.c.nome + '</span></button>';
+    }).join('') || '<p class="tit-vazio">Nenhuma condecoração ainda — elas chegam pelas vitórias: promoção de patente, desempenho em simulado, constância e conquistas em campo.</p>';
+    grade.querySelectorAll('[data-tit]').forEach(function (bt) {
+      bt.addEventListener('click', function () { titFicha(bt.dataset.tit); });
+    });
+    var bm = $('btnTitMais');
+    if (bm) bm.textContent = titTodas ? 'Mostrar só as minhas' : 'Ver todas as condecorações';
+  }
+  /* a ficha da condecoração usa o mesmo cartão da ficha do item */
+  function titFicha(id) {
+    var c = titDe(id); if (!c) return;
+    var meu = TITULOS.filter(function (t) { return t.id === id; })[0];
+    $('itemFichaIco').innerHTML = c.ico;
+    $('itemFichaIco').classList.add('cond');
+    $('itemFichaNome').textContent = c.nome;
+    $('itemFichaDesc').textContent = c.desc;
+    $('itemFichaQtd').textContent = meu ? 'conquistada em ' + meu.quando : 'ainda não conquistada';
+    var corpo = '';
+    corpo += '<div class="item-bloco' + (meu ? ' cond' : '') + '"><div class="ib-t">' + (meu ? 'A vitória que deu este título' : 'Como se conquista') + '</div>' +
+      '<div class="ib-v">' + (meu ? (meu.origem || c.comoGanhar) : c.comoGanhar) + '</div></div>';
+    corpo += '<div class="item-bloco"><div class="ib-t">O que é</div><div class="ib-v">' +
+      'Condecoração do <strong>Viver o Quad</strong> — reconhecimento de uma conquista sua. ' +
+      '<strong>Não é item</strong>: não vai para a vitrine da sua loja nem para o Entreposto. Condecoração não se vende.</div></div>';
+    $('itemFichaCorpo').innerHTML = corpo;
+    $('itemFichaAcoes').innerHTML = '';
+    $('itemLayer').classList.add('on');
+  }
+  window.__titulos = function () { return TITULOS; };        /* para a suíte de testes */
+  window.__titConceder = titConceder;                        /* idem */
+
   /* ================= FICHA DO ITEM (dec. 211) =================
      A página do item: o que é, como veio parar na mochila, o que faz no
      sistema, como se obtém e quanto vale.                            */
@@ -218,6 +289,7 @@
     var it = itemDe(id); if (!it) return;
     var n = mochilaConta(id), hist = (ITEM_HIST[id] || []).slice();
     $('itemFichaIco').innerHTML = itemIcoHtml(it);
+    $('itemFichaIco').classList.remove('cond');
     $('itemFichaNome').textContent = it.nome;
     $('itemFichaDesc').textContent = it.desc || 'item de campo';
     $('itemFichaQtd').textContent = n + (n === 1 ? ' unidade na mochila' : ' unidades na mochila');
@@ -322,6 +394,7 @@
       questConsumir(q);
       MOCHILA.push(q.id);
       histAdd(q.id, 'quest');   /* dec. 211 — quem construiu e quando */
+      if (typeof titConceder === 'function') titConceder('forjador', 'construiu ' + q.nome + ' reunindo os insumos da receita');   /* dec. 218 */
       renderMochila(); renderLojaQuest(); renderLojaCombate();
       if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();   /* DA-10 */
       toast(q.nome + ' construído! O item está na sua mochila' + (q.efeito && q.efeito.tipo === 'foto' ? ' — equipe para trocar a foto do operador' : '') + '.');
@@ -338,12 +411,17 @@
   window.__questEquipada = function () { return questEquipada; };   /* para a suíte de testes */
   $('btnMochila').addEventListener('click', function () {
     if (typeof tutOn !== 'undefined' && tutOn) return;   /* no tutorial, a mochila não abre — foco na escolha do personagem */
-    renderMochila(); $('storageLayer').classList.add('on');
+    renderMochila(); renderTitulos(); $('storageLayer').classList.add('on');
   });
   $('btnStorageFechar').addEventListener('click', function () { $('storageLayer').classList.remove('on'); });
+  (function () {
+    var bm = $('btnTitMais'); if (!bm) return;
+    bm.addEventListener('click', function () { titTodas = !titTodas; renderTitulos(); });
+  })();
   renderLojaCombate();
   renderMochila();
   renderLojaQuest();
+  renderTitulos();
 
   /* ==================================================================
      CADEIA DE SKINS DO PERSONAGEM (Loja · "Seu personagem")

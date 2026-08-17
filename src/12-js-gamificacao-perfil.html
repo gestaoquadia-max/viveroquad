@@ -384,12 +384,16 @@
   }
   function perfDados(nome, pos, pts, euSou) {
     if (euSou) {
-      var minhas = Math.min(PERF_MEDALHAS.length, 1 + Math.floor(carreira.scoreCarreira / 400));
+      /* dec. 218 — as minhas medalhas são as condecorações de verdade,
+         as mesmas que estão na mochila (antes era uma conta pelo score) */
+      var minhas = (typeof TITULOS !== 'undefined' && typeof titDe === 'function')
+        ? TITULOS.map(function (t) { var c = titDe(t.id); return c ? [c.ico, c.nome] : null; }).filter(Boolean)
+        : PERF_MEDALHAS.slice(0, 2);
       return {
         nome: nomeCurto(), insig: carreira.patenteIdx,
         desde: (typeof MEU_DESDE !== 'undefined') ? MEU_DESDE : '11/05/2026',
         turma: (typeof turmaLabel === 'function') ? turmaLabel().replace('Turma ', '') : 'PATAMO',
-        medalhas: PERF_MEDALHAS.slice(0, minhas),
+        medalhas: minhas,
         insta: '@' + (carreira.nomeGuerra || 'aluno').toLowerCase().replace(/[^a-z0-9]/g, '') + '.quad',
         foto: (typeof fotoPersonagem === 'function') ? fotoPersonagem() : '',
         skins: perfMinhasSkins(), eu: true, pts: carreira.scoreCarreira, pos: pos
@@ -579,6 +583,8 @@
       carreira.scorePatente = excedente;
       carreira.estado = 'acumulando';
       carreira.historico.push({ patente: prox.nome, data: new Date().toLocaleDateString('pt-BR'), prova: prova.hits + '/' + GAMI.provaQuestoes });
+      /* dec. 218 — passar na prova é vitória: condecora */
+      if (typeof titConceder === 'function') titConceder('promocao', 'aprovado na prova e promovido a ' + prox.nome);
       body.innerHTML = '<div class="p-card" style="text-align:center">' +
         '<div class="gate-badge ok" style="margin:0 auto 12px">✓</div>' +
         '<span class="insig-img xl" style="display:block;margin:0 auto 12px;background-position:' + insigPos(carreira.patenteIdx) + '"></span>' +

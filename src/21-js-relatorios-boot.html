@@ -226,13 +226,15 @@
            build novo DESCARTA o estado antigo em vez de restaurá-lo por
            cima do seed (dec. 208 — a Loja dizia "18 na mochila" com a
            mochila mostrando outra coisa). v:3 = dec. 211, histórico de
-           aquisição de cada item; v:4 = dec. 216, a loja do aluno.     */
-        v: 4, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
+           aquisição de cada item; v:4 = dec. 216, a loja do aluno;
+           v:5 = dec. 218, títulos e condecorações.                     */
+        v: 5, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
         carreira: carreira,
         mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA : [],
         questEq: (typeof questEquipada !== 'undefined') ? questEquipada : null,
         itemHist: (typeof ITEM_HIST !== 'undefined') ? ITEM_HIST : {},
         minhaLoja: (typeof MINHA_LOJA !== 'undefined') ? MINHA_LOJA : null,
+        titulos: (typeof TITULOS !== 'undefined') ? TITULOS : null,
         avatarIdx: (typeof avatarIdx !== 'undefined') ? avatarIdx : 0,
         guerra: $('nomeGuerra') ? $('nomeGuerra').value : '',
         turmaAtivaId: (typeof turmaAtivaId !== 'undefined') ? turmaAtivaId : '',
@@ -246,7 +248,7 @@
   function evolCarregar() {
     var raw = lsGet(VQ_EVOL); if (!raw) return false;
     var d; try { d = JSON.parse(raw); } catch (e) { return false; }
-    if (!d || d.v !== 4) return false;   /* build antigo → demonstração zera */
+    if (!d || d.v !== 5) return false;   /* build antigo → demonstração zera */
     if (typeof d.score === 'number') score = d.score;
     if (typeof d.diamantes === 'number') diamantes = d.diamantes;
     if (d.carreira) for (var k in d.carreira) if (d.carreira.hasOwnProperty(k)) carreira[k] = d.carreira[k];
@@ -257,6 +259,8 @@
     if (d.itemHist && typeof ITEM_HIST !== 'undefined') { for (var h in d.itemHist) if (d.itemHist.hasOwnProperty(h)) ITEM_HIST[h] = d.itemHist[h]; }
     /* a loja do aluno e a vitrine dela sobrevivem ao F5 (dec. 216) */
     if (d.minhaLoja && typeof MINHA_LOJA !== 'undefined') { for (var ml in d.minhaLoja) if (d.minhaLoja.hasOwnProperty(ml)) MINHA_LOJA[ml] = d.minhaLoja[ml]; }
+    /* as condecorações conquistadas sobrevivem ao F5 (dec. 218) */
+    if (d.titulos && typeof TITULOS !== 'undefined') { TITULOS.length = 0; d.titulos.forEach(function (x) { TITULOS.push(x); }); }
     if (d.lojaOwned && typeof lojaOwned !== 'undefined') for (var o in d.lojaOwned) if (d.lojaOwned.hasOwnProperty(o)) lojaOwned[o] = d.lojaOwned[o];
     if (d.trAj && typeof trAj !== 'undefined') for (var a in d.trAj) if (d.trAj.hasOwnProperty(a)) trAj[a] = d.trAj[a];
     if (d.ledger && typeof LEDGER !== 'undefined' && d.ledger.length) {
@@ -293,6 +297,7 @@
       if (typeof renderLojaQuest === 'function') renderLojaQuest();
       if (typeof renderMinhaLoja === 'function') renderMinhaLoja();
       if (typeof renderMercado === 'function') renderMercado();
+      if (typeof renderTitulos === 'function') renderTitulos();
       if (typeof renderExtrato === 'function') renderExtrato();
       if (typeof definirTurmaAtiva === 'function') definirTurmaAtiva(turmaAtivaId, true);
       $('scoreVal').textContent = fmt(score);
