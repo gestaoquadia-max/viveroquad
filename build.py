@@ -7,11 +7,16 @@ import base64, pathlib
 root = pathlib.Path(__file__).resolve().parent
 
 partes = sorted((root / 'src').glob('[0-9][0-9]-*.html'))
-assert len(partes) == 21, 'esperava 21 partes em src/, achei %d' % len(partes)
+assert len(partes) == 22, 'esperava 22 partes em src/, achei %d' % len(partes)
 src = ''.join(p.read_text(encoding='utf-8') for p in partes)
 
 def b64(p, mime):
     return 'data:%s;base64,%s' % (mime, base64.b64encode((root/p).read_bytes()).decode())
+def b64_opt(p, mime):
+    """Mídia OPCIONAL (dec. 220): se o arquivo existir, entra no build;
+    se não, o componente usa o próprio fallback do design system."""
+    f = root / p
+    return b64(p, mime) if f.exists() else ''
 rep = {
     '__FONTS__': (root/'fonts.css').read_text(encoding='utf-8'),
     '__DANILO_VIDEO__': b64('danilo.mp4', 'video/mp4'),
@@ -22,6 +27,9 @@ rep = {
     '__INSIGNIAS__': b64('insignias.jpg', 'image/jpeg'),
     '__QUAD_COIN__': b64('quad-coin.webp', 'image/webp'),
     '__DIAMANTE__': b64('diamante.webp', 'image/webp'),
+    # capa institucional do login (dec. 220): basta pôr fotos/login-capa.jpg
+    # no repositório para a composição passar a usar a foto oficial
+    '__LOGIN_CAPA__': b64_opt('fotos/login-capa.jpg', 'image/jpeg'),
 }
 # fotos por variante do personagem (fotos/<variante>-<índice>.webp)
 import re as _re

@@ -7,6 +7,11 @@ const S = new URL('./_out', import.meta.url).pathname;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
 const c = await b.newContext({ viewport: { width: 430, height: 900 }, deviceScaleFactor: 2 });
 const p = await c.newPage();
+/* dec. 220 — datas RELATIVAS ao dia da execução: fixá-las no calendário
+   transformava a suíte numa bomba-relógio (o evento vencia e o app,
+   corretamente, deixava de listá-lo).                              */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+
 const erros = [];
 p.on('pageerror', e => erros.push('JS: ' + e.message));
 let ok = 0; const falhas = [];
@@ -83,7 +88,7 @@ t('evento online: sem escolha, o eco fica calado', !await vis('admEvSalaEco'));
 t('o rótulo do bloco passa a falar do Estúdio', /Reserva do Estúdio/.test(await T('admEvReservaLb')));
 
 await set('admEvNovoNome', 'Live de véspera');
-await set('admEvNovoData', '2026-09-14');
+await set('admEvNovoData', emDias(20));
 await set('admEvNovoInicio', '19:00'); await set('admEvNovoFim', '21:00');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
 t('online sem o Estúdio selecionado NÃO cria', /Estúdio/.test(await T('admEvErro')) && /selecione/i.test(await T('admEvErro')));
@@ -108,7 +113,7 @@ await p.waitForTimeout(300);
 const opS = await opcoes('admSimSala');
 t('simulado: só a pergunta e as 4 salas', opS.length === 5 && !opS.some(o => /—/.test(o)));
 t('simulado: a 1ª opção é a pergunta', /Em qual sala o simulado acontece\?/.test(opS[0]));
-await set('admSimData', '2026-09-19');
+await set('admSimData', emDias(25));
 await set('admSimIni', '08:00'); await set('admSimFim', '12:00');
 await set('admSimSala', 'Sala 1');
 t('simulado: o eco confere o sábado escolhido', /Sala 1/.test(await T('admSimSalaEco')) && /(livre|já tem)/.test(await T('admSimSalaEco')));

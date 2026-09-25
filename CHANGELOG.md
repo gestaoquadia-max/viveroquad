@@ -1,5 +1,32 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 25/09/2026 — Reformulação visual completa: o produto ganha design system
+
+- **Tokens de verdade** (dec. 220): marca, superfícies, texto, borda,
+  sombra, espaço, raio, estado e movimento. Uma camada nova
+  (`02-css-sistema`) aplica a linguagem sobre todas as telas.
+- **Tipografia nova**: **Sora** para identidade (títulos, números,
+  gamificação) e **Manrope** para leitura, embutidas no build, com escala
+  fechada e caixa alta só em rótulos.
+- **O texto deixou de ser azul** — era a causa do "azul em tudo". Azul
+  virou ênfase; o corpo é neutro.
+- **Famílias de card** (utilitário, informativo, profundo, missão) no
+  lugar do retângulo branco repetido.
+- **Home com hierarquia**: aluno → aula → missão → avisos → eventos. A
+  missão é o elemento mais carregado; os avisos, deliberadamente sóbrios,
+  com nível (info, urgente, lembrete, material, aula, evento).
+- **Aula de hoje virou timeline**; **HUD** com o nome em protagonismo,
+  patente como badge e carteira em dois chips.
+- **Login virou porta de entrada**, com capa institucional (encaixe para
+  a foto oficial), posicionamento e mostrar/ocultar senha.
+- **Desktop com rail lateral** e conteúdo em duas colunas acima de
+  1080px — não é mais mobile esticado.
+- **Domínio em três faixas**: verde voltou a significar domínio alto.
+- Mascote compacto, microinterações de 140–260ms, foco visível,
+  `prefers-reduced-motion` e estados que não dependem só da cor.
+- Correção de processo: quatro suítes fixavam datas de evento que
+  venceram com o tempo; agora são relativas ao dia da execução.
+
 ## 16/08/2026 — Correção: voltar da condecoração para a mochila
 
 - **Só a grade de itens rolava** dentro do painel (dec. 219). Com a área

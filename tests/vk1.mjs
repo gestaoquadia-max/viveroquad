@@ -7,6 +7,11 @@ const S = new URL('./_out', import.meta.url).pathname;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
 const c = await b.newContext({ viewport: { width: 430, height: 900 }, deviceScaleFactor: 2 });
 const p = await c.newPage();
+/* dec. 220 — data relativa: fixa no calendário, ela vencia e o evento
+   sumia do carrossel e da Loja, derrubando cinco provas de uma vez. */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+const emDiasBR = n => { const d = emDias(n); return d.slice(8, 10) + '/' + d.slice(5, 7); };
+
 const erros = [];
 p.on('pageerror', e => erros.push('JS: ' + e.message));
 let ok = 0; const falhas = [];
@@ -126,7 +131,7 @@ t('evento: avisa que falta a data', /falta a data/i.test(await txt('admEvErro'))
 t('evento: marca o campo da data', await p.evaluate(() => document.getElementById('admEvNovoData').classList.contains('err')));
 await set('admEvNovoModal', 'online');
 await set('admEvNovoTipo', 'pago');
-await set('admEvNovoData', '2026-09-24');
+await set('admEvNovoData', emDias(21));
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
 t('evento pago: cobra o preço', /preço/i.test(await txt('admEvErro')));
 await set('admEvNovoPreco', '300');
@@ -141,14 +146,14 @@ t('online: cobra a reserva do Estúdio', /Estúdio/.test(await txt('admEvErro'))
 await set('admEvSala', 'Estúdio');
 t('eco do Estúdio só fala depois de escolhido, com dia e horário', /livre nesse dia e horário/.test(await txt('admEvSalaEco')));
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
-t('evento: confirmação verde com data e destino', /criado para/i.test(await txt('admEvErro')) && /24\/09/.test(await txt('admEvErro')));
+t('evento: confirmação verde com data e destino', /criado para/i.test(await txt('admEvErro')) && new RegExp(emDiasBR(21)).test(await txt('admEvErro')));
 t('evento pago: a confirmação diz que foi para a Loja', /Loja/.test(await txt('admEvErro')));
 t('evento online: a confirmação diz que o Estúdio foi reservado', /Estúdio reservado/.test(await txt('admEvErro')));
 await el.screenshot({ path: S + '/k1-evento.png' });
 /* o pago reservou o Estúdio 19h–21h; a gratuita no MESMO horário é barrada */
 await set('admEvNovoNome', 'Live gratuita');
 await set('admEvNovoTipo', 'gratuito');
-await set('admEvNovoData', '2026-09-24');
+await set('admEvNovoData', emDias(21));
 await set('admEvSala', 'Estúdio');
 t('eco avisa o choque antes de tentar criar', /já tem/.test(await txt('admEvSalaEco')) && /Aula aberta online/.test(await txt('admEvSalaEco')));
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);

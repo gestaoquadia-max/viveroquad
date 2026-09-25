@@ -4,6 +4,17 @@ const errors = [], log = [];
 const browser = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
 const c = await browser.newContext({ viewport:{width:1100,height:900}, deviceScaleFactor:2 });
 const p = await c.newPage();
+/* dec. 220 — data relativa: fixa no calendário, ela vencia e o próprio
+   comentário do teste deixava de valer.                          */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+/* sábado: dia sem turma, então a Sala 1 está livre (a data original,
+   05/09/2026, era sábado justamente por isso).                      */
+const proximoSabado = () => {
+  const d = new Date(Date.now() + 8 * 864e5);
+  while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+};
+
   await p.addInitScript(() => { window.__admTudo = true; });   /* blocos do admin abertos para o teste */ p.on('pageerror',e=>errors.push('pageerror: '+e.message));
 await p.goto(new URL('../index.html', import.meta.url).href,{waitUntil:'load'}); await p.waitForTimeout(500);
 // entra como aluno (o app fica atrás; personas trocam por fora do telefone)
@@ -76,7 +87,7 @@ const persona = q => p.evaluate(pp=>{ document.querySelector('.persona-btn[data-
   await p.evaluate(()=>document.querySelector('#navAdmin .nav-btn[data-view="v-adm-hoje"]').click()); await p.waitForTimeout(300);
   await p.selectOption('#admEvSel','gincana'); await p.selectOption('#admEvTipo','coins');
   await p.fill('#admEvRegra','Bônus de estreia'); await p.fill('#admEvValor','+20'); await p.click('#btnAdmEvRegra'); await p.waitForTimeout(300);
-  await p.fill('#admEvNovoNome','Copa Quad de Questões'); await p.fill('#admEvNovoData','2026-09-05');   /* data futura: evento vencido sai do carrossel */ await p.fill('#admEvNovoInicio','19:00'); await p.selectOption('#admEvSala','Sala 1'); await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
+  await p.fill('#admEvNovoNome','Copa Quad de Questões'); await p.fill('#admEvNovoData', proximoSabado());   /* sábado SEMPRE futuro: dia sem aula (a sala fica livre) e evento não vencido */ await p.fill('#admEvNovoInicio','19:00'); await p.selectOption('#admEvSala','Sala 1'); await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
   await persona('aluno'); await p.waitForTimeout(400);
   const strip = await p.evaluate(()=>document.getElementById('evStrip').textContent);
   if (!/COPA QUAD DE QUESTÕES/i.test(strip)) errors.push('4: evento novo não entrou no carrossel');

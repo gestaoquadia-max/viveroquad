@@ -276,6 +276,20 @@
   window.__evolCarregar = evolCarregar;
   window.__evolMarcar = evolMarcar;   /* para a suíte de testes */
 
+  /* dec. 220 — mostrar/ocultar senha no login */
+  (function () {
+    var bt = $('btnVerSenha'), campo = $('loginSenha');
+    if (!bt || !campo) return;
+    bt.addEventListener('click', function () {
+      var vendo = campo.type === 'text';
+      campo.type = vendo ? 'password' : 'text';
+      bt.setAttribute('aria-pressed', vendo ? 'false' : 'true');
+      bt.setAttribute('aria-label', vendo ? 'Mostrar a senha' : 'Ocultar a senha');
+      bt.classList.toggle('on', !vendo);
+      campo.focus();
+    });
+  })();
+
   /* ---------- init do estado de acesso/conectividade ---------- */
   renderCarreira();
   applyConnUI();

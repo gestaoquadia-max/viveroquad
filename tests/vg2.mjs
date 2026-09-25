@@ -3,6 +3,14 @@ const { chromium } = pw;
 const b = await chromium.launch({ executablePath:process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
 const c = await b.newContext({viewport:{width:430,height:940}});
 const p = await c.newPage();
+/* dec. 220 — o dia da semana pedido, sempre no futuro: as datas fixas
+   venciam e o evento sumia do carrossel (a suíte quebrava sozinha). */
+const proximaSemana = dia => {
+  const d = new Date(Date.now() + 8 * 864e5);
+  while (d.getDay() !== dia) d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+};
+
   await p.addInitScript(() => { window.__admTudo = true; });   /* blocos do admin abertos para o teste */ const errs=[]; p.on('pageerror',e=>errs.push(e.message));
 let pass=0, fail=0; const ok=(v,t)=>{ if(v){pass++;console.log('  ok  '+t);} else {fail++;console.log('  XX  '+t);} };
 const txt = id => p.evaluate(x=>{const e=document.getElementById(x);return e?e.textContent.replace(/\s+/g,' ').trim():'(inexistente)';},id);
@@ -26,14 +34,14 @@ if (g){ await p.fill('#admEmail','npp@quadconcursos.com.br'); await p.fill('#adm
 await navAdm('v-adm-hoje'); await p.waitForTimeout(400);
 await p.fill('#admEvNovoNome','Aulão da segunda 20h');
 await p.fill('#admEvNovoResumo','choque com a turma da noite');
-await p.fill('#admEvNovoData','2026-09-07');           // segunda-feira (data futura — dec. 189)
+await p.fill('#admEvNovoData', proximaSemana(1));   // segunda-feira SEMPRE futura (dec. 189/220)
 await p.fill('#admEvNovoInicio','20:00'); await p.fill('#admEvNovoFim','21:30');
 await p.selectOption('#admEvSala','Sala 4');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
 // e um evento em horário livre (sábado de manhã)
 await p.fill('#admEvNovoNome','Aulão de sábado 9h');
 await p.fill('#admEvNovoResumo','sem choque');
-await p.fill('#admEvNovoData','2026-09-12');           // sábado (data futura — dec. 189)
+await p.fill('#admEvNovoData', proximaSemana(6));   // sábado SEMPRE futuro (dec. 189/220)
 await p.fill('#admEvNovoInicio','09:00'); await p.fill('#admEvNovoFim','11:00');
 await p.selectOption('#admEvSala','Sala 4');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);

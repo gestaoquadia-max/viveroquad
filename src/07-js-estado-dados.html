@@ -465,11 +465,18 @@
     if (pct <= 50) { return Math.round((pct / 50) * 45); }        /* 0..45: vermelho → âmbar */
     return Math.round(45 + ((pct - 50) / 50) * 172);              /* 45..217: âmbar → azul  */
   }
+  /* dec. 220 — o domínio deixou de ser um arco-íris contínuo: como quase
+     todo percentual caía na faixa alta, a tela inteira ficava verde e o
+     verde perdia o sentido. Agora são três FAIXAS, com as cores do
+     design system, e verde só significa domínio alto de verdade.     */
+  function edFaixa(pct) { return pct < 40 ? 'baixo' : (pct < 70 ? 'medio' : 'alto'); }
   function edFill(pct) {
-    return '<i style="width:' + Math.round(pct) + '%;background:hsl(' + edHue(pct) + ',82%,50%)"></i>';
+    return '<i style="width:' + Math.round(pct) + '%"></i>';
   }
-  function edPcColor(pct) { return 'hsl(' + edHue(pct) + ',78%,38%)'; }
-  function edBar(pct) { return '<span class="ed-bar">' + edFill(pct) + '</span>'; }
+  function edPcColor(pct) {
+    return { baixo: 'var(--p-warn)', medio: 'var(--p-gold)', alto: 'var(--p-ok)' }[edFaixa(pct)];
+  }
+  function edBar(pct) { return '<span class="ed-bar ' + edFaixa(pct) + '">' + edFill(pct) + '</span>'; }
   function renderEdital() {
     var box = $('editalTree');
     if (!box) { return; }
@@ -510,14 +517,14 @@
           '<button class="ed-head" type="button"><span class="chev">\u25B8</span>' +
           '<span class="ed-nm">' + (mi + 1) + '.' + (ai + 1) + ' ' + ass[0] + '</span>' +
           '<span class="ed-pc" style="color:' + edPcColor(assPcts[ai]) + '">' + Math.round(assPcts[ai]) + '%</span></button>' +
-          '<div class="ed-bar">' + edFill(assPcts[ai]) + '</div>' +
+          '<div class="ed-bar ' + edFaixa(assPcts[ai]) + '">' + edFill(assPcts[ai]) + '</div>' +
           '<div class="ed-sublist">' + acoes + subHtml + '</div></div>';
       }).join('');
       html += '<div class="ed-mat' + (mi === 0 ? ' open' : '') + '">' +
         '<button class="ed-head" type="button"><span class="chev">' + (mi === 0 ? '\u25BE' : '\u25B8') + '</span>' +
         '<span class="ed-nm">' + (mi + 1) + '. ' + matNm + '</span>' +
         '<span class="ed-pc" style="color:' + edPcColor(matPct) + '">' + Math.round(matPct) + '%</span></button>' +
-        '<div class="ed-bar">' + edFill(matPct) + '</div>' +
+        '<div class="ed-bar ' + edFaixa(matPct) + '">' + edFill(matPct) + '</div>' +
         '<div class="ed-asslist">' + assHtml + '</div></div>';
     });
     box.innerHTML = html;

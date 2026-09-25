@@ -9,6 +9,10 @@ const S = new URL('./_out', import.meta.url).pathname;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
 const c = await b.newContext({ viewport: { width: 430, height: 900 }, deviceScaleFactor: 2 });
 const p = await c.newPage();
+/* dec. 220 — data relativa: fixá-la no calendário fazia a suíte vencer
+   junto com o evento.                                            */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+
 const erros = [];
 p.on('pageerror', e => erros.push('JS: ' + e.message));
 let ok = 0; const falhas = [];
@@ -73,7 +77,7 @@ t('a lista do admin mostra a turma-alvo', /TURMA C\.O\.R\.E\./.test(await T('adm
 
 await abrir('jumpInterno', 'eventos'); await p.waitForTimeout(300);
 await set('admEvNovoNome', 'Roda de estudos da C.O.R.E.');
-await set('admEvNovoData', '2026-09-10');
+await set('admEvNovoData', emDias(16));
 await set('admEvNovoInicio', '08:00'); await set('admEvNovoFim', '10:00');
 await set('admEvSala', 'Sala 4');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);

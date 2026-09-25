@@ -445,7 +445,18 @@
     if (!tutOn || tutExpect) return;
     if ($('tqLayer').style.display === 'flex') return;
     var scr = $('screen').getBoundingClientRect();
-    if (e.clientX - scr.left > scr.width * 0.35) tutAvanca();
+    var x = e.clientX - scr.left, y = e.clientY - scr.top;
+    /* dec. 220 — avança também quando o toque cai no PRÓPRIO alvo
+       destacado. Antes só valia a metade direita da tela: com a carteira
+       na coluna da esquerda, o alvo passou a ficar antes dos 35% e o
+       roteiro travava — e "toca nela" é justamente o que o QUAD pede. */
+    var ring = $('tutRing'), noAlvo = false;
+    if (ring && ring.style.display === 'block') {
+      var rx = parseFloat(ring.style.left) || 0, ry = parseFloat(ring.style.top) || 0;
+      var rw = parseFloat(ring.style.width) || 0, rh = parseFloat(ring.style.height) || 0;
+      noAlvo = x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+    }
+    if (noAlvo || x > scr.width * 0.35) tutAvanca();
   }, true);
   /* fundo travado: sem rolagem por trás do filtro escuro */
   document.addEventListener('wheel', function (e) {

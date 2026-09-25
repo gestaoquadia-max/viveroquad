@@ -1,33 +1,91 @@
 <title>Viver o Quad — Protótipo V0</title>
 <style>__FONTS__</style>
 <style>
+  /* ==================================================================
+     DESIGN SYSTEM · VIVER O QUAD (dec. 220)
+     Um produto, um sistema. Tudo abaixo sai destes tokens — não se
+     escreve cor, sombra, raio ou espaço solto em componente nenhum.
+     Camadas:  (1) marca  (2) superfícies  (3) texto  (4) forma
+               (5) movimento  (6) tipografia
+     ================================================================== */
   :root {
-    --bg: #F3F9FE;
+    /* ---------- 1. MARCA — o azul Quad continua o dono da casa ------- */
+    --q-blue-900: #06214C;   /* profundidade máxima */
+    --q-blue-800: #0A2F6B;
+    --q-blue-700: #0E3D8A;
+    --q-blue-600: #1652B8;
+    --q-blue-500: #1E63E9;   /* PRIMÁRIA */
+    --q-blue-400: #4685F2;
+    --q-blue-300: #7FACF8;
+    --q-blue-200: #B9D2FC;
+    --q-blue-100: #DEEAFE;
+    --q-blue-50:  #F0F5FF;
+    /* acentos — cada um com um papel, nunca decorativos */
+    --q-cyan:     #17B6D8;   /* tecnologia / interação */
+    --q-cyan-soft:#DEF5FA;
+    --q-gold:     #E5A214;   /* Quad Coins / conquista */
+    --q-gold-soft:#FDF2D9;
+    --q-crystal:  #3BA9E8;   /* Diamantes */
+    --q-crystal-soft:#E4F2FD;
+    --q-green:    #14925A;   /* sucesso / concluído */
+    --q-green-soft:#DFF5EA;
+    --q-orange:   #D97A10;   /* atenção / desafio */
+    --q-orange-soft:#FDEEDA;
+    --q-red:      #CE3B32;   /* erro / perigo */
+    --q-red-soft: #FBE6E4;
+    --q-violet:   #6D42CE;   /* conteúdo / evento especial */
+    --q-violet-soft:#EDE6FB;
+
+    /* ---------- 2. FORMA — raio, sombra, espaço ---------------------- */
+    --r-xs: 8px; --r-sm: 10px; --r-md: 12px; --r-lg: 16px;
+    --r-xl: 20px; --r-2xl: 26px; --r-pill: 999px;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+    --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+    --sh-sm: 0 1px 2px rgba(10, 35, 66, .06);
+    --sh-md: 0 4px 14px rgba(10, 35, 66, .08);
+    --sh-lg: 0 14px 38px rgba(10, 35, 66, .14);
+    --sh-up: 0 -6px 24px rgba(10, 35, 66, .10);
+
+    /* ---------- 3. MOVIMENTO — rápido, nunca saltitante ------------- */
+    --mo-fast: 140ms; --mo: 200ms; --mo-slow: 260ms;
+    --ease: cubic-bezier(.32, .72, .35, 1);
+
+    /* ---------- 4. TIPOGRAFIA ---------------------------------------- */
+    --font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ui:    "Manrope", system-ui, sans-serif;
+    --title: "Sora", "Manrope", system-ui, sans-serif;
+    --num:   "Sora", "Manrope", system-ui, sans-serif;
+    --mono:  ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* ---------- 5. VITRINE (a página que emoldura o protótipo) ------- */
+    --bg: #EDF2F9;
     --panel: #FFFFFF;
-    --ink: #14324F;
-    --ink-dim: #5E7FA0;
-    --line: #D8E7F5;
-    --gold: #1B7FC4;
-    --gold-soft: #E6F3FC;
+    --ink: #0D2440;
+    --ink-dim: #5D7590;
+    --line: #DBE5F1;
+    --gold: var(--q-blue-500);
+    --gold-soft: var(--q-blue-50);
     --blue: #3E6288;
-    --font: "Inter", "SF Pro Text", -apple-system, "Segoe UI", system-ui, sans-serif;
-    --ui: "Exo 2", "Inter", system-ui, sans-serif;
-    --title: "Exo 2", "Inter", system-ui, sans-serif;
-    --num: "Exo 2", "Inter", system-ui, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0B1E30; --panel: #12293F; --ink: #DCEBF8; --ink-dim: #8FB0CC;
-      --line: #1F3D59; --gold: #54B2E8; --gold-soft: #14395A;
+    :root:not([data-theme="light"]) {
+      --bg: #070F1B; --panel: #101F31; --ink: #E4EEF9; --ink-dim: #93AEC9;
+      --line: #1E3149; --gold: #5C9CF5; --gold-soft: #132844;
+      --sh-sm: 0 1px 2px rgba(0, 0, 0, .3);
+      --sh-md: 0 4px 14px rgba(0, 0, 0, .34);
+      --sh-lg: 0 14px 38px rgba(0, 0, 0, .46);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0B1E30; --panel: #12293F; --ink: #DCEBF8; --ink-dim: #8FB0CC;
-    --line: #1F3D59; --gold: #54B2E8; --gold-soft: #14395A;
+    --bg: #070F1B; --panel: #101F31; --ink: #E4EEF9; --ink-dim: #93AEC9;
+    --line: #1E3149; --gold: #5C9CF5; --gold-soft: #132844;
+    --sh-sm: 0 1px 2px rgba(0, 0, 0, .3);
+    --sh-md: 0 4px 14px rgba(0, 0, 0, .34);
+    --sh-lg: 0 14px 38px rgba(0, 0, 0, .46);
   }
   :root[data-theme="light"] {
-    --bg: #F3F9FE; --panel: #FFFFFF; --ink: #14324F; --ink-dim: #5E7FA0;
-    --line: #D8E7F5; --gold: #1B7FC4; --gold-soft: #E6F3FC;
+    --bg: #EDF2F9; --panel: #FFFFFF; --ink: #0D2440; --ink-dim: #5D7590;
+    --line: #DBE5F1; --gold: var(--q-blue-500); --gold-soft: var(--q-blue-50);
   }
 
   * { box-sizing: border-box; }
@@ -63,19 +121,93 @@
 
   /* ============ PHONE — padrão da casa: limpo, claro, slate + azul ============ */
   .phone {
-    width: 384px; flex: none; background: #14304D; border-radius: 34px;
-    padding: 10px; box-shadow: 0 24px 60px rgba(11,42,71,0.28), 0 0 0 1px rgba(255,255,255,0.08);
-    margin: 0 auto;
+    width: 384px; flex: none; border-radius: 38px; padding: 9px; margin: 0 auto;
+    background: linear-gradient(165deg, #1B3757, #0B1E33 60%);
+    box-shadow: 0 30px 70px rgba(8, 28, 52, .30), 0 0 0 1px rgba(255, 255, 255, .07) inset;
   }
+  /* ---- tokens do INTERIOR do aplicativo (tema claro) ----
+     O texto deixou de ser azul vivo: azul agora é ÊNFASE, não corpo.
+     Era daí que vinha a sensação de "azul em tudo" (dec. 220).      */
   .screen {
-    --p-bg: #EDF6FF; --p-surface: #FFFFFF; --p-card: #FFFFFF; --p-line: #E1ECFB;
-    --p-text: #123C8F; --p-dim: #667085; --p-gold: #1976FF; --p-blue: #3B8BFF;
-    --p-ok: #28A96B; --p-bad: #DC2626;
-    --p-navy: #0B2E73; --p-dark: #123C8F; --p-coin: #F4B63A; --p-purple: #6237D8;
+    --p-bg: #EDF2F9;
+    --p-surface: #FFFFFF;
+    --p-surface-2: #F5F8FC;
+    --p-card: #FFFFFF;
+    --p-line: #E0E8F2;
+    --p-line-soft: #EDF2F8;
+    --p-line-strong: #C9D8E9;
+    --p-ink: #0C2138;          /* títulos */
+    --p-text: #17304C;         /* corpo */
+    --p-dim: #64809C;          /* apoio */
+    --p-mute: #8DA4BC;         /* legenda */
+    --p-gold: var(--q-blue-500);      /* acento primário (nome histórico) */
+    --p-gold-soft: var(--q-blue-50);
+    --p-blue: var(--q-blue-400);
+    --p-cyan: var(--q-cyan);
+    --p-ok: var(--q-green);
+    --p-ok-soft: var(--q-green-soft);
+    --p-bad: var(--q-red);
+    --p-bad-soft: var(--q-red-soft);
+    --p-warn: var(--q-orange);
+    --p-warn-soft: var(--q-orange-soft);
+    --p-navy: var(--q-blue-900);
+    --p-dark: var(--q-blue-700);
+    --p-coin: var(--q-gold);
+    --p-coin-soft: var(--q-gold-soft);
+    --p-crystal: var(--q-crystal);
+    --p-crystal-soft: var(--q-crystal-soft);
+    --p-purple: var(--q-violet);
+    --p-purple-soft: var(--q-violet-soft);
+    /* superfície premium: onde o produto respira profundidade */
+    --p-deep: linear-gradient(158deg, #123258 0%, #0A1F3B 62%, #081A33 100%);
+    --p-deep-line: rgba(126, 178, 240, .20);
+    --p-on-deep: #E8F1FC;
+    --p-on-deep-dim: #9FBCDB;
     position: relative;
-    background: var(--p-bg); color: var(--p-text); border-radius: 26px;
+    background: var(--p-bg); color: var(--p-text); border-radius: 30px;
     height: 780px; overflow: hidden; display: flex; flex-direction: column;
-    font-size: 14px;
+    font-family: var(--font); font-size: 13.5px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* ---- tema ESCURO do interior: superfícies próprias, não inversão ---- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .screen {
+      --p-bg: #080F1B;
+      --p-surface: #101E2F;
+      --p-surface-2: #16273B;
+      --p-card: #101E2F;
+      --p-line: #1F3348;
+      --p-line-soft: #17283A;
+      --p-line-strong: #2C4763;
+      --p-ink: #EAF2FB;
+      --p-text: #D3E2F1;
+      --p-dim: #90AAC4;
+      --p-mute: #728FAB;
+      --p-gold: #5C9CF5;
+      --p-gold-soft: #122745;
+      --p-blue: #74B0F8;
+      --p-ok: #35C07E;  --p-ok-soft: #0E3227;
+      --p-bad: #F0685C; --p-bad-soft: #3A1A1A;
+      --p-warn: #F0A33E; --p-warn-soft: #3A2710;
+      --p-coin: #F5BC3F; --p-coin-soft: #3A2C0E;
+      --p-crystal: #6CC5F7; --p-crystal-soft: #102F45;
+      --p-purple: #A184F0; --p-purple-soft: #241B44;
+      --p-deep: linear-gradient(158deg, #16314F 0%, #0B1D31 62%, #071526 100%);
+      --p-on-deep: #E8F1FC;
+      --p-on-deep-dim: #9FBCDB;
+    }
+  }
+  :root[data-theme="dark"] .screen {
+    --p-bg: #080F1B; --p-surface: #101E2F; --p-surface-2: #16273B; --p-card: #101E2F;
+    --p-line: #1F3348; --p-line-soft: #17283A; --p-line-strong: #2C4763;
+    --p-ink: #EAF2FB; --p-text: #D3E2F1; --p-dim: #90AAC4; --p-mute: #728FAB;
+    --p-gold: #5C9CF5; --p-gold-soft: #122745; --p-blue: #74B0F8;
+    --p-ok: #35C07E; --p-ok-soft: #0E3227; --p-bad: #F0685C; --p-bad-soft: #3A1A1A;
+    --p-warn: #F0A33E; --p-warn-soft: #3A2710;
+    --p-coin: #F5BC3F; --p-coin-soft: #3A2C0E;
+    --p-crystal: #6CC5F7; --p-crystal-soft: #102F45;
+    --p-purple: #A184F0; --p-purple-soft: #241B44;
+    --p-deep: linear-gradient(158deg, #16314F 0%, #0B1D31 62%, #071526 100%);
   }
   .statusbar {
     display: flex; justify-content: space-between; padding: 10px 18px 6px;

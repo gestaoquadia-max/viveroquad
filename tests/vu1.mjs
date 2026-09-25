@@ -7,6 +7,9 @@ const S = new URL('./_out', import.meta.url).pathname;
 const b = await chromium.launch({ executablePath: process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
 const c = await b.newContext({ viewport: { width: 430, height: 900 }, deviceScaleFactor: 2 });
 const p = await c.newPage();
+/* dec. 220 — data relativa: fixa, ela vencia e o evento sumia da Loja. */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+
 const erros = [];
 p.on('pageerror', e => erros.push('JS: ' + e.message));
 let ok = 0; const falhas = [];
@@ -91,7 +94,7 @@ await navAdm('v-adm-hoje'); await p.waitForTimeout(300);
 await abrir('jumpInterno', 'eventos'); await p.waitForTimeout(300);
 await set('admEvNovoNome', 'Aulão da Lotação'); await set('admEvNovoTipo', 'pago');
 await set('admEvNovoMoeda', 'qdc'); await set('admEvNovoPreco', '50');
-await set('admEvNovoData', '2026-09-20'); await set('admEvNovoInicio', '18:00'); await set('admEvNovoFim', '20:00');
+await set('admEvNovoData', emDias(23)); await set('admEvNovoInicio', '18:00'); await set('admEvNovoFim', '20:00');
 await set('admEvSala', 'Sala 2');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
 t('a confirmação do evento diz os lugares da sala', /85 lugares/.test(await T('admEvErro')));

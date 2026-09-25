@@ -31,6 +31,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 
 | Parte | Conteúdo |
 |---|---|
+| 02-css-sistema | **Camada do design system** (dec. 220): tipografia (Sora + Manrope), famílias de card, HUD, timeline da aula, missão, avisos com nível, eventos, navegação, login, Domínio, Loja, tutoriais, desktop com rail e microinterações. Carrega depois das folhas históricas e estabelece a linguagem do produto |
 | 01-css-base | Título, `__FONTS__`, temas claro/escuro, moldura `.phone`, login, portões, tutorial |
 | 02-css-gamificado | CSS do redesign gamificado: herói, admin, Loja, insígnias, rankings, media queries |
 | 03-html-aluno | Masthead, barra de personas e as 9 views do aluno |

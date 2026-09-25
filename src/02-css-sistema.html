@@ -1,0 +1,896 @@
+
+<style>
+  /* ==================================================================
+     CAMADA DO SISTEMA VISUAL · VIVER O QUAD (dec. 220)
+     Carrega DEPOIS das folhas históricas e estabelece a linguagem do
+     produto sobre os tokens de 01-css-base. Nada de cor, raio, sombra
+     ou espaço solto aqui: tudo sai de var(--…).
+
+     Ordem do arquivo:
+       1. Tipografia (escala)
+       2. Primitivos (superfície, borda, foco, movimento)
+       3. Famílias de card
+       4. Botões, chips e rótulos
+       5. HUD do aluno
+     ================================================================== */
+
+  /* ============ 1. TIPOGRAFIA ============
+     Sora carrega identidade (títulos, números, gamificação).
+     Manrope carrega leitura (corpo, campos, menus, descrições).
+     A escala é fechada: componente nenhum inventa tamanho.          */
+  .screen {
+    --t-display: 700 22px/1.18 var(--title);
+    --t-h1:      700 18px/1.25 var(--title);
+    --t-h2:      700 15.5px/1.3 var(--title);
+    --t-h3:      700 14px/1.35 var(--ui);
+    --t-card:    700 13.5px/1.35 var(--ui);
+    --t-body:    400 13px/1.55 var(--font);
+    --t-body-sm: 400 12px/1.5 var(--font);
+    --t-caption: 500 11px/1.45 var(--font);
+    --t-label:   700 10px/1.2 var(--ui);
+    --t-stat:    700 17px/1.1 var(--num);
+  }
+  /* o display do produto: caixa alta SÓ aqui e nos rótulos */
+  .screen .mil {
+    font: var(--t-h1); font-family: var(--title); text-transform: uppercase;
+    letter-spacing: -.005em; color: var(--p-ink);
+  }
+  .screen h2.mil, .screen .lh-title { font: var(--t-display); font-family: var(--title); letter-spacing: -.01em; }
+  .screen h3 { font: var(--t-h3); color: var(--p-ink); margin: 0; }
+  .screen .p-card h3 { font: var(--t-h2); font-family: var(--title); color: var(--p-ink); letter-spacing: -.005em; }
+  .screen .sub, .screen .p-card .sub { font: var(--t-body); color: var(--p-dim); }
+  /* rótulo de seção: o único lugar com caixa alta espaçada */
+  .screen .k-label {
+    font: var(--t-label); font-family: var(--ui); letter-spacing: .09em;
+    text-transform: uppercase; color: var(--p-mute);
+  }
+  .screen .k-label.sub-k { color: var(--p-mute); }
+  /* números e estatísticas: Sora tabular, sempre alinhados */
+  .screen .xp-num, .screen .coins-val, .screen .rk-pts, .screen .rk-pos,
+  .screen .st-qtd, .screen .li-preco, .screen .cart-total b, .screen .tile b {
+    font-family: var(--num); font-variant-numeric: tabular-nums;
+  }
+
+  /* ============ 2. PRIMITIVOS ============ */
+  .screen *:focus-visible {
+    outline: 2px solid var(--p-gold); outline-offset: 2px; border-radius: var(--r-xs);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen *, .screen *::before, .screen *::after {
+      animation-duration: .01ms !important; transition-duration: .01ms !important;
+    }
+  }
+
+  /* ============ 3. FAMÍLIAS DE CARD ============
+     Um retângulo branco para tudo era o problema. Cada família tem
+     papel próprio: utilitário, informativo, premium e missão.      */
+  .screen .p-card {
+    background: var(--p-surface);
+    border: 1px solid var(--p-line);
+    border-radius: var(--r-xl);
+    box-shadow: var(--sh-sm);
+    padding: var(--sp-4);
+  }
+  /* informativo: ganha uma faixa de acento à esquerda */
+  .screen .p-card.info { border-left: 3px solid var(--p-gold); }
+  /* premium/profundidade: superfície escura da marca */
+  .screen .p-card.deep {
+    background: var(--p-deep); border-color: var(--p-deep-line);
+    color: var(--p-on-deep); box-shadow: var(--sh-lg);
+  }
+  .screen .p-card.deep h3, .screen .p-card.deep .mil { color: var(--p-on-deep); }
+  .screen .p-card.deep .sub, .screen .p-card.deep .k-label { color: var(--p-on-deep-dim); }
+  /* destaque: o antigo .spot, agora contido */
+  .screen .view .p-card.spot {
+    border-color: var(--q-blue-200);
+    box-shadow: 0 10px 30px rgba(30, 99, 233, .12);
+  }
+
+  /* ============ 4. BOTÕES, CHIPS E RÓTULOS ============ */
+  .screen .btn {
+    font: 700 13px var(--ui); letter-spacing: .01em;
+    border-radius: var(--r-md); padding: 11px 16px;
+    background: var(--p-gold); color: #fff; border: 1px solid transparent;
+    box-shadow: 0 2px 8px rgba(30, 99, 233, .22);
+    transition: transform var(--mo-fast) var(--ease), box-shadow var(--mo) var(--ease),
+                background var(--mo) var(--ease);
+    text-transform: none;
+  }
+  .screen .btn:hover { box-shadow: 0 4px 14px rgba(30, 99, 233, .30); }
+  .screen .btn:active { transform: translateY(1px); box-shadow: 0 1px 4px rgba(30, 99, 233, .24); }
+  .screen .btn.ghost {
+    background: var(--p-surface); color: var(--p-text);
+    border: 1px solid var(--p-line-strong); box-shadow: none; font-weight: 600;
+  }
+  .screen .btn.ghost:hover { background: var(--p-surface-2); border-color: var(--p-gold); color: var(--p-gold); }
+  .screen .btn.small { padding: 8px 12px; font-size: 12px; border-radius: var(--r-sm); }
+  .screen .btn:disabled { opacity: .5; box-shadow: none; }
+
+  /* ============ 5. HUD DO ALUNO ============
+     O nome do aluno é o protagonista. A carteira desce para uma linha
+     própria — antes ela roubava a largura e truncava o nome.        */
+  .screen .app-top.idbar {
+    background: var(--p-surface);
+    border-bottom: 1px solid var(--p-line);
+    padding: var(--sp-3) var(--sp-4) var(--sp-3);
+    gap: var(--sp-3);
+  }
+  .screen .id-row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .screen .who { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .screen .who .name.mil {
+    font: 800 16.5px/1.15 var(--title); text-transform: uppercase;
+    letter-spacing: -.01em; color: var(--p-ink); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  /* patente vira BADGE, não mais texto solto */
+  .screen .rank-line { display: inline-flex; align-items: center; gap: 6px; }
+  .screen .rank-line .rank-name {
+    font: 700 10px var(--ui); letter-spacing: .07em; text-transform: uppercase;
+    color: var(--p-gold); background: var(--p-gold-soft);
+    border: 1px solid var(--q-blue-200); border-radius: var(--r-pill);
+    padding: 3px 9px;
+  }
+  .screen .turma-line {
+    font: 600 11px var(--font); color: var(--p-dim); background: none;
+    border: 0; padding: 0; text-align: left; cursor: pointer;
+    text-transform: none; letter-spacing: 0;
+  }
+  .screen .turma-line:hover { color: var(--p-gold); }
+  /* carteira: linha própria, dois chips lado a lado */
+  .screen .wallet-col {
+    order: 3; flex: 1 0 100%; display: grid;
+    grid-template-columns: 1fr 1fr; gap: var(--sp-2);
+  }
+  .screen .coins-card, .screen .dmn-card {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    background: var(--p-surface-2); border: 1px solid var(--p-line);
+    border-radius: var(--r-md); padding: 7px 10px; cursor: pointer;
+    transition: border-color var(--mo) var(--ease), transform var(--mo-fast) var(--ease);
+  }
+  .screen .coins-card:hover { border-color: var(--p-coin); }
+  .screen .dmn-card:hover { border-color: var(--p-crystal); }
+  .screen .coins-card:active, .screen .dmn-card:active { transform: translateY(1px); }
+  .screen .coin-art, .screen .dmn-art { width: 22px; height: 22px; flex: none; }
+  .screen .coins-txt { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .screen .coins-lbl {
+    font: 700 8.5px var(--ui); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--p-mute);
+  }
+  .screen .coins-val { font: 700 14px var(--num); color: var(--p-ink); font-variant-numeric: tabular-nums; }
+  .screen .coins-card .coins-val { color: var(--q-gold); }
+  .screen .dmn-card .coins-val { color: var(--p-crystal); }
+  /* barra de evolução: nível atual → progresso → próximo nível */
+  .screen .xp-row {
+    display: flex; align-items: center; gap: var(--sp-2);
+    padding-top: var(--sp-1);
+  }
+  .screen .score-lbl {
+    font: 700 9.5px var(--ui); letter-spacing: .09em; text-transform: uppercase;
+    color: var(--p-mute); flex: none;
+  }
+  .screen .xp-track {
+    flex: 1; height: 7px; border-radius: var(--r-pill);
+    background: var(--p-line); overflow: hidden;
+  }
+  .screen .xp-fill {
+    height: 100%; border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--q-blue-500), var(--q-cyan));
+    transition: width var(--mo-slow) var(--ease);
+  }
+  .screen .xp-num { font: 700 11px var(--num); color: var(--p-text); flex: none; font-variant-numeric: tabular-nums; }
+  .screen .avatar-ring {
+    border-radius: 50%; padding: 2px; flex: none;
+    background: linear-gradient(140deg, var(--q-blue-400), var(--q-cyan));
+    border: 0; cursor: pointer;
+    transition: transform var(--mo-fast) var(--ease);
+  }
+  .screen .avatar-ring:active { transform: scale(.96); }
+</style>
+
+<style>
+  /* ============ 6. AULA DE HOJE · TIMELINE ============
+     Antes era uma pilha de linhas horizontais. Agora é uma agenda:
+     horário → trilho → matéria/professor → estado. A aula de agora
+     se destaca; a encerrada recua; a próxima fica neutra.          */
+  .screen #salaCard .card-head { margin-bottom: var(--sp-3); }
+  .screen .card-eyebrow {
+    font: 700 10px var(--ui); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--p-mute);
+  }
+  .screen .aula-title { font: 700 16px/1.25 var(--title); color: var(--p-ink); letter-spacing: -.01em; }
+  .screen #aulaDia { font: var(--t-body-sm); color: var(--p-dim); margin-top: 2px; }
+  .screen #aulaSlots { margin-top: var(--sp-3); }
+  .screen .aula-slot {
+    position: relative; border-top: 0; padding: 0 0 var(--sp-4) 0;
+    display: grid; grid-template-columns: 76px 1fr auto;
+    align-items: start; column-gap: var(--sp-4);
+  }
+  .screen .aula-slot:last-child { padding-bottom: 2px; }
+  /* trilho da agenda */
+  .screen .aula-slot::before {
+    content: ''; position: absolute; left: 82px; top: 16px; bottom: 0;
+    width: 2px; background: var(--p-line); border-radius: 2px;
+  }
+  .screen .aula-slot:last-child::before { display: none; }
+  /* marcador de categoria: cor por posição na grade */
+  .screen .aula-slot::after {
+    content: ''; position: absolute; left: 77px; top: 4px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--p-surface); border: 2.5px solid var(--q-violet);
+    transition: box-shadow var(--mo) var(--ease);
+  }
+  .screen .aula-slot:nth-child(2)::after { border-color: var(--q-cyan); }
+  .screen .aula-slot:nth-child(3)::after { border-color: var(--q-orange); }
+  .screen .aula-slot .a-hr {
+    font: 700 10.5px/1.3 var(--num); color: var(--p-text); background: none; white-space: nowrap;
+    border: 0; padding: 0; text-align: left; font-variant-numeric: tabular-nums;
+    border-radius: 0;
+  }
+  .screen .aula-slot .a-info { grid-column: 2; min-width: 0; padding-left: var(--sp-3); }
+  .screen .aula-slot .a-info b {
+    font: 700 13px/1.3 var(--ui); color: var(--p-ink);
+    text-transform: none; display: block;
+  }
+  .screen .aula-slot .a-info span { font: var(--t-caption); color: var(--p-dim); margin-top: 2px; }
+  .screen .aula-slot .a-st {
+    grid-column: 3; align-self: start; flex: none;
+    font: 700 9px var(--ui); letter-spacing: .08em; text-transform: uppercase;
+    border-radius: var(--r-pill); padding: 4px 9px;
+    background: var(--p-surface-2); color: var(--p-dim); border: 1px solid var(--p-line);
+  }
+  /* estado: acontecendo agora */
+  .screen .aula-slot.now::after { border-color: var(--p-gold); box-shadow: 0 0 0 4px var(--p-gold-soft); }
+  .screen .aula-slot.now .a-info b { color: var(--p-gold); }
+  .screen .aula-slot.now .a-st {
+    background: var(--p-gold); color: #fff; border-color: transparent;
+  }
+  /* estado: encerrada */
+  .screen .aula-slot.done::after { background: var(--p-ok); border-color: var(--p-ok); }
+  .screen .aula-slot.done .a-info b { color: var(--p-dim); }
+  .screen .aula-slot.done .a-st { background: var(--p-ok-soft); color: var(--p-ok); border-color: transparent; }
+  /* rodapé do card: informação de apoio, não protagonista */
+  .screen .p-card .sub.aula-fonte, .screen .p-card .sub#salaSub {
+    font: var(--t-caption); color: var(--p-mute); margin-top: var(--sp-2);
+  }
+  .screen .tag.live.sq {
+    background: var(--p-surface-2); color: var(--p-dim); border: 1px solid var(--p-line);
+    font: 700 9px var(--ui); letter-spacing: .07em; border-radius: var(--r-pill); padding: 4px 9px;
+  }
+  .screen .hexi {
+    width: 30px; height: 30px; border-radius: var(--r-sm);
+    background: linear-gradient(145deg, var(--q-blue-500), var(--q-blue-700));
+    display: grid; place-items: center; flex: none;
+  }
+  .screen .hexi svg { width: 16px; height: 16px; }
+  .screen .card-head { display: flex; align-items: center; gap: var(--sp-2); }
+  .screen .card-head .tag { margin-left: auto; }
+</style>
+
+<style>
+  /* ============ 7. MISSÃO · o componente mais carregado ============
+     Contraste proposital com o resto da Home: superfície profunda da
+     marca, grade técnica e progresso segmentado. É aqui que o produto
+     mostra que é gamificado — e é por isso que os Avisos, logo abaixo,
+     são deliberadamente sóbrios.                                    */
+  .screen .hero-mission {
+    background: var(--p-deep); border: 1px solid var(--p-deep-line);
+    border-radius: var(--r-2xl); padding: 0;
+    /* clip (e não hidden): num item que atravessa colunas da grade do
+       desktop, overflow:hidden zera a altura mínima e colapsa a linha */
+    overflow: hidden; overflow: clip;
+    box-shadow: 0 18px 44px rgba(8, 28, 52, .28);
+    position: relative;
+  }
+  /* grade técnica de fundo — discreta, sem neon */
+  .screen .hero-mission::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(126, 178, 240, .07) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(126, 178, 240, .07) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(120% 90% at 78% 12%, #000 0%, transparent 72%);
+  }
+  .screen .hm-inner { position: relative; padding: var(--sp-4); }
+  .screen .hero-mission .k-label { color: var(--q-cyan); letter-spacing: .1em; }
+  .screen .hm-plaque {
+    width: 30px; height: 30px; border-radius: var(--r-sm); flex: none;
+    display: grid; place-items: center;
+    background: rgba(23, 182, 216, .14); border: 1px solid rgba(23, 182, 216, .34);
+    color: var(--q-cyan);
+  }
+  .screen .hm-plaque svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .screen .hm-status {
+    display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
+    font: 700 9.5px var(--ui); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--p-on-deep); background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .14); border-radius: var(--r-pill); padding: 4px 10px;
+  }
+  .screen .hm-status .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--q-cyan);
+    box-shadow: 0 0 0 3px rgba(23, 182, 216, .22);
+  }
+  .screen .hero-title {
+    font: 800 26px/1.05 var(--title); text-transform: uppercase; letter-spacing: -.015em;
+    color: #fff; margin: var(--sp-3) 0 var(--sp-2);
+  }
+  .screen .hero-sub { font: 400 12.5px/1.5 var(--font); color: var(--p-on-deep-dim); margin: 0; max-width: 30ch; }
+  .screen .hero-prog { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-4); }
+  .screen .hseg-track { flex: 1; display: flex; gap: 4px; }
+  .screen .hero-count-wrap { display: flex; flex-direction: column; align-items: flex-end; flex: none; }
+  .screen .hero-count { font: 800 16px var(--num); color: #fff; font-variant-numeric: tabular-nums; }
+  .screen .hero-count-lbl {
+    font: 700 8.5px var(--ui); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--p-on-deep-dim);
+  }
+  .screen .hero-btn-wrap { margin-top: var(--sp-4); }
+  .screen .btn.hero-btn {
+    width: 100%; background: var(--q-cyan); color: #04202B;
+    font: 800 13px var(--ui); letter-spacing: .01em;
+    border-radius: var(--r-md); padding: 12px 16px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 6px 18px rgba(23, 182, 216, .30);
+  }
+  .screen .btn.hero-btn:hover { box-shadow: 0 8px 24px rgba(23, 182, 216, .42); }
+  .screen .hb-chev { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.4; }
+  .screen .hm-mark { position: absolute; right: -14px; top: -10px; width: 118px; opacity: .07; pointer-events: none; }
+
+  /* ============ 8. AVISOS · sóbrios, com níveis ============
+     Contraponto à missão: sem profundidade, sem gradiente. O que muda
+     entre eles é o MARCADOR — cor + ícone, nunca só a cor.         */
+  .screen .mission-row {
+    display: flex; gap: var(--sp-3); align-items: flex-start;
+    padding: var(--sp-3) 0 var(--sp-3) var(--sp-3);
+    border-top: 1px solid var(--p-line-soft); border-left: 3px solid var(--p-line-strong);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    transition: background var(--mo) var(--ease);
+  }
+  .screen .mission-row:first-child { border-top: 0; }
+  .screen .mission-row:hover { background: var(--p-surface-2); }
+  .screen .mission-row .m-dot {
+    width: 26px; height: 26px; flex: none; border-radius: var(--r-sm);
+    display: grid; place-items: center; background: var(--p-surface-2);
+    color: var(--p-dim); font-size: 0;
+  }
+  .screen .mission-row .m-dot svg {
+    width: 15px; height: 15px; stroke: currentColor; fill: none;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .screen .mission-row .t { font: 700 12.5px/1.35 var(--ui); color: var(--p-ink); }
+  .screen .mission-row .d { font: 400 11.5px/1.45 var(--font); color: var(--p-dim); margin-top: 2px; }
+  /* níveis */
+  .screen .mission-row.av-urgente  { border-left-color: var(--p-bad); }
+  .screen .mission-row.av-urgente .m-dot  { background: var(--p-bad-soft); color: var(--p-bad); }
+  .screen .mission-row.av-material { border-left-color: var(--q-violet); }
+  .screen .mission-row.av-material .m-dot { background: var(--p-purple-soft); color: var(--q-violet); }
+  .screen .mission-row.av-evento   { border-left-color: var(--q-cyan); }
+  .screen .mission-row.av-evento .m-dot   { background: var(--q-cyan-soft); color: var(--q-cyan); }
+  .screen .mission-row.av-aula     { border-left-color: var(--p-gold); }
+  .screen .mission-row.av-aula .m-dot     { background: var(--p-gold-soft); color: var(--p-gold); }
+  .screen .mission-row.av-lembrete { border-left-color: var(--p-warn); }
+  .screen .mission-row.av-lembrete .m-dot { background: var(--p-warn-soft); color: var(--p-warn); }
+
+  /* ============ 9. EVENTOS · carrossel com capa ============ */
+  .screen .ev-strip {
+    display: flex; gap: var(--sp-3); overflow-x: auto; padding: var(--sp-3) 0 var(--sp-2);
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+  }
+  .screen .ev-strip::-webkit-scrollbar { display: none; }
+  .screen .ev-tile {
+    position: relative; flex: 0 0 200px; scroll-snap-align: start;
+    display: flex; flex-direction: column; gap: 3px; text-align: left; cursor: pointer;
+    min-height: 118px; padding: var(--sp-3); border-radius: var(--r-lg);
+    border: 1px solid var(--p-line); overflow: hidden;
+    background: var(--p-surface);
+    transition: transform var(--mo) var(--ease), box-shadow var(--mo) var(--ease);
+  }
+  .screen .ev-tile:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+  /* capa: quando houver arte, ela entra como fundo do próprio botão.
+     Sem arte, o fallback é a superfície da marca — nunca um vazio.  */
+  .screen .ev-tile::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background: linear-gradient(152deg, var(--q-blue-700), var(--q-blue-900));
+  }
+  .screen .ev-tile.ev-cyan::before   { background: linear-gradient(152deg, #0E6A80, #062B38); }
+  .screen .ev-tile.ev-violet::before { background: linear-gradient(152deg, #4B2C96, #22124A); }
+  .screen .ev-tile.ev-gold::before   { background: linear-gradient(152deg, #96701A, #3A2A06); }
+  .screen .ev-tile[style*="--capa"]::before {
+    background-image: var(--capa); background-size: cover; background-position: center;
+  }
+  .screen .ev-tile::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(4, 16, 32, .18) 0%, rgba(4, 16, 32, .82) 100%);
+  }
+  .screen .ev-tile > * { position: relative; z-index: 2; }
+  .screen .ev-tile .ev-date {
+    font: 700 9.5px var(--ui); letter-spacing: .09em; text-transform: uppercase;
+    color: var(--q-cyan);
+  }
+  .screen .ev-tile .ev-name { font: 700 13.5px/1.25 var(--title); color: #fff; margin-top: auto; }
+  .screen .ev-tile .ev-meta { font: 500 10.5px/1.35 var(--font); color: rgba(233, 243, 255, .74); }
+  .screen .ev-tile .tag {
+    align-self: flex-start; margin-top: var(--sp-2);
+    background: rgba(255, 255, 255, .14); color: #fff; border: 1px solid rgba(255, 255, 255, .22);
+    font: 700 8.5px var(--ui); letter-spacing: .08em; border-radius: var(--r-pill); padding: 3px 8px;
+  }
+  .screen .ev-tile .tag.gold { background: var(--q-gold); color: #33240A; border-color: transparent; }
+  .screen .ev-tile .tag.warn { background: var(--p-warn); color: #3A2205; border-color: transparent; }
+</style>
+
+<style>
+  /* ============ 10. LIMPEZA DOS CHANFROS LEGADOS ============
+     A "placa técnica" recortada brigava com o card novo e deixava
+     bordas soltas. A missão continua sendo o elemento mais forte da
+     Home — mas por superfície, contraste e ritmo, não por recorte.  */
+  .screen .hero-mission, .screen .hm-inner,
+  .screen .hm-plaque, .screen .hero-btn-wrap, .screen .btn.hero-btn {
+    clip-path: none;
+  }
+  .screen .hero-btn-wrap {
+    padding: 0; background: none; filter: none;
+  }
+  .screen .btn.hero-btn {
+    height: auto; border-radius: var(--r-md); text-transform: none;
+    font: 800 13.5px var(--ui); letter-spacing: .01em;
+    background: var(--q-cyan); color: #04202B;
+    box-shadow: 0 6px 18px rgba(23, 182, 216, .30);
+  }
+  .screen .btn.hero-btn .hb-chev { stroke: currentColor; stroke-width: 2.6; width: 15px; height: 15px; }
+  /* progresso segmentado: peças retas, cheias em ciano */
+  .screen .hseg-track {
+    padding: 5px 6px; border-radius: var(--r-sm);
+    background: rgba(4, 18, 36, .46); border: 1px solid rgba(126, 178, 240, .16);
+  }
+  .screen .hseg {
+    height: 10px; border-radius: 2px; transform: none;
+    background: rgba(146, 187, 233, .18);
+    transition: background var(--mo) var(--ease), box-shadow var(--mo) var(--ease);
+  }
+  .screen .hseg.on {
+    background: linear-gradient(180deg, #5FE0FA, var(--q-cyan));
+    box-shadow: 0 0 10px rgba(23, 182, 216, .5);
+  }
+
+  /* ============ 11. MASCOTE · assistente, não obstáculo ============
+     Continua sendo o Danilo, mas compacto e ancorado acima da barra —
+     antes ele cobria eventos e botões. A escala é por transform para
+     não quebrar a animação por quadros do sprite.                   */
+  .screen .danilo-fab {
+    right: 6px; bottom: 76px; z-index: 24;
+    transform: scale(.58); transform-origin: bottom right;
+    filter: drop-shadow(0 6px 14px rgba(9, 34, 90, .30));
+    transition: transform var(--mo) var(--ease);
+  }
+  .screen .danilo-fab:hover { transform: scale(.63); }
+  .screen .danilo-fab::before {
+    content: ''; position: absolute; right: 2px; bottom: -6px;
+    width: 104px; height: 104px; border-radius: 50%; z-index: -1;
+    background: radial-gradient(circle, rgba(30, 99, 233, .16), transparent 68%);
+  }
+  .screen .danilo-hint {
+    right: 66px; bottom: 96px; z-index: 24;
+    background: var(--p-surface); color: var(--p-text);
+    border: 1px solid var(--p-line-strong); box-shadow: var(--sh-md);
+    font: 600 10.5px var(--font); border-radius: var(--r-md) var(--r-md) 3px var(--r-md);
+    padding: 7px 11px;
+  }
+
+  /* ============ 12. NAVEGAÇÃO MOBILE ============ */
+  .screen .navbar {
+    background: var(--p-surface);
+    border-top: 1px solid var(--p-line);
+    box-shadow: var(--sh-up);
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  .screen .nav-btn {
+    font: 600 9.5px var(--ui); letter-spacing: .02em; color: var(--p-mute);
+    gap: 3px; border-radius: var(--r-sm); text-transform: uppercase;
+    transition: color var(--mo) var(--ease), background var(--mo) var(--ease);
+    position: relative;
+  }
+  .screen .nav-btn .ico { font-size: 16px; }
+  .screen .nav-btn:hover { color: var(--p-text); }
+  .screen .nav-btn.active { color: var(--p-gold); font-weight: 800; }
+  /* estado ativo não depende só da cor: ganha um traço superior */
+  .screen .nav-btn.active::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 22px; height: 3px; border-radius: 0 0 3px 3px; background: var(--p-gold);
+  }
+  .screen .nav-plus {
+    background: linear-gradient(160deg, var(--q-blue-400), var(--q-blue-600));
+    box-shadow: 0 8px 22px rgba(30, 99, 233, .40), 0 0 0 5px var(--p-surface);
+    transition: transform var(--mo) var(--ease), box-shadow var(--mo) var(--ease);
+  }
+  .screen .nav-plus:hover { box-shadow: 0 10px 28px rgba(30, 99, 233, .50), 0 0 0 5px var(--p-surface); }
+  .screen .nav-plus:active { transform: translateY(1px) scale(.97); }
+
+  /* ============ 13. AJUSTES DE LEITURA NOS EVENTOS ============ */
+  .screen .ev-tile { flex-basis: 212px; min-height: 126px; }
+  .screen .ev-tile .ev-name {
+    font: 700 13px/1.22 var(--title); overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .screen .ev-tile .ev-meta {
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  }
+  .screen #mineCard .sub { font: var(--t-caption); color: var(--p-mute); }
+</style>
+
+<style>
+  /* ============ 14. LOGIN · a porta de entrada ============
+     Antes: um formulário centralizado no branco. Agora: composição —
+     capa institucional + marca + posicionamento em cima, autenticação
+     numa folha elevada embaixo. A capa aceita a fotografia oficial do
+     Quad; sem foto, o fallback é a superfície profunda da marca com
+     uma grade técnica discreta (nunca uma imagem aleatória).        */
+  /* voltar ao login é IMEDIATO; sair dele é que desaparece suave. Antes
+     a entrada também levava 0,35s esmaecendo — tempo em que a tela ficava
+     tecnicamente invisível (dec. 220).                                */
+  .screen .login-layer { transition: none; }
+  .screen .login-layer.off { transition: opacity var(--mo) var(--ease); }
+  .screen .login-layer {
+    position: absolute; inset: 0; z-index: 60;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0; background: var(--p-bg); overflow: hidden; border-radius: 30px;
+  }
+  .screen .login-capa {
+    position: absolute; inset: 0; background: var(--p-deep); overflow: hidden;
+  }
+  /* com foto oficial no build, ela assume a capa */
+  .screen .login-layer[style*="login-capa:url('data:"] .login-capa {
+    background-image: var(--login-capa); background-size: cover; background-position: center 28%;
+  }
+  /* o véu escurece de cima para baixo: a marca respira no alto e o
+     texto de posicionamento fica legível logo acima da folha      */
+  .screen .login-capa::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(176deg, rgba(5, 22, 45, .30) 0%, rgba(5, 22, 45, .58) 46%, rgba(4, 17, 36, .88) 100%);
+  }
+  /* marca d'água do emblema preenche o alto quando não há fotografia */
+  .screen .login-capa .lc-grade::after {
+    content: ''; position: absolute; left: 50%; top: 16%;
+    width: 300px; height: 300px; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(70, 133, 242, .22), transparent 62%);
+  }
+  /* grade técnica do fallback — some quando há fotografia */
+  .screen .lc-grade {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(126, 178, 240, .10) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(126, 178, 240, .10) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(90% 70% at 50% 24%, #000 0%, transparent 74%);
+  }
+  .screen .login-hero {
+    position: relative; z-index: 1; text-align: center;
+    padding: var(--sp-8) var(--sp-5) var(--sp-6); margin-top: auto;
+  }
+  .screen .login-logo-wrap {
+    width: 76px; height: 76px; margin: 0 auto var(--sp-4); border-radius: var(--r-xl);
+    display: grid; place-items: center; background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .20);
+  }
+  .screen .login-logo { width: 52px; height: 52px; object-fit: contain; }
+  .screen .login-title {
+    font: 800 27px/1.05 var(--title); letter-spacing: -.015em;
+    text-transform: uppercase; color: #fff; margin: 0;
+  }
+  .screen .login-kicker {
+    font: 500 12.5px/1.55 var(--font); color: rgba(233, 243, 255, .92);
+    margin: var(--sp-3) auto 0; max-width: 30ch;
+  }
+  /* folha de autenticação */
+  .screen .login-sheet {
+    position: relative; z-index: 1;
+    background: var(--p-surface); border-top: 1px solid var(--p-line);
+    border-radius: var(--r-2xl) var(--r-2xl) 30px 30px;
+    padding: var(--sp-5) var(--sp-5) var(--sp-6);
+    box-shadow: 0 -14px 40px rgba(8, 28, 52, .18);
+  }
+  .screen .login-sub {
+    font: 400 12.5px/1.5 var(--font); color: var(--p-dim);
+    margin: 0 0 var(--sp-4); text-align: center;
+  }
+  .screen .login-field { margin-bottom: var(--sp-3); }
+  .screen .login-field label {
+    display: block; font: 700 10px var(--ui); letter-spacing: .08em;
+    text-transform: uppercase; color: var(--p-mute); margin-bottom: 6px;
+  }
+  .screen .login-field input {
+    width: 100%; font: 400 14px var(--font); color: var(--p-ink);
+    background: var(--p-surface-2); border: 1px solid var(--p-line-strong);
+    border-radius: var(--r-md); padding: 12px 14px; outline: none;
+    transition: border-color var(--mo) var(--ease), box-shadow var(--mo) var(--ease), background var(--mo) var(--ease);
+  }
+  .screen .login-field input::placeholder { color: var(--p-mute); }
+  .screen .login-field input:focus {
+    border-color: var(--p-gold); background: var(--p-surface);
+    box-shadow: 0 0 0 3px var(--p-gold-soft);
+  }
+  .screen .login-senha-wrap { position: relative; display: block; }
+  .screen .login-senha-wrap input { padding-right: 46px; }
+  .screen .login-olho {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: 34px; height: 34px; border: 0; background: none; cursor: pointer;
+    display: grid; place-items: center; border-radius: var(--r-sm); color: var(--p-mute);
+    transition: color var(--mo) var(--ease), background var(--mo) var(--ease);
+  }
+  .screen .login-olho svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .screen .login-olho:hover { color: var(--p-gold); background: var(--p-gold-soft); }
+  .screen .login-olho.on { color: var(--p-gold); }
+  .screen .login-olho.on::after {
+    content: ''; position: absolute; left: 7px; right: 7px; top: 50%;
+    height: 1.8px; background: currentColor; transform: rotate(-38deg); border-radius: 2px;
+  }
+  .screen .login-sheet .btn { padding: 13px 16px; font-size: 13.5px; }
+  .screen .gate-link {
+    display: block; width: 100%; text-align: center; background: none; border: 0;
+    font: 500 12px var(--font); color: var(--p-dim); cursor: pointer;
+  }
+  .screen .gate-link strong { color: var(--p-gold); font-weight: 700; }
+  .screen .gate-link:hover strong { text-decoration: underline; }
+</style>
+
+<style>
+  /* ============ 15. ETIQUETAS E BARRAS (compartilhados) ============ */
+  .screen .tag {
+    font: 700 9px var(--ui); letter-spacing: .08em; text-transform: uppercase;
+    border-radius: var(--r-pill); padding: 4px 9px;
+    background: var(--p-surface-2); color: var(--p-dim); border: 1px solid var(--p-line);
+  }
+  .screen .tag.gold  { color: var(--q-gold); background: var(--p-coin-soft); border-color: transparent; }
+  .screen .tag.live  { color: var(--p-ok); background: var(--p-ok-soft); border-color: transparent; }
+  .screen .tag.v1    { color: var(--p-gold); background: var(--p-gold-soft); border-color: transparent; }
+  .screen .tag.warn  { color: var(--p-warn); background: var(--p-warn-soft); border-color: transparent; }
+  .screen .tag.v2    { color: var(--q-violet); background: var(--p-purple-soft); border-color: transparent; }
+
+  /* ============ 16. DOMÍNIO · árvore do edital ============
+     Hierarquia por peso e recuo: matéria > assunto > subassunto.
+     A barra muda de cor por FAIXA de domínio (baixo/médio/alto), o
+     que evita a tela inteira verde.                                */
+  .screen .ed-mat { border-bottom: 1px solid var(--p-line-soft); padding: var(--sp-3) 0; }
+  .screen .ed-head { gap: var(--sp-2); padding: 2px 0; border-radius: var(--r-sm); }
+  .screen .ed-head:hover .ed-nm { color: var(--p-gold); }
+  .screen .ed-head .chev { transition: transform var(--mo) var(--ease); color: var(--p-mute); }
+  .screen .ed-mat.open > .ed-head .chev, .screen .ed-ass.open > .ed-head .chev { transform: rotate(90deg); }
+  .screen .ed-head .ed-nm { font: 700 13px var(--ui); color: var(--p-ink); }
+  .screen .ed-ass .ed-head .ed-nm { font: 600 12.5px var(--ui); color: var(--p-text); }
+  .screen .ed-sub .ed-head .ed-nm { font: 500 12px var(--font); color: var(--p-dim); }
+  .screen .ed-head .ed-pc {
+    font: 700 12.5px var(--num); font-variant-numeric: tabular-nums; color: var(--p-text);
+  }
+  .screen .ed-bar { height: 6px; background: var(--p-line); border-radius: var(--r-pill); }
+  .screen .ed-bar > i {
+    background: var(--p-gold); border-radius: var(--r-pill);
+    transition: width var(--mo-slow) var(--ease);
+  }
+  /* faixas de domínio */
+  .screen .ed-bar.baixo > i  { background: var(--p-warn); }
+  .screen .ed-bar.medio > i  { background: var(--p-gold); }
+  .screen .ed-bar.alto > i   { background: var(--p-ok); }
+  .screen .ed-asslist, .screen .ed-sublist { margin-left: 22px; }
+  .screen .ed-ass { border-top: 1px solid var(--p-line-soft); border-top-style: solid; }
+
+  /* ============ 17. QUIZ E FLASHCARD · foco na pergunta ============ */
+  .screen .quiz-head { padding: var(--sp-5) var(--sp-5) var(--sp-3); border-bottom: 1px solid var(--p-line); }
+  .screen .quiz-body { padding: var(--sp-5); }
+  .screen .quiz-foot { padding: var(--sp-3) var(--sp-5) var(--sp-5); border-top: 1px solid var(--p-line); }
+  .screen .q-alt {
+    border: 1px solid var(--p-line-strong); border-radius: var(--r-md);
+    padding: 13px 14px; background: var(--p-surface);
+    font: 400 13px/1.5 var(--font); color: var(--p-text);
+    transition: border-color var(--mo) var(--ease), background var(--mo) var(--ease),
+                transform var(--mo-fast) var(--ease);
+  }
+  .screen .q-alt:hover { border-color: var(--p-gold); }
+  .screen .q-alt:active { transform: scale(.995); }
+  .screen .q-alt .letter {
+    font: 700 11px var(--num); color: var(--p-dim);
+    width: 20px; height: 20px; border-radius: var(--r-xs); flex: none;
+    display: grid; place-items: center; background: var(--p-surface-2);
+  }
+  .screen .q-alt.sel { border-color: var(--p-gold); background: var(--p-gold-soft); }
+  .screen .q-alt.sel .letter { background: var(--p-gold); color: #fff; }
+  /* acerto e erro NÃO dependem só da cor: ganham sinal no marcador */
+  .screen .q-alt.hit  { border-color: var(--p-ok); background: var(--p-ok-soft); }
+  .screen .q-alt.hit .letter { background: var(--p-ok); color: #fff; font-size: 0; }
+  .screen .q-alt.hit .letter::after { content: '✓'; font: 700 12px var(--ui); }
+  .screen .q-alt.miss { border-color: var(--p-bad); background: var(--p-bad-soft); }
+  .screen .q-alt.miss .letter { background: var(--p-bad); color: #fff; font-size: 0; }
+  .screen .q-alt.miss .letter::after { content: '✕'; font: 700 12px var(--ui); }
+
+  /* ============ 18. QUAD STORE ============ */
+  .screen .loja-hero {
+    background: var(--p-deep); border: 1px solid var(--p-deep-line);
+    color: var(--p-on-deep); border-radius: var(--r-2xl); overflow: hidden; position: relative;
+  }
+  .screen .loja-hero .lh-title { color: #fff; }
+  .screen .loja-hero .lh-sub { color: var(--p-on-deep-dim); font: 400 12px/1.5 var(--font); }
+  .screen .loja-saldo {
+    background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: var(--r-md); color: #fff; font: 700 13px var(--num);
+    padding: 7px 12px; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .screen .loja-item {
+    background: var(--p-surface); border: 1px solid var(--p-line);
+    border-radius: var(--r-lg); padding: var(--sp-3); box-shadow: none;
+    transition: transform var(--mo) var(--ease), box-shadow var(--mo) var(--ease),
+                border-color var(--mo) var(--ease);
+  }
+  .screen .loja-item:hover { transform: translateY(-2px); box-shadow: var(--sh-md); border-color: var(--p-line-strong); }
+  .screen .loja-item .li-ico {
+    width: 40px; height: 40px; border-radius: var(--r-md);
+    background: var(--p-surface-2); color: var(--p-gold);
+  }
+  .screen .loja-item .li-nome { font: 700 12.5px/1.3 var(--ui); color: var(--p-ink); }
+  .screen .loja-item .li-desc { font: 400 11px/1.4 var(--font); color: var(--p-dim); }
+  .screen .loja-item .li-preco {
+    font: 700 11.5px var(--num); border-radius: var(--r-pill); padding: 4px 10px;
+    background: var(--p-coin-soft); color: #8A6206; border: 1px solid transparent;
+  }
+  .screen .loja-item[data-moeda="dmn"] .li-preco { background: var(--p-crystal-soft); color: #1B6FA0; }
+  /* indisponível: legível, sem apagar (a leitura não pode sofrer) */
+  .screen .loja-item.indisponivel { opacity: 1; background: var(--p-surface-2); border-style: dashed; }
+  .screen .loja-item.indisponivel .li-nome { color: var(--p-dim); }
+  .screen .loja-item.indisponivel .li-preco { background: var(--p-line); color: var(--p-dim); }
+  .screen .loja-item.comprado { border-color: var(--p-ok); }
+  .screen .loja-item.comprado .li-preco { background: var(--p-ok-soft); color: var(--p-ok); }
+  .screen .loja-sec {
+    font: 700 10px var(--ui); letter-spacing: .09em; text-transform: uppercase;
+    color: var(--p-mute); display: flex; align-items: center; gap: var(--sp-2);
+  }
+  .screen .loja-sec::after { content: ''; flex: 1; height: 1px; background: var(--p-line); }
+
+  /* ============ 19. CENTRAL DE TUTORIAIS ============ */
+  .screen .help-box {
+    background: var(--p-surface); border: 1px solid var(--p-line);
+    border-radius: var(--r-2xl); box-shadow: var(--sh-lg); padding: var(--sp-5);
+  }
+  .screen .help-title { font: 700 15.5px/1.3 var(--title); color: var(--p-ink); margin: 4px 0 var(--sp-4); }
+  .screen .tut-name b { font: 800 10.5px var(--ui); letter-spacing: .1em; color: var(--p-gold); }
+  .screen .tut-etapa { font: 600 10px var(--font); color: var(--p-mute); }
+  .screen .help-opt {
+    display: flex; align-items: center; gap: var(--sp-3);
+    border: 1px solid var(--p-line); border-radius: var(--r-md);
+    padding: 12px 14px; margin-bottom: var(--sp-2); background: var(--p-surface);
+    font: 600 12.5px var(--ui); color: var(--p-text);
+    transition: border-color var(--mo) var(--ease), background var(--mo) var(--ease),
+                transform var(--mo-fast) var(--ease);
+  }
+  .screen .help-opt::after {
+    content: '›'; margin-left: auto; font: 700 17px var(--ui); color: var(--p-mute); line-height: 1;
+  }
+  .screen .help-opt:hover {
+    border-color: var(--p-gold); background: var(--p-gold-soft); color: var(--p-gold);
+  }
+  .screen .help-opt:hover::after { color: var(--p-gold); }
+  .screen .help-opt:active { transform: translateY(1px); }
+</style>
+
+<style>
+  /* ============ 20. DESKTOP · shell próprio, não mobile esticado ============
+     Em tela larga a moldura deixa de ser um celular: a navegação
+     inferior vira RAIL LATERAL e o conteúdo se reorganiza em colunas.
+     Abaixo do ponto de corte nada muda — o mobile segue intacto.    */
+  @media (min-width: 1080px) {
+    .stage { justify-content: center; }
+    .phone {
+      width: min(1080px, 94vw); border-radius: 28px; padding: 8px;
+    }
+    .screen {
+      height: 760px; border-radius: 22px;
+      padding-left: 224px; font-size: 13.5px;
+    }
+    .screen .statusbar { display: none; }
+    /* barra inferior → rail lateral */
+    .screen .navbar {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 224px; overflow-y: auto;
+      flex-direction: column; justify-content: flex-start; align-items: stretch;
+      gap: var(--sp-1); padding: var(--sp-5) var(--sp-3);
+      border-top: 0; border-right: 1px solid var(--p-line);
+      box-shadow: none; background: var(--p-surface); z-index: 30;
+    }
+    .screen .navbar::before {
+      content: 'Viver o Quad'; display: block;
+      font: 800 13px var(--title); letter-spacing: -.01em; color: var(--p-ink);
+      padding: 0 var(--sp-3) var(--sp-4);
+    }
+    .screen .nav-btn {
+      flex: none; flex-direction: row; justify-content: flex-start; gap: var(--sp-3);
+      padding: 11px var(--sp-3); border-radius: var(--r-md);
+      font-size: 12.5px; text-transform: none; letter-spacing: 0;
+    }
+    .screen .nav-btn .ico { font-size: 18px; }
+    .screen .nav-btn:hover { background: var(--p-surface-2); }
+    .screen .nav-btn.active { background: var(--p-gold-soft); }
+    .screen .nav-btn.active::before {
+      top: 50%; left: 0; transform: translateY(-50%);
+      width: 3px; height: 20px; border-radius: 0 3px 3px 0;
+    }
+    /* o "+" deixa de flutuar e vira uma ação da lateral */
+    .screen .nav-plus {
+      position: static; width: 100%; height: 42px; border-radius: var(--r-md);
+      margin-top: var(--sp-3); box-shadow: 0 4px 14px rgba(30, 99, 233, .28);
+      order: 9;
+    }
+    /* conteúdo em colunas: o que empilhava no celular divide o espaço.
+       SÓ a view ativa vira grade — senão o display:grid venceria o
+       display:none e todas as telas apareceriam juntas.            */
+    .screen .view.on {
+      padding: var(--sp-5) var(--sp-5) var(--sp-6);
+      /* minmax(0,…): sem isso o carrossel de eventos empurra a largura
+         mínima da coluna e a grade inteira estoura (dec. 220)      */
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--sp-4); align-content: start;
+      max-width: 940px; margin: 0 auto;
+    }
+    /* blocos que mandam ocupam a largura inteira */
+    .screen .view.on > .app-top,
+    .screen #v-inicio.on > .p-card.hero-mission { grid-column: 1 / -1; }
+    .screen .app-top.idbar { grid-column: 1 / -1; border-radius: var(--r-xl); border: 1px solid var(--p-line); }
+    /* a Home segue a hierarquia: HUD, depois Aula + Missão, depois o resto */
+    .screen #v-inicio.on #salaCard { grid-column: 1 / -1; }
+    .screen .p-card { align-self: start; }
+    /* o mascote acompanha o canto inferior direito do conteúdo */
+    .screen .danilo-fab { bottom: 24px; right: 20px; }
+    .screen .danilo-hint { bottom: 112px; right: 74px; }
+    /* as camadas sobrepostas continuam cobrindo a tela inteira */
+    .screen .login-layer, .screen .storage-layer, .screen .item-layer,
+    .screen .ico-layer, .screen .quiz-layer, .screen .help-layer,
+    .screen .tut-layer, .screen .danilo-pop, .screen .compra-layer {
+      left: 0; right: 0;
+    }
+    .screen .login-layer { padding-left: 0; }
+    .screen .login-hero { max-width: 640px; margin-left: auto; margin-right: auto; }
+    .screen .login-sheet { max-width: 520px; margin: 0 auto; border-radius: var(--r-2xl); }
+  }
+  /* ============ 21. MICROINTERAÇÕES ============ */
+  /* Entrada da tela: SÓ opacidade. Com translateY o elemento muda de
+     posição enquanto o tutorial recorta o "buraco" do escurecimento no
+     alvo — o clique real caía no escuro e o roteiro travava (dec. 220). */
+  @keyframes vqSubir { from { opacity: 0; } to { opacity: 1; } }
+  .screen .view.on > * { animation: vqSubir var(--mo) var(--ease) both; }
+  .screen .p-card, .screen .loja-item, .screen .mkt-loja, .screen .st-slot {
+    transition: transform var(--mo) var(--ease), box-shadow var(--mo) var(--ease),
+                border-color var(--mo) var(--ease), background var(--mo) var(--ease);
+  }
+</style>
+
+<style>
+  /* ============ 22. CORREÇÕES DE CONTRASTE E ACABAMENTO ============ */
+  /* Loja: os saldos ficavam em azul escuro sobre a superfície profunda */
+  .screen .loja-hero .loja-saldo b, .screen .loja-hero .loja-saldo { color: #fff; }
+  .screen .loja-hero .loja-saldo img { width: 20px; height: 20px; }
+  .screen .loja-hero .lh-gift input {
+    background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20);
+    color: #fff; border-radius: var(--r-md); padding: 11px 13px; font: 400 13px var(--font);
+  }
+  .screen .loja-hero .lh-gift input::placeholder { color: rgba(226, 239, 253, .55); }
+  .screen .loja-hero .lh-gift input:focus {
+    border-color: var(--q-cyan); box-shadow: 0 0 0 3px rgba(23, 182, 216, .22); outline: none;
+  }
+  .screen .loja-hero .btn.ghost {
+    background: rgba(255, 255, 255, .10); border-color: rgba(255, 255, 255, .22); color: #fff;
+  }
+  .screen .loja-hero .btn.ghost:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+  .screen .loja-hero .lh-mark {
+    width: 54px; height: 54px; border-radius: var(--r-lg); margin: 0 auto var(--sp-3);
+    background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .20);
+    display: grid; place-items: center;
+  }
+  .screen .loja-hero .lh-mark svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 1.8; }
+  /* Domínio: o percentual acompanha a faixa da barra */
+  .screen .ed-bar > i { transition: width var(--mo-slow) var(--ease); }
+  .screen .ed-bar.baixo > i { background: var(--p-warn); }
+  .screen .ed-bar.medio > i { background: var(--p-gold); }
+  .screen .ed-bar.alto  > i { background: var(--p-ok); }
+  /* títulos de bloco da Loja: menos peso, mais respiro */
+  .screen .loja-macro {
+    font: 700 13px var(--title); color: var(--p-ink); text-transform: none;
+    letter-spacing: -.005em; display: flex; align-items: center; gap: var(--sp-2);
+  }
+  .screen .loja-macro .lm-ico {
+    width: 30px; height: 30px; border-radius: var(--r-sm); flex: none; display: grid; place-items: center;
+    background: var(--p-gold-soft); color: var(--p-gold);
+  }
+  .screen .loja-macro .lm-ico svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; }
+  /* Painel de domínio e demais cabeçalhos longos */
+  .screen .p-card h3 + .sub { margin-top: var(--sp-2); }
+</style>

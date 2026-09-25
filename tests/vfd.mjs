@@ -3,6 +3,11 @@ const { chromium } = pw;
 const b = await chromium.launch({ executablePath:process.env.VQ_CHROME ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
 const c = await b.newContext({viewport:{width:430,height:940}});
 const p = await c.newPage();
+/* dec. 220 — datas RELATIVAS ao dia da execução: fixá-las no calendário
+   transformava a suíte numa bomba-relógio (o evento vencia e o app,
+   corretamente, deixava de listá-lo).                              */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+
   await p.addInitScript(() => { window.__admTudo = true; });   /* blocos do admin abertos para o teste */ const errs=[]; p.on('pageerror',e=>errs.push(e.message));
 let pass=0, fail=0; const ok=(v,t)=>{ if(v){pass++;console.log('  ok  '+t);} else {fail++;console.log('  XX  '+t);} };
 const txt = id => p.evaluate(x=>{const e=document.getElementById(x);return e?e.textContent.replace(/\s+/g,' ').trim():'(inexistente)';},id);
@@ -42,13 +47,13 @@ ok(/Módulos/.test(await txt('toast')),'6.8 publicado em Módulos');
 // publica excursão com data
 await p.selectOption('#admProdCat','pres:excursao'); await p.waitForTimeout(200);
 await p.fill('#admProdNome','Excursão PRF Brasília'); await p.fill('#admProdDesc','ida e volta');
-await p.fill('#admProdPreco','500'); await p.fill('#admProdQtd','8'); await p.fill('#admProdData','2026-09-12');
+await p.fill('#admProdPreco','500'); await p.fill('#admProdQtd','8'); await p.fill('#admProdData',emDias(18));
 await p.click('#btnAdmProd'); await p.waitForTimeout(400);
 ok(/entra no calendário/.test(await txt('toast')),'6.9 excursão com data avisa que entra no calendário');
 // publica mentoria
 await p.selectOption('#admProdCat','dig:mentoria'); await p.waitForTimeout(200);
 await p.fill('#admProdNome','Mentoria individual CFO'); await p.fill('#admProdDesc','1h por semana');
-await p.fill('#admProdPreco','700'); await p.fill('#admProdData','2026-09-20');
+await p.fill('#admProdPreco','700'); await p.fill('#admProdData',emDias(26));
 /* a mentoria virou turma online: pede começo E fim */
 await p.click('#btnAdmProd'); await p.waitForTimeout(300);
 ok(/data de término/.test(await p.evaluate(()=>document.getElementById('admProdErro').textContent)),'6.9b mentoria cobra a data de término');

@@ -583,22 +583,38 @@
         </div>
 
         <!-- ============ LOGIN ============ -->
-        <div class="login-layer" id="loginLayer">
-          <div class="login-logo-wrap" id="logoWrap">
-            <img class="login-logo" src="__QUAD_SIMBOLO__" alt="Símbolo Quad Concursos">
+        <!-- dec. 220 — o login virou a porta de entrada do universo:
+             composição no alto (capa + marca + posicionamento) e a
+             autenticação numa folha própria embaixo. A capa aceita a
+             fotografia oficial do Quad pelo encaixe __LOGIN_CAPA__;
+             sem foto, o fallback é a superfície da marca.            -->
+        <div class="login-layer" id="loginLayer" style="--login-capa:url('__LOGIN_CAPA__')">
+          <div class="login-capa" aria-hidden="true"><span class="lc-grade"></span></div>
+          <div class="login-hero">
+            <div class="login-logo-wrap" id="logoWrap">
+              <img class="login-logo" src="__QUAD_SIMBOLO__" alt="Símbolo Quad Concursos">
+            </div>
+            <h2 class="login-title">VIVER O QUAD</h2>
+            <p class="login-kicker">A sua preparação inteira — aulas, missões, simulados e conquistas — dentro do Quad.</p>
           </div>
-          <h2 class="login-title">VIVER O QUAD</h2>
-          <p class="login-sub">Entre com a conta que você criou no site do Quad.</p>
-          <div class="login-field">
-            <label for="loginEmail">Login (e-mail)</label>
-            <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
+          <div class="login-sheet">
+            <p class="login-sub">Entre com a conta que você criou no site do Quad.</p>
+            <div class="login-field">
+              <label for="loginEmail">Login (e-mail)</label>
+              <input id="loginEmail" type="email" placeholder="voce@exemplo.com" autocomplete="off" />
+            </div>
+            <div class="login-field">
+              <label for="loginSenha">Senha</label>
+              <span class="login-senha-wrap">
+                <input id="loginSenha" type="password" placeholder="••••••••" autocomplete="off" />
+                <button type="button" class="login-olho" id="btnVerSenha" aria-label="Mostrar a senha" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.2 12S6 5.4 12 5.4 21.8 12 21.8 12 18 18.6 12 18.6 2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3.1"/></svg>
+                </button>
+              </span>
+            </div>
+            <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Entrar</button>
+            <button class="gate-link" id="btnCriarConta" style="margin-top:16px">Ainda não tem conta? <strong>Criar conta</strong></button>
           </div>
-          <div class="login-field">
-            <label for="loginSenha">Senha</label>
-            <input id="loginSenha" type="password" placeholder="••••••••" autocomplete="off" />
-          </div>
-          <button class="btn" id="btnAcessar" style="width:100%; margin-top:6px">Entrar</button>
-          <button class="gate-link" id="btnCriarConta" style="margin-top:16px">Ainda não tem conta? <strong>Criar conta</strong></button>
         </div>
 
         <div class="toast" id="toast"></div>
