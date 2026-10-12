@@ -1,5 +1,29 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 12/10/2026 — Leitura de Lei Seca
+
+- **A lei estudada artigo por artigo** (dec. 221): no "+" do aluno, logo
+  depois do chat da administração, entra a vitrine das leis publicadas —
+  o que cada uma trata, **um selo por edital** em que cai e quanto já foi
+  fixado.
+- **O dispositivo vem vazado**: as peças (com distratores) ficam na
+  bandeja, na zona do polegar. **Arrastar e tocar funcionam igual** — e
+  o teclado também; tocar numa lacuna preenchida devolve a peça.
+- **Acertar o dispositivo inteiro rende +5 de score e +3 QdC**; peça no
+  lugar errado é marcada e não pontua.
+- **Bloco de questões** depois dos dispositivos marcados pela
+  administração: **+3 de score e +2 QdC** por acerto, com comentário que
+  remete ao artigo.
+- Cada artigo mostra os **dispositivos que fazem referência a ele**.
+- O progresso entra na **DA-10**: sobrevive ao F5 e a leitura **retoma
+  onde parou**.
+- **No painel de controle**: nome da lei, do que trata, **em quais
+  editais cai** (seletor sobre os concursos da base) e o **CSV** com
+  artigos, referências e questões — colado ou como arquivo `.csv`. O que
+  não fecha é recusado com a linha apontada; o que publica entra **na
+  hora** na vitrine do aluno.
+- Suíte nova `vz8` (69 verificações).
+
 ## 25/09/2026 — Reformulação visual completa: o produto ganha design system
 
 - **Tokens de verdade** (dec. 220): marca, superfícies, texto, borda,

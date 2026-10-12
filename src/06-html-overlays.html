@@ -198,6 +198,10 @@
               <span class="grow"><span class="t">Chat · recados da administração</span><span class="d">mensagens exclusivas para você</span></span>
               <span class="chat-badge" id="chatBadge" style="display:none">1</span>
             </button>
+            <button class="plus-row" data-goto="v-lei-seca">
+              <span class="p-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.2A1.7 1.7 0 0 1 5.7 3.5H19v17H5.7A1.7 1.7 0 0 1 4 18.8Z"/><path d="M8 8h7M8 11.5h7M8 15h4"/></svg></span>
+              <span class="grow"><span class="t">Leitura de Lei Seca</span><span class="d">complete a lei artigo por artigo e fixe o texto</span></span>
+            </button>
             <button class="plus-row locked" data-lock="Chat ao vivo com a administração — próxima implementação">
               <span class="p-ico">✆</span>
               <span class="grow"><span class="t">Chat ao vivo</span><span class="d">conversa em tempo real com o time Quad</span></span>
@@ -359,6 +363,42 @@
             <div class="item-acoes">
               <button class="btn" id="btnLojaCarrinho">Ver carrinho</button>
             </div>
+          </div>
+        </div>
+
+        <!-- ============ LEITURA DE LEI SECA · sessão (dec. 221) ============ -->
+        <div class="lei-layer" id="leiLayer">
+          <div class="lei-topo">
+            <button class="storage-close" id="btnLeiSair" aria-label="Sair da leitura">✕</button>
+            <div class="lei-id">
+              <div class="k-label" id="leiNome">—</div>
+              <div class="lei-passo" id="leiPasso">—</div>
+            </div>
+            <div class="lei-track"><i id="leiFill" style="width:0%"></i></div>
+          </div>
+
+          <div class="lei-corpo" id="leiCorpo">
+            <!-- etapa: completar o artigo -->
+            <div id="leiArtigo">
+              <div class="lei-art-n" id="leiArtN">—</div>
+              <p class="lei-art-txt" id="leiArtTxt"></p>
+              <div class="lei-refs" id="leiRefs"></div>
+              <div class="k-label lei-bandeja-lb">Arraste ou toque para completar</div>
+              <div class="lei-pecas" id="leiPecas"></div>
+              <div class="lei-aviso" id="leiAviso"></div>
+            </div>
+            <!-- etapa: bloco de questões -->
+            <div id="leiQuiz" style="display:none">
+              <div class="lei-quiz-sel">Bloco de questões · fixação</div>
+              <p class="lei-q-enun" id="leiQEnun"></p>
+              <div id="leiQAlts"></div>
+              <div class="lei-coment" id="leiQComent"></div>
+            </div>
+          </div>
+
+          <div class="lei-rodape">
+            <span class="lei-premio" id="leiPremio"></span>
+            <button class="btn" id="btnLeiConferir">Conferir</button>
           </div>
         </div>
 

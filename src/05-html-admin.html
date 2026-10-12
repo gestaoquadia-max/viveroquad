@@ -105,6 +105,7 @@
               <button class="jp" data-jump="msg">Comunicação interna</button>
               <button class="jp" data-jump="gift">Criar Gift cards</button>
               <button class="jp" data-jump="estornos">Estornos e desistências</button>
+              <button class="jp" data-jump="leis">Leitura de Lei Seca</button>
               <button class="jp todos" data-jump="*">Ver todos os blocos</button>
             </div>
           </div>
@@ -268,6 +269,34 @@
             <div class="adm-sep"><span>Mensagens enviadas</span></div>
             <div id="admMsgList"></div>
             <p class="sub" style="margin-top:8px">Fale com <strong>um aluno</strong>, <strong>um professor</strong> ou com um <strong>público inteiro</strong>: os inscritos de uma turma, isolada, simulado ou evento — ou <strong>todos os alunos da plataforma</strong>. Para o aluno, chega no "+" com contador (estilo WhatsApp); para o professor, na sala dele. O chat ao vivo fica como próxima implementação.</p>
+          </div>
+
+          <!-- ============ LEITURA DE LEI SECA · publicação (dec. 221) ============ -->
+          <div class="p-card" data-bl="leis">
+            <div class="k-label">Leitura de Lei Seca · publicar uma lei</div>
+            <div class="adm-form">
+              <input class="fld" id="admLeiNome" placeholder="Nome da lei (ex.: Lei 8.112/90)">
+              <div class="adm-row" style="margin-top:8px">
+                <input class="fld" id="admLeiDesc" placeholder="Do que ela trata (ex.: Regime Jurídico dos Servidores Civis da União)">
+              </div>
+              <div class="k-label sub-k" style="margin-top:10px">Em quais editais ela cai</div>
+              <div class="lei-editais" id="admLeiEditais"></div>
+              <div class="k-label sub-k" style="margin-top:10px">Artigos, dispositivos e questões (CSV)</div>
+              <p class="sub" style="margin:2px 0 6px">Uma linha por dispositivo. Marque com <code>{{ }}</code> os trechos que viram lacuna. Colunas separadas por <strong>;</strong> e opções por <strong>|</strong>:</p>
+              <pre class="lei-csv-ex">tipo;ref;texto;opcoes;extra
+ART;Art. 1º;Esta Lei institui o {{Regime Jurídico}} dos servidores…;empresas públicas|autarquias;CF/88, art. 39
+QUESTAO;Art. 1º;Os cargos públicos são criados por:;decreto|lei|portaria;2</pre>
+              <textarea class="fld" id="admLeiCsv" rows="5" placeholder="Cole aqui o conteúdo do CSV…"></textarea>
+              <div class="adm-row" style="margin-top:8px; align-items:center">
+                <input type="file" id="admLeiArq" accept=".csv,text/csv" class="fld" style="max-width:190px">
+                <span class="sub" style="flex:1">ou escolha o arquivo .csv</span>
+              </div>
+              <div class="adm-alerta" id="admLeiErro"></div>
+              <div style="margin-top:10px"><button class="btn small" id="btnAdmLei">Publicar lei</button></div>
+            </div>
+            <div class="adm-sep"><span>Leis publicadas</span></div>
+            <div id="admLeiLista"></div>
+            <p class="sub" style="margin-top:8px">A lei entra na hora em <strong>Leitura de Lei Seca</strong>, no menu “+” do aluno. Em <strong>QUESTAO</strong>, a coluna <em>ref</em> diz depois de qual artigo o bloco aparece e <em>extra</em> é o número da alternativa correta. Toque no ✕ para tirar do ar.</p>
           </div>
 
           <div class="p-card" data-bl="gift">

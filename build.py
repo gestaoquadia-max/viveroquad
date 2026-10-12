@@ -7,7 +7,7 @@ import base64, pathlib
 root = pathlib.Path(__file__).resolve().parent
 
 partes = sorted((root / 'src').glob('[0-9][0-9]-*.html'))
-assert len(partes) == 22, 'esperava 22 partes em src/, achei %d' % len(partes)
+assert len(partes) == 23, 'esperava 23 partes em src/, achei %d' % len(partes)
 src = ''.join(p.read_text(encoding='utf-8') for p in partes)
 
 def b64(p, mime):

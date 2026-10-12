@@ -894,3 +894,167 @@
   /* Painel de domínio e demais cabeçalhos longos */
   .screen .p-card h3 + .sub { margin-top: var(--sp-2); }
 </style>
+
+<style>
+  /* ============ 23. LEITURA DE LEI SECA (dec. 221) ============
+     A lei vira exercício: artigo com lacunas, peças embaralhadas e
+     blocos de fixação. Família própria de componentes — não é card
+     utilitário nem missão.                                        */
+  .screen .lei-hero { text-align: center; }
+  .screen .lei-hero .lh-mark {
+    width: 52px; height: 52px; border-radius: var(--r-lg); margin: 0 auto var(--sp-3);
+    background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .20);
+    display: grid; place-items: center;
+  }
+  .screen .lei-hero .lh-mark svg { width: 25px; height: 25px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .screen .lei-hero .lh-title { color: #fff; }
+  .screen .lei-hero .lh-sub { color: var(--p-on-deep-dim); font: 400 12px/1.5 var(--font); margin-top: var(--sp-2); }
+
+  /* --- vitrine de leis --- */
+  .screen .lei-card {
+    width: 100%; display: flex; align-items: center; gap: var(--sp-3); text-align: left; cursor: pointer;
+    background: var(--p-surface); border: 1px solid var(--p-line); border-radius: var(--r-lg);
+    padding: var(--sp-3); margin-bottom: var(--sp-2);
+    transition: transform var(--mo) var(--ease), box-shadow var(--mo) var(--ease), border-color var(--mo) var(--ease);
+  }
+  .screen .lei-card:hover { transform: translateY(-2px); box-shadow: var(--sh-md); border-color: var(--p-line-strong); }
+  .screen .lei-card .lc-ico {
+    width: 38px; height: 38px; flex: none; border-radius: var(--r-md); display: grid; place-items: center;
+    background: var(--p-gold-soft); color: var(--p-gold);
+  }
+  .screen .lei-card .lc-ico svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .screen .lei-card .lc-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .screen .lei-card .lc-txt b { font: 700 13px var(--ui); color: var(--p-ink); }
+  .screen .lei-card .lc-txt small { font: 500 11px var(--font); color: var(--p-dim); }
+  /* um selo por edital: o aluno reconhece de relance se a lei cai no dele */
+  .screen .lei-card .lc-editais { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .screen .lei-card .lc-ed {
+    font: 700 9px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--q-violet);
+    background: var(--p-purple-soft); border-radius: var(--r-pill); padding: 3px 8px;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .screen .lei-card .lc-prog { height: 5px; border-radius: var(--r-pill); background: var(--p-line); margin-top: 6px; overflow: hidden; }
+  .screen .lei-card .lc-prog i { display: block; height: 100%; background: var(--p-gold); border-radius: var(--r-pill); }
+  .screen .lei-card .lc-pc { font: 600 10px var(--font); color: var(--p-mute); }
+  .screen .lei-card .lc-seta { font-size: 18px; color: var(--p-dim); flex: none; }
+
+  /* --- sessão de leitura --- */
+  .screen .lei-layer {
+    position: absolute; inset: 0; z-index: 48; display: none; flex-direction: column;
+    background: var(--p-bg); border-radius: 30px; overflow: hidden;
+  }
+  .screen .lei-layer.on { display: flex; }
+  .screen .lei-topo {
+    flex: none; position: relative; padding: var(--sp-5) var(--sp-4) var(--sp-3);
+    background: var(--p-deep); color: var(--p-on-deep);
+  }
+  .screen .lei-topo .storage-close { position: absolute; top: 14px; right: 14px; }
+  .screen .lei-topo .k-label { color: var(--q-cyan); }
+  .screen .lei-passo { font: 700 15px var(--title); color: #fff; margin-top: 2px; }
+  .screen .lei-track { height: 5px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .16); margin-top: var(--sp-3); overflow: hidden; }
+  .screen .lei-track i { display: block; height: 100%; border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--q-cyan), #6FE4FA); transition: width var(--mo-slow) var(--ease); }
+  .screen .lei-corpo { flex: 1; overflow-y: auto; padding: var(--sp-4) var(--sp-4) 0; display: flex; flex-direction: column; }
+  .screen #leiQuiz { padding-bottom: var(--sp-4); }
+  .screen .lei-corpo > div { display: flex; flex-direction: column; flex: 1; }
+  /* a bandeja desce para a base da tela: o texto fica em cima, as peças na
+     zona do polegar, num painel que se lê como bandeja */
+  .screen .lei-bandeja-lb {
+    margin: auto calc(var(--sp-4) * -1) 0; padding: var(--sp-3) var(--sp-4) 0;
+    border-top: 1px solid var(--p-line); background: var(--p-surface-2);
+  }
+  .screen .lei-art-n {
+    font: 800 11px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--p-gold);
+    background: var(--p-gold-soft); border-radius: var(--r-pill); padding: 4px 11px;
+    display: inline-block; align-self: flex-start;
+  }
+  .screen .lei-art-txt {
+    font: 400 14px/2.15 var(--font); color: var(--p-ink); margin: var(--sp-3) 0 0;
+  }
+  /* a lacuna */
+  .screen .lei-gap {
+    display: inline-block; min-width: 92px; padding: 1px 10px; margin: 0 1px;
+    border-bottom: 2px dashed var(--p-line-strong); border-radius: var(--r-xs) var(--r-xs) 0 0;
+    background: var(--p-surface-2); color: var(--p-ink); font-weight: 700; text-align: center;
+    cursor: pointer; vertical-align: -5px; min-height: 22px; line-height: 1.5;
+    transition: background var(--mo) var(--ease), border-color var(--mo) var(--ease);
+  }
+  .screen .lei-gap.alvo { background: var(--p-gold-soft); border-color: var(--p-gold); }
+  .screen .lei-gap.cheia { border-bottom-style: solid; border-color: var(--p-gold); background: var(--p-gold-soft); }
+  .screen .lei-gap.ok { border-color: var(--p-ok); background: var(--p-ok-soft); color: var(--p-ok); }
+  .screen .lei-gap.erro { border-color: var(--p-bad); background: var(--p-bad-soft); color: var(--p-bad); }
+  /* a lacuna certa/errada não depende só da cor */
+  .screen .lei-gap.ok::after { content: ' ✓'; font-size: 11px; }
+  .screen .lei-gap.erro::after { content: ' ✕'; font-size: 11px; }
+  .screen .lei-refs { margin-top: var(--sp-3); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .screen .lei-refs .lr-lb {
+    font: 700 9px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--p-mute); width: 100%;
+  }
+  .screen .lei-refs .lr-chip {
+    font: 600 10.5px var(--font); color: var(--p-dim);
+    background: var(--p-surface-2); border: 1px solid var(--p-line); border-radius: var(--r-pill); padding: 3px 9px;
+  }
+  /* a bandeja de peças */
+  .screen .lei-pecas {
+    display: flex; flex-wrap: wrap; gap: var(--sp-2);
+    margin: 0 calc(var(--sp-4) * -1); padding: var(--sp-2) var(--sp-4) var(--sp-3);
+    background: var(--p-surface-2);
+  }
+  .screen .lei-peca {
+    font: 700 12px var(--ui); color: var(--p-text); cursor: grab;
+    background: var(--p-surface); border: 1px solid var(--p-line-strong); border-radius: var(--r-sm);
+    padding: 9px 12px; box-shadow: var(--sh-sm);
+    transition: transform var(--mo-fast) var(--ease), border-color var(--mo) var(--ease), opacity var(--mo) var(--ease);
+  }
+  .screen .lei-peca:hover { border-color: var(--p-gold); }
+  .screen .lei-peca.sel { border-color: var(--p-gold); background: var(--p-gold-soft); color: var(--p-gold); transform: translateY(-1px); }
+  .screen .lei-peca.usada { opacity: .32; pointer-events: none; }
+  /* o recado fecha a bandeja, no mesmo painel das peças */
+  .screen .lei-aviso { margin-top: var(--sp-3); font: 600 12px/1.45 var(--font); min-height: 18px; }
+  .screen #leiArtigo .lei-aviso {
+    margin: 0 calc(var(--sp-4) * -1); padding: 0 var(--sp-4) var(--sp-4);
+    background: var(--p-surface-2);
+  }
+  .screen .lei-aviso.atencao { color: var(--p-warn); }
+  .screen .lei-aviso.erro { color: var(--p-bad); }
+  .screen .lei-aviso.ok { color: var(--p-ok); }
+  /* bloco de questões */
+  .screen .lei-quiz-sel {
+    font: 700 10px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--q-violet);
+    background: var(--p-purple-soft); border-radius: var(--r-pill); padding: 4px 11px;
+    display: inline-block; align-self: flex-start;
+  }
+  .screen .lei-q-enun { font: 600 14px/1.6 var(--font); color: var(--p-ink); margin: var(--sp-3) 0 var(--sp-3); }
+  .screen .lei-q-alt { width: 100%; display: flex; gap: 10px; text-align: left; margin-bottom: var(--sp-2); align-items: flex-start; }
+  .screen .lei-coment {
+    display: none; margin-top: var(--sp-3); font: 400 12px/1.55 var(--font); color: var(--p-text);
+    background: var(--p-surface-2); border-left: 3px solid var(--p-gold);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 10px 12px;
+  }
+  .screen .lei-coment.on { display: block; }
+  .screen .lei-rodape {
+    flex: none; display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4) var(--sp-4); border-top: 1px solid var(--p-line); background: var(--p-surface);
+  }
+  .screen .lei-premio {
+    flex: 1; font: 700 10.5px var(--ui); letter-spacing: .04em; color: var(--q-gold);
+  }
+  .screen .lei-rodape .btn { flex: none; min-width: 148px; }
+  /* painel do admin */
+  .screen .lei-editais { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+  .screen .lei-ed-opt {
+    display: flex; align-items: center; gap: 8px; font: 600 12px var(--font); color: var(--p-text);
+    background: var(--p-surface-2); border: 1px solid var(--p-line); border-radius: var(--r-sm); padding: 8px 10px; cursor: pointer;
+  }
+  .screen .lei-ed-opt small { color: var(--p-mute); font-weight: 500; }
+  .screen .lei-ed-opt:hover { border-color: var(--p-gold); }
+  .screen .lei-csv-ex {
+    font: 500 10px/1.6 var(--mono); color: var(--p-dim); background: var(--p-surface-2);
+    border: 1px solid var(--p-line); border-radius: var(--r-sm); padding: 9px 10px; margin: 0 0 8px;
+    overflow-x: auto; white-space: pre;
+  }
+  @media (min-width: 1080px) {
+    .screen .lei-layer { left: 0; right: 0; }
+    .screen .lei-corpo { max-width: 760px; margin: 0 auto; width: 100%; }
+  }
+</style>

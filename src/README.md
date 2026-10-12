@@ -1,7 +1,8 @@
-# src/ — o fonte do protótipo, em 20 partes
+# src/ — o fonte do protótipo, em 23 partes
 
 O protótipo é UM documento HTML. As partes deste diretório são **fatias
-contíguas** dele, na ordem do prefixo numérico (`01-…` a `20-…`): o build
+contíguas** dele, na ordem do prefixo numérico (`01-…` a `21-…`, com partes irmãs como
+`02-css-sistema` e `19-js-lei-seca`): o build
 (`build.py` ou `build.ps1`) as concatena **sem acrescentar nem remover um
 byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 `artifact.html` e `index.html`.
@@ -11,12 +12,12 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 1. **Edite as partes; nunca edite `index.html`/`artifact.html`** (são saída
    de build, não versionadas).
 2. **Nenhuma parte é HTML/CSS/JS válido sozinha.** O `<style>` abre na
-   parte 01 e fecha na 02; o layout abre na 03 e fecha na 06; o
-   `<script>` com o IIFE abre na 07 e só fecha na 20. **Não** rode
+   parte 01 e fecha na 02-css-sistema; o layout abre na 03 e fecha na 06;
+   o `<script>` com o IIFE abre na 07 e só fecha na 21. **Não** rode
    formatador, linter ou "auto-fix" em uma parte isolada — isso quebra a
    concatenação.
 3. **A ordem é imutável.** O JavaScript depende da ordem de execução
-   entre as partes (a cascata de inicialização fica na parte 20).
+   entre as partes (a cascata de inicialização fica na parte 21).
    Renomear ou reordenar partes = quebra silenciosa.
 4. **Tokens de build**: os de mídia (`__FONTS__`, `__DANILO_VIDEO__`,
    `__DANILO_SPRITE__`, `__QUAD_LOGO__`, `__QUAD_SIMBOLO__`,
@@ -25,7 +26,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
    preenchidos pelos fragmentos de `../data/*.js` — ver `data/README.md`)
    ocupam cada um uma única linha — não os quebre nem os renomeie; o
    build falha (de propósito) se algum sumir ou sobrar.
-5. Arquivos em LF, UTF-8 sem BOM; a parte 20 termina com newline final.
+5. Arquivos em LF, UTF-8 sem BOM; a parte 21 termina com newline final.
 
 ## O que há em cada parte
 
@@ -51,6 +52,7 @@ byte**, substitui os tokens `__*__` pelas mídias em base64 e gera
 | 17-js-admin-liberacoes | Eventos do admin (com os campos **Score / Quad Coins de participação**, dec. 200), pedidos/retiradas, portaria (autorizações de acesso), PDF de inscritos |
 | 18-js-admin-hoje-loja | Lançamento de simulados, dificuldades por aluno, governança da Loja |
 | 19-js-compras-estornos | **Carteira do aluno** (card único "Carteira · extrato e compras", dec. 197: `renderRelCompras` com os KPIs recebido/gasto/compras/a receber + `renderExtrato` do ledger, saldo de abertura `MV-00000`/`MV-00001`) e os **estornos** de 7 dias, que também lançam no extrato |
+| 19-js-lei-seca | **Leitura de Lei Seca** (dec. 221): a vitrine das leis (`renderLeiLista`), a sessão de leitura por lacunas (`leiRenderArtigo`/`leiLigarInteracao`/`leiConferirArtigo` — toque, arraste e teclado no mesmo componente), o bloco de questões de fixação (`leiRenderQuestao`/`leiResponderQuestao`) e a publicação pelo painel (`leiParseCSV`/`renderLeiEditais`/`renderLeiAdm`). Entre a 19 das compras e a 20 do mercado porque o IIFE é um só |
 | 20-js-mercado-interno | **Minha loja** do aluno (nome, lema, anúncios com reserva da mochila, abrir/fechar, vendas) e **Mercado interno** com vitrine por loja e carrinho em Quad Coins (dec. 216), mais o **Entreposto Quad** — a loja do sistema que compra qualquer item da mochila a 1 QdC por unidade (dec. 217) |
 | 21-js-relatorios-boot | Relatórios com gráficos, **persistência da evolução do aluno** (`evolSalvar`/`evolCarregar`/`evolMarcar`, chave `vq_evolucao`, debounce de 400 ms — DA-10, dec. 196), cascata de inicialização, fechamento do IIFE |
 

@@ -20,7 +20,7 @@ e o material de marca usado na construção.
 | **Comece aqui (guia do Danilo)** | [`docs/00-comece-aqui-danilo.md`](docs/00-comece-aqui-danilo.md) |
 | Protótipo online (sempre atualizado) | https://claude.ai/code/artifact/945e81a8-9ca3-4d55-9169-c4fc9f6f3703 |
 | Protótipo local | `index.html` (gerado pelo build — rode `build.py` ou `build.ps1` após clonar) |
-| Fonte editável | `src/` (20 partes — ver [`src/README.md`](src/README.md)) |
+| Fonte editável | `src/` (23 partes — ver [`src/README.md`](src/README.md)) |
 | **Arquitetura oficial (Consolidação v1.0)** | [`docs/arquitetura/00-arquitetura-oficial.md`](docs/arquitetura/00-arquitetura-oficial.md) |
 | Auditoria do protótipo (30/07/2026) | [`docs/auditoria/README.md`](docs/auditoria/README.md) |
 | Visão e escopo | [`docs/01-visao-e-escopo.md`](docs/01-visao-e-escopo.md) |
@@ -32,9 +32,9 @@ e o material de marca usado na construção.
 
 ```
 viveroquad/
-├── src/                            ← FONTE do protótipo em 20 partes (01-…20-…)
+├── src/                            ← FONTE do protótipo em 23 partes (01-…21-…)
 │   └── README.md                   ← tabela das partes e regras de edição
-├── data/                           ← dados demonstrativos (22 fragmentos __SEED_*__)
+├── data/                           ← dados demonstrativos (25 fragmentos __SEED_*__)
 │   └── README.md                   ← o que é cada conjunto e as relações entre eles
 ├── tests/                          ← 67 suítes de regressão Playwright (rede de segurança)
 │   ├── run.sh                      ← roda as suítes (./run.sh [suíte…])
@@ -70,7 +70,7 @@ Os arquivos do mascote chamam-se `danilo.*` por razão histórica — o guia do 
    [`src/README.md`](src/README.md) antes de mexer.
 2. **Buildar**: rode `python3 build.py` (qualquer sistema com Python) **ou**
    `build.ps1` (clique direito → Executar com PowerShell). O build concatena as
-   20 partes, injeta os dados demonstrativos de `data/`, valida os tokens,
+   23 partes, injeta os dados demonstrativos de `data/`, valida os tokens,
    embute as mídias como data URI e gera `index.html` (~9,4 MB) e
    `artifact.html` (versão para publicação).
 3. **Verificar**: `python3 verify.py` roda o build e as **67 suítes de
