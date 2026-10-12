@@ -56,21 +56,21 @@ Ou, no Windows:
 
 Os dois scripts fazem o mesmo:
 
-1. Concatenam as 20 partes de `src/` na ordem do prefixo, **sem acrescentar
+1. Concatenam as 23 partes de `src/` na ordem do prefixo, **sem acrescentar
    nem remover um byte**;
-2. Substituem os 10 tokens de mídia e injetam os 19 fragmentos de dados
+2. Substituem os tokens de mídia e injetam os 25 fragmentos de dados
    demonstrativos de `data/` (tokens `__SEED_*__`);
 3. Validam que nenhum token faltou **nem sobrou**;
 4. Gravam `artifact.html` (conteúdo publicado) e `index.html` (com o
    esqueleto `<html>` — abre com clique duplo).
 
-Depois do build, `python3 verify.py` roda a **regressão completa** (58 suítes
+Depois do build, `python3 verify.py` roda a **regressão completa** (68 suítes
 Playwright em [`tests/`](../tests/README.md)) — o portão de aceite de qualquer
 mudança no fonte.
 
 ### Validações (o build falha de propósito se…)
 
-- `src/` não tiver **exatamente 20 partes** `NN-*.html`;
+- `src/` não tiver **exatamente 23 partes** `NN-*.html`;
 - algum **token esperado estiver ausente** do fonte concatenado;
 - **sobrar token** não substituído na saída.
 
