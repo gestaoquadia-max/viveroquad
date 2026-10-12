@@ -9,6 +9,12 @@ async function ctx(){ const c = await b.newContext({ viewport:{width:430,height:
 const loginAluno = async () => { const p = await ctx(); await p.evaluate(()=>{localStorage.setItem('vq_tut_done','1');localStorage.setItem('vq_tut_skip','1');}); await p.fill('#loginEmail','aluno@quad.com'); await p.fill('#loginSenha','quad1234'); await p.click('#btnAcessar'); await p.waitForTimeout(5600); return p; };
 const persona = (p,q) => p.evaluate(pp=>{ document.querySelector('.persona-btn[data-persona="'+pp+'"]').click(); }, q);
 const toast = p => p.evaluate(()=>document.getElementById('toast').textContent);
+/* datas relativas ao dia da execução: datas fixas vencem no calendário e o
+   app — corretamente — para de listar evento vencido (precedente: dec. 220-a).
+   Domingo e sábado são os dias sem aula, então as salas estão livres. */
+const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+const proximoDomingo = () => { const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); return d.toISOString().slice(0, 10); };
+const proximoSabado = () => { const d = new Date(); d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7)); return d.toISOString().slice(0, 10); };
 async function entrarAdmin(p){ await persona(p,'admin'); await p.waitForTimeout(400); await p.fill('#admEmail','npp@quadconcursos.com.br'); await p.fill('#admChave','NPP-2026'); await p.click('#btnAdmEntrar'); await p.waitForTimeout(400); }
 const irLoja = p => p.evaluate(()=>document.querySelector('#navAluno .nav-btn[data-view="v-loja"]').click());
 /* a vitrine de eventos da Loja foi dividida em presenciais e online */
@@ -24,7 +30,7 @@ const carrosselTxt = p => p.evaluate(()=>document.getElementById('evStrip').text
   await p.evaluate(()=>document.querySelector('#navAdmin .nav-btn[data-view="v-adm-hoje"]').click()); await p.waitForTimeout(300);
   ok(await p.evaluate(()=>document.getElementById('admEvNovoInicio')?.type==='time' && document.getElementById('admEvNovoFim')?.type==='time'), 'ITEM1: campos de início E término existem');
   await p.fill('#admEvNovoNome','Aulão teste'); await p.fill('#admEvNovoResumo','revisão');
-  await p.fill('#admEvNovoData','2026-09-23'); await p.fill('#admEvNovoInicio','19:00'); await p.fill('#admEvNovoFim','21:30');
+  await p.fill('#admEvNovoData', emDias(10)); await p.fill('#admEvNovoInicio','19:00'); await p.fill('#admEvNovoFim','21:30');
   await p.evaluate(()=>document.getElementById('admEvNovoData').dispatchEvent(new Event('change')));
   await p.waitForTimeout(150);
   ok(/19H–21H30/.test(await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent)), 'ITEM1: prévia mostra faixa "19H–21H30": '+await p.evaluate(()=>document.getElementById('admEvNovoPrev').textContent));
@@ -73,7 +79,7 @@ const carrosselTxt = p => p.evaluate(()=>document.getElementById('evStrip').text
   // gratuito presencial
   await p.fill('#admEvNovoNome','Roda de estudos'); await p.fill('#admEvNovoResumo','grátis');
   await p.selectOption('#admEvNovoModal','presencial'); await p.selectOption('#admEvNovoTipo','gratuito');
-  await p.fill('#admEvNovoData','2026-09-27'); await p.fill('#admEvNovoInicio','18:00'); await p.fill('#admEvNovoFim','20:00');
+  await p.fill('#admEvNovoData', proximoDomingo()); await p.fill('#admEvNovoInicio','18:00'); await p.fill('#admEvNovoFim','20:00');
   await p.selectOption('#admEvSala','Sala 1');
   await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
   ok(/carrossel/i.test(await toast(p)), 'CRIAR: evento gratuito confirma entrada no Início');
@@ -83,7 +89,7 @@ const carrosselTxt = p => p.evaluate(()=>document.getElementById('evStrip').text
   ok(!(await p.evaluate(()=>document.getElementById('admEvNovoLink').disabled)), 'CRIAR: link habilita quando modalidade=online');
   ok(!(await p.evaluate(()=>document.getElementById('admEvNovoPreco').disabled)), 'CRIAR: preço habilita quando tipo=pago');
   await p.fill('#admEvNovoLink','https://meet.quad/ws'); await p.fill('#admEvNovoPreco','80');
-  await p.fill('#admEvNovoData','2026-09-26'); await p.fill('#admEvNovoInicio','20:00'); await p.fill('#admEvNovoFim','22:00');
+  await p.fill('#admEvNovoData', proximoSabado()); await p.fill('#admEvNovoInicio','20:00'); await p.fill('#admEvNovoFim','22:00');
   await p.selectOption('#admEvSala','Estúdio');   /* dec. 136: o online reserva o Estúdio à mão */
   await p.click('#btnAdmEvNovo'); await p.waitForTimeout(300);
   ok(/Loja/i.test(await toast(p)), 'CRIAR: evento pago confirma que está à venda na Loja');

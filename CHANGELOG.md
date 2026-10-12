@@ -23,6 +23,12 @@
   não fecha é recusado com a linha apontada; o que publica entra **na
   hora** na vitrine do aluno.
 - Suíte nova `vz8` (69 verificações).
+- **A semana da demonstração deixou de vencer** (dec. 221-a): as datas
+  dos eventos e da mentoria **nascem da data de hoje** (âncora na
+  próxima segunda-feira). A vitrine de eventos pagos da Loja estava
+  amanhecendo vazia porque o seed ficou parado em setembro — e o app,
+  corretamente, não lista evento vencido. As últimas datas fixas das
+  suítes (`vevento`, `vu1`, `vfasea`) também caíram.
 
 ## 25/09/2026 — Reformulação visual completa: o produto ganha design system
 

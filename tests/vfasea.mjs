@@ -30,7 +30,12 @@ const toast = p => p.evaluate(()=>document.getElementById('toast').textContent);
   ok(/SEMANA INSANA/i.test(await p.evaluate(()=>document.getElementById('evStrip').textContent)) && /NA LOJA/.test(await p.evaluate(()=>[...document.querySelectorAll('#evStrip .ev-tile')].find(t=>/SEMANA INSANA/i.test(t.textContent))?.textContent||'')), '1: evento pago da semana aparece no carrossel com "Na Loja"');
   await nav(p,'v-loja'); await p.waitForTimeout(400);
   const vitrine = await p.evaluate(()=>document.getElementById('lojaEventos-pres').textContent);
-  ok(/Semana Insana/.test(vitrine) && /400\s*Dmn/.test(vitrine) && /até 25\/09\/2026/.test(vitrine), '1: Semana Insana à venda (400 Dmn, até 31/07)');
+  /* a data do limite acompanha a semana da demonstração, que é relativa ao dia de hoje */
+  const ateInsana = await p.evaluate(() => {
+    const ev = (window.__eventos ? window.__eventos() : []).find(x => x.id === 'semana-insana');
+    return ev ? ev.ate.slice(8, 10) + '/' + ev.ate.slice(5, 7) + '/' + ev.ate.slice(0, 4) : '';
+  });
+  ok(/Semana Insana/.test(vitrine) && /400\s*Dmn/.test(vitrine) && !!ateInsana && vitrine.includes('até ' + ateInsana), '1: Semana Insana à venda (400 Dmn, com o limite da maratona)');
   // saldo demo (150 Dmn) não cobre — resgata gift card QUAD-500 antes
   await p.fill('#giftCode','QUAD-500'); await p.click('#btnGift'); await p.waitForTimeout(300);
   ok(await p.evaluate(()=>parseInt(document.getElementById('lojaSaldoDmn').textContent.replace(/\D/g,''),10))>=650, '1: gift card QUAD-500 creditou os Diamantes');

@@ -9,6 +9,10 @@ const c = await b.newContext({ viewport: { width: 430, height: 900 }, deviceScal
 const p = await c.newPage();
 /* dec. 220 — data relativa: fixa, ela vencia e o evento sumia da Loja. */
 const emDias = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+/* o evento desta suíte precisa de um dia SEM aula na Sala 2 — a turma
+   ocupa as noites de semana. Domingo é o dia livre, e ele é relativo
+   para a suíte não vencer com o calendário (precedente: dec. 220-a). */
+const proximoDomingo = () => { const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); return d.toISOString().slice(0, 10); };
 
 const erros = [];
 p.on('pageerror', e => erros.push('JS: ' + e.message));
@@ -94,7 +98,7 @@ await navAdm('v-adm-hoje'); await p.waitForTimeout(300);
 await abrir('jumpInterno', 'eventos'); await p.waitForTimeout(300);
 await set('admEvNovoNome', 'Aulão da Lotação'); await set('admEvNovoTipo', 'pago');
 await set('admEvNovoMoeda', 'qdc'); await set('admEvNovoPreco', '50');
-await set('admEvNovoData', emDias(23)); await set('admEvNovoInicio', '18:00'); await set('admEvNovoFim', '20:00');
+await set('admEvNovoData', proximoDomingo()); await set('admEvNovoInicio', '18:00'); await set('admEvNovoFim', '20:00');
 await set('admEvSala', 'Sala 2');
 await p.click('#btnAdmEvNovo'); await p.waitForTimeout(400);
 t('a confirmação do evento diz os lugares da sala', /85 lugares/.test(await T('admEvErro')));
