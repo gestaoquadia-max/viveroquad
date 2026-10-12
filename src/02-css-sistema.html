@@ -949,6 +949,13 @@
     background: var(--p-deep); color: var(--p-on-deep);
   }
   .screen .lei-topo .storage-close { position: absolute; top: 14px; right: 14px; }
+  .screen .lei-voltar {
+    position: absolute; top: 16px; left: var(--sp-4);
+    font: 700 11px var(--ui); letter-spacing: .04em; color: var(--q-cyan);
+    background: none; border: 0; padding: 0; cursor: pointer;
+  }
+  .screen .lei-voltar:hover { color: #fff; }
+  .screen .lei-topo:has(.lei-voltar:not([style*="display:none"])) .lei-id { margin-top: 14px; }
   .screen .lei-topo .k-label { color: var(--q-cyan); }
   .screen .lei-passo { font: 700 15px var(--title); color: #fff; margin-top: 2px; }
   .screen .lei-track { height: 5px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .16); margin-top: var(--sp-3); overflow: hidden; }
@@ -959,24 +966,73 @@
   .screen .lei-corpo > div { display: flex; flex-direction: column; flex: 1; }
   /* a bandeja desce para a base da tela: o texto fica em cima, as peças na
      zona do polegar, num painel que se lê como bandeja */
-  .screen .lei-bandeja-lb {
+  .screen #leiBandeja {
     margin: auto calc(var(--sp-4) * -1) 0; padding: var(--sp-3) var(--sp-4) 0;
     border-top: 1px solid var(--p-line); background: var(--p-surface-2);
   }
+  .screen .lei-bandeja-lb { margin: 0; }
+  /* --- índice da lei: as partes de estudo --- */
+  .screen .lei-retoma {
+    background: var(--p-deep); color: var(--p-on-deep); border-radius: var(--r-lg);
+    padding: var(--sp-4); display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  }
+  .screen .lei-retoma .k-label { color: var(--q-cyan); }
+  .screen .lei-retoma b { font: 700 15px/1.35 var(--title); color: #fff; }
+  .screen .lei-retoma small { font: 400 11.5px var(--font); color: var(--p-on-deep-dim); }
+  .screen .lei-retoma .btn { margin-top: var(--sp-2); }
+  .screen .lei-retoma.ok { background: var(--p-ok-soft); color: var(--p-ink); border: 1px solid var(--p-ok); }
+  .screen .lei-retoma.ok .k-label { color: var(--p-ok); }
+  .screen .lei-retoma.ok b { color: var(--p-ink); }
+  .screen .lei-retoma.ok small { color: var(--p-dim); }
+  .screen .lei-parte {
+    width: 100%; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 3px;
+    background: var(--p-surface); border: 1px solid var(--p-line); border-left: 3px solid var(--p-line-strong);
+    border-radius: var(--r-md); padding: var(--sp-3); margin-top: var(--sp-2);
+    transition: border-color var(--mo) var(--ease), transform var(--mo-fast) var(--ease);
+  }
+  .screen .lei-parte:hover { transform: translateX(2px); border-left-color: var(--p-gold); }
+  .screen .lei-parte.meio { border-left-color: var(--p-gold); }
+  .screen .lei-parte.ok { border-left-color: var(--p-ok); }
+  .screen .lei-parte .lp-top { display: flex; align-items: center; gap: var(--sp-2); }
+  .screen .lei-parte .lp-tit {
+    flex: 1; min-width: 0; font: 700 9.5px var(--ui); letter-spacing: .06em; text-transform: uppercase;
+    color: var(--p-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .screen .lei-parte .lp-selo {
+    flex: none; font: 800 8.5px var(--ui); letter-spacing: .07em;
+    color: var(--p-mute); background: var(--p-surface-2); border-radius: var(--r-pill); padding: 3px 7px;
+  }
+  .screen .lei-parte.meio .lp-selo { color: var(--p-gold); background: var(--p-gold-soft); }
+  .screen .lei-parte.ok .lp-selo { color: var(--p-ok); background: var(--p-ok-soft); }
+  .screen .lei-parte .lp-nome { font: 700 13px/1.35 var(--title); color: var(--p-ink); }
+  .screen .lei-parte .lp-prog { height: 4px; border-radius: var(--r-pill); background: var(--p-line); overflow: hidden; margin-top: 5px; }
+  .screen .lei-parte .lp-prog i { display: block; height: 100%; border-radius: var(--r-pill); background: var(--p-gold); }
+  .screen .lei-parte.ok .lp-prog i { background: var(--p-ok); }
+  .screen .lei-parte .lp-pc { font: 500 10.5px var(--font); color: var(--p-mute); }
+
+  /* --- o dispositivo: texto de lei, não texto de app --- */
+  .screen .lei-art-topo { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .screen .lei-parte-rot {
+    font: 700 9.5px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--p-mute);
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .screen .lei-art-n {
-    font: 800 11px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--p-gold);
-    background: var(--p-gold-soft); border-radius: var(--r-pill); padding: 4px 11px;
+    font: 800 12px var(--ui); letter-spacing: .04em; color: var(--p-gold);
+    background: var(--p-gold-soft); border-radius: var(--r-pill); padding: 4px 12px;
     display: inline-block; align-self: flex-start;
   }
+  /* leitura de lei: corpo maior, entrelinha de leitura, sem caixa alta e
+     sem justificar (justificado com lacuna inline abre buracos no texto) */
   .screen .lei-art-txt {
-    font: 400 14px/2.15 var(--font); color: var(--p-ink); margin: var(--sp-3) 0 0;
+    font: 400 15.5px/1.95 var(--font); color: var(--p-ink); margin: var(--sp-3) 0 0;
+    letter-spacing: .004em; text-align: left; overflow-wrap: break-word; hyphens: none;
   }
   /* a lacuna */
   .screen .lei-gap {
-    display: inline-block; min-width: 92px; padding: 1px 10px; margin: 0 1px;
+    display: inline-block; min-width: 104px; padding: 1px 11px; margin: 0 1px;
     border-bottom: 2px dashed var(--p-line-strong); border-radius: var(--r-xs) var(--r-xs) 0 0;
-    background: var(--p-surface-2); color: var(--p-ink); font-weight: 700; text-align: center;
-    cursor: pointer; vertical-align: -5px; min-height: 22px; line-height: 1.5;
+    background: transparent; color: var(--p-ink); font-weight: 600; text-align: center;
+    cursor: pointer; vertical-align: -6px; min-height: 24px; line-height: 1.55;
     transition: background var(--mo) var(--ease), border-color var(--mo) var(--ease);
   }
   .screen .lei-gap.alvo { background: var(--p-gold-soft); border-color: var(--p-gold); }
@@ -997,8 +1053,7 @@
   /* a bandeja de peças */
   .screen .lei-pecas {
     display: flex; flex-wrap: wrap; gap: var(--sp-2);
-    margin: 0 calc(var(--sp-4) * -1); padding: var(--sp-2) var(--sp-4) var(--sp-3);
-    background: var(--p-surface-2);
+    margin: 0; padding: var(--sp-2) 0 var(--sp-3);
   }
   .screen .lei-peca {
     font: 700 12px var(--ui); color: var(--p-text); cursor: grab;
@@ -1015,10 +1070,37 @@
     margin: 0 calc(var(--sp-4) * -1); padding: 0 var(--sp-4) var(--sp-4);
     background: var(--p-surface-2);
   }
+  /* sem recado não há faixa: o gabarito esconde a bandeja e a base limpa */
+  .screen #leiArtigo .lei-aviso:empty { padding: 0; min-height: 0; margin: 0; background: none; }
   .screen .lei-aviso.atencao { color: var(--p-warn); }
   .screen .lei-aviso.erro { color: var(--p-bad); }
   .screen .lei-aviso.ok { color: var(--p-ok); }
+  /* --- gabarito do dispositivo (depois do erro) --- */
+  .screen .lei-gab {
+    margin-top: var(--sp-4); background: var(--p-surface); border: 1px solid var(--p-line);
+    border-left: 3px solid var(--p-gold); border-radius: 0 var(--r-md) var(--r-md) 0; padding: var(--sp-3) var(--sp-4);
+  }
+  .screen .lei-gab .k-label { color: var(--p-gold); }
+  .screen .lei-gab-txt { font: 400 15px/1.9 var(--font); color: var(--p-ink); margin: var(--sp-2) 0 0; }
+  .screen .lei-gab-txt b {
+    font-weight: 700; color: var(--p-gold); background: var(--p-gold-soft);
+    border-radius: var(--r-xs); padding: 1px 5px;
+  }
+  .screen .lei-gab-nota { display: block; margin-top: var(--sp-3); font: 400 11.5px/1.5 var(--font); color: var(--p-dim); }
+  .screen .lei-aviso-acao { display: flex; justify-content: flex-start; }
+  .screen #leiArtigo .lei-aviso-acao {
+    margin: 0 calc(var(--sp-4) * -1); padding: 0 var(--sp-4) var(--sp-4); background: var(--p-surface-2);
+  }
+  .screen #leiArtigo .lei-aviso-acao:empty { padding: 0; }
+  .screen .btn.ghost {
+    background: var(--p-surface); color: var(--p-text); border: 1px solid var(--p-line-strong); box-shadow: none;
+  }
+  .screen .btn.ghost:hover { border-color: var(--p-gold); color: var(--p-gold); }
   /* bloco de questões */
+  .screen .lei-q-tit {
+    font: 700 9.5px var(--ui); letter-spacing: .06em; text-transform: uppercase;
+    color: var(--p-mute); margin-top: var(--sp-3);
+  }
   .screen .lei-quiz-sel {
     font: 700 10px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--q-violet);
     background: var(--p-purple-soft); border-radius: var(--r-pill); padding: 4px 11px;
@@ -1037,9 +1119,14 @@
     padding: var(--sp-3) var(--sp-4) var(--sp-4); border-top: 1px solid var(--p-line); background: var(--p-surface);
   }
   .screen .lei-premio {
-    flex: 1; font: 700 10.5px var(--ui); letter-spacing: .04em; color: var(--q-gold);
+    flex: 1 1 auto; min-width: 0; font: 700 10.5px/1.3 var(--ui); letter-spacing: .04em; color: var(--q-gold);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .screen .lei-rodape .btn { flex: none; min-width: 148px; }
+  .screen .lei-rodape .btn { flex: none; min-width: 132px; }
+  /* com o gabarito aberto o rodapé leva dois botões: o recado encolhe */
+  .screen .lei-rodape .btn.ghost { min-width: 0; padding-left: 14px; padding-right: 14px; }
+  .screen .lei-rodape:has(.btn.ghost:not([style*="display:none"])) .lei-premio { flex: 0 1 auto; font-size: 9.5px; }
+  .screen .lei-rodape:has(.btn.ghost:not([style*="display:none"])) .btn { min-width: 0; }
   /* painel do admin */
   .screen .lei-editais { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
   .screen .lei-ed-opt {
@@ -1053,6 +1140,17 @@
     border: 1px solid var(--p-line); border-radius: var(--r-sm); padding: 9px 10px; margin: 0 0 8px;
     overflow-x: auto; white-space: pre;
   }
+  /* cada CSV é um bloco fechado: explicação, colunas, exemplo e campos */
+  .screen .lei-csv-bloco {
+    margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px dashed var(--p-line);
+  }
+  .screen .lei-csv-cols { display: flex; flex-direction: column; gap: 3px; margin: 0 0 8px; }
+  .screen .lei-csv-cols span { font: 400 11px/1.45 var(--font); color: var(--p-dim); }
+  .screen .lei-csv-cols b {
+    font: 700 10px var(--mono); color: var(--p-gold); background: var(--p-gold-soft);
+    border-radius: var(--r-xs); padding: 1px 6px; margin-right: 6px;
+  }
+  .screen .lei-csv-cols i { color: var(--p-mute); font-style: normal; }
   @media (min-width: 1080px) {
     .screen .lei-layer { left: 0; right: 0; }
     .screen .lei-corpo { max-width: 760px; margin: 0 auto; width: 100%; }

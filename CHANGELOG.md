@@ -1,5 +1,21 @@
 # Histórico de versões — Viver o Quad (protótipo)
 
+## 12/10/2026 — Leitura de Lei Seca · a lei dividida, o gabarito e os dois CSVs
+
+- **A lei chega dividida como ela é** (dec. 221-b): título, capítulo,
+  seção. Abrir a lei abre um **índice de partes**, com o estado de cada
+  uma e quantas questões esperam no fecho.
+- **O app marca onde você parou** e convida a continuar dali — mas
+  qualquer parte pode ser aberta, inclusive mais à frente.
+- **Dois CSVs no painel**: o conteúdo da lei e o banco de questões, cada
+  um com seu campo e seu arquivo, com as colunas explicadas.
+- **As questões entram só no fecho da parte** — e são sorteadas entre os
+  títulos que o aluno **já revisou**.
+- **Ver gabarito** no lugar da tentativa infinita: o dispositivo inteiro
+  na forma correta, marcado como errado, com **repetir** ou **avançar**.
+- **Tipografia da leitura refeita**: corpo maior, entrelinha de leitura,
+  lacuna como linha pontilhada e bandeja ancorada na base.
+
 ## 12/10/2026 — Leitura de Lei Seca
 
 - **A lei estudada artigo por artigo** (dec. 221): no "+" do aluno, logo

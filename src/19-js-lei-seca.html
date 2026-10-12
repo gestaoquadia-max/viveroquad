@@ -1,27 +1,57 @@
   /* ==================================================================
      LEITURA DE LEI SECA (dec. 221)
-     A lei estudada por lacunas: o artigo aparece com trechos vazados e
-     as peças embaralhadas embaixo. O aluno arrasta (ou toca) até
-     completar; acertando, pontua um pouco de score e de Quad Coins e
-     avança. A cada bloco de artigos entram questões de fixação.
+     A lei estudada por lacunas, DIVIDIDA como ela é: título, capítulo,
+     seção. O aluno abre a lei e vê o índice — o app marca onde ele
+     parou, mas ele pode entrar em qualquer parte. Dentro da parte, um
+     dispositivo por vez: o texto vem vazado e as peças embaralhadas na
+     bandeja. Só ao FECHAR a parte entra o bloco de questões, sorteado
+     entre as questões dos títulos que ele já revisou.
 
      Decisão de interação: além de arrastar, TUDO funciona com toque —
      tocar a peça e tocar a lacuna. Arrastar é instável no celular e
      inacessível por teclado; o toque é o caminho garantido.
+
+     Decisão de correção (dec. 221-b): errar não vira tentativa infinita.
+     O aluno pode tentar de novo, mas tem sempre à mão VER GABARITO — que
+     abre o dispositivo inteiro na forma correta, marca o dispositivo
+     como errado (sem pontos) e oferece repetir ou avançar.
      ================================================================== */
   __SEED_LEIS_SECAS__
-  var LEI_SCORE_ART = 5, LEI_COIN_ART = 3;    /* por artigo completado */
+  var LEI_SCORE_ART = 5, LEI_COIN_ART = 3;    /* por dispositivo completado */
   var LEI_SCORE_Q = 3,  LEI_COIN_Q = 2;       /* por questão certa */
+  var LEI_Q_BLOCO = 3;                        /* questões sorteadas por bloco */
   var leiAtual = null;      /* a lei em leitura */
-  var leiIdx = 0;           /* índice do artigo */
-  var leiQFila = [];        /* questões pendentes do bloco */
-  var leiQIdx = 0;
-  var leiEmQuiz = false;
+  var leiParte = null;      /* a parte (título/capítulo) em leitura */
+  var leiIdx = 0;           /* índice do dispositivo dentro da parte */
+  var leiQFila = [], leiQIdx = 0, leiEmQuiz = false;
   var leiPecaSel = null;    /* peça escolhida esperando uma lacuna */
-  var leiProgresso = {};    /* id da lei → quantos artigos já concluiu */
+  var leiAcao = 'conferir'; /* o que o botão do rodapé faz agora */
+  var leiProgresso = {};    /* id da lei → { partes: {id: feitos}, ultima: id } */
 
   function leiDe(id) { return LEIS_SECAS.filter(function (l) { return l.id === id; })[0]; }
-  /* as lacunas do artigo, na ordem em que aparecem no texto */
+  function leiPartes(l) { return (l && l.partes) || []; }
+  function leiParteDe(l, id) { return leiPartes(l).filter(function (p) { return p.id === id; })[0] || null; }
+  function leiProg(id) {
+    if (!leiProgresso[id]) leiProgresso[id] = { partes: {}, ultima: '' };
+    if (!leiProgresso[id].partes) leiProgresso[id].partes = {};
+    return leiProgresso[id];
+  }
+  function leiFeitos(l, p) { return Math.min(leiProg(l.id).partes[p.id] || 0, p.artigos.length); }
+  function leiParteOk(l, p) { return leiFeitos(l, p) >= p.artigos.length; }
+  function leiTotal(l) { return leiPartes(l).reduce(function (s, p) { return s + p.artigos.length; }, 0); }
+  function leiFeitosTotal(l) { return leiPartes(l).reduce(function (s, p) { return s + leiFeitos(l, p); }, 0); }
+  /* o rótulo curto da parte: o capítulo/seção quando existe, senão o título */
+  function leiParteNome(p) { return p.capitulo || p.titulo; }
+  /* como a parte se apresenta no índice: em cima o lugar dela na lei,
+     embaixo o nome do pedaço — sem repetir a mesma frase duas vezes */
+  function leiParteRotulos(p) {
+    if (p.capitulo) return { cima: p.titulo, nome: p.capitulo };
+    var corte = p.titulo.indexOf('·');
+    if (corte > 0) return { cima: p.titulo.slice(0, corte).trim(), nome: p.titulo.slice(corte + 1).trim() };
+    return { cima: 'Parte da lei', nome: p.titulo };
+  }
+
+  /* as lacunas do dispositivo, na ordem em que aparecem no texto */
   function leiLacunas(art) {
     var achados = art.texto.match(/\{\{([^}]+)\}\}/g) || [];
     return achados.map(function (x) { return x.slice(2, -2).trim(); });
@@ -60,14 +90,15 @@
   function renderLeiLista() {
     var el = $('leiLista'); if (!el) return;
     el.innerHTML = LEIS_SECAS.map(function (l) {
-      var feitos = leiProgresso[l.id] || 0, total = l.artigos.length;
+      var feitos = leiFeitosTotal(l), total = leiTotal(l);
       var pct = total ? Math.round((feitos / total) * 100) : 0;
       return '<button type="button" class="lei-card" data-lei="' + l.id + '">' +
         '<span class="lc-ico"><svg viewBox="0 0 24 24"><path d="M4 5.2A1.7 1.7 0 0 1 5.7 3.5H19v17H5.7A1.7 1.7 0 0 1 4 18.8Z"/><path d="M8 8h7M8 11.5h7M8 15h4"/></svg></span>' +
         '<span class="lc-txt"><b>' + l.nome + '</b><small>' + l.desc + '</small>' +
         '<span class="lc-editais">' + leiEditalSelos(l.editais) + '</span>' +
         '<span class="lc-prog"><i style="width:' + pct + '%"></i></span>' +
-        '<small class="lc-pc">' + feitos + ' de ' + total + ' dispositivos · ' + pct + '%</small></span>' +
+        '<small class="lc-pc">' + leiPartes(l).length + (leiPartes(l).length === 1 ? ' parte · ' : ' partes · ') +
+        feitos + ' de ' + total + ' dispositivos · ' + pct + '%</small></span>' +
         '<span class="lc-seta">›</span></button>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma lei publicada ainda. A administração publica em <strong>Painel de controle · Leitura de Lei Seca</strong>.</p>';
     el.querySelectorAll('[data-lei]').forEach(function (bt) {
@@ -75,57 +106,123 @@
     });
   }
 
-  /* ---------------- sessão de leitura ---------------- */
+  /* ---------------- o índice da lei ---------------- */
   function leiAbrir(id) {
-    var l = leiDe(id); if (!l || !l.artigos.length) { toast('Esta lei ainda não tem dispositivos publicados.'); return; }
-    leiAtual = l;
-    /* retoma onde parou; quem já concluiu a lei entra de novo pelo começo,
-       em revisão — a pontuação não se repete (o guard do conferir cuida) */
-    var feitos = leiProgresso[id] || 0;
-    var revisao = feitos >= l.artigos.length;
-    leiIdx = revisao ? 0 : feitos;
-    leiEmQuiz = false; leiQFila = []; leiQIdx = 0;
+    var l = leiDe(id);
+    if (!l || !leiPartes(l).length) { toast('Esta lei ainda não tem dispositivos publicados.'); return; }
+    leiAtual = l; leiParte = null; leiEmQuiz = false; leiQFila = []; leiQIdx = 0;
     $('leiNome').textContent = l.nome;
     $('leiLayer').classList.add('on');
-    leiRenderArtigo();
-    if (revisao) toast('Você já concluiu esta lei — esta leitura é de revisão.');
+    leiRenderIndice();
   }
   function leiFechar() {
     $('leiLayer').classList.remove('on');
-    leiAtual = null; leiPecaSel = null;
+    leiAtual = null; leiParte = null; leiPecaSel = null;
     renderLeiLista();
   }
-  function leiProgressoUI() {
-    var total = leiAtual.artigos.length;
+  /* a parte em que o aluno deve retomar: a última aberta, se não acabou;
+     senão a primeira que ainda não fechou */
+  function leiParteRetomar(l) {
+    var pr = leiProg(l.id);
+    var ult = pr.ultima ? leiParteDe(l, pr.ultima) : null;
+    if (ult && !leiParteOk(l, ult)) return ult;
+    var abertas = leiPartes(l).filter(function (p) { return !leiParteOk(l, p); });
+    return abertas.length ? abertas[0] : null;
+  }
+  function leiRenderIndice() {
+    var l = leiAtual, total = leiTotal(l), feitos = leiFeitosTotal(l);
+    leiParte = null; leiEmQuiz = false; leiPecaSel = null;
+    $('leiIndice').style.display = ''; $('leiArtigo').style.display = 'none'; $('leiQuiz').style.display = 'none';
+    $('btnLeiVoltar').style.display = 'none';
+    $('leiRodape').style.display = 'none';
+    $('leiPasso').textContent = feitos + ' de ' + total + ' dispositivos fixados';
+    $('leiFill').style.width = (total ? Math.round(feitos / total * 100) : 0) + '%';
+
+    /* onde ele parou — e o convite para continuar dali */
+    var alvo = leiParteRetomar(l);
+    $('leiRetomar').innerHTML = alvo
+      ? '<div class="lei-retoma"><span class="k-label">' + (leiFeitos(l, alvo) ? 'Você parou aqui' : 'Comece por aqui') + '</span>' +
+        '<b>' + leiEscapar(leiParteNome(alvo)) + '</b>' +
+        '<small>' + leiFeitos(l, alvo) + ' de ' + alvo.artigos.length + ' dispositivos</small>' +
+        '<button type="button" class="btn small" data-ir="' + alvo.id + '">' +
+        (leiFeitos(l, alvo) ? 'Continuar a leitura' : 'Começar') + ' ›</button></div>'
+      : '<div class="lei-retoma ok"><span class="k-label">Lei concluída</span><b>Você fixou todos os dispositivos</b>' +
+        '<small>escolha qualquer parte abaixo para revisar — a revisão não pontua de novo</small></div>';
+
+    $('leiPartes').innerHTML = leiPartes(l).map(function (p) {
+      var f = leiFeitos(l, p), n = p.artigos.length, pc = n ? Math.round(f / n * 100) : 0;
+      var estado = f >= n ? 'ok' : (f ? 'meio' : '');
+      var selo = f >= n ? 'CONCLUÍDO' : (f ? 'EM ANDAMENTO' : 'A COMEÇAR');
+      var nq = (l.questoes || []).filter(function (q) { return q.titulo === p.titulo; }).length;
+      var rot = leiParteRotulos(p);
+      return '<button type="button" class="lei-parte ' + estado + '" data-ir="' + p.id + '">' +
+        '<span class="lp-top"><span class="lp-tit">' + leiEscapar(rot.cima) + '</span>' +
+        '<span class="lp-selo">' + selo + '</span></span>' +
+        '<b class="lp-nome">' + leiEscapar(rot.nome) + '</b>' +
+        '<span class="lp-prog"><i style="width:' + pc + '%"></i></span>' +
+        '<small class="lp-pc">' + f + ' de ' + n + ' dispositivos' +
+        (nq ? ' · ' + nq + (nq === 1 ? ' questão no fecho' : ' questões no fecho') : '') + '</small></button>';
+    }).join('');
+
+    $('leiIndice').querySelectorAll('[data-ir]').forEach(function (bt) {
+      bt.addEventListener('click', function () { leiAbrirParte(bt.dataset.ir); });
+    });
+  }
+
+  /* ---------------- a leitura de uma parte ---------------- */
+  function leiAbrirParte(id) {
+    var p = leiParteDe(leiAtual, id); if (!p) return;
+    leiParte = p;
+    var pr = leiProg(leiAtual.id);
+    pr.ultima = p.id;
+    /* retoma no dispositivo seguinte ao último fixado; parte fechada
+       recomeça do zero, em revisão */
+    var f = leiFeitos(leiAtual, p);
+    leiIdx = f >= p.artigos.length ? 0 : f;
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+    leiRenderArtigo();
+  }
+  function leiPassoUI() {
+    var p = leiParte;
     $('leiPasso').textContent = leiEmQuiz
       ? 'Questão ' + (leiQIdx + 1) + ' de ' + leiQFila.length
-      : 'Dispositivo ' + (leiIdx + 1) + ' de ' + total;
-    $('leiFill').style.width = Math.round(((leiEmQuiz ? leiIdx + 1 : leiIdx) / total) * 100) + '%';
+      : 'Dispositivo ' + (leiIdx + 1) + ' de ' + p.artigos.length;
+    $('leiFill').style.width = Math.round(((leiEmQuiz ? p.artigos.length : leiIdx) / p.artigos.length) * 100) + '%';
   }
   function leiRenderArtigo() {
-    var art = leiAtual.artigos[leiIdx];
+    var art = leiParte.artigos[leiIdx];
     leiEmQuiz = false; leiPecaSel = null;
+    $('leiIndice').style.display = 'none';
     $('leiArtigo').style.display = ''; $('leiQuiz').style.display = 'none';
+    $('btnLeiVoltar').style.display = ''; $('leiRodape').style.display = '';
+    $('leiParteRot').textContent = leiParteNome(leiParte);
     $('leiArtN').textContent = art.n;
     var i = 0;
     $('leiArtTxt').innerHTML = leiEscapar(art.texto).replace(/\{\{([^}]+)\}\}/g, function (_, palavra) {
-      var alvo = '<span class="lei-gap" data-gap="' + (i++) + '" data-certo="' + leiEscapar(palavra.trim()) + '" tabindex="0" role="button" aria-label="lacuna"></span>';
-      return alvo;
+      return '<span class="lei-gap" data-gap="' + (i++) + '" data-certo="' + leiEscapar(palavra.trim()) + '" tabindex="0" role="button" aria-label="lacuna"></span>';
     });
     $('leiRefs').innerHTML = (art.refs && art.refs.length)
       ? '<span class="lr-lb">Dispositivos relacionados</span>' +
         art.refs.map(function (r) { return '<span class="lr-chip">' + leiEscapar(r) + '</span>'; }).join('')
       : '';
-    var pecas = leiEmbaralhar(leiLacunas(art).concat(art.distratores || []));
+    var pecas = leiEmbaralhar(leiLacunas(art).concat(art.alternativas || art.distratores || []));
     $('leiPecas').innerHTML = pecas.map(function (pc, k) {
       return '<button type="button" class="lei-peca" draggable="true" data-peca="' + k + '" data-val="' + leiEscapar(pc) + '">' + leiEscapar(pc) + '</button>';
     }).join('');
+    $('leiBandeja').style.display = '';
+    $('leiGab').style.display = 'none'; $('leiGab').innerHTML = '';
     $('leiAviso').textContent = ''; $('leiAviso').className = 'lei-aviso';
-    $('leiPremio').textContent = '+' + LEI_SCORE_ART + ' score · +' + LEI_COIN_ART + ' QdC';
-    $('btnLeiConferir').textContent = 'Conferir';
+    $('leiAvisoAcao').style.display = 'none';
+    $('leiPremio').textContent = leiFeitos(leiAtual, leiParte) > leiIdx
+      ? 'revisão · sem nova pontuação'
+      : '+' + LEI_SCORE_ART + ' score · +' + LEI_COIN_ART + ' QdC';
+    leiBotao('conferir', 'Conferir');
+    $('btnLeiRepetir').style.display = 'none';
     leiLigarInteracao();
-    leiProgressoUI();
+    leiPassoUI();
   }
+  function leiBotao(acao, rot) { leiAcao = acao; $('btnLeiConferir').textContent = rot; }
+
   /* toque e arraste no mesmo componente */
   function leiLigarInteracao() {
     $('leiPecas').querySelectorAll('.lei-peca').forEach(function (pc) {
@@ -166,6 +263,15 @@
     g.textContent = ''; delete g.dataset.val; delete g.dataset.peca;
     g.classList.remove('cheia', 'erro', 'ok');
   }
+  /* marca o dispositivo como percorrido (com ou sem acerto): é isso que
+     impede pontuar duas vezes pelo mesmo dispositivo */
+  function leiMarcarFeito() {
+    var pr = leiProg(leiAtual.id);
+    if ((pr.partes[leiParte.id] || 0) <= leiIdx) pr.partes[leiParte.id] = leiIdx + 1;
+    if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
+  }
+  function leiInedito() { return (leiProg(leiAtual.id).partes[leiParte.id] || 0) <= leiIdx; }
+
   function leiConferirArtigo() {
     var gaps = Array.prototype.slice.call($('leiArtTxt').querySelectorAll('.lei-gap'));
     var vazias = gaps.filter(function (g) { return !g.dataset.val; });
@@ -183,43 +289,82 @@
     });
     if (erros) {
       $('leiAviso').textContent = erros === 1
-        ? 'Uma peça está no lugar errado — toque nela para devolver e tente de novo.'
-        : erros + ' peças estão no lugar errado — toque nelas para devolver e tente de novo.';
+        ? 'Uma peça está no lugar errado. Tente de novo ou veja o gabarito.'
+        : erros + ' peças estão no lugar errado. Tente de novo ou veja o gabarito.';
       $('leiAviso').className = 'lei-aviso erro';
+      $('leiAvisoAcao').style.display = '';
       return;
     }
     /* acertou o dispositivo inteiro */
-    $('leiAviso').textContent = 'Dispositivo completo! ' + leiAtual.artigos[leiIdx].n + ' fixado.';
+    var art = leiParte.artigos[leiIdx];
+    $('leiAviso').textContent = 'Dispositivo completo! ' + art.n + ' fixado.';
     $('leiAviso').className = 'lei-aviso ok';
-    var art = leiAtual.artigos[leiIdx];
-    if (!leiProgresso[leiAtual.id] || leiProgresso[leiAtual.id] <= leiIdx) {
-      leiProgresso[leiAtual.id] = leiIdx + 1;
+    $('leiAvisoAcao').style.display = 'none';
+    if (leiInedito()) {
+      leiMarcarFeito();
       addPontos(LEI_SCORE_ART, '');
       ledgerOp({ tipo: 'leitura de lei · ' + art.n, origem: 'Leitura de Lei Seca', destino: nomeCurto(), autor: nomeCurto() }, function () {
         addScore(LEI_COIN_ART, art.n + ' fixado · +' + LEI_SCORE_ART + ' score e +' + LEI_COIN_ART + ' QdC');
       });
-      if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
     }
-    $('btnLeiConferir').textContent = 'Avançar ›';
-    $('btnLeiConferir').dataset.pronto = '1';
+    leiBotao('avancar', 'Avançar ›');
   }
+
+  /* VER GABARITO — o dispositivo inteiro na forma correta. Vale como
+     erro: não pontua, mas conta como percorrido. */
+  function leiVerGabarito() {
+    var art = leiParte.artigos[leiIdx];
+    var certo = leiEscapar(art.texto).replace(/\{\{([^}]+)\}\}/g, function (_, palavra) {
+      return '<b>' + leiEscapar(palavra.trim()) + '</b>';
+    });
+    $('leiGab').innerHTML = '<span class="k-label">Gabarito · ' + leiEscapar(art.n) + '</span>' +
+      '<p class="lei-gab-txt">' + certo + '</p>' +
+      '<small class="lei-gab-nota">Dispositivo marcado como <strong>errado</strong> — sem pontuação desta vez. Repita para fixar ou siga para o próximo.</small>';
+    $('leiGab').style.display = '';
+    $('leiBandeja').style.display = 'none';
+    $('leiAvisoAcao').style.display = 'none';
+    $('leiAviso').textContent = ''; $('leiAviso').className = 'lei-aviso';
+    $('leiPremio').textContent = 'sem pontuação';
+    leiMarcarFeito();
+    $('btnLeiRepetir').style.display = '';
+    leiBotao('avancar', 'Avançar ›');
+  }
+  function leiRepetirArtigo() { leiRenderArtigo(); }
+
+  /* ---------------- avanço e fecho da parte ---------------- */
   function leiAvancar() {
-    delete $('btnLeiConferir').dataset.pronto;
-    var art = leiAtual.artigos[leiIdx];
-    /* o bloco de questões entra depois do artigo marcado */
-    var doBloco = (leiAtual.questoes || []).filter(function (q) { return q.apos === art.n; });
-    if (doBloco.length) { leiQFila = doBloco; leiQIdx = 0; leiRenderQuestao(); return; }
-    leiProximoArtigo();
+    if (leiIdx + 1 < leiParte.artigos.length) { leiIdx++; leiRenderArtigo(); return; }
+    leiFecharParte();
   }
-  function leiProximoArtigo() {
-    if (leiIdx + 1 >= leiAtual.artigos.length) { leiConcluir(); return; }
-    leiIdx++;
-    leiRenderArtigo();
+  /* ao FECHAR a parte entram as questões — sorteadas entre as questões
+     dos títulos que o aluno já revisou (nunca de matéria que ele ainda
+     não viu) */
+  function leiQuestoesDoBloco() {
+    var l = leiAtual, vistos = {};
+    leiPartes(l).forEach(function (p) { if (leiParteOk(l, p)) vistos[p.titulo] = 1; });
+    var pool = (l.questoes || []).filter(function (q) { return vistos[q.titulo]; });
+    return leiEmbaralhar(pool).slice(0, LEI_Q_BLOCO);
   }
+  function leiFecharParte() {
+    var fila = leiQuestoesDoBloco();
+    if (!fila.length) { leiVoltarIndice('Parte concluída! ' + leiParteNome(leiParte) + '.'); return; }
+    leiQFila = fila; leiQIdx = 0;
+    leiRenderQuestao();
+  }
+  function leiVoltarIndice(msg) {
+    if (msg) toast(msg);
+    leiRenderIndice();
+  }
+
+  /* ---------------- bloco de questões ---------------- */
   function leiRenderQuestao() {
     leiEmQuiz = true;
     var q = leiQFila[leiQIdx];
-    $('leiArtigo').style.display = 'none'; $('leiQuiz').style.display = '';
+    $('leiArtigo').style.display = 'none'; $('leiIndice').style.display = 'none';
+    $('leiQuiz').style.display = ''; $('leiRodape').style.display = '';
+    $('btnLeiRepetir').style.display = 'none';
+    $('leiQSel').textContent = 'Fecho da parte · questão de fixação';
+    $('leiQTit').textContent = 'Cobra: ' + q.titulo;
     $('leiQEnun').textContent = q.enunciado;
     $('leiQAlts').innerHTML = q.alternativas.map(function (a, i) {
       return '<button type="button" class="q-alt lei-q-alt" data-alt="' + i + '">' +
@@ -227,7 +372,7 @@
     }).join('');
     $('leiQComent').textContent = ''; $('leiQComent').classList.remove('on');
     $('leiPremio').textContent = '+' + LEI_SCORE_Q + ' score · +' + LEI_COIN_Q + ' QdC';
-    $('btnLeiConferir').textContent = 'Responder';
+    leiBotao('responder', 'Responder');
     $('leiQAlts').querySelectorAll('[data-alt]').forEach(function (bt) {
       bt.addEventListener('click', function () {
         if ($('leiQComent').classList.contains('on')) return;   /* já respondida */
@@ -235,13 +380,12 @@
         bt.classList.add('sel');
       });
     });
-    leiProgressoUI();
+    leiPassoUI();
   }
   function leiResponderQuestao() {
     var q = leiQFila[leiQIdx];
     var sel = $('leiQAlts').querySelector('.sel');
     if (!sel) { toast('Escolha uma alternativa.'); return; }
-    if ($('leiQComent').classList.contains('on')) { leiProximaQuestao(); return; }
     var certa = parseInt(sel.dataset.alt, 10) === q.correta;
     $('leiQAlts').querySelectorAll('[data-alt]').forEach(function (bt) {
       var i = parseInt(bt.dataset.alt, 10);
@@ -257,60 +401,83 @@
       });
       if (typeof evolAtivo !== 'undefined' && evolAtivo && typeof evolMarcar === 'function') evolMarcar();
     }
-    $('btnLeiConferir').textContent = leiQIdx + 1 < leiQFila.length ? 'Próxima questão ›' : 'Continuar a leitura ›';
+    leiBotao('proxima', leiQIdx + 1 < leiQFila.length ? 'Próxima questão ›' : 'Voltar ao índice ›');
   }
   function leiProximaQuestao() {
     if (leiQIdx + 1 < leiQFila.length) { leiQIdx++; leiRenderQuestao(); return; }
     leiQFila = []; leiEmQuiz = false;
-    leiProximoArtigo();
+    leiVoltarIndice('Parte concluída! ' + leiParteNome(leiParte) + '.');
   }
-  function leiConcluir() {
-    toast('Você concluiu a leitura de ' + leiAtual.nome + '!');
-    leiFechar();
-  }
+
   (function () {
     if (!$('leiLayer')) return;
     $('btnLeiSair').addEventListener('click', leiFechar);
+    $('btnLeiVoltar').addEventListener('click', function () { leiVoltarIndice(''); });
+    $('btnLeiGabarito').addEventListener('click', leiVerGabarito);
+    $('btnLeiRepetir').addEventListener('click', leiRepetirArtigo);
     $('btnLeiConferir').addEventListener('click', function () {
-      if (leiEmQuiz) { leiResponderQuestao(); return; }
-      if ($('btnLeiConferir').dataset.pronto) { leiAvancar(); return; }
-      leiConferirArtigo();
+      if (leiAcao === 'conferir') { leiConferirArtigo(); return; }
+      if (leiAcao === 'avancar') { leiAvancar(); return; }
+      if (leiAcao === 'responder') { leiResponderQuestao(); return; }
+      if (leiAcao === 'proxima') { leiProximaQuestao(); return; }
     });
   })();
-  window.__lei = function () { return { atual: leiAtual, idx: leiIdx, progresso: leiProgresso, quiz: leiEmQuiz }; };
+  window.__lei = function () {
+    return { atual: leiAtual, parte: leiParte, idx: leiIdx, progresso: leiProgresso, quiz: leiEmQuiz, acao: leiAcao };
+  };
+  window.__leiQFila = function () { return leiQFila; };          /* para a suíte */
+  window.__leiQAtual = function () { return leiQFila[leiQIdx]; };
 
   /* ================== PAINEL: publicar uma lei ==================
-     O CSV traz uma linha por dispositivo. ART = artigo (texto com as
-     lacunas em {{ }}, opções = distratores, extra = dispositivos de
-     referência). QUESTAO = bloco de fixação (ref = artigo depois do
-     qual ele aparece, opções = alternativas, extra = o número da
-     alternativa correta).                                          */
-  function leiParseCSV(txt) {
+     Dois CSVs, como a lei é de verdade:
+     1) CONTEÚDO — uma linha por dispositivo:
+        titulo;capitulo;dispositivo;texto;alternativas;referencias
+        O título e o capítulo dizem onde o dispositivo mora; linhas
+        seguidas com o mesmo par viram UMA parte de estudo.
+     2) QUESTÕES — uma linha por questão, amarrada ao TÍTULO:
+        titulo;enunciado;alternativas;correta;comentario            */
+  function leiLinhas(txt, cab) {
     var linhas = String(txt).split(/\r?\n/).filter(function (l) { return l.trim(); });
-    if (!linhas.length) throw new Error('O CSV está vazio.');
-    if (/^\s*tipo\s*;/i.test(linhas[0])) linhas.shift();   /* cabeçalho é opcional */
-    var artigos = [], questoes = [];
-    linhas.forEach(function (linha, n) {
+    if (!linhas.length) return [];
+    if (new RegExp('^\\s*' + cab + '\\s*;', 'i').test(linhas[0])) linhas.shift();   /* cabeçalho é opcional */
+    return linhas;
+  }
+  function leiSepara(v) {
+    return String(v || '').split('|').map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+  function leiParseCSVLei(txt) {
+    var linhas = leiLinhas(txt, 'titulo');
+    if (!linhas.length) throw new Error('O CSV da lei está vazio.');
+    var partes = [], atual = null, n = 0;
+    linhas.forEach(function (linha, k) {
       var c = linha.split(';').map(function (x) { return x.trim(); });
-      var tipo = (c[0] || '').toUpperCase();
-      if (tipo === 'ART') {
-        if (!c[1] || !c[2]) throw new Error('Linha ' + (n + 1) + ': artigo sem referência ou sem texto.');
-        if (!/\{\{[^}]+\}\}/.test(c[2])) throw new Error('Linha ' + (n + 1) + ': o texto do ' + c[1] + ' não tem nenhuma lacuna marcada com {{ }}.');
-        artigos.push({ n: c[1], texto: c[2],
-          distratores: (c[3] || '').split('|').map(function (x) { return x.trim(); }).filter(Boolean),
-          refs: (c[4] || '').split('|').map(function (x) { return x.trim(); }).filter(Boolean) });
-      } else if (tipo === 'QUESTAO') {
-        var alts = (c[3] || '').split('|').map(function (x) { return x.trim(); }).filter(Boolean);
-        var gab = parseInt(c[4], 10);
-        if (alts.length < 2) throw new Error('Linha ' + (n + 1) + ': a questão precisa de ao menos duas alternativas.');
-        if (!gab || gab < 1 || gab > alts.length) throw new Error('Linha ' + (n + 1) + ': a alternativa correta deve ser um número de 1 a ' + alts.length + '.');
-        questoes.push({ apos: c[1], enunciado: c[2], alternativas: alts, correta: gab - 1, comentario: c[5] || '' });
-      } else {
-        throw new Error('Linha ' + (n + 1) + ': o tipo deve ser ART ou QUESTAO (veio “' + (c[0] || '') + '”).');
+      var titulo = c[0], capitulo = c[1] || '', disp = c[2], texto = c[3];
+      if (!titulo) throw new Error('CSV da lei, linha ' + (k + 1) + ': falta o título (1ª coluna) — é ele que divide a lei.');
+      if (!disp || !texto) throw new Error('CSV da lei, linha ' + (k + 1) + ': falta o dispositivo (3ª coluna) ou o texto (4ª coluna).');
+      if (!/\{\{[^}]+\}\}/.test(texto)) throw new Error('CSV da lei, linha ' + (k + 1) + ': o texto de ' + disp + ' não tem nenhuma lacuna marcada com {{ }}.');
+      if (!atual || atual.titulo !== titulo || atual.capitulo !== capitulo) {
+        atual = { id: 'pt' + (++n), titulo: titulo, capitulo: capitulo, artigos: [] };
+        partes.push(atual);
       }
+      atual.artigos.push({ n: disp, texto: texto, alternativas: leiSepara(c[4]), refs: leiSepara(c[5]) });
     });
-    if (!artigos.length) throw new Error('O CSV não trouxe nenhum artigo (linha ART).');
-    return { artigos: artigos, questoes: questoes };
+    return partes;
+  }
+  function leiParseCSVQuestoes(txt, partes) {
+    var linhas = leiLinhas(txt, 'titulo');
+    if (!linhas.length) throw new Error('O CSV das questões está vazio.');
+    var titulos = {};
+    partes.forEach(function (p) { titulos[p.titulo] = 1; });
+    return linhas.map(function (linha, k) {
+      var c = linha.split(';').map(function (x) { return x.trim(); });
+      var alts = leiSepara(c[2]), gab = parseInt(c[3], 10);
+      if (!c[0]) throw new Error('CSV das questões, linha ' + (k + 1) + ': falta o título (1ª coluna).');
+      if (!titulos[c[0]]) throw new Error('CSV das questões, linha ' + (k + 1) + ': o título “' + c[0] + '” não existe no CSV da lei — escreva exatamente igual.');
+      if (!c[1]) throw new Error('CSV das questões, linha ' + (k + 1) + ': falta o enunciado (2ª coluna).');
+      if (alts.length < 2) throw new Error('CSV das questões, linha ' + (k + 1) + ': são necessárias ao menos duas alternativas, separadas por |.');
+      if (!gab || gab < 1 || gab > alts.length) throw new Error('CSV das questões, linha ' + (k + 1) + ': a alternativa correta deve ser um número de 1 a ' + alts.length + '.');
+      return { titulo: c[0], enunciado: c[1], alternativas: alts, correta: gab - 1, comentario: c[4] || '' };
+    });
   }
   function renderLeiEditais() {
     var host = $('admLeiEditais'); if (!host) return;
@@ -323,9 +490,10 @@
   function renderLeiAdm() {
     var el = $('admLeiLista'); if (!el) return;
     el.innerHTML = LEIS_SECAS.map(function (l) {
-      var nq = (l.questoes || []).length;
-      return '<div class="adm-bar"><span class="nm">' + l.nome + ' <span class="tag">' + l.artigos.length + ' DISPOSITIVOS</span>' +
-        '<small>' + l.desc + ' · ' + nq + (nq === 1 ? ' questão' : ' questões') + ' · ' + leiEditalNomes(l.editais) + '</small></span>' +
+      var nq = (l.questoes || []).length, np = leiPartes(l).length;
+      return '<div class="adm-bar"><span class="nm">' + l.nome + ' <span class="tag">' + np + (np === 1 ? ' PARTE' : ' PARTES') + '</span>' +
+        '<small>' + l.desc + ' · ' + leiTotal(l) + ' dispositivos · ' + nq + (nq === 1 ? ' questão' : ' questões') +
+        ' · ' + leiEditalNomes(l.editais) + '</small></span>' +
         '<button class="adm-x" data-rm-lei="' + l.id + '" aria-label="Tirar do ar">✕</button></div>';
     }).join('') || '<p class="sub" style="padding:8px 0">Nenhuma lei publicada ainda.</p>';
     el.querySelectorAll('[data-rm-lei]').forEach(function (b) {
@@ -340,12 +508,15 @@
   (function () {
     var bt = $('btnAdmLei'); if (!bt) return;
     renderLeiEditais();
-    var arq = $('admLeiArq');
-    if (arq) arq.addEventListener('change', function () {
-      var f = arq.files && arq.files[0]; if (!f) return;
-      var fr = new FileReader();
-      fr.onload = function () { $('admLeiCsv').value = fr.result; toast('CSV “' + f.name + '” carregado — confira e publique.'); };
-      fr.readAsText(f);
+    /* cada CSV tem seu campo e seu arquivo — nunca os dois no mesmo lugar */
+    [['admLeiArq', 'admLeiCsv'], ['admLeiQArq', 'admLeiQCsv']].forEach(function (par) {
+      var arq = $(par[0]); if (!arq) return;
+      arq.addEventListener('change', function () {
+        var f = arq.files && arq.files[0]; if (!f) return;
+        var fr = new FileReader();
+        fr.onload = function () { $(par[1]).value = fr.result; toast('CSV “' + f.name + '” carregado — confira e publique.'); };
+        fr.readAsText(f);
+      });
     });
     bt.addEventListener('click', function () {
       var erro = $('admLeiErro');
@@ -356,18 +527,21 @@
       if (!nome || /["<>]/.test(nome)) { falha('Dê um nome válido à lei.'); return; }
       if (LEIS_SECAS.some(function (l) { return l.nome.toLowerCase() === nome.toLowerCase(); })) { falha('Já existe uma lei publicada com esse nome.'); return; }
       if (!eds.length) { falha('Escolha ao menos um edital em que a lei cai.'); return; }
-      var txt = $('admLeiCsv').value.trim();
-      if (!txt) { falha('Cole o CSV com os artigos (ou escolha o arquivo).'); return; }
-      var dados;
-      try { dados = leiParseCSV(txt); } catch (e) { falha(e.message); return; }
+      var txtLei = $('admLeiCsv').value.trim(), txtQ = $('admLeiQCsv').value.trim();
+      if (!txtLei) { falha('Falta o CSV 1 — o conteúdo da lei (cole o texto ou escolha o arquivo).'); return; }
+      if (!txtQ) { falha('Falta o CSV 2 — o banco de questões (cole o texto ou escolha o arquivo).'); return; }
+      var partes, questoes;
+      try { partes = leiParseCSVLei(txtLei); } catch (e) { falha(e.message); return; }
+      try { questoes = leiParseCSVQuestoes(txtQ, partes); } catch (e) { falha(e.message); return; }
       LEIS_SECAS.push({ id: 'lei' + Date.now(), nome: nome, desc: desc || 'lei publicada pela administração',
-        editais: eds, artigos: dados.artigos, questoes: dados.questoes, criada: true });
-      $('admLeiNome').value = ''; $('admLeiDesc').value = ''; $('admLeiCsv').value = '';
+        editais: eds, partes: partes, questoes: questoes, criada: true });
+      $('admLeiNome').value = ''; $('admLeiDesc').value = '';
+      $('admLeiCsv').value = ''; $('admLeiQCsv').value = '';
       $('admLeiEditais').querySelectorAll('input:checked').forEach(function (x) { x.checked = false; });
       renderLeiAdm(); renderLeiLista();
-      toast('“' + nome + '” publicada · ' + dados.artigos.length + ' dispositivos e ' + dados.questoes.length + ' questões.');
+      var nd = partes.reduce(function (s, p) { return s + p.artigos.length; }, 0);
+      toast('“' + nome + '” publicada · ' + partes.length + ' partes, ' + nd + ' dispositivos e ' + questoes.length + ' questões.');
     });
   })();
   renderLeiLista();
   renderLeiAdm();
-

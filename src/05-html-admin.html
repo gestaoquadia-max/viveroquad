@@ -281,22 +281,54 @@
               </div>
               <div class="k-label sub-k" style="margin-top:10px">Em quais editais ela cai</div>
               <div class="lei-editais" id="admLeiEditais"></div>
-              <div class="k-label sub-k" style="margin-top:10px">Artigos, dispositivos e questões (CSV)</div>
-              <p class="sub" style="margin:2px 0 6px">Uma linha por dispositivo. Marque com <code>{{ }}</code> os trechos que viram lacuna. Colunas separadas por <strong>;</strong> e opções por <strong>|</strong>:</p>
-              <pre class="lei-csv-ex">tipo;ref;texto;opcoes;extra
-ART;Art. 1º;Esta Lei institui o {{Regime Jurídico}} dos servidores…;empresas públicas|autarquias;CF/88, art. 39
-QUESTAO;Art. 1º;Os cargos públicos são criados por:;decreto|lei|portaria;2</pre>
-              <textarea class="fld" id="admLeiCsv" rows="5" placeholder="Cole aqui o conteúdo do CSV…"></textarea>
-              <div class="adm-row" style="margin-top:8px; align-items:center">
-                <input type="file" id="admLeiArq" accept=".csv,text/csv" class="fld" style="max-width:190px">
-                <span class="sub" style="flex:1">ou escolha o arquivo .csv</span>
+              <!-- CSV 1 · o texto da lei, dividido como ela é -->
+              <div class="lei-csv-bloco">
+                <div class="k-label sub-k">CSV 1 · o conteúdo da lei</div>
+                <p class="sub" style="margin:2px 0 6px">Uma linha por <strong>dispositivo</strong>, na ordem da lei. As duas primeiras colunas dizem <strong>onde ele mora</strong> — título e capítulo/seção (deixe o capítulo vazio quando não houver). Linhas seguidas com o mesmo título e capítulo viram <strong>uma parte de estudo</strong>, e é no fecho dela que entram as questões. No texto, marque entre <code>{{ }}</code> os trechos que viram lacuna; em <em>alternativas</em> vão as peças erradas que entram embaralhadas com as certas.</p>
+                <div class="lei-csv-cols">
+                  <span><b>titulo</b> Título I · Das Disposições Preliminares</span>
+                  <span><b>capitulo</b> Capítulo I · Do Provimento <i>(pode ficar vazio)</i></span>
+                  <span><b>dispositivo</b> Art. 1º · Art. 3º, parágrafo único · Art. 5º, § 2º</span>
+                  <span><b>texto</b> o dispositivo com as <code>{{lacunas}}</code></span>
+                  <span><b>alternativas</b> peças erradas, separadas por <strong>|</strong></span>
+                  <span><b>referencias</b> dispositivos relacionados, separados por <strong>|</strong></span>
+                </div>
+                <pre class="lei-csv-ex">titulo;capitulo;dispositivo;texto;alternativas;referencias
+Título I · Das Disposições Preliminares;;Art. 1º;Esta Lei institui o {{Regime Jurídico}} dos Servidores Públicos Civis da União;empresas públicas|sociedades de economia mista;CF/88, art. 39
+Título I · Das Disposições Preliminares;;Art. 4º;É proibida a prestação de serviços {{gratuitos}}, salvo os casos previstos em lei;remunerados|voluntários;</pre>
+                <textarea class="fld" id="admLeiCsv" rows="5" placeholder="Cole aqui o CSV com o conteúdo da lei…"></textarea>
+                <div class="adm-row" style="margin-top:8px; align-items:center">
+                  <input type="file" id="admLeiArq" accept=".csv,text/csv" class="fld" style="max-width:190px">
+                  <span class="sub" style="flex:1">ou escolha o arquivo .csv da lei</span>
+                </div>
               </div>
+
+              <!-- CSV 2 · o banco de questões, por título -->
+              <div class="lei-csv-bloco">
+                <div class="k-label sub-k">CSV 2 · o banco de questões</div>
+                <p class="sub" style="margin:2px 0 6px">Uma linha por <strong>questão</strong>. O <strong>título</strong> diz de que parte da lei ela cobra e precisa estar escrito <strong>exatamente igual</strong> ao do CSV 1. Quando o aluno fecha uma parte, o app sorteia questões entre as dos títulos que ele <strong>já revisou</strong> — nunca de matéria que ele ainda não viu.</p>
+                <div class="lei-csv-cols">
+                  <span><b>titulo</b> o mesmo título do CSV 1</span>
+                  <span><b>enunciado</b> o que a questão pergunta</span>
+                  <span><b>alternativas</b> separadas por <strong>|</strong></span>
+                  <span><b>correta</b> o número da alternativa certa (1, 2, 3…)</span>
+                  <span><b>comentario</b> o porquê, citando o dispositivo</span>
+                </div>
+                <pre class="lei-csv-ex">titulo;enunciado;alternativas;correta;comentario
+Título I · Das Disposições Preliminares;Os cargos públicos são criados por:;decreto|lei|portaria|resolução;2;Art. 3º, parágrafo único: criados por LEI.</pre>
+                <textarea class="fld" id="admLeiQCsv" rows="4" placeholder="Cole aqui o CSV com as questões…"></textarea>
+                <div class="adm-row" style="margin-top:8px; align-items:center">
+                  <input type="file" id="admLeiQArq" accept=".csv,text/csv" class="fld" style="max-width:190px">
+                  <span class="sub" style="flex:1">ou escolha o arquivo .csv das questões</span>
+                </div>
+              </div>
+
               <div class="adm-alerta" id="admLeiErro"></div>
               <div style="margin-top:10px"><button class="btn small" id="btnAdmLei">Publicar lei</button></div>
             </div>
             <div class="adm-sep"><span>Leis publicadas</span></div>
             <div id="admLeiLista"></div>
-            <p class="sub" style="margin-top:8px">A lei entra na hora em <strong>Leitura de Lei Seca</strong>, no menu “+” do aluno. Em <strong>QUESTAO</strong>, a coluna <em>ref</em> diz depois de qual artigo o bloco aparece e <em>extra</em> é o número da alternativa correta. Toque no ✕ para tirar do ar.</p>
+            <p class="sub" style="margin-top:8px">A lei entra na hora em <strong>Leitura de Lei Seca</strong>, no menu “+” do aluno, já dividida pelas partes do CSV 1. O aluno abre onde parou e pode avançar para qualquer parte. Toque no ✕ para tirar do ar.</p>
           </div>
 
           <div class="p-card" data-bl="gift">

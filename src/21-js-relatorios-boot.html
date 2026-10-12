@@ -228,8 +228,9 @@
            mochila mostrando outra coisa). v:3 = dec. 211, histórico de
            aquisição de cada item; v:4 = dec. 216, a loja do aluno;
            v:5 = dec. 218, títulos e condecorações; v:6 = dec. 221, a
-           leitura de lei seca já percorrida.                           */
-        v: 6, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
+           leitura de lei seca já percorrida; v:7 = dec. 221-b, a leitura
+           guarda o progresso por PARTE da lei (título/capítulo).        */
+        v: 7, id: (typeof MEU_ID !== 'undefined') ? MEU_ID : '', score: score, diamantes: diamantes,
         carreira: carreira,
         mochila: (typeof MOCHILA !== 'undefined') ? MOCHILA : [],
         questEq: (typeof questEquipada !== 'undefined') ? questEquipada : null,
@@ -250,7 +251,7 @@
   function evolCarregar() {
     var raw = lsGet(VQ_EVOL); if (!raw) return false;
     var d; try { d = JSON.parse(raw); } catch (e) { return false; }
-    if (!d || d.v !== 6) return false;   /* build antigo → demonstração zera */
+    if (!d || d.v !== 7) return false;   /* build antigo → demonstração zera */
     if (typeof d.score === 'number') score = d.score;
     if (typeof d.diamantes === 'number') diamantes = d.diamantes;
     if (d.carreira) for (var k in d.carreira) if (d.carreira.hasOwnProperty(k)) carreira[k] = d.carreira[k];

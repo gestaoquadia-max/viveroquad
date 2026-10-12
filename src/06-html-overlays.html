@@ -370,6 +370,7 @@
         <div class="lei-layer" id="leiLayer">
           <div class="lei-topo">
             <button class="storage-close" id="btnLeiSair" aria-label="Sair da leitura">✕</button>
+            <button class="lei-voltar" id="btnLeiVoltar" style="display:none">‹ Índice da lei</button>
             <div class="lei-id">
               <div class="k-label" id="leiNome">—</div>
               <div class="lei-passo" id="leiPasso">—</div>
@@ -378,26 +379,45 @@
           </div>
 
           <div class="lei-corpo" id="leiCorpo">
-            <!-- etapa: completar o artigo -->
-            <div id="leiArtigo">
-              <div class="lei-art-n" id="leiArtN">—</div>
+            <!-- etapa: o índice da lei (títulos, capítulos, seções) -->
+            <div id="leiIndice">
+              <div id="leiRetomar"></div>
+              <div class="k-label" style="margin-top:14px">Partes da lei</div>
+              <div id="leiPartes"></div>
+              <p class="sub" style="margin-top:10px">Você pode <strong>avançar para qualquer parte</strong> — a leitura abre onde você parou, mas o caminho é seu.</p>
+            </div>
+            <!-- etapa: completar o dispositivo -->
+            <div id="leiArtigo" style="display:none">
+              <div class="lei-art-topo">
+                <span class="lei-parte-rot" id="leiParteRot">—</span>
+                <span class="lei-art-n" id="leiArtN">—</span>
+              </div>
               <p class="lei-art-txt" id="leiArtTxt"></p>
               <div class="lei-refs" id="leiRefs"></div>
-              <div class="k-label lei-bandeja-lb">Arraste ou toque para completar</div>
-              <div class="lei-pecas" id="leiPecas"></div>
+              <!-- gabarito do dispositivo (depois do erro) -->
+              <div class="lei-gab" id="leiGab" style="display:none"></div>
+              <div id="leiBandeja">
+                <div class="k-label lei-bandeja-lb">Arraste ou toque para completar</div>
+                <div class="lei-pecas" id="leiPecas"></div>
+              </div>
               <div class="lei-aviso" id="leiAviso"></div>
+              <div class="lei-aviso-acao" id="leiAvisoAcao" style="display:none">
+                <button class="btn small ghost" id="btnLeiGabarito">Ver gabarito</button>
+              </div>
             </div>
-            <!-- etapa: bloco de questões -->
+            <!-- etapa: bloco de questões (só no fecho da parte) -->
             <div id="leiQuiz" style="display:none">
-              <div class="lei-quiz-sel">Bloco de questões · fixação</div>
+              <div class="lei-quiz-sel" id="leiQSel">Fecho da parte · questão de fixação</div>
+              <div class="lei-q-tit" id="leiQTit"></div>
               <p class="lei-q-enun" id="leiQEnun"></p>
               <div id="leiQAlts"></div>
               <div class="lei-coment" id="leiQComent"></div>
             </div>
           </div>
 
-          <div class="lei-rodape">
+          <div class="lei-rodape" id="leiRodape" style="display:none">
             <span class="lei-premio" id="leiPremio"></span>
+            <button class="btn small ghost" id="btnLeiRepetir" style="display:none">Repetir o dispositivo</button>
             <button class="btn" id="btnLeiConferir">Conferir</button>
           </div>
         </div>
